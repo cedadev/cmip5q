@@ -1,0 +1,19 @@
+<h1> Edit a Model Component </h1>
+
+<form action="/cmip5/components/{{centre}}/edit/{{component}}" method='post'>
+<p>{{form.title}}({{form.abbrev}}, type={{form.scienceType}}</p>
+<p>{{form.contact}}</p>
+<p>{{form.comments}}</p>
+</form>
+
+
+{% for r in required %}
+<li><form action='/cmip5/components/{{centre}}/add/{{r}}' method='get'>
+<input type="submit" value="Add {{%s}} subcomponent}}"/>
+</form></li>
+{% endfor %}
+</ul>
+    
+<p><form action='/cmip5/references' method='get'>
+<input type="submit" value="Add a new reference"/>
+</form>

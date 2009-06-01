@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="inner">
+<h1> Edit a Model Component </h1>
+
+<form action="{{url}}" method='post'>
+    <h4> Common Characteristics </h4>
+    <div class="inbox">
+    <p>Title: {{cform.title}}(Abbrev: {{cform.abbrev}}, type:  {{cform.scienceType}})</p>
+    <p>Contact:{{cform.contact}}</p>
+    <p>Description:{{cform.description}}</p>
+    </div>
+    <h4> Sub-Components</h4>
+        <div class="guidance">
+        <p> Any model component can consist of sub-components. There are
+        four options for handling those below</p>
+        <ol><li> You can link to a pre-existing subcomponent. Note that if you do that, 
+        all subcomponents which link to that subcomponent will inherit any changes to that subcomponent if you change it.</li>
+        <li> You can copy an existing subcomponent, modify it, and save it as new subcomponent, </li>
+        <li> You can select from the list of required subcomponents, and edit a new sub-component of that type, </li>
+        <li> You can create a completely new subcomponent (but only if you are editing an already saved component). </li>
+        </ol>
+        </div>
+       
+        <div class="inbox">
+            <p> Nothing in this box functions yet </p>
+            <div class="colmask3 threecol">
+                <div class="colmid">
+                    <div class="colleft">
+                        <div class="col1"><!-- Centre Column! -->
+                            <h4> Available SubComponents <h4>
+                             {{cform.components}}
+                        </div>
+                        <div class="col2">
+                            <h4>SubComponents</h4>
+                                <table width="100%">
+                                {% for s in subc %}
+                                <tr><td>{{s.abbrev}}</td></tr>
+                                {% endfor %}
+                                </table>
+                               
+                        </div>
+                        <div class="col3">
+                            <h4> Required SubComponents</h4>
+                                <ol>{% for r in required %}
+                                    <li><a href="/cmip5/components/addsub/{{component}}/{{r}}/">{{r}}</a></li>
+                                {% endfor %}</ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <center>
+            <a href="/cmip5/components/addsub/{{component}}/"> Add new subcomponent </a>
+            </center>
+        </div> 
+        <p> Note that your model will not validate until all the required
+        subcomponents have been entered </p>
+    <h4> Parameters </h4>
+    <div class="inbox">
+    <p> not yet implemented </p>
+    </div>     
+    <h4> References </h4>
+        <div class="guidance">
+            <p> To add a new reference to this component, you need to select it from the available list, and it will 
+            be attached to the component (and appear in the left hand column below). You may need to create a
+            reference first, then select it from the available list <p>
+        </div> 
+        <div class="inbox">
+            <div class="colmask3 threecol">
+                <div class="colmid">
+                    <div class="colleft">
+                        <div class="col1"><!-- Centre Column! -->
+                            <h4> Available References </h4>
+                             <p> (need to replace with select from scrollbar list) </p>
+                             <table width="100%">
+                                {% for r in refs %}
+                                <tr><td>{{r.mnemonic}}</td>
+                                    <td><a href="/cmip5/references/assign/{{component}}/{{r.id}}/">select</td></tr>
+                                {% endfor %}
+                                <tr><td col="2"><a href="/cmip5/references/add/">Add a new reference</a></td></tr>
+                                </table>
+                        </div>
+                        <div class="col2">
+                            <h4> References</h4>
+                                <table width="100%">
+                                {% for r in assignedrefs %}
+                                <tr> <td>{{r.mnemonic}}</td><td>edit</td><td>remove</td></tr>
+                                {% endfor %}
+                                </table>
+                        </div>
+                        <div class="col3">
+                            <h4> Search References</h4>
+                            (to be implemented)
+                        </div> <!-- col3 -->
+                    </div> <!-- colleft -->
+                </div> <!-- colmid -->
+            </div> <!-- colmask threecol -->
+            <p> The left hand column is the list of references attached to this componnet </p><!-- need a p here for the inbox div-->
+     </div> <!-- inbox -->
+    <input type="submit" value="Submit Modified Component"/>
+</form>
+</div>
+{% endblock%}

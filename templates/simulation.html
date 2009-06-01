@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2> {{label}} a simulation in {{exp.abbrev}}</h2>
+<form action="{{url}}" method="post">
+{{simform.as_p}}
+<input type="submit" value="{{label}}"/>
+</form>
+{% endblock %}

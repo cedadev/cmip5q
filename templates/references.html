@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1> References </h1>
+
+<table>
+<tr><td> Name</td><td>Authors</td><td>Citation</td><td></td></tr>
+{%for r in refs %}
+<tr><td><a href="/cmip5/references/edit/{{r.id}}/">{{r.name}}</a></td><td>{{r.citation}}</td>></tr>
+{% endfor %}
+<tr><td colspan="2"><form action='/cmip5/references/add' method='get'>
+<input type="submit" value="Add a new reference"/>
+</form></td></tr>
+</table>
+
+{% endblock %}

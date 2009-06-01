@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1> CMIP5 Modelling Centres </h1>
+
+<p>Choose your centre from below:</p>
+
+<form action='/cmip5/centres/' method='post'>
+{% for choice in centreList %}
+<input type="radio" name="choice" id="{{forloop.counter}}"
+value="{{choice.id}}"/>
+<label for="choice{{forloop.counter}}">{{choice.abbrev}}</label><br/>
+{% endfor %}
+<input type="submit" value="Choose"/>
+</form>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<table class="navmain">
+   <tr>
+      <td valign="top" width="200px"><div id="treeDiv" >
+      {{navtree|safe}}
+      </div></td>
+      <td valign="top" width="900px">
+<div class="inner">
+    <h1> Model Component {{c.abbrev }} </h1>
+    <form action="{{url}}" method='post'>
+    {{m}}
+    <div class="boxer">    
+        {{cform.management_form}}
+        <!--<h4> General Characteristics </h4>-->
+        <table>
+            <tr><td>Title</td><td>{{cform.title}}</td></tr>
+            <tr><td></td><td>(Abbrev: {{cform.abbrev}}, type:  {{cform.scienceType}})</td></tr>
+            <tr><td>Contact&nbsp;</td><td>{{cform.contact}}</td></tr>
+        </table>
+    </div>
+    <div class="boxer">
+        <!--<h4> Component Details </h4>-->
+        <!-- We don't know how many rows we have in each column, so using divs is easier -->
+        <div class="twocol">
+            <div class="tab300">
+                <h4> Sub Components </h4>
+                 <table width="100%">
+                    {% for s in subs %}
+                    <tr><td>{{s.abbrev}}</td><td><a href="/cmip5/components/edit/{{s.id}}/">edit</a></td></tr>
+                    {% endfor %}
+                    <!--<tr><td colspan="2"> <a href="/cmip5/components/addsubs/{{c.id}}/">Modify subcomponents </a></td></tr>-->
+                </table>
+                <center><a href="/cmip5/components/addsub/{{c.id}}/"> Add Subcomponent</a></center>
+            </div>
+            <div class="tab500">
+                <h4> Parameters </h4>
+                <div class="guidance"><p> Not all subcomponents will have parameters associated with them </p></div>
+                {{pset.management_form}}
+                <p class="cmip5q"> Still got work to do to change these boxes to have drop down lists of vocab etc </p>
+                <table>
+                <tr><th>Name</th><th>Value</th><th>Type</th></tr>
+                {% for f in pset.forms %}
+                <tr><td>{{f.id}}{{f.name}}</td><td>{{f.value}}</td><td>{{f.ptype}}</td></tr>
+                {% endfor %}
+                
+                </table>
+                <p class="cmip5q"> Not sure what to do about deletions. Do we want to allow them?</p>
+            </div>
+            <br style="clear:both"/><!-- Hack to make div expand vertically --> 
+            <p class="cmip5q"> Should we have the parameters and subcomponents in the same box? How
+               we handle them are quite different ... e.g. we update the form contents, or click on links ... </p>
+        </div> <!-- twocol -->
+    </div>
+    <div class="boxer">
+        <h4> References </h4>
+        <table width="100%" class="backgrey">
+            {% for r in refs%}
+            <tr><td width="33%"><a href="{{r.link}}">{{r.name}}</a></td><td>{{r.citation}}</td></tr>
+            {% endfor %}
+        </table>
+        <center><a href="/cmip5/components/addrefs/{{c.id}}"> Modify references</a></center>
+    </div>
+    <div class="boxer">
+    <h4> Additional Information </h4>
+    <center>
+    <p class="guidance">Please tell us how this component has
+    been improved from previous generations of this model: </p>
+    <p>{{cform.geneology}}</p>
+    <p class="guidance">Any additional information about this component: </p>
+    <p>{{cform.description}}</p> 
+    <p><input type="submit" value="update parameters and characteristics"/></p>
+    <p><a href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p>
+    </center>
+    </div>
+    </form>
+    
+    <!--<div class="boxer">
+        <center>
+        <a href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a>
+        {% if c.TCparentID %} <a href="/cmip5/components/edit/{{c.TCparentID}}/">Return to component: {{c.TCparentAbbrev}}</a> 
+        {% endif %}
+        </center>
+        <center>
+        </center>
+    </div>-->
+</div> 
+</td></tr></table>
+
+<!-- YUI treeview stuff for body -->
+<script type="text/javascript">
+
+//create our own namespace object
+YAHOO.namespace("protoq.tree");
+	                 
+//define the initTree function
+YAHOO.protoq.tree.initTree = function() {
+
+    //create a TreeView object
+    var tree = new YAHOO.widget.TreeView("treeDiv");
+
+    //Fix for non-activation of href link on single-clicking node label (YUI bug?):
+    //Subscribe to the "dblClickEvent" and do nothing.
+    tree.subscribe("dblClickEvent", function(node) {
+    }); 
+
+	// Draw the tree
+    tree.draw();
+  
+};
+ 
+ //Add an onDOMReady handler to build the tree when the document is ready
+YAHOO.util.Event.onDOMReady(YAHOO.protoq.tree.initTree);
+ 
+</script>
+<!-- End of YUI treeview stuff for body -->
+
+{% endblock%}

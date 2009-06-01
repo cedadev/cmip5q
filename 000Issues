@@ -1,0 +1,35 @@
+000 Issues
+
+**** General ****
+
+1) Huge delay (is it a yui download issue)
+  - what about the hanging ports ...
+7) Need distinct look and feel for
+   a) jumps to different pages 
+   b) forms
+   c) jumps away from q ...
+
+**** Couplings Page ****
+
+9) Support coupling page and links ...
+
+**** Component ****
+
+8) At top level components ... download (xml) and print (via xslt making things pretty).
+12) When we create a component, edit it, and it's invalid, we end up with a stray component. (is that still true)
+13) The navigation pane include all models and their subcomponents, not just the current model. Is that a problem?
+14) We need to add more than just the atmosphere. ... but for now, atmosphere needs to pretend it IS a model, to root things at ...
+15) "re-usable concepts" Need to make sure we ask about physical domain etc ... 
+6) add link to the reference model ...
+
+**** Simulations ****
+
+depends on the activity stuff 
+
+10) more simulation information
+ - initial conditions should point to previous simulations ...
+16) simulation sequence tags (so if this simulation follows another).
+
+**** Reference Page ****
+
+5) reference layout only half fixed

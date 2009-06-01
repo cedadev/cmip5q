@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="inner">
+    <h1> Model Component {{c.abbrev }}: SubComponents </h1>
+    <div class="guidance">
+        <p> To add a new subcomponent to this component, you need to select it from the available list, and it will 
+        be attached to the component (and appear in the left hand column below). You may need to create it first,
+        then select it from the available list <p>
+        <p> Note that if you can either select a specific existing subcomponent, or, you can copy an existing
+        sub component, and edit that </p>
+    </div> 
+    <div class="inbox">
+        <div class="colmask3 threecol">
+            <div class="colmid">
+                <div class="colleft">
+                    <div class="col1"><!-- Centre Column! -->
+                        <h4> Available Subcomponents </h4>
+                            <div class="guidance">
+                            <p> (need to replace with select from scrollbar list) (also filter to only see appropriate ones
+                            using controlled vocabularies </p></div>
+                            <table width="100%">
+                            {% for r in available %}
+                            <tr><td>{{r.abbrev}}</td>
+                                <td><a href="/cmip5/components/assign/{{c.id}}/{{r.id}}/">select</td><td>copy</td></tr>
+                            {% endfor %}
+                            <tr><td colspan="3"><a href="/cmip5/components/addsub/{{c.id}}/sub">Add a new subcomponent</a></td></tr>
+                            </table>
+                    </div>
+                    <div class="col2">
+                        <h4> Subcomponents</h4>
+                            <table width="100%">
+                            {% for r in existing %}
+                            <tr> <td>{{r.abbrev}}</td>
+                                 <td><a href="/cmip5/components/edit/{{r.id}}/{{c.id}}/">edit</a></td><td>remove</td></tr>
+                            {% endfor %}
+                            </table>
+                    </div>
+                    <div class="col3">
+                        <h4> Search components</h4>
+                        (to be implemented)
+                    </div> <!-- col3 -->
+                </div> <!-- colleft -->
+            </div> <!-- colmid -->
+        </div> <!-- colmask threecol -->
+        <p> The left hand column is the list of subcomponents attached to this componnet </p><!-- need a p here for the inbox div-->
+    </div> <!-- inbox -->
+ <a href="/cmip5/components/edit/{{c.id}}/"> Return to [{{c.abbrev}}]</a>
+ <div class="guidance"><p> note to self, the link isn't quite right for nested components, will need to think how to do this
+ for nesting below one level </p></div>
+</div>
+{% endblock %}

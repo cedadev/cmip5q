@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1> {{label}} a reference </h1>
+
+<form action="{{url}}" method="POST">
+{{rform.as_p}}
+<input type="submit" value="{{label}} Reference"/>
+{% endblock %}
