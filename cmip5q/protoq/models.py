@@ -111,8 +111,8 @@ class NumericalRequirement(Doc):
 ##            "string"
 ##            "float"
 ##            "integer"
-##            "vocab-any" - any number of the values at an accom
-##            "vocab-one" 
+##            "OR" - any number of the values at an accom
+##            "XOR" 
 ##      and optionally a uri value, which must be present if either rof the vocab types are present"
 ##      for the moment, the uri value is a "vocab name" and we have a table of those too "
 
@@ -155,7 +155,7 @@ class ComponentForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'72'}))
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     contact=forms.CharField(widget=forms.TextInput(attrs={'size':'72'}))
     #uri=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
     scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %} 
 
-<h1> Model Component {{c.abbrev }} </h1>
+<div class="boxer"><h1> Model Component {{c.abbrev }} </h1></div>
 
 <table class="navmain">
    <tr>
@@ -12,9 +12,9 @@
         subcomponents of this component <p>
         <p><a href="/cmip5/components/addsub/{{c.id}}/"> Add Subcomponent</a></p>
         </div>
+        <div class="boxer"><p><a href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p></div>
       </td>
       <td valign="top" width="900px">
-<div class="inner">
    
     <form action="{{url}}" method='post'>
     {{m}}
@@ -38,25 +38,19 @@
                 <p class="cmip5q"> These don't yet submit anything, and we have to
                 put back the other sorts of parameters etc </p>
                 <table>
-                <tr><th>Name</th><th>Value</th><th>Options</th><th>Choice</th></tr>
+                <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
                 {% for r in pform.rows %}
                 {{r.html|safe}}
                 {% endfor %}
+                <tr><td colspan="2"> Add a new param: </td><td colspan="2"></td></tr>
+                {{pform.new|safe }}
                 </table>
                 <p class="cmip5q"> Not sure what to do about deletions. Do we want to allow them?</p>
             </div>
             <br style="clear:both"/><!-- Hack to make div expand vertically --> 
         </div> 
     </div>
-    <div class="boxer">
-        <h4> References </h4>
-        <table width="100%" class="backgrey">
-            {% for r in refs%}
-            <tr><td width="33%"><a href="{{r.link}}">{{r.name}}</a></td><td>{{r.citation}}</td></tr>
-            {% endfor %}
-        </table>
-        <center><a href="/cmip5/components/addrefs/{{c.id}}"> Modify references</a></center>
-    </div>
+    
     <div class="boxer">
     <h4> Additional Information </h4>
     <center>
@@ -66,8 +60,17 @@
     <p class="guidance">Any additional information about this component: </p>
     <p>{{cform.description}}</p> 
     <p><input type="submit" value="update parameters and characteristics"/></p>
-    <p><a href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p>
+    
     </center>
+    </div>
+        <div class="boxer">
+        <h4> References </h4>
+        <table width="100%" class="backgrey">
+            {% for r in refs%}
+            <tr><td width="33%"><a href="{{r.link}}">{{r.name}}</a></td><td>{{r.citation}}</td></tr>
+            {% endfor %}
+        </table>
+        <center><a href="/cmip5/components/addrefs/{{c.id}}"> Modify references</a></center>
     </div>
     </form>
     
@@ -80,7 +83,7 @@
         <center>
         </center>
     </div>-->
-</div> 
+
 </td></tr></table>
 
 <!-- YUI treeview stuff for body -->

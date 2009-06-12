@@ -19,11 +19,11 @@ class PropertyForm:
         advice={'OR':'Multiple','XOR':'One'}[ptype]
         logging.info('Arguments to row %s,%s,%s'%(name,operation,len(values)))
         html='''<tr>
-             <td>%s</td><td><input name="%s" id="id_%s"></td>
-             <td><select name="opt_%s" size="1" onchange="document.getElementById(\'id_%s\').value %s this.value + \'|\';">'''%(name, name, name, name, name, operation)
+             <td>%s</td><td><input name="%s" id="id_%s" size="40"></td><td>%s</td>
+             <td><select name="opt_%s" size="1" onchange="document.getElementById(\'id_%s\').value %s this.value + \'|\';">'''%(name, name, name, advice,name, name, operation)
         for v in values:
             html+='<option value="%s">%s</option>'% (v.value, v.value)
-        html+='</select></td><td>%s</td></tr>'%advice
+        html+='</select></td></tr>'
         return html
     
     def __init__(self,component,prefix=''):
@@ -51,6 +51,21 @@ class PropertyForm:
             values=Value.objects.filter(vocab=o.vocab)
             pp.html=self.__VocabRowHTML(o.name,'XOR',values)
             self.rows.append(pp)
+            
+        for o in self.other:
+            pp=ParamRow(o.name)
+            pp.html='''<tr><td>%s</td><td>
+                       <input name="%s" id="id_%" size="40" value="%s"></td>
+                       <td></td><td></td></tr>'''%(o.name,o.name,o.value)
+            self.rows.append(pp)
+            
+        self.new='''<tr><td><input name="newparam" id="newparam" size="20"></td>
+                        <td><input name="newparamval" id="newparamval" size="40"></td><td></td><td></td></tr>'''
+            
+        
+            
+            
+        
             
         
           
