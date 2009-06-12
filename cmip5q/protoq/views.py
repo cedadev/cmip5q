@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
+from cmip5q.protoq.utilities import PropertyForm
 from cmip5q.XMLVocabReader import XMLVocabReader
 from django import forms
 import uuid
@@ -122,6 +123,7 @@ def _deepCopy(centre_id,component_id):
     # it's likely to be very model dependent because of the m2m issues ...
     #
     return None
+
  
 def editComponent(request,component_id):
     ''' Provides a form to edit a component, and handle the posting of a form
@@ -184,6 +186,8 @@ def editComponent(request,component_id):
     
     #OK, we have three cases to handle:
     
+    #FIXME; we'll need to put this in the right places with instances:
+    pform=PropertyForm(c,prefix='params')
     if request.method=='POST':
         if postOK:
             #redirect, so repainting the page doesn't resubmit
@@ -201,7 +205,7 @@ def editComponent(request,component_id):
     logging.debug('Finished handling %s to component %s'%(request.method,component_id))
     return render_to_response('componentMain.html',
             {'c':c,'subs':subc,'refs':refs,
-            'cform':cform,'pset':pset,
+            'cform':cform,'pset':pset,'pform':pform,
             'm':message,'navtree':navtree.html,'refu':refurl})
             
       
