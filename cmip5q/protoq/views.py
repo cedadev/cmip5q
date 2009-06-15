@@ -153,10 +153,10 @@ def editComponent(request,component_id):
     # this is the automatic machinery ...
     refs=Reference.objects.filter(component__id=component_id)
     
+    pform=PropertyForm(c,prefix='props')
     postOK=True
     message=''
     if request.method=="POST":
-        pset=ParamFormSet(request.POST,prefix='params',queryset=Param.objects.filter(component=c))
         cform=ComponentForm(request.POST,prefix='gen',instance=c)
         if cform.is_valid():
             uricopy=c.uri
@@ -169,16 +169,7 @@ def editComponent(request,component_id):
             logging.debug('Unable to save characteristics for component %s'%component_id)
             postOK=False
             message=cform.errors
-        if pset.is_valid():
-            instances=pset.save(commit=False)
-            for instance in instances:
-                logging.debug('Saving parameter settings %s'%instance)
-                instance.component=c
-                instance.save()
-        else:
-            logging.debug('Unable to save parameters for component %s'%component_id)
-            postOK=False
-            message=pset.errors
+        pform.update(request)
     
     # We sepereate the response handling so we can do some navigation in the
     # meanwhile ...
@@ -187,7 +178,7 @@ def editComponent(request,component_id):
     #OK, we have three cases to handle:
     
     #FIXME; we'll need to put this in the right places with instances:
-    pform=PropertyForm(c,prefix='params')
+   
     if request.method=='POST':
         if postOK:
             #redirect, so repainting the page doesn't resubmit
@@ -198,14 +189,12 @@ def editComponent(request,component_id):
             # don't reset the forms so the user gets an error response.
     else:
         #get some forms
-        print 'params',len(Param.objects.filter(component=c))
-        pset=ParamFormSet(prefix='params',queryset=Param.objects.filter(component=c))
 	cform=ComponentForm(instance=c,prefix='gen')
   
     logging.debug('Finished handling %s to component %s'%(request.method,component_id))
     return render_to_response('componentMain.html',
             {'c':c,'subs':subc,'refs':refs,
-            'cform':cform,'pset':pset,'pform':pform,
+            'cform':cform,'pform':pform,
             'm':message,'navtree':navtree.html,'refu':refurl})
             
       
