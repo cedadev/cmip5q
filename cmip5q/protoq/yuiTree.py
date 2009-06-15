@@ -81,7 +81,8 @@ class yuiTree2:
     def __li(self,e,i,a,ok=0):
         url=self.baseURL.replace('+EDID+','/%s/'%i)
         ok1,ok2={0:('',''),1:('[',']')}[ok] #used to denote hanging chads (see debug)
-        return '<li%s>%s<a href="%s">%s</a>%s\n'%(e,ok1,url,a,ok2)
+        cc={1:' class="open"',0:''}[i==self.family.me]
+        return '<li%s>%s<a href="%s"%s>%s</a>%s\n'%(e,ok1,url,cc,a,ok2)
     
     def __init__(self,component,top='model',baseURL=''):
         self.baseURL=baseURL.replace('/%s/'%component,'+EDID+')
@@ -100,6 +101,7 @@ class yuiTree2:
         children=component.components.all()
         cstring=''
         if component.id in self.expanders: cstring=' class="expanded"'
+       
         self.html+=self.__li(cstring,component.id,component.abbrev)
         self.found.append(component.id)
         if len(children)==0: return

@@ -45,7 +45,6 @@ class PropertyForm:
         
         for o in self.orp:
             pp=ParamRow(o.name)
-            print 'in',o.name,o.value
             pp.values=Value.objects.filter(vocab=o.vocab)
             pp.html=self.__VocabRowHTML(o.name,o.value,'OR',pp.values)
             self.rows.append(pp)
@@ -53,7 +52,6 @@ class PropertyForm:
         
         for o in self.xorp:
             pp=ParamRow(o.name)
-            print 'in',o.name,o.value
             pp.values=Value.objects.filter(vocab=o.vocab)
             pp.html=self.__VocabRowHTML(o.name,o.value,'XOR',pp.values)
             self.rows.append(pp)
@@ -82,13 +80,14 @@ class PropertyForm:
             if key[0:lenprefix]==self.prefix: 
                 mykey=key[lenprefix+1:]
                 if mykey == 'newparam':
-                    nvalkey='%s-newparamval'%self.prefix
-                    if nvalkey not in qdict:
-                        logging.info('New param value expected, nothing added(%s)'%qdict)
-                    else:
-                        new=Param(name=qdict[key],value=qdict[nvalkey],ptype='User',
-                            component=self.component)
-                        new.save()
+                    if qdict[key]<>'':
+                        nvalkey='%s-newparamval'%self.prefix
+                        if nvalkey not in qdict:
+                            logging.info('New param value expected, nothing added(%s)'%qdict)
+                        else:
+                            new=Param(name=qdict[key],value=qdict[nvalkey],ptype='User',
+                                component=self.component)
+                            new.save()
                 elif mykey == 'newparamval':
                     #ignore, handled above
                     pass
