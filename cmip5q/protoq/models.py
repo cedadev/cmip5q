@@ -92,6 +92,23 @@ class Simulation(Doc):
     #each simulation run by one centre
     centre=models.ForeignKey('Centre')
     
+    
+class Conformance:
+    ''' This relates a numerical requirement to an actual solution in the simulation '''
+    uid=models.CharField(max_length=64,unique=True)
+    # the identifier of the numerical requirement:
+    exptuid=models.CharField(max_length=64)
+    # if we didn't use a file, it will be code
+    usedFile=models.BooleanField(default=1)
+    # so we enter some text if we do a code modification
+    ## FIXME: use foreign keys for component ids, not blank strings ...
+    codeModDescription=models.TextField(blank=True,null=True)
+    # this is the uid of the target component that has been modified (if any has)
+    codeModTargetUid=models.CharField(max_length=64,blank=True,null=True)
+    # This is the original unmodified component if we know it
+    codeOriginalUid=models.CharField(max_length=64,blank=True,null=True
+    
+    
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
     
