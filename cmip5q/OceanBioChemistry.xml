@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab>
+  <component name="OceanBiogeoChemistry">
+    <component name="OceanBioTransport">
+      <parameter name="Method" choice="XOR" note="If method for transport calculations is different from the one for Ocean Tracers, then describe these differences.">
+        <value name="Offline"/>
+        <value name="Online, same as Ocean Tracers"/>
+        <value name="Online, different from Ocean Tracers"/>
+      </parameter>
+    </component>
+    <component name="OceanBioBoundaryForcing">
+      <parameter name="AtmosphericDeposition" choice="" note="Provide the origin of Atmospheric Deposition."/>
+      <parameter name="RiverInput" choice="" note="Provide the origin of River Input."/>
+      <parameter name="SedimentInteractions" choice="" note="Provide the origin of Sedimentation Interactions."/>
+    </component>
+    <component name="OceanBioGazExchange">
+      <parameter name="Species" choice="OR">
+        <value name="CO2"/>
+        <value name="O2"/>
+        <value name="DMS"/>
+        <value name="N2"/>
+        <value name="N2O"/>
+        <value name="CO"/>
+      </parameter>
+      <parameter name="SchemeName" choice="XOR" note="Give a Gaz Exchange Scheme for each of the selected Species.">
+        <value name="Liss &amp; Merlivat"/>
+        <value name="Wanninkhof"/>
+        <value name="Nightingale"/>
+        <value name="Other"/>
+      </parameter>
+    </component>
+    <component name="OceanBioTracerDamping">
+      <component name="SpatialExtent">
+        <parameter name="Depth" choice="keyboard">
+          <value format="numerical" name="min, max" units="m"/>
+        </parameter>
+        <parameter name="Latitude" choice="keyboard">
+          <value format="numerical" name="min, max" units="degN"/>
+        </parameter>
+        <parameter name="Longitude" choice="keyboard">
+          <value format="numerical" name="min, max" units="degW"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="OceanBioTracers">
+      <component name="Ecosystem">
+        <component name="Phytoplancton">
+          <parameter name="Type" choice="XOR">
+            <value name="none"/>
+            <value name="Generic"/>
+            <value name="List"/>
+          </parameter>
+          <parameter name="ListOfSpecies" choice="OR" note="If Type = List.">
+            <value name="Diatoms"/>
+            <value name="Nfixers"/>
+            <value name="Calcifiers"/>
+            <value name="Picophytoplancton"/>
+            <value name="Other"/>
+          </parameter>
+        </component>
+        <component name="Zooplancton">
+          <parameter name="Type" choice="XOR">
+            <value name="none"/>
+            <value name="Generic"/>
+            <value name="List"/>
+          </parameter>
+          <parameter name="ListOfSpecies" choice="OR" note="If Type = List.">
+            <value name="Microzooplancton"/>
+            <value name="Mesozooplancton"/>
+            <value name="&lt;more...&gt;"/>
+            <value name="Other"/>
+          </parameter>
+        </component>
+        <parameter name="UpperTrophicLevels" choice="XOR">
+          <value name="Yes"/>
+          <value name="No"/>
+        </parameter>
+      </component>
+      <component name="Nutrients">
+        <parameter name="ListOfSpecies" choice="OR">
+          <value name="Nitrogen N"/>
+          <value name="Phosphorus P"/>
+          <value name="Silicium Si"/>
+          <value name="Iron Fe"/>
+          <value name="Other"/>
+        </parameter>
+        <component name="NitrogenN" note="If &quot;Nitrogen N&quot; select in ListOfSpecies."/>
+      </component>
+    </component>
+  </component>
+</vocab>

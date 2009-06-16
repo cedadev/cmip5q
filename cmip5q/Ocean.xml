@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab>
+  <component name="Ocean">
+    <component name="OceanAdvection">
+      <component name="MomentumScheme">
+        <parameter name="SchemeName" choice="keyboard">
+          <value format="string" name="usual scheme name"/>
+        </parameter>
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Flux form"/>
+          <value name="Vector form"/>
+        </parameter>
+        <parameter name="Properties" choice="keyboard">
+          <value format="string" name="additional description of the advection scheme for momentum"/>
+        </parameter>
+      </component>
+      <component name="TracersLateralScheme">
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Centred 2nd order"/>
+          <value name="Centred 4th order"/>
+          <value name="Total Variance Dissipiation (TVD)"/>
+          <value name="MUSCL"/>
+          <value name=" QUICKEST"/>
+          <value name=" Piecewise Parabolic method"/>
+          <value name="Other"/>
+        </parameter>
+      </component>
+      <component name="TracersVerticalScheme">
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Centred 2nd order"/>
+          <value name="Centred 4th order"/>
+          <value name="TVD"/>
+          <value name="Other"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="OceanLateralPhysics">
+      <component name="Momentum">
+        <parameter name="Direction" choice="XOR">
+          <value name="Horizontal"/>
+          <value name="Isopycnal"/>
+          <value name="Isoneutral"/>
+          <value name="Geopotential"/>
+          <value name="Iso-level"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Operator" choice="XOR">
+          <value name="Harmonic (second order)"/>
+          <value name="Bi-harmonic (fourth order)"/>
+          <value name="Other"/>
+        </parameter>
+        <component name="EddyViscosityCoefficient">
+          <parameter name="CoefficientType" choice="XOR">
+            <value name="Constant"/>
+            <value name="Space varying"/>
+            <value name="Time + Space varying (Smagorinski)"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;Constant&quot; is selected for CoefficientType.">
+            <value format="numerical" name="Eddy viscosity coefficient for momentum" units="m2/s"/>
+          </parameter>
+          <parameter name="SpatialVariation" choice="OR" note="Only if &quot;Space varying&quot; or &quot;Time + Space varying&quot; is selected for CoefficientType.">
+            <value name="With depth"/>
+            <value name="With latitude"/>
+            <value name="With longitude"/>
+          </parameter>
+          <parameter name="MinimalBackgroundValue" choice="keyboard">
+            <value format="numerical" name="minimal background Eddy viscosity coefficient for momentum" units="m2/s"/>
+          </parameter>
+        </component>
+      </component>
+      <component name="Tracers">
+        <parameter name="Direction" choice="XOR">
+          <value name="Horizontal"/>
+          <value name="Isopycnal"/>
+          <value name="Geopotential"/>
+          <value name="Iso-level"/>
+          <value name="Isoneutral"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Operator" choice="XOR">
+          <value name="Harmonic (second order)"/>
+          <value name="Bi-harmonic (fourth order)"/>
+          <value name="Other"/>
+        </parameter>
+        <component name="EddyViscosityCoefficient">
+          <parameter name="CoefficientType" choice="XOR">
+            <value name="Constant"/>
+            <value name="Space varying"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;constant&quot; for Type.">
+            <value format="numerical" name="Eddy viscosity coefficient for tracers" units="m2/s"/>
+          </parameter>
+          <parameter name="SpatialVariation" choice="OR" note="Only if &quot;Space varying&quot; is selected for CoefficientType.">
+            <value name="With depth"/>
+            <value name="With latitude"/>
+            <value name="With longitude"/>
+          </parameter>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <value format="numerical" name="background Eddy viscosity coefficient for tracers" units="m2/s"/>
+          </parameter>
+        </component>
+        <component name="Eddy-inducedVelocity">
+          <parameter name="CoefficientType" choice="XOR">
+            <value name="GM scheme"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="GMvalue" choice="keyboard" note="Only if &quot;GM scheme&quot; for CoefficientType.">
+            <value format="numerical" name="Eddy induced velocity coefficient" units="m2/s"/>
+          </parameter>
+        </component>
+      </component>
+    </component>
+    <component name="OceanVerticalPhysics">
+      <component name="MixedLayer">
+        <component name="Tracers">
+          <parameter name="SchemeType" choice="XOR">
+            <value name="Constant values"/>
+            <value name="TKE turbulent closure"/>
+            <value name="KPP turbulent closure"/>
+            <value name="Mellor-Yamada turbulent closure"/>
+            <value name="PP Richardson number dependent"/>
+            <value name="KT Richardson number dependent"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;Constant values&quot; selected for SchemeType.">
+            <value format="numerical" name="mixing coefficient for tracers in the mixed layer" units="m2/s"/>
+          </parameter>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <value format="numerical" name="background mixing coefficient for tracers in the mixed layer" units="m2/s"/>
+          </parameter>
+        </component>
+        <component name="Momentum">
+          <parameter name="SchemeType" choice="XOR">
+            <value name="Constant values"/>
+            <value name="TKE turbulent closure"/>
+            <value name="KPP turbulent closure"/>
+            <value name="Mellor-Yamada turbulent closure"/>
+            <value name="PP Richardson number dependent"/>
+            <value name="KT Richardson number dependent"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;Constant values&quot; selected for SchemeType.">
+            <value format="numerical" name="mixing coefficient for momentum in the mixed layer" units="m2/s"/>
+          </parameter>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <value format="numerical" name="background mixing coefficient for momentum in the mixed layer" units="m2/s"/>
+          </parameter>
+        </component>
+      </component>
+      <component name="OceanInterior">
+        <component name="Tracers">
+          <parameter name="SchemeType" choice="XOR">
+            <value name="Constant values"/>
+            <value name="TKE turbulent closure"/>
+            <value name="Mellor-Yamada turbulent closure"/>
+            <value name="PP Richardson number dependent"/>
+            <value name="KT Richardson number dependent"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;constant values&quot; for Type.">
+            <value format="numerical" name="mixing coefficient for tracers in the ocean interior" units="m2/s"/>
+          </parameter>
+          <parameter name="BackgroundType" choice="XOR">
+            <value name="Vertical profile"/>
+            <value name="Constant value"/>
+          </parameter>
+          <parameter name="BackgroundConstantValue" choice="keyboard" note="Only if &quot;constant value&quot; for BackgroundType.">
+            <value format="numerical" name="background mixing coefficient for tracers in the ocean interior" units="m2/s"/>
+          </parameter>
+        </component>
+        <component name="Momentum">
+          <parameter name="SchemeType" choice="XOR">
+            <value name="Constant values"/>
+            <value name="TKE turbulent closure"/>
+            <value name="Mellor-Yamada turbulent closure"/>
+            <value name="PP Richardson number dependent"/>
+            <value name="KT Richardson number dependent"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;constant values&quot; for Type.">
+            <value format="numerical" name="mixing coefficient for momentum in the ocean interior" units="m2/s"/>
+          </parameter>
+          <parameter name="BackgroundType" choice="XOR">
+            <value name="Vertical profile"/>
+            <value name="Constant value"/>
+          </parameter>
+          <parameter name="BackgroundConstantValue" choice="keyboard" note="Only if &quot;constant value&quot; for BackgroundType.">
+            <value format="numerical" name="background mixing coefficient for momentum in the ocean interior" units="m2/s"/>
+          </parameter>
+        </component>
+      </component>
+      <parameter name="Tide-inducedMixing" choice="XOR">
+        <value name="Yes"/>
+        <value name="No"/>
+      </parameter>
+    </component>
+    <component name="OceanConvection">
+      <parameter name="Method" choice="XOR">
+        <value name="Non-penetrative convective adjustment"/>
+        <value name="Enhanced vertical diffusion"/>
+        <value name="Included in the Turbulence Closure Scheme"/>
+        <value name="Other"/>
+      </parameter>
+    </component>
+    <component name="OceanBottomBoundaryLayer">
+      <parameter name="BoundaryLayerType" choice="XOR">
+        <value name="Diffusive"/>
+        <value name="Advective"/>
+        <value name="Advective+Diffusive"/>
+        <value name="Other"/>
+      </parameter>
+      <parameter name="LateralMixingCoefficient" choice="keyboard" note="Only if &quot;Diffusive&quot; or &quot;Advective+Diffusive&quot; for Type.">
+        <value format="numerical" name="lateral mixing coefficient in the bottom boundary layer" units="m2/s"/>
+      </parameter>
+      <parameter name="SillOverflow " choice="XOR">
+        <value name="Specific treatment"/>
+        <value name="No specific treatment"/>
+      </parameter>
+    </component>
+    <component name="OceanBoundaryForcing">
+      <component name="Momentum">
+        <parameter name="BottomFriction" choice="XOR">
+          <value name="Linear"/>
+          <value name="Non-linear"/>
+          <value name="None"/>
+        </parameter>
+        <parameter name="LateralFriction" choice="XOR">
+          <value name="None"/>
+          <value name="Free-slip"/>
+          <value name="No-slip"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="SurfaceFluxCorrection" choice="XOR">
+          <value name="Yes"/>
+          <value name="No"/>
+        </parameter>
+      </component>
+      <component name="Tracers">
+        <component name="SunlightPenetration">
+          <parameter name="SchemeType" choice="XOR">
+            <value name=" 1 extinction depth"/>
+            <value name=" 2 extinction depths"/>
+            <value name="3 extinction depths"/>
+          </parameter>
+          <parameter name="FirstDepth" choice="keyboard">
+            <value format="numerical" name="fisrt extinction depth" units="m"/>
+          </parameter>
+          <parameter name="SecondDepth" choice="keyboard" note="Only if &quot;2 extinction depths&quot; for Type.">
+            <value format="numerical" name="second exctinction depth" units="m"/>
+          </parameter>
+          <parameter name="ThirdDepth" choice="keyboard" note="Only if &quot;3 extinction depths&quot; for Type.">
+            <value format="numerical" name="third exctinction depth" units="m"/>
+          </parameter>
+        </component>
+        <component name="SurfaceSalinity">
+          <parameter name="FromAtmosphere" choice="XOR">
+            <value name="Freshwater flux"/>
+            <value name="Virtual salt flux"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="FromSeaice" choice="XOR">
+            <value name="Freshwater flux"/>
+            <value name="Virtual salt flux"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="FromRiver" choice="XOR">
+            <value name="Freshwater flux"/>
+            <value name="Virtual salt flux"/>
+            <value name="Other"/>
+          </parameter>
+        </component>
+        <component name="GeothermalHeating">
+          <parameter name="Type" choice="XOR">
+            <value name="Spatial varying"/>
+            <value name="Other"/>
+          </parameter>
+        </component>
+        <component name="SurfaceFluxCorrections">
+          <parameter name="TemperatureCorrection" choice="XOR">
+            <value name="Yes"/>
+            <value name="No"/>
+          </parameter>
+          <parameter name="SalinityCorrection" choice="XOR">
+            <value name="Yes"/>
+            <value name="No"/>
+          </parameter>
+        </component>
+      </component>
+    </component>
+    <component name="OceanPropertySeaWater">
+      <parameter name="EquationOfState" choice="XOR" note="Provide the type of the equation of state.">
+        <value name="Linear"/>
+        <value name="McDougall et al."/>
+        <value name="Other"/>
+      </parameter>
+      <parameter name="FreezingPointOfSeaWater" choice="keyboard">
+        <value format="numerical" name="freezing temperature of sea water" units="degC"/>
+      </parameter>
+    </component>
+    <component name="OceanFreeSurface">
+      <parameter name="Type" choice="XOR" note="Provide the type of free surface used.">
+        <value name="Linear implicit"/>
+        <value name="Linear filtered"/>
+        <value name="Linear split-explicit"/>
+        <value name="Non-linear implicit"/>
+        <value name="Non-linear filtered"/>
+        <value name="Non-linear split-explicit"/>
+      </parameter>
+    </component>
+    <component name="OceanTracerDamping">
+      <parameter name="SpatialExtent" choice="OR">
+        <value name="Depth"/>
+        <value name="Latitude"/>
+        <value name="Longitude"/>
+      </parameter>
+    </component>
+  </component>
+</vocab>
