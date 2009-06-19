@@ -106,7 +106,7 @@ class Conformance:
     # this is the uid of the target component that has been modified (if any has)
     codeModTargetUid=models.CharField(max_length=64,blank=True,null=True)
     # This is the original unmodified component if we know it
-    codeOriginalUid=models.CharField(max_length=64,blank=True,null=True
+    codeOriginalUid=models.CharField(max_length=64,blank=True,null=True)
     
     
 class Centre(Doc):
