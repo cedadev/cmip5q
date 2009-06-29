@@ -1,248 +1,240 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vocab>
   <component name="Atmosphere">
-    <component name="AtmosAdvection">
-      <parameter name="Scheme" choice="XOR">
-        <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-        <value name="no advection scheme"/>
+    <component name="DynamicalCore">
+      <parameter name="BasicApproximations" choice="OR">
+        <value name="Primitive Equations"/>
+        <value name="Non Hydrostatic"/>
+        <value name="Anelastic"/>
+        <value name="Boussinesq"/>
+        <value name="Hydrostatic"/>
+        <value name="Quasi-Hydrostatic"/>
+        <value name="Other"/>
       </parameter>
-      <parameter name="Type" choice="XOR">
-        <value name="Eulerian"/>
-        <value name="Semi-lagrangian"/>
-        <value name="Mass-conserving"/>
-        <value name="Other" note="Other: enter the type of scheme and a brief description."/>
-        <value name="no advection scheme"/>
+      <parameter name="TimeSteppingFramework" choice="XOR">
+        <value name="Adam Bashford"/>
+        <value name="Explicit"/>
+        <value name="Implicit"/>
+        <value name="Semi-Implicit"/>
+        <value name="LeapFrog"/>
+        <value name="Multi-step"/>
+        <value name="Runge Kutta fifth order"/>
+        <value name="Runge Kutta second order"/>
+        <value name="Runge Kutta third order"/>
+        <value name="Other"/>
       </parameter>
-    </component>
-    <component name="AtmosHorizontalDiffusion">
-      <parameter name="Scheme" choice="XOR">
-        <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-        <value name="no horizontal diffusion scheme"/>
-      </parameter>
-      <parameter name="Type" choice="XOR">
-        <value name="Nabla 2"/>
-        <value name="Nabla 4"/>
-        <value name="Nabla 6"/>
-        <value name="Other" note="Other: enter the type of scheme and a brief description."/>
-        <value name="no horizontal diffusion scheme"/>
-      </parameter>
-    </component>
-    <component name="AtmosVerticalDiffusion">
-      <parameter name="Scheme" choice="XOR">
-        <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-        <value name="no vertical diffusion scheme"/>
-      </parameter>
-      <parameter name="Type" choice="XOR">
-        <value name="TKE"/>
-        <value name="Constant Mixing coefficient"/>
-        <value name="Closure order 1"/>
-        <value name="Closure order 2"/>
-        <value name="Other" note="Other: enter the type of scheme and a brief description."/>
-        <value name="no vertical diffusion scheme"/>
-      </parameter>
-    </component>
-    <component name="AtmosRadiation">
-      <component name="Longwave">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Morcrette"/>
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no longwave radiation scheme"/>
+      <component name="HorizontalDiscretisation">
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Spectral"/>
+          <value name="Fixed Grid"/>
+          <value name="Other" note="Other: enter horizontal discretisation method&#10;"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
+        <parameter name="SpectralTruncatureNumber" choice="keyboard" note="Only if SchemeType = Spectral.">
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="NumberOfZonalGridBoxes" choice="keyboard" note="Only if ShemeType = Fixed grid.&#10;">
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="NumberOfMeridionalGridBoxes" choice="keyboard" note="Only if ShemeType = Fixed grid.">
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="Method" choice="XOR" note="Only if ShemeType = Fixed grid.">
+          <value name="Finite emement"/>
+          <value name="Finite volume"/>
+          <value name="Finite differences"/>
+          <value name="Centered finite differences"/>
+        </parameter>
+        <parameter name="Order" choice="keyboard" note="Only if Method = (Finite difference) or (Centered finite difference).">
+          <value format="numerical" name=""/>
+        </parameter>
+      </component>
+      <component name="AdvectionScheme">
+        <component name="Momentum">
+          <parameter name="SchemeName" choice="XOR">
+            <value name="Other"/>
+          </parameter>
+          <parameter name="SchemeType" choice="XOR">
+            <value name="Eulerian"/>
+            <value name="Lagrangian"/>
+            <value name="Semi-lagrangian"/>
+            <value name="Mass-conserving"/>
+            <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
+            <value name="Other"/>
+          </parameter>
+        </component>
+      </component>
+      <component name="AtmosHorizontalDiffusion">
+        <parameter name="SchemeName" choice="XOR">
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Method" choice="XOR">
+          <value name="Iterated Laplacian"/>
+          <value name="Other"/>
+        </parameter>
+      </component>
+      <parameter name="TopBoundaryCondition" choice="XOR">
+        <value name="Sponge layer"/>
+        <value name="Radiation boundary condition"/>
+        <value name="Other "/>
+      </parameter>
+      <parameter name="LateralBoundaryCondition" choice="XOR">
+        <value name="sponge layer"/>
+        <value name="radiation boundary condition"/>
+        <value name="Other "/>
+      </parameter>
+    </component>
+    <component name="Radiation">
+      <component name="Longwave">
+        <parameter name="ShemeType" choice="XOR">
+          <value name="Wide-band model"/>
+          <value name="Wide-band (Morcrette)"/>
+          <value name="K-correlated"/>
+          <value name="K-correlated (RRTM)"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Method" choice="XOR">
           <value name="Two stream"/>
           <value name="Layer interaction"/>
-          <value name="Other" note="Other: enter the type of scheme and a brief description."/>
-          <value name="no longwave radiation scheme"/>
+          <value name="Other"/>
         </parameter>
-        <parameter name="NumberOfChannels" choice="keyboard">
-          <value format="numerical" name="Number of Channels"/>
-        </parameter>
-        <parameter name="GreenHouseGases" choice="OR">
-          <value name="CO2"/>
-          <value name="CH4"/>
-          <value name="N2O"/>
-          <value name="CFC"/>
-          <value name="H2O"/>
-          <value name="O3"/>
-          <value name="Other" note="Other: enter further green house gasses"/>
+        <parameter name="NumberOfSpectralIntervals" choice="keyboard">
+          <value format="numerical" name=""/>
         </parameter>
       </component>
       <component name="Shortwave">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Foucquart"/>
-          <value name="delta-Eddington"/>
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no shortwave radiation scheme"/>
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Wide-band model"/>
+          <value name="Wide-band model (Foucquart)"/>
+          <value name="Other"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Other" note="Other: enter the type scheme and a brief description."/>
-          <value name="no shortwave radiation scheme"/>
-        </parameter>
-        <parameter name="NumberOfChannels" choice="keyboard">
-          <value format="numerical" name="Number of Channels"/>
-        </parameter>
-        <parameter name="Aerosols" choice="OR">
-          <value name="Continental"/>
-          <value name="Urban"/>
-          <value name="Oceanic"/>
-          <value name="Desertic"/>
-          <value name="Sulphate"/>
-          <value name="Sea Salt"/>
-          <value name="Soot"/>
-          <value name="Biomass"/>
-          <value name="Soil Dust"/>
-          <value name="NAT"/>
-          <value name="Polar Stratospheric Ice"/>
-          <value name="Other" note="Other: enter further aerosols"/>
-        </parameter>
-        <parameter name="Gases" choice="OR">
-          <value name="CO2"/>
-          <value name="CH4"/>
-          <value name="N2O"/>
-          <value name="CFC"/>
-          <value name="H2O"/>
-          <value name="O3"/>
-          <value name="O2"/>
-          <value name="Other" note="Other: enter further green house gasses"/>
+        <parameter name="NumberOfSpectralIntervals" choice="keyboard">
+          <value format="numerical" name=""/>
         </parameter>
       </component>
-      <parameter name="RadiatonTimeStep " choice="keyboard" note="RadiationTimeStep is a numerical property but there is no need to deploy all the NumericalProperties common feature.">
-        <value format="numerical" name="Time Step" units="hours"/>
+      <parameter name="AerosolTypes" choice="OR">
+        <value name="Continental"/>
+        <value name="Urban"/>
+        <value name="Oceanic"/>
+        <value name="Desertic"/>
+        <value name="Sulphate"/>
+        <value name="Sea Salt"/>
+        <value name="Soot"/>
+        <value name="Biomass"/>
+        <value name="Soil Dust"/>
+        <value name="NAT"/>
+        <value name="Polar Stratospheric Ice"/>
+        <value name="Other" note="Other: enter further aerosols"/>
+      </parameter>
+      <parameter name="GHG-Types" choice="OR">
+        <value name="CO2"/>
+        <value name="CH4"/>
+        <value name="N2O"/>
+        <value name="CFC"/>
+        <value name="H2O"/>
+        <value name="O3"/>
+        <value name="Other" note="Other: enter further green house gasses"/>
       </parameter>
     </component>
-    <component name="AtmosConvection">
-      <component name="DeepConvection">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the deep convection scheme and a reference."/>
-          <value name="no deep convection scheme"/>
+    <component name="TurbulenceConvectionClouds">
+      <component name="BoundaryLayerTurbulence">
+        <parameter name="SchemeName" choice="XOR">
+          <value name="Mellor-Yamada"/>
+          <value name="Other"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="MassFlux"/>
-          <value name="Adjustment"/>
-          <value name="Other" note="Other: enter the type of scheme and a brief description"/>
-          <value name="no deep convection scheme"/>
+        <parameter name="ClosureOrder" choice="keyboard" note="If SchemeName = Mellor-Yamada.">
+          <value format="numerical" name="N.x"/>
+        </parameter>
+        <parameter name="Method" choice="XOR">
+          <value name="TKE prognostic"/>
+          <value name="TKE diagnostic"/>
+          <value name="TKE coupled with water"/>
+          <value name=" Vertical profile of Kz"/>
+          <value name="Other"/>
         </parameter>
         <parameter name="Properties" choice="OR">
-          <value name="Vertical momentum transport"/>
-          <value name="Mass flux determined by CAPE"/>
-          <value name="Bulk mass flux scheme"/>
-          <value name="Penetrative convection effects included"/>
-          <value name="Representation of updrafts and downdrafts"/>
-          <value name="Radiative effects of anvils"/>
-          <value name="Entrainment"/>
-          <value name="Detrainment"/>
-          <value name="Other" note="Other: enter more keywords/keyphrases that describe the behaviour of the deep convection scheme&#10;"/>
+          <value name="Use of counter gradient"/>
         </parameter>
       </component>
-      <component name="MidLevelConvection">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the mid-level convection scheme and a reference."/>
-          <value name="no mid-level convection scheme"/>
+      <component name="DeepConvection">
+        <parameter name="SchemeName" choice="XOR">
+          <value name="Other"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Mass Flux"/>
-          <value name="Other" note="Other: enter the name of the type of scheme and a description of it.&#10;"/>
-          <value name="no mid-level convection scheme"/>
+        <parameter name="SchemeType" choice="XOR">
+          <value name="Mass-flux"/>
+          <value name="Adjustment"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Method" choice="OR" note="If SchemeType = Mass-flux (to be confirmed).">
+          <value name="Mass flux determined by CAPE"/>
+          <value name="Bulk mass flux scheme"/>
         </parameter>
         <parameter name="Properties" choice="OR">
           <value name="Vertical momentum transport"/>
-          <value name="Mass flux determined by CAPE"/>
-          <value name="Bulk mass flux scheme"/>
+          <value name="Convective momentum transport (CMT)"/>
           <value name="Penetrative convection effects included"/>
-          <value name="Entrainment"/>
-          <value name="Detrainment"/>
-          <value name="Other" note="Other: enter more keywords/keyphrases that describe the behaviour of the shallow convection scheme&#10;"/>
+          <value name="Representation of updrafts and downdrafts"/>
+          <value name="Other" note="Other: enter further convection keywords"/>
         </parameter>
       </component>
       <component name="ShallowConvection">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the shallow convection scheme and a reference."/>
-          <value name="no shallow convection scheme"/>
+        <parameter name="Method" choice="XOR">
+          <value name="same as deep (unified)"/>
+          <value name="included in Boundary layer turbulence"/>
+          <value name="separated"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Mass Flux"/>
-          <value name="Other" note="Other: enter the type of scheme and a brief description.&#10;"/>
-          <value name="no shallow convection scheme"/>
+        <parameter name="SchemeName" choice="XOR" note="Only if Method = Separated.">
+          <value name="Other"/>
         </parameter>
+        <parameter name="Scheme" choice="XOR" note="Only if Method = Separated.">
+          <value name="none"/>
+          <value name="Mass-flux"/>
+          <value name="Other"/>
+        </parameter>
+      </component>
+      <component name="AtmosCloudScheme">
+        <component name="SubGridScaleWaterDistribution">
+          <parameter name="Type" choice="XOR">
+            <value name="Prognostic"/>
+            <value name="Diagnostic"/>
+          </parameter>
+          <parameter name="NameOfDistributionFunction" choice="keyboard">
+            <value format="string" name=""/>
+          </parameter>
+          <parameter name="OrdersOfDistributionFunction" choice="keyboard">
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Properties" choice="XOR">
+            <value name="Coupled with deep convection"/>
+            <value name="Coupled with shallow convection"/>
+            <value name="Not coupled with convection"/>
+          </parameter>
+        </component>
         <parameter name="Properties" choice="OR">
-          <value name="Vertical momentum transport"/>
-          <value name="Mass flux determined by CAPE"/>
-          <value name="Bulk mass flux scheme"/>
-          <value name="Penetrative convection effects included"/>
+          <value name="Separated cloud treatment (convective+stratiform+boundary layer)"/>
+          <value name="Cloud overlap"/>
           <value name="Entrainment"/>
           <value name="Detrainment"/>
-          <value name="Other" note="Other: enter more keywords/keyphrases that describe the behaviour of the shallow convection scheme&#10;"/>
+          <value name="Other" note="Other: enter further properties for Cloud Scheme."/>
         </parameter>
       </component>
-    </component>
-    <component name="AtmosClouds">
-      <component name="ConvectiveClouds">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the convective cloud scheme and a reference"/>
-          <value name="no convective cloud scheme"/>
+      <component name="AtmosLargeScalePrecipitation">
+        <parameter name="SchemeName" choice="XOR">
+          <value name="Other"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Prognostic"/>
-          <value name="Diagnostic"/>
-          <value name="Empirical"/>
-          <value name="Prescribed"/>
-          <value name="Other" note="Other: enter the name of the type of scheme and a description of it.&#10;"/>
-          <value name="no convective cloud scheme"/>
-        </parameter>
-        <parameter name="Properties" choice="OR">
-          <value name="Cloud area fraction"/>
-          <value name="Bulk cloud value"/>
-          <value name="Other" note="Other: enter further convection keywords"/>
-        </parameter>
-      </component>
-      <component name="StratiformClouds">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no stratiform cloud scheme"/>
-        </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Prognostic"/>
-          <value name="Diagnostic"/>
-          <value name="Empirical"/>
-          <value name="Prescribed"/>
-          <value name="Other" note="Other: enter the name of the type of scheme and a description of it.&#10;"/>
-          <value name="no stratiform cloud scheme"/>
-        </parameter>
-        <parameter name="Properties" choice="OR">
-          <value name="Cloud area fraction"/>
-          <value name="Bulk cloud value"/>
-          <value name="Other" note="Other: enter further convection keywords"/>
-        </parameter>
-      </component>
-      <component name="BoundaryLayerClouds">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no boundary layer cloud scheme"/>
-        </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Prognostic"/>
-          <value name="Diagnostic"/>
-          <value name="Empirical"/>
-          <value name="Prescribed"/>
-          <value name="Other" note="Other: enter the name of the type of scheme and a description of it.&#10;"/>
-          <value name="no boundary layer cloud scheme"/>
-        </parameter>
-        <parameter name="Properties" choice="OR">
-          <value name="Cloud area fraction"/>
-          <value name="Bulk cloud value"/>
-          <value name="Other" note="Other: enter further convection keywords"/>
+        <parameter name="PrecipitatingHydrometeors" choice="OR">
+          <value name="Liquid Rain"/>
+          <value name="Snow"/>
+          <value name="Hail"/>
+          <value name="Graupel"/>
+          <value name="Cats&amp;Dogs"/>
+          <value name="Other" note="Other: enter other name(s) for Precipitating Hydrometeors (can be several)."/>
         </parameter>
       </component>
       <component name="Microphysics">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no cloud microphysics scheme"/>
+        <parameter name="SchemeName" choice="XOR">
+          <value name="Other"/>
         </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Other" note="Other: enter the type of scheme and a brief description.&#10;"/>
-          <value name="no cloud microphysics scheme"/>
-        </parameter>
-        <parameter name="Properties" choice="OR">
+        <parameter name="MicrophysicalProcesses" choice="OR">
           <value name="Mixed phase"/>
           <value name="Cloud droplets"/>
           <value name="Cloud ice"/>
@@ -251,143 +243,52 @@
           <value name="Raindrops"/>
           <value name="Snow"/>
           <value name="Graupel"/>
-          <value name="Other" note="Other: enter further microphysics keywords"/>
+          <value name="Other"/>
         </parameter>
       </component>
     </component>
-    <component name="AtmosPrecipitation">
-      <component name="LargeScalePrecipitation">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no large scale precipitation scheme"/>
-        </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Other" note="Other: enter the type of scheme and a brief description.&#10;"/>
-          <value name="no large scale precipitation scheme"/>
-        </parameter>
-        <parameter name="PrecipitatingHydrometeors " choice="OR">
-          <value name="Liquid Rain"/>
-          <value name="Snow"/>
-          <value name="Hail"/>
-          <value name="Graupel"/>
-          <value name="Other" note="Other: enter further hydrometeors"/>
-        </parameter>
-      </component>
-      <component name="ConvectivePrecipitation">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no convective precipitation scheme"/>
-        </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Other" note="Other: enter the type of scheme and a brief description.&#10;"/>
-          <value name="no convective precipitation scheme"/>
-        </parameter>
-        <parameter name="PrecipitatingHydrometeors " choice="OR">
-          <value name="Liquid Rain"/>
-          <value name="Snow"/>
-          <value name="Hail"/>
-          <value name="Graupel"/>
-          <value name="Other" note="Other: enter further hydrometeors"/>
-        </parameter>
-      </component>
-      <component name="Microphysics">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference"/>
-          <value name="no cloud microphysics scheme"/>
-        </parameter>
-        <parameter name="Type" choice="XOR">
-          <value name="Other" note="Other: enter the type of scheme and a brief description.&#10;"/>
-          <value name="no cloud microphysics scheme"/>
-        </parameter>
-        <parameter name="Properties" choice="OR">
-          <value name="Mixed phase"/>
-          <value name="Cloud droplets"/>
-          <value name="Cloud ice"/>
-          <value name="Ice Nucleation"/>
-          <value name="Water vapour deposition"/>
-          <value name="Raindrops"/>
-          <value name="Snow"/>
-          <value name="Graupel"/>
-          <value name="Other" note="Other: enter further microphysics keywords"/>
-        </parameter>
-      </component>
-    </component>
-    <component name="AtmosGravityWaves">
-      <component name="OrographicGW">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-          <value name="no orographic gravity wave scheme"/>
-        </parameter>
-        <parameter name="PropagationType" choice="XOR">
-          <value name="Linear theory"/>
-          <value name="Non-Linear theory"/>
-          <value name="Other" note="Other: enter the type of the propagation scheme and a description"/>
-          <value name="none"/>
-        </parameter>
-        <parameter name="DissipationType" choice="XOR">
-          <value name="Total Wave"/>
-          <value name="Single Wave"/>
-          <value name="Spectral"/>
-          <value name="Linear"/>
-          <value name="Other" note="Other: enter the type of the disipation scheme and a description"/>
-          <value name="none"/>
-        </parameter>
-        <parameter name="Source Mechanisms" choice="OR">
-          <value name="Linear Mountain Waves"/>
-          <value name="Hydraulic Jump"/>
-          <value name="Envelope Orography"/>
-          <value name="Statistical Sub-Grid Scale Variance"/>
-          <value name="Non-Linear Calculation"/>
-          <value name="More than two cardinal directions"/>
-          <value name="Other" note="Other: enter further source mechanism keywords"/>
-        </parameter>
-      </component>
-      <component name="SpectralGW">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-          <value name="no spectral gravity wave scheme"/>
-        </parameter>
-        <parameter name="PropagationType" choice="XOR">
-          <value name="Linear theory"/>
-          <value name="Non-Linear theory"/>
-          <value name="Other" note="Other: enter the type of the propagation scheme and a description"/>
-          <value name="none"/>
-        </parameter>
-        <parameter name="DissipationType" choice="XOR">
-          <value name="Total Wave"/>
-          <value name="Single Wave"/>
-          <value name="Spectral"/>
-          <value name="Linear"/>
-          <value name="Other" note="Other: enter the type of the disipation scheme and a description"/>
-          <value name="none"/>
-        </parameter>
-        <parameter name="Source Mechanisms" choice="OR">
-          <value name="Convection"/>
-          <value name="Precipitation"/>
-          <value name="Background Spectrum"/>
-          <value name="Spatially Dependent"/>
-          <value name="Temporally Dependent"/>
-          <value name="Other" note="Other: enter further source mechanism keywords"/>
-        </parameter>
-      </component>
-      <component name="ConvectiveGW">
-        <parameter name="Scheme" choice="XOR">
-          <value name="Other" note="Other: enter the name of the scheme and a reference."/>
-          <value name="no convectively generated gravity wave scheme"/>
-        </parameter>
-        <parameter name="PropagationType" choice="XOR">
-          <value name="Linear theory"/>
-          <value name="Non-Linear theory"/>
-          <value name="Other" note="Other: enter the type of the propagation scheme and a description"/>
-          <value name="none"/>
-        </parameter>
-        <parameter name="DissipationType" choice="XOR">
-          <value name="Total Wave"/>
-          <value name="Single Wave"/>
-          <value name="Spectral"/>
-          <value name="Linear"/>
-          <value name="Other" note="Other: enter the type of the disipation scheme and a description"/>
-          <value name="none"/>
+    <component name="OrographyAndWaves">
+      <component name="GravityWaves">
+        <component name="Orographic">
+          <parameter name="SourceMechanisms" choice="OR">
+            <value name="Linear Mountain Waves"/>
+            <value name="Hydraulic Jump"/>
+            <value name="Envelope Orography"/>
+            <value name="Statistical Sub-Grid Scale Variance"/>
+            <value name="Non-Linear Calculation"/>
+            <value name="More than two cardinal directions"/>
+            <value name="Other" note="Other: enter further source mechanism keywords"/>
+          </parameter>
+          <parameter name="PropagationScheme" choice="XOR">
+            <value name="Linear theory"/>
+            <value name="Non-Linear theory"/>
+            <value name="Other" note="Other: enter the type of the propagation scheme and a description"/>
+          </parameter>
+          <parameter name="DissipationScheme" choice="XOR">
+            <value name="Total Wave"/>
+            <value name="Single Wave"/>
+            <value name="Spectral"/>
+            <value name="Linear"/>
+            <value name="Other" note="Other: enter the type of the disipation scheme and a description"/>
+          </parameter>
+        </component>
+        <component name="Convective">
+          <parameter name="Propagation Scheme" choice="XOR">
+            <value name="Linear theory"/>
+            <value name="Non-Linear theory"/>
+            <value name="Other" note="Other: enter the type of the propagation scheme and a description"/>
+          </parameter>
+          <parameter name="Dissipation Scheme" choice="XOR">
+            <value name="Total Wave"/>
+            <value name="Single Wave"/>
+            <value name="Spectral"/>
+            <value name="Linear"/>
+            <value name="Other" note="Other: enter the type of the disipation scheme and a description"/>
+          </parameter>
+        </component>
+        <parameter name="Background" choice="XOR">
+          <value name="None"/>
+          <value name="Other"/>
         </parameter>
       </component>
     </component>
