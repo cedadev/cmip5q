@@ -3,12 +3,15 @@
     <head>
         <link rel="stylesheet" href="/css/style.css" type="text/css" />
         <title>{% block title %}CMIP5 Model Metadata Questionaire{% endblock %}</title>
-		<!-- YUI treeview stuff for head -->
-		<script type="text/javascript" src="/css/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+        <!-- YUI treeview stuff for head -->
+        <script type="text/javascript" src="/css/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
         <script type="text/javascript" src="/css/yui/build/connection/connection-min.js"></script>
         <script type="text/javascript" src="/css/yui/build/treeview/treeview-min.js"></script>
+        <script type="text/javascript" src="/css/yui/build/element/element-min.js"></script>
+        <script type="text/javascript" src="/css/yui/build/tabview/tabview-min.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/yui/build/treeview/assets/skins/sam/treeview.css">
-		<!-- end of YUI treeview stuff for head -->
+        <link rel="stylesheet" type="text/css" href="/css/yui/build/tabview/assets/skins/sam/tabview.css" />
+        <!-- end of YUI treeview stuff for head -->
     </head>
     <body class="yui-skin-sam">
         <div id="page">
@@ -30,16 +33,33 @@
             </div>
             <div id="breadcrumb">
             </div>
+
+
+
             <div class="main">
-               <div class="tabs">
-               <ul>
-                <li>Experiments</li>
-                <li>Centre</li>
-                <li>Model</li>
-                <li>Simulations</li>
-                <li>References</li>
-                </ul>
-               </div>
+
+                <!--BEGIN SOURCE CODE FOR YUI TABS =============================== -->
+                <div id="tabs" class="yui-navset">
+                    <ul class="yui-nav">
+                        <li><a href="#tab_Experiments"><em>Experiments</em></a></li>
+                        <li class="selected"><a href="#tab_Centre"><em>Centre</em></a></li>
+                        <li><a href="#tab_Model"><em>Model</em></a></li>
+                        <li><a href="#tab_Simulations"><em>Simulations</em></a></li>
+                        <li><a href="#tab_References"><em>References</em></a></li>
+                    </ul>            
+                    <div class="yui-content">
+                        <div id="tab_Experiments"><p>Content for Experiments tab</p></div>
+                        <div id="tab_Centre"><p>Content for Centre tab</p></div>
+                        <div id="tab_Model"><p>Content for Model tabt</p></div>
+                        <div id="tab_Simulations"><p>Content for Simulations tab</p></div>
+                        <div id="tab_References"><p>Content for References tab</p></div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    var tabView = new YAHOO.widget.TabView('tabs');
+                </script>
+                <!--END SOURCE CODE FOR YUI TABS =============================== -->
+
                {% block content %}
                {% endblock %}</p>	 
             </div>
