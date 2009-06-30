@@ -92,7 +92,7 @@ def addComponent(request,centre_id,cmip5=True):
     component.contact=author
     component.title='GCM Template'
     component.abbrev='GCM Template'
-    mindmaps=['Atmosphere.xml']  #FIXME: add the rest here as they are ready.
+    mindmaps=['Atmosphere.xml','Ocean.xml','SeaIce.xml','OceanBioChemistry.xml']
     for m in mindmaps:
         x=XMLVocabReader(m, centre_id,author)
         x.doParse()

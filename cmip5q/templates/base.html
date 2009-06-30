@@ -9,8 +9,10 @@
         <script type="text/javascript" src="/css/yui/build/treeview/treeview-min.js"></script>
         <script type="text/javascript" src="/css/yui/build/element/element-min.js"></script>
         <script type="text/javascript" src="/css/yui/build/tabview/tabview-min.js"></script>
+        <script type="text/javascript" src="/css/yui/build/button/button-min.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/yui/build/treeview/assets/skins/sam/treeview.css">
         <link rel="stylesheet" type="text/css" href="/css/yui/build/tabview/assets/skins/sam/tabview.css" />
+        <link rel="stylesheet" type="text/css" href="/css/yui/build/button/assets/skins/sam/button.css"> 
         <!-- end of YUI treeview stuff for head -->
     </head>
     <body class="yui-skin-sam">
@@ -42,24 +44,22 @@
                 <div id="tabs" class="yui-navset">
                     <ul class="yui-nav">
                         <li><a href="#tab_Experiments"><em>Experiments</em></a></li>
-                        <li class="selected"><a href="#tab_Centre"><em>Centre</em></a></li>
-                        <li><a href="#tab_Model"><em>Model</em></a></li>
                         <li><a href="#tab_Simulations"><em>Simulations</em></a></li>
-                        <li><a href="#tab_References"><em>References</em></a></li>
+                        <li class="selected"><a href="/cmip5/centre/{{c.centre_id}}"><em>Models</em></a></li>
+                        <li><a href="#tab_References"><em>All References</em></a></li>
+                        
                     </ul>            
                     <div class="yui-content">
-                        <div id="tab_Experiments"><p>Content for Experiments tab</p></div>
-                        <div id="tab_Centre"><p>Content for Centre tab</p></div>
-                        <div id="tab_Model"><p>Content for Model tabt</p></div>
-                        <div id="tab_Simulations"><p>Content for Simulations tab</p></div>
-                        <div id="tab_References"><p>Content for References tab</p></div>
+                        <div id="tab_Experiments"><p class="cmip5q"> Tab view under construction</p></div>
+                        <div id="tab_Centre"><p class="cmip5q"> Tab view under construction</p></div>
+                        <div id="tab_Simulations"><p class="cmip5q"> Tab view under construction</p></div>
+                        <div id="tab_References"><p class="cmip5q"> Tab view under construction</p></div>
                     </div>
                 </div>
                 <script type="text/javascript">
                     var tabView = new YAHOO.widget.TabView('tabs');
                 </script>
                 <!--END SOURCE CODE FOR YUI TABS =============================== -->
-
                {% block content %}
                {% endblock %}</p>	 
             </div>
