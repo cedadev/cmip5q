@@ -1,8 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
-<h2> {{label}} a simulation in {{exp.abbrev}}</h2>
+<div class="boxer">
+<h2> {{label}} a simulation in {{exp.docID}}</h2>
+<p>({{exp.rationale}} {{exp.why}})</p>
+</div>
+<div class="boxer">
+<h4> General Characteristics of the Simulation </h4>
+<p class="guidance"> In this box you fill out the general characteristics of the simulation. Note that you need to press the Add or Update button to update this part separately from the conformance section below.</p>
 <form action="{{url}}" method="post">
-{{simform.as_p}}
-<input type="submit" value="{{label}}"/>
+{{simform.management_form}}
+<table>
+<tr><td>Short Name:{{simform.abbrev.errors}} </td><td>{{simform.abbrev}}</td></tr>
+<tr><td>Long Name:{{simform.title.errors}} </td><td>{{simform.title}}</td></tr>
+<tr><td>Contact:{{simform.contact.errors}} </td><td>{{simform.contact}}</td></tr>
+<tr><td> Simulation used:  </td><td>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
+on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
+<tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}</td></tr>
+<tr><td>Description (notes)</td><td>{{simform.description}}</td></tr>
+<tr><td colspan="2">
+<center><input id="simFormButton" type="submit" value="{{label}}"/>
+<script type="text/javascript">
+ var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
+</script>
+</center></td></tr>
+</table>
 </form>
+</div>
+<div class="boxer backgrey">
+<h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
+<p class="guidance"> In this section you need to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuraiton of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
+<ul>
+<li> <p>Where you indicate the use of a file, you will need to choose a file from a dropdown list of those files which you have <em> already </em> defined.</p><p class="cmip5q"> next button broken </p>
+<form action="{{dataURL}}" method="POST">
+<input type="hidden" name="simulation" value="{{simid}}">
+<input id="fileBut" type="submit" value="(add more file(s) now)">
+</form>
+<script type="text/javascript">
+var fileButton = new YAHOO.widget.Button("fileBut",{value:"fileButvalue"}); 
+</script></li>
+<li> <p>Where you indicate a code modification, please indicate which component was modified, using the drop down list provided. </p>
+<p class="cmip5q"> At the moment the components offered include all those from your centre,
+not just those from within the specific model ... until we fix that, watch out!</p>
+{% ifequal label "Update" %}
+</li>
+</ul>
+<p class="cmip5q"> We can make the defaults for the file/code to be files for i.c and b.c ... </p>
+<p class="cmip5q"> ?? Do we want to ask for references with conformances ?? </p>
+<table width="100%">
+{%for r in reqs %}
+    <tr>
+    <td width="30%"><table>
+            <tr><td><b>{{r.name}}</b></td></tr>
+            <tr><td>{{r.description}}</td></tr>
+    </table></td>
+    <td>{% include "conformance.html" %}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endifequal %}
+{% ifnotequal label "Update" %}
+<p> This section cannot be filled in until the general characteristics have been submitted </p>
+{% endifnotequal %}
+</div>
+        
 {% endblock %}

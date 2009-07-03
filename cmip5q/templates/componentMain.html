@@ -7,18 +7,19 @@
 <table class="navmain">
    <tr>
       <td valign="top" width="200px">
-        <div id="treeDiv" class="boxer">{{navtree|safe}}</div>
-        <div class="boxer"> 
+      
+        <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
+        <h4>Component {{c.abbrev}}</h4>
         <p class="guidance"> Please add details of any other relevant
         subcomponents of this component <p>
-        <p><a id="linkbutton4" href="/cmip5/components/addsub/{{c.id}}/"> Add Subcomponent</a></p>
+        <p><a id="linkbutton4" href="{{subu}}"> Add Subcomponent</a></p>
         </div>
+        
         <div class="boxer"><p class="cmip5q"> Placeholder for link to Coupling Page </p> </div>
         <div class="boxer">
-        <p class="cmip5q">View and Validate buttons do not work</p>
-          <p><a id="linkbutton2" href="/cmip5/centre/{{c.centre_id}}">View</a></p>
-          <p><a id="linkbutton3" href="/cmip5/centre/{{c.centre_id}}">Validate</a></p>
-          <p><a id="linkbutton1" href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p>
+          <p><a id="linkbutton2" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/view/">View</a></p>
+          <p><a id="linkbutton3" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/validate/">Validate</a></p>
+          <p><a id="linkbutton1" href="/cmip5/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p>
            
         </div>
       </td>
@@ -30,9 +31,9 @@
         {{cform.management_form}}
         <!--<h4> General Characteristics </h4>-->
         <table>
-            <tr><td>Title</td><td>{{cform.title}}</td></tr>
-            <tr><td></td><td>(Abbrev: {{cform.abbrev}}, type:  {{cform.scienceType}})</td></tr>
-            <tr><td>Contact&nbsp;</td><td>{{cform.contact}}</td></tr>
+           <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
+            <tr><td>Long Name:&nbsp;</td><td>{{cform.title}}</td></tr> 
+            <tr><td>Contact:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
         </table>
     </div>
     <div class="boxer">
@@ -50,7 +51,7 @@
                 <tr><td colspan="2"> Add a new param: </td><td colspan="2"></td></tr>
                 {{pform.new|safe }}
                 </table>
-                <p class="cmip5q"> Not sure what to do about deletions. Do we want to allow them?</p>
+                <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
             </div>
             <br style="clear:both"/><!-- Hack to make div expand vertically --> 
         </div> 
@@ -60,7 +61,7 @@
     <h4> Additional Information </h4>
     <center>
     <p class="guidance">Please tell us how this component has
-    been improved from previous generations of this model: </p>
+    been improved from previous generations. </p>
     <p>{{cform.geneology}}</p>
     <p class="guidance">Any additional information about this component: </p>
     <p>{{cform.description}}</p> 

@@ -2,7 +2,7 @@
 {% block content %}
 <h2> Platform </h2>
 <div class="inner">
-    <form action='/cmip5/platforms/edit/{{platform_id}}/' method='post'>
+    <form action='{{url}}' method='post'>
     {{pform.as_p}}
     <input type="submit" value="Submit Platform"/>
     </form>

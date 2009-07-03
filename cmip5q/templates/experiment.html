@@ -2,8 +2,30 @@
 {% block content %}
 
 <div class="inner">
-<p>Experiment View Not Implemented Yet  </p>
-<p> Note that experiments are *created* via the admin interface <p>
+
+    <div class="boxer">
+        <h1> Experiment {{e.docID}} </h1>
+        <p>{{e.rationale}} </p>
+        <p>{{e.why}} </p>
+        <p> Duration {{e.startDate}} to {{ e.endDate }}
+    </div>
+    
+    <div class="boxer">
+        <h4> Requirements </h4>
+        <div class="backgrey">
+            <table>
+                {% for r in reqs %}
+                    <tr><td>{{r.name}}</td><td>{{r.type}}<td>{{r.description}}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+    </div>
+    
+    <div class="boxer">
+        <p class="cmip5q"> Placeholder for a list of centres and simulation numbers which have been documented for this experiment </p>
+    </div>
+
 </div>
 
 {% endblock %}

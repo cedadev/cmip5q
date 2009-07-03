@@ -1,5 +1,21 @@
 import logging
 from cmip5q.protoq.models import *
+from django.core.urlresolvers import reverse
+
+class tab:
+    ''' This is a simple tab class to support yui tabs '''
+    def __init__(self,name,url,active=0):
+        self.name=name
+        self.url=url
+        self.active={0:'false',1:'true'}[active]
+
+def tabs(centre_id,view,component=1):
+    ''' Build a list of tabs to be used on each page, passed to base.html '''
+    t=[]
+    t.append(tab('Summary',reverse('cmip5q.protoq.views.centre',args=(centre_id,)),(view=='Summary')))
+    t.append(tab('Models',reverse('cmip5q.protoq.views.componentEdit',args=(centre_id,component,)),(view=='Models')))
+    t.append(tab('References',reverse('cmip5q.protoq.views.references',args=()),(view=='References')))
+    return t
 
 class ParamRow(object):
     

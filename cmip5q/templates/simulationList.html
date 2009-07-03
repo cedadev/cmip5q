@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+
+    <h1> Simulations </h1>
+    <p> This page holds the master index of all the simulations run by {{c.abbrev}}, and relates them
+    to the appropriate CMIP5 experiment.</p>
+    <p> You are expected to use the add simulation button to add simulations, after which you can edit
+    their descriptions. You can choose to add placeholders for all simulations now, or add them over
+    time, and either way, come back and edit the simulation descriptions at a later date. </p>
+    
+    <p class="guidance">For each experiment, you can see listed the simulations from this centre conforming to the model.</p>
+    <p class="cmip5q"> (NB: The experiments, and their descriptions will be entered via the CIM instances)<p>
+        <div class="backgrey">
+    <table width="100%">
+        <tr><th width="20%">name</th><th colspan="2"> simulations </th></tr>
+        {% for e in experiments %}
+        <tr><td><a href="/cmip5/experiment/view/{{e.id}}/">{{e.abbrev}}</a></td><td >
+        {% for s in e.values %}
+            <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
+            <script type="text/javascript">
+                var oLinkSimEdButton{{s.id}} = new YAHOO.widget.Button("simEdButton{{s.id}}");
+            </script>
+        {% endfor %}
+        </td> <td width="10%"> 
+        <a id="simAddButton{{forloop.counter}}" href="{{e.new}}">Add New</a>
+        <script  type="text/javascript"> 
+            var oLinkButton{{forloop.counter}} = new YAHOO.widget.Button("simAddButton{{forloop.counter}}"); 
+        </script>
+        </td></tr>
+        {% endfor %}
+    </table>
+        </div>
+
+</div>
+{% endblock %}

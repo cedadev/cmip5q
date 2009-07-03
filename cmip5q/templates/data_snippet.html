@@ -1,0 +1,39 @@
+<div id="conform{{r.id}}">
+    <form action="{{r.con.url}}" method="POST">
+        <table>
+        <tr><td></td><td></td><td>
+            <table>
+            {{r.con.form.management_form}}
+            <tr><td> Link to file {{r.con.form.link.errors}}</td>
+                <td colspan="3"> {{r.con.form.link}}</td></tr>
+            <tr><td> Variable (within that file) {{r.con.form.variable.errors}}</td>
+                <td> {{r.con.form.variable}}</td>
+                <td> CF name {{r.con.form.cfname.errors}}</td>
+                <td> {{r.con.form.cftype}}</td></tr>
+             <tr><td> Data Description {{r.con.form.description.errors}}</td>
+                <td colspan="3">{{r.con.form.description}}</td></tr>
+             <tr><td colspan="4">
+                <center>
+                <input id="conform{{r.id}}" type="submit" value="submit conformance">
+                <script type="text/javascript">
+                    var conformSubBut{{r.id}} = new YAHOO.widget.Button("conformSubBut{{r.id}}",
+                                        {value:"conformSubBut{{r.id}}value"});
+                </script>
+                </center>
+            </td></tr>
+        </table>
+        </td></tr>
+        </table>
+    </form>
+</div>
+<div id="dform{{r.conform.id}}">
+    <form action="{{r.conform.url}}" method="POST">
+        {{o.form}}
+        <input id="dformBut{{r.conform.id}}" type="submit" value="submit data details">
+        <script type="text/javascript">
+            var odformBut{{o.id}} = new YAHOO.widget.Button("dformBut{{o.id}}",
+                                {value:"dformBut{{o.id}}value"});
+        </script>
+    </form>
+</div>
+    

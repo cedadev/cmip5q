@@ -22,40 +22,9 @@ class Reference(models.Model):
     ''' An academic Reference '''
     name=models.CharField(max_length=24)
     citation=models.TextField(blank=True)
+    link=models.URLField(blank=True,null=True)
     def __unicode__(self):
         return self.name
-    
-#class triple(models.Model):
-#    ''' Used for building bidirectional relationships '''
-#    ##http://docs.djangoproject.com/en/dev/ref/contrib/contenttypes/
-#    # subject, object, predicate
-#    object=models.SlugField(max_length=64)
-#    
-#    subject=models.ForeignKey(ContentType,related_name='triple_subject')
-#    subject_id=models.PositiveIntegerField()
-#    subject_object=generic.GenericForeignKey('subject','subject_id')
-#    
-#    predicate=models.ForeignKey(ContentType,related_name='triple_predicate')
-#    predicate_id=models.PositiveIntegerField()
-#    predicate_object=generic.GenericForeignKey('predicate','predicate_id')
-#   
-#    def __unicode__(self):
-#        return '%s,%s,%s'%(subject,object,predicate)
-    
-#class Relation(models.Model):
-#    ''' Used for holding uni-directional relationships '''
-#    tag=models.SlugField(max_length=64)
-#    #relation=models.ForeignKey(ContentType)
-#    #relation_id=models.PositiveIntegerField()
-#    ##relation_object=generic.GenericForeignKey(ct_field='relation',fk_field='relat#ion_id')
-#    content_type = models.ForeignKey(ContentType)
-#    object_id = models.PositiveIntegerField()
-#    content_object = generic.GenericForeignKey('content_type', 'object_id')
-#    # don't know why the former doesn't work, but let's deal
-#    # with one problem at a time.#
-#
-#    def __unicode__(self):
-#        return '(%s,%s)'%(self.tag,self.relation_object)
     
 class Component(Doc):
     ''' A model component '''
@@ -77,8 +46,21 @@ class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
     centre=models.ForeignKey('Centre',blank=True,null=True)
     
-class Experiment(Doc):
+class Experiment(models.Model):
     ''' A CMIP5 Experiment '''
+    rationale=models.TextField(blank=True,null=True)
+    why=models.TextField(blank=True,null=True)
+    requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
+    docID=models.CharField(max_length=128)
+    startDate=models.CharField(max_length=32)
+    endDate=models.CharField(max_length=32)
+    
+    
+class NumericalRequirement(models.Model):
+    ''' A numerical Requirement '''
+    description=models.TextField()
+    name=models.CharField(max_length=128)
+    type=models.CharField(max_length=32,blank=True,null=True)
     
 class Simulation(Doc):
     ''' A CMIP5 Simulation '''
@@ -87,34 +69,34 @@ class Simulation(Doc):
     ensembleMembers=models.PositiveIntegerField(default=1)
     #each simulation corresponds to one experiment
     experiment=models.ForeignKey(Experiment)
-    #expect to set platforms up after we've set up simulations
-    platform=models.ForeignKey(Platform,blank=True,null=True)
+    #platforms
+    platform=models.ForeignKey(Platform)
     #each simulation run by one centre
     centre=models.ForeignKey('Centre')
     
-    
-class Conformance:
+class Conformance(models.Model):
     ''' This relates a numerical requirement to an actual solution in the simulation '''
-    uid=models.CharField(max_length=64,unique=True)
+    # centre (for access control)
+    centre=models.ForeignKey('Centre')
     # the identifier of the numerical requirement:
-    exptuid=models.CharField(max_length=64)
+    requirement=models.ForeignKey(NumericalRequirement)
+    # simulation owning the requirement 
+    simulation=models.ForeignKey(Simulation)
     # if we didn't use a file, it will be code
-    usedFile=models.BooleanField(default=1)
-    # so we enter some text if we do a code modification
-    ## FIXME: use foreign keys for component ids, not blank strings ...
-    codeModDescription=models.TextField(blank=True,null=True)
-    # this is the uid of the target component that has been modified (if any has)
-    codeModTargetUid=models.CharField(max_length=64,blank=True,null=True)
-    # This is the original unmodified component if we know it
-    codeOriginalUid=models.CharField(max_length=64,blank=True,null=True)
+    method=models.CharField(max_length=30)
+    # so we enter some text (particuarly if we do a code modification)
+    description=models.TextField()
+    # this is the target component that has been modified (if any has)
+    component=models.ForeignKey(Component,blank=True,null=True)
+    # this is the file object that has been used (if any)
+    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
+    
     
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
     
-class NumericalRequirement(Doc):
-    ''' A numerical Requirement '''
-    experiment=models.ForeignKey(Experiment)
+
 #
 ##
 ### Tables for holding internal component parameter values (and parameter options)
@@ -154,17 +136,56 @@ class Param(models.Model):
     # still not sure about this ...
     vocab=models.ForeignKey(Vocab,null=True,blank=True)
     value=models.CharField(max_length=512,blank=True)
+    
+class DataObject(models.Model):
+    ''' Holds the data object information agreed in Paris '''
+    # a name for drop down file lists:
+    name=models.CharField(max_length=64)
+    # a link to the object if possible:
+    link=models.URLField(blank=True)
+    # a free text description
+    description=models.TextField()
+    # if the data object is a variable within a dataset at the target uri, give the variable
+    variable=models.CharField(max_length=128,blank=True)
+    # and if possible the CF name
+    cftype=models.CharField(max_length=512,blank=True)
+    
 ##
 ### FORMS FOLLOW
 ## We only need forms for the things the punters fill in,
 ## we can use the admin interface for the things we fill in
 ## (Exxperiment, Centre)
 #
+
+class ConformanceForm(forms.ModelForm):
+    ''' Handles material needed to establish conformance '''
+    mychoices=(
+    ('File','External File'),('Code','Modified Code'),('Standard ','Standard Configuration'),)
+    method=forms.ChoiceField(choices=mychoices)
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+    class Meta:
+        model=Conformance
+        # the following are known via the URI used ...
+        exclude=('centre','requirement','simulation')
+
+class DataObjectForm(forms.ModelForm):
+    link=forms.URLField(widget=forms.TextInput(attrs={'size':'60'}))
+    description=forms.CharField(widget=forms.Textarea({'cols':'70','rows':'2'}))
+    variable=forms.CharField(widget=forms.TextInput(attrs={'size':'30'}),required=False)
+    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'30'}),required=False)
+    class Meta:
+        model=DataObject
+
 class SimulationForm(forms.ModelForm):
+    #it appears that when we explicitly set the layout for forms, we have to explicitly set 
+    #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
+    description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
     class Meta:
         model=Simulation
         #these are enforced by the workflow leading to the form
-        exclude=('centre','experiment',)
+        exclude=('centre','experiment','uri')
 
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
@@ -173,12 +194,16 @@ class ComponentForm(forms.ModelForm):
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
-    contact=forms.CharField(widget=forms.TextInput(attrs={'size':'72'}))
+    contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
     #uri=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
     scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+    implemented=forms.BooleanField(required=True)
     class Meta:
         model=Component
         exclude=('centre','uri')
+        
+        
+        
 
 class ReferenceForm(forms.ModelForm):
     class Meta:

@@ -67,7 +67,7 @@ padding:5px 5px 5px 15px;
 /* Two equal column options */
 .tableft{float:left;width:520px; background-color:#FFFFFF;margin:5px;}
 .tabright{float:right; width:520px;background-color:#FFFFFF;margin:5px;}
-.twocol td, .threecol td, .backgrey { background-color:#E1E1E1;}
+.twocol td, .threecol td, .backgrey td { background-color:#E1E1E1;}
 td.space {background-color:#FFFFFF;}
 /* Two columns, with the left as a sidebar */
 .sidebar {float: left;width:130px;background-color:#FFFFFF;margin:5px}

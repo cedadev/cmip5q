@@ -2,86 +2,113 @@
 {% block content %}
 
 <div class="inner">
-<h1> {{centre.title}} </h1>
 
-<p>Each centre has associated with it a number of simulations, run with a model, and conforming to a CMIP5 experiment. </p>
-
-<p> To add a simulation which uses a <b> new </b> model, you need to add the model first. Note that if the new model is a variant of an existing
-model, you can copy an old model and edit that!</p>
-
-<p> To add an experiment which uses an old model, you can simply go straight
-to the add simulation option <p>
-
-
-<div class="twocol">
-    <div class="tableft">
-    
-        <h2> Experiments </h2>
-        <p>This is the collection of CMIP5 experiments. For each experiment, you can see listed the simulations from this centre conforming to the model.</p>
-        <div class="guidance"><p> (NB: The experiments, and their descriptions will be entered via the admin interface,
-            and there will be a lot of them !)<p></div>
-        <table width="100%">
-            <tr><td>name</td><td colspan="2"> simulations </td></tr>
-            {% for e in experiments %}
-            <tr><td><a href="/cmip5/experiment/view/{{e.id}}/">{{e.abbrev}}</a></td><td>
-            {% for s in e.values %}
-            <a href="/cmip5/simulations/edit/{{s.id}}/">
-            {{s.abbrev}}</a>&nbsp;
-            {% endfor %}
-            </td> <td> 
-            <form action='/cmip5/simulations/add/{{centre.id}}/{{e.id}}/'>
-            <input type="submit" value="Add New"/></form> </td></tr>
-            {% endfor %}
-        </table>
-    </div>
-        
-    <div class="tabright">
-        <h2> Models and Platforms</h2>
-        <p> You need to make sure you have at least one model and platform defined before you can create a simulation </p>
-        <div id="models">
-            <div class="instanceList">
-                <table width="100%">
-                <thead>
-                    <tr><th colspan="4"> Models associated with {{centre.abbrev}}</td></tr>
-                    <tr><th> Model </th> <th width=15%> Status </th><th width="30%" colspan="2"></tr>
-                    {% for m in models %}
-                        </thead><tbody><tr>
-                        <td>{{m.abbrev}}</td><td></td>
-                        <td> <form action='/cmip5/components/edit/{{m.id}}/' method='get'>
-                            <input type="submit" value="edit"/>
-                            </form>
-                        </td><td><form action='/cmip5/components/add/{{centre.id}}/{{m.id}}/' method='get'>
-                            <input type="submit" value="CopyAsNew"/>
-                            </form> 
-                        </td></tr>
-                    {% endfor %}
-                    <tbody>
-                </table>
-                    <form action="/cmip5/components/add/{{centre.id}}">
-                        <input type="submit" value="Add a new CMIP5 Model"/>
-                    </form>
-                <p class="guidance"> The status column provides an indicator of how much of the model description has
-                been completed. CopyAsNew should be used to describe variants of already described models.</p>
-                </form>
-            </div>
-        </div>
-        <div id="platforms">
-            <div class="instanceList">
-                <table width="100%">
-                <thead>
-                <tr><th colspan="2"> Computing platforms associated with {{centre.abbrev}}</td></tr></thead><tbody>
-                {% for m in platforms %}
-                <tr><td>{{m.abbrev}}</td>
-                <td><a href="/cmip5/platforms/edit/{{m.id}}">edit</a></td></tr>
-                {% endfor %}
-                </tbody></table>
-                    <form action="/cmip5/platforms/add/{{centre.id}}/">
-                        <input type="submit" value="Add a new Platform"/>
-                    </form>
-            </div> <!--instanceList -->
-        </div> <!-- platform -->
-    </div> <!-- tabright -->
-    <br style="clear:both"/><!-- Hack to make div expand vertically -->
-</div> <!-- twocol -->
+<div class="boxer">
+<h1> Summary: {{centre.title}} </h1>
 </div>
+<div class="boxer">
+<h4> Introduction </h4>
+
+<p>Each CMIP5 modelling centre is running <em> Simulations </em> which run <em> Models </em> on <em> Platforms </em>.</p>
+
+<p>The <em> Models </em> are made up of <em>Components</em></p>
+
+<p>The <em> Simulations </em> conform to the <em>NumericalRequirements</em> of <em> Experments</em> via what we call <em>Conformances</em> which consist of either specific code modifications or the use of specific boundary or initial condition <em>DataObject</em>s</p>
+
+<p>The purpose of this questionnaire is to glean information about the entities denoted <em>thus</em> and/or their relationships.</p>
+
+<p> We expect to see each centre enter at least one model, one platform, and then multiple simulations, each of which will involve entering descriptions of how they conform to the numerical requirements via conformances. It is not possible to start entering simulation information until at least a named template exists for at least one model and one platform </p>
+</p>
+
+</div>
+
+<div class="boxer">
+
+<h4> </h4>
+<table>
+<tr><td width="50%">
+    <div class="backgrey">
+    <table width="100%">
+        <thead>
+            <tr><th colspan="3"> Models associated with {{centre.abbrev}}</th></tr>
+            <tr><th colspan="2"></th> <th width=30%> Status </th>
+        </thead>
+        <tbody> 
+        {% for m in models %}
+        <tr><td width="50%">{{m.abbrev}}</td>
+        <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a>
+        <script type="text/javascript">
+            var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");
+        </script>    
+        </td><td>
+        <p class="cmip5q">placeholder</p>
+        </td></tr>
+        {% endfor %} 
+        <tr><td><a id="newModButton" href="{{newmod}}">Add a new model (template)</a></td><td colspan="2">Note that it can take some time to create a new model template ... be patient!</td></tr>
+        <tbody>
+    </table>
+    </div>
+    <script type="text/javascript">
+        var newmodButton = new YAHOO.widget.Button("newModButton");
+    </script>
+    <p class="guidance"> The status column provides an indicator of how much of the model description has
+    been completed. <!--CopyAsNew should be used to describe variants of already described models.--></p>
+    <div class="backgrey">
+    <table width="100%">
+        <thead>
+        <tr><th colspan="2"> Computing platforms associated with {{centre.abbrev}}</td></tr>
+        </thead>
+        <tbody>
+        {% for m in platforms %}
+        <tr><td width="50%">{{m.abbrev}}</td>
+        <td><a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">edit</a></td></tr>
+        <script type="text/javascript">
+            var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
+        </script>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <a id="newPlatButton" href="{{newplat}}">Add a new Platform</a>
+    <script type="text/javascript">
+        var newplatButton = new YAHOO.widget.Button("newPlatButton"); 
+    </script>
+</td>
+<td>
+    <div class="backgrey">
+    <table width="100%">
+        <thead>
+        <tr><th>Simulations associated with {{centre.abbrev}}</th><tr>
+        </thead>
+        <tbody>
+        <tr><td>{% for s in sims %} 
+           <a id="edSimButton{{forloop.counter}}" href="{{s.url}}">{{s.abbrev}}</a>
+           <script type="text/javascript">
+                var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{forloop.counter}}");
+           </script>
+           {% endfor %}
+        <tr><td><a id="viewSimBut" href="{{viewsimurl}}"> Simulation Master Page</a></td></tr>
+        </tbody>
+        <script type="text/javascript">
+            var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
+        </script>
+    </table>
+    <p></p>
+    <table width="100%">
+       <thead>
+        <tr><th>Other</th><tr>
+        </thead>
+        <tbody>
+        <tr><td><p class="cmip5q"> Number of dataobjects and conformances listed here</p> </td></tr>
+        </tbody>
+    </table>  
+</td>        
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+
+           
 {% endblock %}
