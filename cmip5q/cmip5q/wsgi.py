@@ -11,6 +11,7 @@ __contact__ = "Philip.Kershaw@stfc.ac.uk"
 __revision__ = "$Id$"
 
 import django.core.handlers.wsgi
+import os
 
 def app_factory(globalConfig, **localConfig):
     '''Paste app factory wrapper for Django WSGI handler.  This enables the 
@@ -19,4 +20,7 @@ def app_factory(globalConfig, **localConfig):
     [app:CMIP5QApp]
     paste.app_factory = cmip5q.wsgi:app_factory
     '''
+    if 'DJANGO_SETTINGS_MODULE' not in os.environ:
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'cmip5q.settings'
+        
     return django.core.handlers.wsgi.WSGIHandler()

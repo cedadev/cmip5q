@@ -54,18 +54,16 @@ setup(
     license =                'BSD - See LICENCE file for details',
     packages =                find_packages(),
     package_data = {
-        'ndg.security.server.sso.sso': [
-            'i18n/*/LC_MESSAGES/*.mo'
+        'cmip5q': [
+            '000Issues', 'LICENSE', 'loadmm', '*.xml', 'data/experiment/*.xml', 
+            'data/model/*.xml', 'setupProto.sh'
         ],
-        'ndg.security.server.conf': [
-            '*.xml', '*.py', '*.cfg', '*.conf'
-        ],
-        'cmip5q': ['data/experiment/*.xml', 'data/model/*.xml'],
         'cmip5q.test.data': ['*'], 
-        'cmip5q.test.integration.wsgi.paste': ['*.ini'],
-        'cmip5q.test.integration.wsgi.secured': ['*.ini', '*.xml'],
+        'cmip5q.test.integration.wsgi.paste': ['README', '*.ini'],
         'cmip5q.test.integration.wsgi.secured': [
-            'ca/*.0', 'ca/*.crt', 'pki/*.crt', 'pki/*.key'],
+            'README', '*.ini', '*.xml',
+            'ca/*.0', 'ca/*.crt', 'pki/*.crt', 'pki/*.key'
+        ],
     },
     include_package_data =    True,
     zip_safe =                False

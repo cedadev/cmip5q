@@ -1,0 +1,13 @@
+CMIP5 Questionnaire run with a Paste ini file configuration together with
+NDG Security filters.
+
+Requires:
+$ easy_install ndg_security_server ndg_security_common ndg_security_test
+
+Run:
+$ securityservicesapp.py
+
+from ndg.security.test.integration.authz package
+
+and this app:
+$ paster serve service.ini

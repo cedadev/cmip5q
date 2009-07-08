@@ -1,0 +1,3 @@
+CMIP5 Questionnaire run with a Paste ini file configuration 
+
+$ paster serve service.ini
