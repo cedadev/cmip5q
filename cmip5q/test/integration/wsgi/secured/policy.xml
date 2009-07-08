@@ -1,0 +1,14 @@
+   <?xml version="1.0" encoding="UTF-8"?>
+<Policy PolicyId="DjangoCMIP5Q" xmlns="urn:ndg:security:authz:1.0:policy">
+    <Description>Test secured Django app for CMIP5 Questionnaire development</Description>
+    
+    <Target>
+        <URIPattern>^/.*$</URIPattern>
+        <Attributes>
+            <Attribute>urn:siteA:security:authz:1.0:attr:staff</Attribute>
+        </Attributes>
+        <AttributeAuthority>
+            <uri>http://localhost:7443/AttributeAuthority</uri>
+        </AttributeAuthority>
+    </Target>
+</Policy>
