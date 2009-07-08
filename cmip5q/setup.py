@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+"""Distribution Utilities setup program for NDG Security Test Package
+
+Metafor Project
+"""
+__author__ = "P J Kershaw"
+__date__ = "08/07/07"
+__copyright__ = "(C) 2009 Science and Technology Facilities Council"
+__license__ = "BSD - see LICENSE file in top-level directory"
+__contact__ = "Philip.Kershaw@stfc.ac.uk"
+__revision__ = '$Id$'
+
+# Bootstrap setuptools if necessary.
+from ez_setup import use_setuptools
+use_setuptools()
+from setuptools import setup, find_packages
+import os
+
+_longDescription = """Django web application for CMIP5 questionnaire
+
+To set-up, run:
+
+$ ./setupProto.sh
+
+from this directory to initialise the SQLite Database.  This uses the 'python'
+executable in your PATH variable.  To set an alternative python, set the 
+PYTHON environment variable e.g.
+
+$ export PYTHON=python2.5
+$ ./setupProto.sh
+
+Then to run the application,
+
+$ python manage.py runserver
+
+The wsgi package contains settings to run the application using paster e.g.
+
+$ paster serve service.ini
+
+The service.ini provides example code for securing the application with NDG
+Security and should be modified to suit
+"""
+
+setup(
+    name =                   'cmip5q',
+    version =                '0.1.0',
+    description =            'CMIP5 Questionnaire',
+    long_description =       _longDescription,
+    author =                 'Bryan Lawrence',
+    author_email =           'Bryan.Lawrence@stfc.ac.uk',
+    maintainer =             'Bryan Lawrence',
+    maintainer_email =       'Bryan.Lawrence@stfc.ac.uk',
+    url =                    'http://metaforclimate.eu/trac',
+    license =                'BSD - See LICENCE file for details',
+    packages =                find_packages(),
+    package_data = {
+        'ndg.security.server.sso.sso': [
+            'i18n/*/LC_MESSAGES/*.mo'
+        ],
+        'ndg.security.server.conf': [
+            '*.xml', '*.py', '*.cfg', '*.conf'
+        ],
+        'cmip5q': ['data/experiment/*.xml', 'data/model/*.xml'],
+        'cmip5q.test.data': ['*'], 
+        'cmip5q.test.integration.wsgi.paste': ['*.ini'],
+        'cmip5q.test.integration.wsgi.secured': ['*.ini', '*.xml'],
+        'cmip5q.test.integration.wsgi.secured': [
+            'ca/*.0', 'ca/*.crt', 'pki/*.crt', 'pki/*.key'],
+    },
+    include_package_data =    True,
+    zip_safe =                False
+)
