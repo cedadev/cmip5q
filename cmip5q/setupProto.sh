@@ -14,6 +14,7 @@ python manage.py shell << EOF
 # set up some things after a complete database rewriet
 #
 from protoq.models import *
+from XMLActivityReader import NumericalExperiment
 import uuid
 
 #
@@ -29,38 +30,9 @@ c.save()
 #
 # create a couple of experiments
 #
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM PreInd Con',title='ESM pre-industrial control',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM hist',title='ESM historical',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM RCP8.5',title='ESM RCP8.5',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM fixed 1',title='ESM fixed climate 1',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM fixed 2',title='ESM fixed climate 2',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM feedback 1',title='ESM feedback climate 1',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='ESM feedback 2',title='ESM feedback climate 2',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='1% CO2',title='1 percent per year CO2',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='SST cont',title='control SST climatology',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='CO2 Forcing',title='CO2 Forcing',uri=u)
-e.save()
-u=str(uuid.uuid1())
-e=Experiment(abbrev='4xCO2  Abrupt',title='4XCO2 Abrupt Forcing',uri=u)
-e.save()
+for f in ['1.6_Decadal_AtmosChem.xml']:
+    x=NumericalExperiment(f) 
+    x.load()
+    
 
 EOF
