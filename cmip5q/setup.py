@@ -56,8 +56,9 @@ setup(
     packages =               find_packages(),
     package_data = {
         'cmip5q': [
-            '000Issues', 'LICENSE', 'loadmm', '*.xml', 'data/experiment/*.xml', 
-            'data/model/*.xml', 'setupProto.sh'
+            '000Issues', 'LICENSE', 'loadmm', '*.xml', 
+            'data/experiment/*.xml', 'data/model/*.xml', 
+            'setupProto.sh'
         ],
         'cmip5q.test.data': ['*'], 
         'cmip5q.test.integration.wsgi.paste': ['README', '*.ini'],
