@@ -13,6 +13,9 @@ from django import forms
 import uuid
 import logging
 
+import os
+
+ 
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
     centre=Centre.objects.get(pk=centre_id)
@@ -25,6 +28,10 @@ def makeComponent(centre_id,scienceType='sub'):
     return c
     
 class componentHandler(object):
+    # Data directory for retrieving mindmap XML files
+    mindMapDir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                              'data',
+                              'mindmaps')
     
     def __init__(self,centre_id,component_id=None):
         ''' Instantiate a component handler, by loading existing component information '''
@@ -39,7 +46,9 @@ class componentHandler(object):
             component.contact=author
             component.title='GCM Template'
             component.abbrev='GCM Template'
-            mindmaps=['Atmosphere.xml','Ocean.xml','SeaIce.xml','OceanBioChemistry.xml']
+            mindmaps=[os.path.join(componentHandler.mindMapDir, f) 
+                      for f in os.listdir(componentHandler.mindMapDir)
+                      if f.endswith('.xml')]
             for m in mindmaps:
                 x=XMLVocabReader(m, centre_id,author)
                 x.doParse()

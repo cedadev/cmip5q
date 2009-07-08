@@ -30,9 +30,12 @@ c.save()
 #
 # create a couple of experiments
 #
-for f in ['1.6_Decadal_AtmosChem.xml']:
-    x=NumericalExperiment(f) 
-    x.load()
+import os
+experimentDir = './data/experiments'
+for f in os.listdir(experimentDir):
+    if f.endswith('.xml'):
+	    x=NumericalExperiment(os.path.join(experimentDir, f)) 
+	    x.load()
     
 
 EOF
