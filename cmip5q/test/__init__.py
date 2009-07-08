@@ -1,5 +1,5 @@
-"""Integration testing sub-package for running Django app with Paste and 
-secured with NDG Security filters.
+"""test sub-package for running Django app with Paste and secured with
+NDG Security filters.
 
 Metafor Project
 

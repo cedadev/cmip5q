@@ -17,6 +17,6 @@ def app_factory(globalConfig, **localConfig):
     Django application to be added as an app entry in a Paste ini file e.g.
        
     [app:CMIP5QApp]
-    paste.app_factory = wsgi:app_factory
+    paste.app_factory = cmip5q.wsgi:app_factory
     '''
     return django.core.handlers.wsgi.WSGIHandler()
