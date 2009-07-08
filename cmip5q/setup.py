@@ -43,7 +43,7 @@ Security and should be modified to suit
 
 setup(
     name =                   'cmip5q',
-    version =                '0.1.0',
+    version =                '0.1.1',
     description =            'CMIP5 Questionnaire',
     long_description =       _longDescription,
     author =                 'Bryan Lawrence',
@@ -52,7 +52,8 @@ setup(
     maintainer_email =       'Bryan.Lawrence@stfc.ac.uk',
     url =                    'http://metaforclimate.eu/trac',
     license =                'BSD - See LICENCE file for details',
-    packages =                find_packages(),
+    install_requires =       ['django'],
+    packages =               find_packages(),
     package_data = {
         'cmip5q': [
             '000Issues', 'LICENSE', 'loadmm', '*.xml', 'data/experiment/*.xml', 
