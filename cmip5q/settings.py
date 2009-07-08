@@ -66,13 +66,23 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'cmip5q.urls'
 
+# Switch for PJK's sandbox.  
+# TODO: Does Django have a better way of doing this e.g. env variable?
+#TEMPLATE_DIRS = (
+#    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+#    # Always use forward slashes, even on Windows.
+#    # Don't forget to use absolute paths, not relative paths.
+#    "/home/bnl/meta4q/cmip5q/templates"
+#)
+#STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/bnl/meta4q/cmip5q/templates"
+    "/home/pjkersha/workspace/cmip5q/templates"
 )
-STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+STATIC_DOC_ROOT = "/home/pjkersha/workspace/cmip5q/templates/css"
 
 INSTALLED_APPS = (
     'django.contrib.auth',

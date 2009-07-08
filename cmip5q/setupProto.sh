@@ -1,17 +1,17 @@
-source ~/meta4q/bin/activate
+#source ~/meta4q/bin/activate
 
 
-#This only works if you use sqlite of course ...
-rm sqlite.db
+# This only works if you use sqlite of course ...
+rm -f sqlite.db
 
-#for now we don't have a superuser, which means no admin
-python manage.py syncdb <<EOF
+# for now we don't have a superuser, which means no admin
+${PYTHON:-python} manage.py syncdb <<EOF
 no
 EOF
 
-python manage.py shell << EOF
+${PYTHON:-python} manage.py shell << EOF
 #
-# set up some things after a complete database rewriet
+# set up some things after a complete database rewrite
 #
 from protoq.models import *
 from XMLActivityReader import NumericalExperiment
