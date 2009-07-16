@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab>
+  <component name="LandIce">
+    <component name="LandGlaciers">
+      <parameter name="Properties" choice="OR">
+        <value name="snow treatment"/>
+        <value name="dynamic areal extent"/>
+        <value name="other"/>
+      </parameter>
+    </component>
+  </component>
+</vocab>
