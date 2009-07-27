@@ -67,13 +67,7 @@ def centre(request,centre_id):
         {'centre':c,'models':models,'platforms':platforms,
         'newmod':newmodURL,'newplat':newplatURL,'sims':sims,'viewsimurl':viewsimURL,
         'tabs':tabs(c.id,'Summary'),'notAjax':not request.is_ajax()})
-        
-        
-#### CONFORMANCE HANDLING ###########################################################
-def conformanceEdit(request,cen_id,sim_id,req_id):
-    ''' Handle a specific conformance within a simulation '''
-    return HttpResponse('Not implemented')
-        
+      
 #### COMPONENT HANDLING ###########################################################
 
 # Provide a vew interface to the component object 
@@ -206,8 +200,13 @@ def simulationView(request,centre_id,simulation_id):
 def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)
-    
-        
+   
+#### CONFORMANCE HANDLING APPEARS IN THE SIMULATION FILE  ###########################################################
+ 
+def conformanceEdit(request,cen_id,sim_id,req_id):
+    s=simulationHandler(cen_id,simid=sim_id)
+    return s.conformanceEdit(request,req_id)
+            
 ##### PLATFORM HANDLING ###########################################################
 # we can do this simply because p doesn't have any mandatory links.
 

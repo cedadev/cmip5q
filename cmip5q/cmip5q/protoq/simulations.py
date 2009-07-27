@@ -31,6 +31,18 @@ class MySimForm(SimulationForm):
         self.fields['numericalModel'].queryset=Component.objects.filter(scienceType='model').filter(centre=centre)
         
 
+def GetConformance(req,cen,sim):
+    c=Conformance.objects.filter(
+            requirement=req,centre=cen,simulation=sim)
+    print c
+    if len(c)==0:
+        return None
+    elif len(c)==1:
+        return c[0]
+    else:
+        logging.info('Multiple conformances for %s,%s,%s'%(req,cen,sim))
+        return c[0]
+
 class simulationHandler(object):
     
     def __init__(self,centre_id,simid=None,expid=None):
@@ -39,6 +51,7 @@ class simulationHandler(object):
         self.centre=Centre.objects.get(pk=centre_id)
         self.simid=simid
         self.expid=expid
+        self.errors={}
         
     def __conformances(self,s,reqs):
         ''' We monkey patch onto the requirements what is needed to put up a conformance
@@ -49,17 +62,22 @@ class simulationHandler(object):
                 self.url=url
                 self.form=form
         
+        s=Simulation.objects.get(id=s.id)
         for r in reqs:
             # attach variables for a conformance request form
             # need an id, a url, and a form 
             url=reverse('cmip5q.protoq.views.conformanceEdit',args=(self.centreid,s.id,r.id))
-            form=MyConformanceForm()
-            form.specialise(s.centre)
+            i=GetConformance(r,self.centre,s)
+            if r not in self.errors:
+                form=MyConformanceForm(instance=i)
+                form.specialise(s.centre)
+            else:
+                form=self.errors[r]
             r.con=conform(url,form)
             
         return reqs
         
-    def __handle(self,request,s,e,url,label):
+    def __handle(self,request,s,e,url,label,fix):
         ''' This method handles the form itself for both the add and edit methods '''
         print 'entering handle routine'
         reqs=e.requirements.all()
@@ -68,7 +86,7 @@ class simulationHandler(object):
         
         if label=="Update": reqs=self.__conformances(s,reqs)
         
-        if request.method=='POST':
+        if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
             # s.id is for a new simulation
             #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
@@ -88,17 +106,15 @@ class simulationHandler(object):
             {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,
             'notAjax':not request.is_ajax()})
         
-        
-    def edit(self,request):
+    def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''
        
         s=Simulation.objects.get(pk=self.simid)
         e=s.experiment
         url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id,))
         label='Update'
-        return self.__handle(request,s,e,url,label)
+        return self.__handle(request,s,e,url,label,fix)
        
-            
     def add(self,request):
         ''' Create a new simulation instance '''
         # first see whether a model and platform have been created!
@@ -157,3 +173,26 @@ class simulationHandler(object):
             {'c':c,'experiments':exp,
             'tabs':tabs(c.id,'Simulations'),'notAjax':not request.is_ajax()})
         
+ 
+    def conformanceEdit(self,request,req_id):
+        ''' Handle a specific conformance within a simulation '''
+        # this should only be called as a form post ...
+        backURL=reverse('cmip5q.protoq.views.simulationEdit',
+            args=(self.centreid,self.simid,))
+        if request.method=='GET':
+            return HttpResponseRedirect(backURL)
+        elif request.method=='POST':
+            c,s,r=(self.centre,
+                Simulation.objects.get(pk=self.simid),
+                NumericalRequirement.objects.get(pk=req_id))
+            conformance=GetConformance(r,c,s)
+            cform=ConformanceForm(request.POST,instance=conformance)
+            if cform.is_valid():
+                cform.save()
+                return HttpResponseRedirect(backURL)
+            else:
+                # need to hand it back somehow ...
+                self.errors[r]=cform
+                return self.edit(request,fix=True)
+       
+                

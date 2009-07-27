@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django import forms
 from django.forms.models import modelformset_factory
+from django.forms.util import ErrorList
 
 import vocab
 
@@ -55,12 +56,13 @@ class Experiment(models.Model):
     startDate=models.CharField(max_length=32)
     endDate=models.CharField(max_length=32)
     
-    
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
     description=models.TextField()
     name=models.CharField(max_length=128)
     type=models.CharField(max_length=32,blank=True,null=True)
+    def __unicode__(self):
+        return self.name
     
 class Simulation(Doc):
     ''' A CMIP5 Simulation '''
@@ -90,8 +92,9 @@ class Conformance(models.Model):
     component=models.ForeignKey(Component,blank=True,null=True)
     # this is the file object that has been used (if any)
     dataObject=models.ForeignKey('DataObject',blank=True,null=True)
-    
-    
+    def __unicode__(self):
+        return "%s (s:%s,r:%s,c:%s)"%(
+                self.description,self.simulation,self.requirement,self.centre)
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -152,6 +155,19 @@ class ConformanceForm(forms.ModelForm):
         model=Conformance
         # the following are known via the URI used ...
         exclude=('centre','requirement','simulation')
+    def clean(self):
+        ''' Check cross field requirements '''
+        cleaned_data=self.cleaned_data
+        method=cleaned_data['method']
+        file=cleaned_data['dataObject']
+        component=cleaned_data['component']
+        if method=='File' and file is None:
+            msg='External File requires File detail'
+            self._errors['dataObject']=ErrorList([msg])
+        if method=='Code' and component is None: 
+            msg='Modified Code needs component detail'
+            self._errors['component']=ErrorList([msg])
+        return cleaned_data
 
 class DataObjectForm(forms.ModelForm):
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
