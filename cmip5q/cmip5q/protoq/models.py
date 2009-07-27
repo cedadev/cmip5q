@@ -95,25 +95,6 @@ class Conformance(models.Model):
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
-    
-
-#
-##
-### Tables for holding internal component parameter values (and parameter options)
-##  follow.
-##  The basic idea is that a parameter has
-##      a name,
-##      a value,
-##      and a type, from a questionairre controlled type list ...
-##      but the type itself can represent a third party controlled type.
-##      so, values for type are:
-##            "string"
-##            "float"
-##            "integer"
-##            "OR" - any number of the values at an accom
-##            "XOR" 
-##      and optionally a uri value, which must be present if either rof the vocab types are present"
-##      for the moment, the uri value is a "vocab name" and we have a table of those too "
 
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -169,10 +150,10 @@ class ConformanceForm(forms.ModelForm):
         exclude=('centre','requirement','simulation')
 
 class DataObjectForm(forms.ModelForm):
-    link=forms.URLField(widget=forms.TextInput(attrs={'size':'60'}))
-    description=forms.CharField(widget=forms.Textarea({'cols':'70','rows':'2'}))
-    variable=forms.CharField(widget=forms.TextInput(attrs={'size':'30'}),required=False)
-    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'30'}),required=False)
+    link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+    variable=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
+    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
     class Meta:
         model=DataObject
 

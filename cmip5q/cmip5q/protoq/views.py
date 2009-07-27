@@ -241,6 +241,29 @@ def viewExperiment(request,experiment_id):
     e=Experiment.objects.get(pk=experiment_id)
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'notAjax':not request.is_ajax()})
+
+
+
+############ DATA VIEWS ######################
+def dataEdit(request,cen_id,object_id=None):
+    ''' Handle the editing of a specific data object '''
+    
+    editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
+    if object_id is None:
+        dform=DataObjectForm()
+    else:
+        d=DataObject.objects.get(pk=object_id)
+        if request.method=='POST':
+            dform=DataObjectForm(request.POST,instance=d)
+            if dform.is_valid():
+                d=dform.save()
+                editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,d.id))
+                return HttpResponseRedirect(editURL)
+        else:
+            editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
+            dform=DataObjectForm(instance=d)
+    return render_to_response('data_snippet.html',
+            {'dform':dform,'editURL':editURL})
     
     
     

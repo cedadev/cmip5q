@@ -59,29 +59,27 @@ class simulationHandler(object):
         return reqs
         
     def __handle(self,request,s,e,url,label):
-        ''' This method handles the form itself for both
-        the add and edit methods '''
-        
-        
+        ''' This method handles the form itself for both the add and edit methods '''
+        print 'entering handle routine'
         reqs=e.requirements.all()
-        
-        editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
         dataurl=reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid))
         print 'dataurl',dataurl
         
         if label=="Update": reqs=self.__conformances(s,reqs)
         
         if request.method=='POST':
+            # we can't do the following, because on initialisation, we don't know what
+            # s.id is for a new simulation
+            #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
+            afterURL=reverse('cmip5q.protoq.views.simulationList',args=(self.centreid,))
             simform=MySimForm(request.POST,instance=s)
             simform.centre(self.centre)
             if simform.is_valid():
                 s=simform.save()
-                
-                return HttpResponseRedirect(editURL)
+                return HttpResponseRedirect(afterURL)
             else:
                 print 'SIMFORM not valid [%s]'%simform.errors
         else:
-          
             simform=MySimForm(instance=s)
             simform.centre(self.centre)
         
@@ -117,6 +115,7 @@ class simulationHandler(object):
             message='You need to create a model before creating a simulation'
             return render_to_response('error.html',{'message':message,'url':url})
         url=reverse('cmip5q.protoq.views.simulationAdd',args=(self.centreid,self.expid,))
+       
         u=str(uuid.uuid1())
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
