@@ -49,7 +49,7 @@ class NumericalExperiment:
                 
         self.duration=(self.root.find(s).text,self.root.find(e).text)
                       
-        self.docID=self.root.find('{%s}documentID'%cimv).text
+        self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
         logging.debug('Experiment %s has %s requirements'%(self.docID,len(self.numericalRequirements)))
    
     def load(self):
