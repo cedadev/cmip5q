@@ -65,6 +65,10 @@ class simulationHandler(object):
         
         reqs=e.requirements.all()
         
+        editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
+        dataurl=reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid))
+        print 'dataurl',dataurl
+        
         if label=="Update": reqs=self.__conformances(s,reqs)
         
         if request.method=='POST':
@@ -72,7 +76,7 @@ class simulationHandler(object):
             simform.centre(self.centre)
             if simform.is_valid():
                 s=simform.save()
-                editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
+                
                 return HttpResponseRedirect(editURL)
             else:
                 print 'SIMFORM not valid [%s]'%simform.errors
@@ -82,7 +86,7 @@ class simulationHandler(object):
             simform.centre(self.centre)
         
         return render_to_response('simulation.html',
-            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,
+            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,
             'notAjax':not request.is_ajax()})
         
         
@@ -103,6 +107,7 @@ class simulationHandler(object):
         c=self.centre
         p=c.platform_set.values()
         m=c.component_set.values()
+        url=reverse('cmip5q.protoq.views.centre',args=(self.centreid,))
         if len(p)==0:
             ''' Require them to create a platform '''
             message='You need to create a platform before creating a simulation'
@@ -111,11 +116,10 @@ class simulationHandler(object):
             ''' Require them to create a model'''
             message='You need to create a model before creating a simulation'
             return render_to_response('error.html',{'message':message,'url':url})
-        
+        url=reverse('cmip5q.protoq.views.simulationAdd',args=(self.centreid,self.expid,))
         u=str(uuid.uuid1())
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
-        url=reverse('cmip5q.protoq.views.simulationAdd',args=(self.centreid,self.expid,))
         label='Add'
         return self.__handle(request,s,e,url,label)
         
@@ -145,6 +149,7 @@ class simulationHandler(object):
             sims=[s for s in e.simulation_set.filter(centre=c.id)]
             for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))
             exp.append(etmp(e.docID,sims,e.id))
+            print 'loading experiment %s (%s)'%(e.id,e.docID)
         
         logging.info('Viewing simulation %s'%c.id)
         
