@@ -95,6 +95,7 @@ class Conformance(models.Model):
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
+    files=models.ForeignKey('DataObject',blank=True,null=True)
 
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -130,6 +131,9 @@ class DataObject(models.Model):
     variable=models.CharField(max_length=128,blank=True)
     # and if possible the CF name
     cftype=models.CharField(max_length=512,blank=True)
+    def __unicode__(self):
+        return self.name
+        
     
 ##
 ### FORMS FOLLOW

@@ -1,39 +1,25 @@
-<div id="conform{{r.id}}">
-    <form action="{{r.con.url}}" method="POST">
+{% extends "base.html" %}
+{% block content %}
+<div id="data">
+    <form action="{{editURL}}" method="POST">
         <table>
-        <tr><td></td><td></td><td>
-            <table>
-            {{r.con.form.management_form}}
-            <tr><td> Link to file {{r.con.form.link.errors}}</td>
-                <td colspan="3"> {{r.con.form.link}}</td></tr>
-            <tr><td> Variable (within that file) {{r.con.form.variable.errors}}</td>
-                <td> {{r.con.form.variable}}</td>
-                <td> CF name {{r.con.form.cfname.errors}}</td>
-                <td> {{r.con.form.cftype}}</td></tr>
-             <tr><td> Data Description {{r.con.form.description.errors}}</td>
-                <td colspan="3">{{r.con.form.description}}</td></tr>
-             <tr><td colspan="4">
+            {{dform.management_form}}
+            <tr><td width="15%">Name{{dform.name.errors}}:</td><td>{{dform.name}}</td></tr>
+            <tr><td>Link:{{dform.link.errors}}</td><td>{{dform.link}}</td></tr>
+            <tr><td>Description:{{dform.description.errors}}</td><td>{{dform.description}}</td></tr>
+            <tr><td>Standard Name:{{dform.cftype.errors}}</td><td>{{dform.cftype}}</td></tr>
+            <tr><td>(If necessary) Actual variable name within the file: {{dform.variable.errros}}</td>
+                 <td>{{dform.variable}}</td></tr>
+            <tr><td colspan="2">
                 <center>
-                <input id="conform{{r.id}}" type="submit" value="submit conformance">
+                <input id="subDatBut" type="submit" value="Submit Data Object">
                 <script type="text/javascript">
-                    var conformSubBut{{r.id}} = new YAHOO.widget.Button("conformSubBut{{r.id}}",
-                                        {value:"conformSubBut{{r.id}}value"});
+                    var subDatBut = new YAHOO.widget.Button("varSubBut",
+                                        {value:"varSubButvalue"});
                 </script>
                 </center>
             </td></tr>
         </table>
-        </td></tr>
-        </table>
     </form>
 </div>
-<div id="dform{{r.conform.id}}">
-    <form action="{{r.conform.url}}" method="POST">
-        {{o.form}}
-        <input id="dformBut{{r.conform.id}}" type="submit" value="submit data details">
-        <script type="text/javascript">
-            var odformBut{{o.id}} = new YAHOO.widget.Button("dformBut{{o.id}}",
-                                {value:"dformBut{{o.id}}value"});
-        </script>
-    </form>
-</div>
-    
+{% endblock%} 

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<table>
+{% for d in files %}
+  <tr><td><a href="{{d.editURL}}">{{d.name}}</td><td>{{d.cftype}}<td><td>{{d.link}}</td><td>{{d.description}}</td></tr>
+{%endfor%}
+</table>
+<p><a id="linkbutton1" href="{{c.url}}">Return to centre: {{c.abbrev}}</a></p>
+<p><a id="linkbutton2" href="{{surl}}">Return to simulations for: {{c.abbrev}}</a></p>
+<script  type="text/javascript"> 
+        var oLinkButton1 = new YAHOO.widget.Button("linkbutton1"); 
+        var oLinkButton2 = new YAHOO.widget.Button("linkbutton2"); 
+</script>
+{% endblock%}

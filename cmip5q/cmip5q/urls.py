@@ -51,13 +51,23 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/edit$',
             'cmip5q.protoq.views.platformEdit'),
     #
-    # experiment/experiment_id
+    # experiment/view/experiment_id
     (r'^cmip5/experiment/view/(?P<experiment_id>\d+)/$',
             'cmip5q.protoq.views.viewExperiment'),   
                 
     # cmip5/conformance/centre_id/simulation_id/requirement_id/$
     (r'^cmip5/conformance/(?P<cen_id>\d+)/(?P<sim_id>\d+)/(?P<req_id>\d+)/$',
-            'cmip5q.protoq.views.conformanceEdit'),      
+            'cmip5q.protoq.views.conformanceEdit'),  
+                    
+    #cmip5/data/centre_id/dataobject/*
+    (r'^cmip5/data/(?P<cen_id>\d+)/(?P<object_id>\d+)/$',
+            'cmip5q.protoq.views.dataEdit'),
+    #cmip5/data/centre_id/
+    (r'^cmip5/data/(?P<cen_id>\d+)/$',
+            'cmip5q.protoq.views.dataEdit'),  
+    #cmip5/data/centre_id/list
+    (r'^cmip5/data/(?P<cen_id>\d+)/list$',
+            'cmip5q.protoq.views.dataList'),        
     #
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

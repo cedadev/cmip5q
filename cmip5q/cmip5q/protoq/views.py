@@ -245,25 +245,46 @@ def viewExperiment(request,experiment_id):
 
 
 ############ DATA VIEWS ######################
+
+def dataList(request,cen_id):
+    do=DataObject.objects.all()
+    for d in do:
+        d.editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,d.id))
+    c=Centre.objects.get(pk=cen_id)
+    c.url=reverse('cmip5q.protoq.views.centre',args=(cen_id,))
+    surl=reverse('cmip5q.protoq.views.simulationList',args=(cen_id,))
+    return render_to_response('dataList.html',{'files':do,'surl':surl,'c':c,
+                                'notAjax':not request.is_ajax()})
+
 def dataEdit(request,cen_id,object_id=None):
     ''' Handle the editing of a specific data object '''
     
     editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
+    
     if object_id is None:
-        dform=DataObjectForm()
+        if request.method=='GET':
+            # then we're starting afresh
+            dform=DataObjectForm()
+        elif request.method=='POST':
+            dform=DataObjectForm(request.POST)
     else:
         d=DataObject.objects.get(pk=object_id)
-        if request.method=='POST':
-            dform=DataObjectForm(request.POST,instance=d)
-            if dform.is_valid():
-                d=dform.save()
-                editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,d.id))
-                return HttpResponseRedirect(editURL)
-        else:
-            editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
+        if request.method=='GET':
             dform=DataObjectForm(instance=d)
+        elif request.method=='POST':
+            dform=DataObjectForm(request.POST,instance=d)
+  
+    if request.method=='POST':
+        if dform.is_valid():
+            print 'yippeee'
+            d=dform.save()
+            return HttpResponseRedirect(reverse('cmip5q.protoq.views.dataList',args=(cen_id,)))
+        else:
+            print 'what?'
+    else:
+        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
     return render_to_response('data_snippet.html',
-            {'dform':dform,'editURL':editURL})
+            {'dform':dform,'editURL':editURL,'notAjax':not request.is_ajax()})
     
     
     

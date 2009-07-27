@@ -20,6 +20,7 @@ class MyConformanceForm(ConformanceForm):
     def specialise(self,centre):
         # FIXME, we should make this queryset include just component within a specific model
         self.fields['component'].queryset=Component.objects.filter(centre=centre)
+        #FIXME and we need to limit files to specific centre
 
 class MySimForm(SimulationForm):
     ''' Handles specific issues for a SimulationForm '''
@@ -40,7 +41,7 @@ class simulationHandler(object):
         self.expid=expid
         
     def __conformances(self,s,reqs):
-        ''' We monkey patch onto the requirments what is needed to put up a conformance
+        ''' We monkey patch onto the requirements what is needed to put up a conformance
         form as well '''
         
         class conform:
