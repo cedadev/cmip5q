@@ -48,14 +48,17 @@ not just those from within the specific model ... until we fix that, watch out!<
 <p class="cmip5q"> ?? Do we want to ask for references with conformances ?? </p>
 <table width="100%">
 {%for r in reqs %}
-    <!-- FIXME: make this a function 
-    and work out why response is null and responseText empty 
-    -->
+    <!-- FIXME: make this a function -->
+    <!-- Useful for debugging to firefox firebug:
+         console.log("text");
+         console.dir(o{{r.id}});
+         -->
     <script type="text/javascript">
         var callback{{r.id}} = {
             success: function(o{{r.id}})
-                {document.getElementById('conform{{r.id}}').innerHTML = 
-                'FIXME: conformance updated but window not updated '+ o{{r.id}}.responseText}
+                {
+                document.getElementById('replaceMe{{r.id}}').innerHTML = o{{r.id}}.responseText;
+                }
             };
         function conRequest{{r.id}}() {
         YAHOO.log("Initiating AJAX conformance {{r.id}}","info","example");
@@ -67,7 +70,14 @@ not just those from within the specific model ... until we fix that, watch out!<
             <tr><td><b>{{r.name}}</b></td></tr>
             <tr><td>{{r.description}}</td></tr>
     </table></td>
-    <td id="conform{{r.id}}"> {% include "conformance.html" %}</td>
+    <td id="conform{{r.id}}">
+        <form action="{{r.con.url}}" method="POST" id="form{{r.id}}">
+        {{r.con.form.management}}
+        <table id="replaceMe{{r.id}}">
+            {% include "conformance.html" %}
+        </table>
+        </form>
+    </td>
     </tr>
 {% endfor %}
 </table>
