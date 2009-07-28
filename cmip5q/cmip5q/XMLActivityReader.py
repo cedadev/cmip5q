@@ -6,10 +6,23 @@ import logging
 cimv='http://www.metaforclimate.eu/cim/1.1'
 typekey='{http://www.w3.org/2001/XMLSchema-instance}type'
 
+def getText(elem,path):
+    ''' Return text from an element ... if it exists '''
+    e=elem.find('{%s}%s'%(cimv,path))
+    if e is None: 
+        return ''
+    else:
+        return (e.text or '')
+def getText2(elem,path):
+    e=elem.find(path)
+    if e is None: 
+        return '' 
+    else: return e.text or ''
+
 class numericalRequirement:
     def __init__(self,elem):
-        self.description=(elem.find('{%s}description'%cimv).text or '')
-        self.id=(elem.find('{%s}id'%cimv).text or '')
+        self.description=getText(elem,'description')
+        self.id=getText(elem,'id')
         
         if typekey in elem.attrib.keys():
             self.type=elem.attrib[typekey]
@@ -33,10 +46,11 @@ class NumericalExperiment:
     def __init__(self,filename):
         ''' Reads CIM V1.0 format numerical experiments '''
         self.etree=ET.parse(filename)
+        logging.debug('Parsing filename %s'%filename)
 	self.root=self.etree.getroot() 
         
-        self.rationale=(self.root.find('{%s}rationale'%cimv).text or '')
-        self.why=(self.root.find('{%s}Why'%cimv).text or '')
+        self.rationale=getText(self.root,'rationale')
+        self.why=getText(self.root,'Why')
         
         self.numericalRequirements=[]
         
@@ -47,7 +61,7 @@ class NumericalExperiment:
         (s,e)=('{%s}requiredDuration/{%s}startDate'%(cimv,cimv),
                 '{%s}requiredDuration/{%s}endDate'%(cimv,cimv))
                 
-        self.duration=(self.root.find(s).text,self.root.find(e).text)
+        self.duration=[getText2(self.root,i) for i in (s,e)]
                       
         self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
         logging.debug('Experiment %s has %s requirements'%(self.docID,len(self.numericalRequirements)))
