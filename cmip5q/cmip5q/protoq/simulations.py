@@ -188,7 +188,13 @@ class simulationHandler(object):
             conformance=GetConformance(r,c,s)
             cform=ConformanceForm(request.POST,instance=conformance)
             if cform.is_valid():
-                cform.save()
+                if conformance is None:
+                    co=cform.save(commit=False)
+                    co.centre=c
+                    co.simulation=s
+                    co.requirement=r
+                    co.save()
+                else: cform.save()
                 return HttpResponseRedirect(backURL)
             else:
                 # need to hand it back somehow ...
