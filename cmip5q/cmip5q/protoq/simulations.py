@@ -137,7 +137,7 @@ class simulationHandler(object):
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
         label='Add'
-        return self.__handle(request,s,e,url,label)
+        return self.__handle(request,s,e,url,label,False)
         
     def validate(self):
         ''' Is this simulation complete? '''
