@@ -34,7 +34,6 @@ class MySimForm(SimulationForm):
 def GetConformance(req,cen,sim):
     c=Conformance.objects.filter(
             requirement=req,centre=cen,simulation=sim)
-    print c
     if len(c)==0:
         return None
     elif len(c)==1:
@@ -43,6 +42,12 @@ def GetConformance(req,cen,sim):
         logging.info('Multiple conformances for %s,%s,%s'%(req,cen,sim))
         return c[0]
 
+class conform:
+    ''' Just used to munge urls and forms together '''
+    def __init__(self,url,form):
+        self.url=url
+        self.form=form
+                
 class simulationHandler(object):
     
     def __init__(self,centre_id,simid=None,expid=None):
@@ -56,11 +61,6 @@ class simulationHandler(object):
     def __conformances(self,s,reqs):
         ''' We monkey patch onto the requirements what is needed to put up a conformance
         form as well '''
-        
-        class conform:
-            def __init__(self,url,form):
-                self.url=url
-                self.form=form
         
         s=Simulation.objects.get(id=s.id)
         for r in reqs:
@@ -172,7 +172,6 @@ class simulationHandler(object):
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,
             'tabs':tabs(c.id,'Simulations'),'notAjax':not request.is_ajax()})
-        
  
     def conformanceEdit(self,request,req_id):
         ''' Handle a specific conformance within a simulation '''
@@ -186,7 +185,9 @@ class simulationHandler(object):
                 Simulation.objects.get(pk=self.simid),
                 NumericalRequirement.objects.get(pk=req_id))
             conformance=GetConformance(r,c,s)
-            cform=ConformanceForm(request.POST,instance=conformance)
+            cform=MyConformanceForm(request.POST,instance=conformance)
+            cform.specialise(c)
+            url=reverse('cmip5q.protoq.views.conformanceEdit',args=(c.id,s.id,r.id))
             if cform.is_valid():
                 if conformance is None:
                     co=cform.save(commit=False)
@@ -195,10 +196,17 @@ class simulationHandler(object):
                     co.requirement=r
                     co.save()
                 else: cform.save()
-                return HttpResponseRedirect(backURL)
+                if request.is_ajax():
+                    r.con=conform(url,cform)
+                    return render_to_response('conformance.html',{'r':r})
+                else:return HttpResponseRedirect(backURL)
             else:
                 # need to hand it back somehow ...
                 self.errors[r]=cform
-                return self.edit(request,fix=True)
+                if request.is_ajax():
+                    #just return a conformance form alone ...
+                    r.con=conform(url,cform)
+                    return render_to_response('conformance.html',{'r':r})
+                else: return self.edit(request,fix=True)
        
                 

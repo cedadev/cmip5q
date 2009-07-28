@@ -1,22 +1,20 @@
-<div id="conform{{r.id}}">
-   
-    <table>
-        <form action="{{r.con.url}}" method="POST">
-        {{r.con.form.management}}
-        <tr><td>Method: {{r.con.form.method.errors}}</td><td>{{r.con.form.method}}</td>
-            <td>File: {{r.con.form.dataObject.errors}}</td><td>{{r.con.form.dataObject}}</td>
-            <td>Component: {{r.con.form.component.errors}}</td><td>{{r.con.form.component}}</td></tr>
-        <tr><td>Description: {{r.con.form.description.errors}}</td><td colspan="5">{{r.con.form.description}}</td></tr>
-        <tr><td colspan="6">
-            <center>
-            <input id="conform{{r.id}}" type="submit" value="submit conformance">
-            <script type="text/javascript">
-                var conformSubBut{{r.id}} = new YAHOO.widget.Button("conformSubBut{{r.id}}",
-                                    {value:"conformSubBut{{r.id}}value"});
-            </script>
-            </center>
-        </td></tr></form>
-    </table>
-    
-</div>
-    
+<table>
+    <form action="{{r.con.url}}" method="POST" id="form{{r.id}}">
+    {{r.con.form.management}}
+    <tr><td>Method: {{r.con.form.method.errors}}</td><td>{{r.con.form.method}}</td>
+        <td>File: {{r.con.form.dataObject.errors}}</td><td>{{r.con.form.dataObject}}</td>
+        <td>Component: {{r.con.form.component.errors}}</td><td>{{r.con.form.component}}</td></tr>
+    <tr><td>Description: {{r.con.form.description.errors}}</td><td colspan="5">{{r.con.form.description}}</td></tr>
+    <tr><td colspan="6">
+        <center>
+        <input id="inpform{{r.id}}" type="button" value="submit conformance" onClick="conRequest{{r.id}}();">
+        <!-- 
+        <input id="inpform{{r.id}}" type="submit" value="submit conformance">
+        <script type="text/javascript">
+            var conformSubBut{{r.id}} = new YAHOO.widget.Button("conformSubBut{{r.id}}",
+                                {value:"conformSubBut{{r.id}}value"});
+        </script>
+        -->
+        </center>
+    </td></tr></form>
+</table>

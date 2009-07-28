@@ -48,12 +48,26 @@ not just those from within the specific model ... until we fix that, watch out!<
 <p class="cmip5q"> ?? Do we want to ask for references with conformances ?? </p>
 <table width="100%">
 {%for r in reqs %}
+    <!-- FIXME: make this a function 
+    and work out why response is null and responseText empty 
+    -->
+    <script type="text/javascript">
+        var callback{{r.id}} = {
+            success: function(o{{r.id}})
+                {document.getElementById('conform{{r.id}}').innerHTML = 
+                'FIXME: conformance updated but window not updated '+ o{{r.id}}.responseText}
+            };
+        function conRequest{{r.id}}() {
+        YAHOO.log("Initiating AJAX conformance {{r.id}}","info","example");
+        YAHOO.util.Connect.setForm('form{{r.id}}');
+        var connectionObj{{r.id}} = YAHOO.util.Connect.asyncRequest('POST','{{r.con.url}}',callback{{r.id}}); }
+    </script> 
     <tr>
     <td width="30%"><table>
             <tr><td><b>{{r.name}}</b></td></tr>
             <tr><td>{{r.description}}</td></tr>
     </table></td>
-    <td>{% include "conformance.html" %}</td>
+    <td id="conform{{r.id}}"> {% include "conformance.html" %}</td>
     </tr>
 {% endfor %}
 </table>
