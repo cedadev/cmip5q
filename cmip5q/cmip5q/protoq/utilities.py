@@ -25,9 +25,13 @@ class tabs(list):
                 reverse('cmip5q.protoq.views.references',args=(centre_id,)))
         t['Files']=tab('Files',
                 reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
-        if active in t.keys(): t[active].activate()
+        if active in t.keys(): 
+            t[active].activate()
+        else:
+            t['Extra']=tab(str(active),'',1)
         list.__init__(self)
         for key in ('Sum','Sims','Files','Refs'):self.append(t[key])
+        if 'Extra' in t.keys(): self.append(t['Extra'])
 
 class ParamRow(object):
     
