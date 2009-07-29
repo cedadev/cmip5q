@@ -61,7 +61,7 @@ class componentHandler(object):
             for x in component.components.all(): logging.debug('...component includes %s'%x.abbrev)
             component_id=component.id
         
-        self.tabs=tabs(centre_id,'Models',component_id)
+        self.tabs=tabs(centre_id,'Update')
         self.component=Component.objects.get(pk=component_id)
     
     def add(self):
@@ -115,7 +115,6 @@ class componentHandler(object):
         
         pform=PropertyForm(c,prefix='props')
         postOK=True
-        message=''
         if request.method=="POST":
             cform=ComponentForm(request.POST,prefix='gen',instance=c)
             if cform.is_valid():
@@ -128,7 +127,6 @@ class componentHandler(object):
             else:
                 logging.debug('Unable to save characteristics for component %s'%c.id)
                 postOK=False
-                message=cform.errors
             pform.update(request)
         
         # We separate the response handling so we can do some navigation in the
@@ -155,7 +153,7 @@ class componentHandler(object):
         return render_to_response('componentMain.html',
                 {'c':c,'subs':subc,'refs':refs,
                 'cform':cform,'pform':pform,
-                'm':message,'navtree':navtree.html,
+                'navtree':navtree.html,
                 'refu':refurl,'subu':suburl,
                 'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
