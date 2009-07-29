@@ -19,20 +19,17 @@
         <div class="boxer">
           <p><a id="linkbutton2" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/view/">View</a></p>
           <p><a id="linkbutton3" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/validate/">Validate</a></p>
-          <p><a id="linkbutton1" href="/cmip5/{{c.centre_id}}">Return to centre: {{c.centre}}</a></p>
-           
         </div>
       </td>
       <td valign="top" width="900px">
       
     <form action="{{url}}" method='post'>
-    {{m}}
     <div class="boxer">    
         {{cform.management_form}}
         <!--<h4> General Characteristics </h4>-->
         <table>
            <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
-            <tr><td>Long Name:&nbsp;</td><td>{{cform.title}}</td></tr> 
+            <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td>{{cform.title}}</td></tr> 
             <tr><td>Contact:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
         </table>
     </div>
@@ -79,23 +76,12 @@
         <center><a id="linkbutton5" href="/cmip5/components/addrefs/{{c.id}}"> Modify references</a></center>
     </div>
     </form>
-    
-    <!--<div class="boxer">
-        <center>
-        <a href="/cmip5/centre/{{c.centre_id}}">Return to centre: {{c.centre}}</a>
-        {% if c.TCparentID %} <a href="/cmip5/components/edit/{{c.TCparentID}}/">Return to component: {{c.TCparentAbbrev}}</a> 
-        {% endif %}
-        </center>
-        <center>
-        </center>
-    </div>-->
 
 </td></tr></table>
 
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
         var oLinkButton4 = new YAHOO.widget.Button("linkbutton4"); 
-        var oLinkButton1 = new YAHOO.widget.Button("linkbutton1"); 
         var oLinkButton2 = new YAHOO.widget.Button("linkbutton2"); 
         var oLinkButton3 = new YAHOO.widget.Button("linkbutton3"); 
         var oLinkButton3 = new YAHOO.widget.Button("linkbutton5"); 

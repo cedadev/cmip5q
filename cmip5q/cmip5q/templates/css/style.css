@@ -152,6 +152,7 @@ text-decoration: none;
 
 .tabcontent {
 margin-left: 5px;
+margin-right: 5px;
 border: 1px solid black;
 background-color:#FFFACD; /* lemonchiffon, see http://www.somacon.com/p142.php */
 padding: 5px;
