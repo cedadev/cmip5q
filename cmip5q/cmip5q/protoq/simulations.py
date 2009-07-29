@@ -103,7 +103,7 @@ class simulationHandler(object):
             simform.centre(self.centre)
         
         return render_to_response('simulation.html',
-            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,
+            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,'tabs':tabs(self.centreid,None),
             'notAjax':not request.is_ajax()})
         
     def edit(self,request,fix=False):
@@ -171,7 +171,7 @@ class simulationHandler(object):
         
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,
-            'tabs':tabs(c.id,'Simulations'),'notAjax':not request.is_ajax()})
+            'tabs':tabs(c.id,'Sims'),'notAjax':not request.is_ajax()})
  
     def conformanceEdit(self,request,req_id):
         ''' Handle a specific conformance within a simulation '''

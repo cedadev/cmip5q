@@ -3,19 +3,31 @@ from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 
 class tab:
-    ''' This is a simple tab class to support yui tabs '''
+    ''' This is a simple tab class to support navigation tabs '''
     def __init__(self,name,url,active=0):
-        self.name=name
+        self.name=name # what is seen in the tab
         self.url=url
-        self.active={0:'false',1:'true'}[active]
+        self.active=active
+    def activate(self):
+        self.active=1
+    def deactivate(self):
+        self.active=0
 
-def tabs(centre_id,view,component=1):
+class tabs(list):
     ''' Build a list of tabs to be used on each page, passed to base.html '''
-    t=[]
-    t.append(tab('Summary',reverse('cmip5q.protoq.views.centre',args=(centre_id,)),(view=='Summary')))
-    t.append(tab('Models',reverse('cmip5q.protoq.views.componentEdit',args=(centre_id,component,)),(view=='Models')))
-    t.append(tab('References',reverse('cmip5q.protoq.views.references',args=()),(view=='References')))
-    return t
+    def __init__(self,centre_id,active):
+        t={}
+        t['Sum']=tab('Home',
+                reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
+        t['Sims']=tab('Simulations',
+                reverse('cmip5q.protoq.views.simulationList',args=(centre_id,)))
+        t['Refs']=tab('References',
+                reverse('cmip5q.protoq.views.references',args=(centre_id,)))
+        t['Files']=tab('Files',
+                reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
+        if active in t.keys(): t[active].activate()
+        list.__init__(self)
+        for key in ('Sum','Sims','Files','Refs'):self.append(t[key])
 
 class ParamRow(object):
     

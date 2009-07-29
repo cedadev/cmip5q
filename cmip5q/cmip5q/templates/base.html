@@ -22,47 +22,34 @@
     <body class="yui-skin-sam">
         <div id="page">
             <!--<b class="hb0"/><b class="hb1"/><b class="hb2"/><b class="hb3"/><b class="hb4"/>-->
-            {% if notAjax %}
-                <div id="header">
-                    <table id="hdricon">
-                    <tr>
-                    <td width="150px" align="left"><!--<img height="80" src="/css/icons/eu_fw7_logo.jpg"/>--></td>
-                    <td width="800px" align="center">
-                        <table><tr><td align="center"><img height="60" src="/css/icons/metafor_logo.png"/></td></tr>
-                        <tr><td align="center"><span id="subtitle"> "finding and understanding simulations of past, present and future climate"</span></td></tr></table></td>
-                    <td width="150px" align="right"><!--<img height="80" src="/css/icons/curator.gif"/>--></td>
-                    </tr>
-                    </table>
-                    
-                </div>
-                <div id="banner">
-                    <center> DRAFT CMIP5 Questionaire</center>
-                </div>
+            <div id="header">
+                <table id="hdricon">
+                <tr>
+                <td width="150px" align="left"><!--<img height="80" src="/css/icons/eu_fw7_logo.jpg"/>--></td>
+                <td width="800px" align="center">
+                    <table><tr><td align="center"><img height="60" src="/css/icons/metafor_logo.png"/></td></tr>
+                    <tr><td align="center"><span id="subtitle"> "finding and understanding simulations of past, present and future climate"</span></td></tr></table></td>
+                <td width="150px" align="right"><!--<img height="80" src="/css/icons/curator.gif"/>--></td>
+                </tr>
+                </table>
                 
-                <!--BEGIN SOURCE CODE FOR YUI TABS =============================== -->
-                <!--<div id="tabs"></div>
-                    <script type="text/javascript">
-                    var tabView = new YAHOO.widget.TabView();
-                    {% for tab in tabs %}
-                    tabView.addTab( new YAHOO.widget.Tab({ 
-                        label: '{{tab.name}}',
-                        dataSrc: '{{tab.url}}',
-                        cacheData: false,
-                        active: {{tab.active}}}));
-                    {% endfor %} 
-                    tabView.appendTo('tabs');
-                </script>-->
-                <!--END SOURCE CODE FOR YUI TABS =============================== -->
-            {% endif %}
-            <div class="main">
-                <div id="breadcrumb" class="boxer">
-                <p class="cmip5q"> We will put some navigation (menus or tabs) here to allow one to move between parts of the questionnaire, eg: 
-        |Summary | Simulations | Files | References | </p>
-                </div>
-                {% block content %}
-                {% endblock %}</p>	 
             </div>
-            {% if notAjax %}
+            <div id="banner">
+                <center> DRAFT CMIP5 Questionaire</center>
+            </div>
+            <div class="main">
+                <div class="tabnav">
+                    <ul>
+                    {% for tab in tabs %}
+                    <li{% if tab.active %} class="selected"{% endif %}><a href="{{tab.url}}">{{tab.name}}</a></li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div class="tabcontent">
+                    {% block content %}
+                    {% endblock %}</p>
+                </div>	 
+            </div>
             <div id="footer">
                 <center>
                     <!--<table>
@@ -79,7 +66,6 @@
                 </center>
             <!--<b class="hb4"/><b class="hb3"/><b class="hb2"/><b class="hb1"/><b class="hb0"/>-->
             </div>
-            {% endif %}
         </div>
 
     </body>

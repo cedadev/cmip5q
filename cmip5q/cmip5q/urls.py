@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     # reference/add    
     #          
     (r'^cmip5/references/$','cmip5q.protoq.views.references'),
+    (r'^cmip5/references/(?P<centre_id>\d+)/$','cmip5q.protoq.views.references'),
     (r'^cmip5/references/add/$','cmip5q.protoq.views.addReference'),
     (r'^cmip5/references/add/(?P<component_id>\d+)/$','cmip5q.protoq.views.addReference'),
     (r'^cmip5/references/edit/(?P<reference_id>\d+)/$','cmip5q.protoq.views.editReference'),

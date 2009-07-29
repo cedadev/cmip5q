@@ -66,7 +66,7 @@ def centre(request,centre_id):
     return render_to_response('centre.html',
         {'centre':c,'models':models,'platforms':platforms,
         'newmod':newmodURL,'newplat':newplatURL,'sims':sims,'viewsimurl':viewsimURL,
-        'tabs':tabs(c.id,'Summary'),'notAjax':not request.is_ajax()})
+        'tabs':tabs(c.id,'Sum'),'notAjax':not request.is_ajax()})
       
 #### COMPONENT HANDLING ###########################################################
 
@@ -109,17 +109,21 @@ def componentXML(request,centre_id,component_id):
    
 ###### REFERENCE HANDLING ######################################################
    
-def references(request):
+def references(request,centre_id=None):
     ''' Handle the listing of references '''
     refs=Reference.objects.all()
-    return render_to_response('references.html',{'refs':refs})
+    if centre_id is None: 
+        t=None
+    else: t=tabs(centre_id,'Refs')
+    return render_to_response('references.html',{'refs':refs,'tabs':t})
 
 def addReference(request,component_id=None):
     ''' Handle the addition of a new reference, if componentID is present, offer to 
-    return to their, otherwise go back to references '''
+    return to there, otherwise go back to references '''
     logging.debug('Adding reference to %s'%component_id)
     if component_id is not None:
         url=reverse('cmip5q.protoq.views.addReference',args=(component_id,))
+        
     else: url=reverse('cmip5q.protoq.views.addReference')
     
     if request.method=='POST':
@@ -131,7 +135,7 @@ def addReference(request,component_id=None):
             c.save()
             logging.info('Added reference %s to component %s'%(ref.id,c.id))
             if component_id is None:
-                return HttpResponseRedirect(reverse('cmip5q.protoq.views.references'))
+                return HttpResponseRedirect(reverse('cmip5q.protoq.views.references',args=(c.centere_id,)))
             else:
                 return HttpResponseRedirect(reverse('cmip5q.protoq.views.componentRefs',args=(component_id,)))
         else:
@@ -241,8 +245,6 @@ def viewExperiment(request,experiment_id):
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'notAjax':not request.is_ajax()})
 
-
-
 ############ DATA VIEWS ######################
 
 def dataList(request,cen_id):
@@ -253,9 +255,11 @@ def dataList(request,cen_id):
     c.url=reverse('cmip5q.protoq.views.centre',args=(cen_id,))
     surl=reverse('cmip5q.protoq.views.simulationList',args=(cen_id,))
     return render_to_response('dataList.html',{'files':do,'surl':surl,'c':c,
+                                'tabs':tabs(cen_id,'Files'),
                                 'notAjax':not request.is_ajax()})
 
 def dataEdit(request,cen_id,object_id=None):
+    
     ''' Handle the editing of a specific data object '''
     
     editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
@@ -283,7 +287,8 @@ def dataEdit(request,cen_id,object_id=None):
     else:
         editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
     return render_to_response('data_snippet.html',
-            {'dform':dform,'editURL':editURL,'notAjax':not request.is_ajax()})
+            {'dform':dform,'editURL':editURL,'tabs':tabs(cen_id,'FileEdit'),
+            'notAjax':not request.is_ajax()})
     
     
     

@@ -126,6 +126,43 @@ td.space {background-color:#FFFFFF;}
 div.guidance {font-size:small; margin-left:20px; margin-right:20px;}
 .cmip5q{font-size:small; margin-left:20px; margin-right:20px;color:green}
 a.button {text-decoration:None;padding:1px 3px 1px 3px;border:1px solid black; background-color:#E1E1E1;}
+    
+/* support for in page tab navigation, munged from multiple websites */
+ 
+.tabnav ul {                                 /* basic tab set */
+text-align: centre;                            /* left, right or center */
+margin: 0 0 0 0;                                   /* margin */
+font: bold 12px verdana, arial, sans-serif;  /* font type */
+list-style: none;                            /* IMPORTANT */
+padding: 8px 0 0 10px;                                  /* padding */
+}
+.tabnav li { 
+display: inline;                              /* IMPORTANT */
+border: solid;
+border-width: 1px 1px 0 1px;                  /* BOTTOM HAS TO BE ZERO */
+margin: 0 0.5em 0 0 ;                           /* Second one is spacing */
+padding: 2px 0 0 0;                           /* nb can't pad down */
+}
+
+.tabnav a {
+text-decoration: none;
+}
+
+.tabnav a:hover {background: #ddf; }
+
+.tabcontent {
+margin-left: 5px;
+border: 1px solid black;
+background-color:#FFFACD; /* lemonchiffon, see http://www.somacon.com/p142.php */
+padding: 5px;
+}        /* tabs sit on this div */
+
+.tabnav li a {padding: 0 5px;}                /* padd out the addresses in the tabs */
+
+.tabnav .selected {
+padding-bottom: 1px; 
+background: #FFFACD;  /* needs to be the same as tabcontent */
+}
 
 
 
