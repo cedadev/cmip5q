@@ -103,7 +103,7 @@ class simulationHandler(object):
             simform.centre(self.centre)
         
         return render_to_response('simulation.html',
-            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,'tabs':tabs(self.centreid,None),
+            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,'tabs':tabs(self.centreid,'Update'),
             'notAjax':not request.is_ajax()})
         
     def edit(self,request,fix=False):
