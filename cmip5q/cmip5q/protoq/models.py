@@ -24,6 +24,8 @@ class Reference(models.Model):
     name=models.CharField(max_length=24)
     citation=models.TextField(blank=True)
     link=models.URLField(blank=True,null=True)
+    refTypes=models.ForeignKey('Vocab',null=True,blank=True)
+    refType=models.ForeignKey('Value')
     def __unicode__(self):
         return self.name
     
@@ -55,6 +57,8 @@ class Experiment(models.Model):
     docID=models.CharField(max_length=128)
     startDate=models.CharField(max_length=32)
     endDate=models.CharField(max_length=32)
+    def __unicode__(self):
+        return self.docID
     
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
@@ -107,12 +111,16 @@ class Vocab(models.Model):
     name=models.CharField(max_length=64)
     uri=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
+    def __unicode__(self):
+        return self.name
     
 class Value(models.Model):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
     value=models.CharField(max_length=64)
-    vocab=models.ForeignKey(Vocab)  
-    
+    vocab=models.ForeignKey(Vocab)
+    def __unicode__(self):  
+        return self.value
+        
 class Param(models.Model):
     ''' This is the abstract parameter class'''
     name=models.CharField(max_length=64,blank=False)
@@ -121,6 +129,8 @@ class Param(models.Model):
     # still not sure about this ...
     vocab=models.ForeignKey(Vocab,null=True,blank=True)
     value=models.CharField(max_length=512,blank=True)
+    def __unicode__(self):
+        return self.name
     
 class DataObject(models.Model):
     ''' Holds the data object information agreed in Paris '''
@@ -136,8 +146,23 @@ class DataObject(models.Model):
     cftype=models.CharField(max_length=512,blank=True)
     def __unicode__(self):
         return self.name
-        
     
+class Coupling(models.Model):
+    ''' Holds the coupling class description based on ticket 256 mindmaps '''
+    #use an integer so we can point at the id of a file or component
+    #flag if it's a file (False means a component):
+    sourceIsFile=models.BooleanField()
+    #we can't use a foreign key directly because it could be either:
+    source=models.IntegerField()
+    frequency=models.IntegerField()  # units are hours
+    interpolatorOnline=models.BooleanField() # online or offline coupling
+    usesCoupler=models.BooleanField() # if False done in model code
+    couplingReference=models.ForeignKey(Reference) # reference to coupling details
+    description=models.TextField(blank=True,null=True) # if wanted.
+    def __unicode__(self):
+        return 'Coupling (File:%s, Source:%s, Frequency: %s)'%(
+            self.sourceIsFile,self.source,self.frequency)
+        
 ##
 ### FORMS FOLLOW
 ## We only need forms for the things the punters fill in,
@@ -203,8 +228,10 @@ class ComponentForm(forms.ModelForm):
         model=Component
         exclude=('centre','uri')
         
-        
-        
+class CouplingForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
+    class Meta:
+        model=Coupling
 
 class ReferenceForm(forms.ModelForm):
     class Meta:

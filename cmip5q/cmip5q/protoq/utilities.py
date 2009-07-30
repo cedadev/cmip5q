@@ -17,7 +17,8 @@ class tabs(list):
     ''' Build a list of tabs to be used on each page, passed to base.html '''
     def __init__(self,centre_id,active):
         t={}
-        t['Sum']=tab('Home',
+        c=Centre.objects.get(id=centre_id)
+        t['Sum']=tab('Home:%s'%c.abbrev,
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
         t['Sims']=tab('Simulations',
                 reverse('cmip5q.protoq.views.simulationList',args=(centre_id,)))
