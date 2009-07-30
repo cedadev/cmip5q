@@ -24,7 +24,7 @@ class Reference(models.Model):
     name=models.CharField(max_length=24)
     citation=models.TextField(blank=True)
     link=models.URLField(blank=True,null=True)
-    refTypes=models.ForeignKey('Vocab',null=True,blank=True)
+    refTypes=models.ForeignKey('Vocab',null=True,blank=True,editable=False)
     refType=models.ForeignKey('Value')
     def __unicode__(self):
         return self.name
@@ -48,6 +48,7 @@ class Component(Doc):
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
     centre=models.ForeignKey('Centre',blank=True,null=True)
+    #see http://metaforclimate.eu/trac/wiki/tickets/280
     
 class Experiment(models.Model):
     ''' A CMIP5 Experiment '''
@@ -234,8 +235,11 @@ class CouplingForm(forms.ModelForm):
         model=Coupling
 
 class ReferenceForm(forms.ModelForm):
+    citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))
+    link=forms.URLField(widget=forms.TextInput(attrs={'size':'55'}))
     class Meta:
         model=Reference
+        #exclude=('refTypes')
         
 class PlatformForm(forms.ModelForm):
     class Meta:

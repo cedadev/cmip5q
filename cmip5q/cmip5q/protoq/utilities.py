@@ -23,7 +23,7 @@ class tabs(list):
         t['Sims']=tab('Simulations',
                 reverse('cmip5q.protoq.views.simulationList',args=(centre_id,)))
         t['Refs']=tab('References',
-                reverse('cmip5q.protoq.views.references',args=(centre_id,)))
+                reverse('cmip5q.protoq.views.referenceList',args=(centre_id,)))
         t['Files']=tab('Files',
                 reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
         if active in t.keys(): 

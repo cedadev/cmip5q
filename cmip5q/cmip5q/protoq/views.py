@@ -9,6 +9,7 @@ from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import PropertyForm, tabs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
+from cmip5q.protoq.references import referenceHandler
 from cmip5q.XMLVocabReader import XMLVocabReader
 from django import forms
 import uuid
@@ -109,52 +110,15 @@ def componentXML(request,centre_id,component_id):
    
 ###### REFERENCE HANDLING ######################################################
    
-def references(request,centre_id=None):
-    ''' Handle the listing of references '''
-    refs=Reference.objects.all()
-    if centre_id is None: 
-        t=None
-    else: t=tabs(centre_id,'Refs')
-    return render_to_response('references.html',{'refs':refs,'tabs':t})
+def referenceList(request,centre_id=None):
+    ''' Handle the listing of references, including the options to edit, or add'''
+    rH=referenceHandler(centre_id)
+    return rH.list()
 
-def addReference(request,component_id=None):
-    ''' Handle the addition of a new reference, if componentID is present, offer to 
-    return to there, otherwise go back to references '''
-    logging.debug('Adding reference to %s'%component_id)
-    if component_id is not None:
-        url=reverse('cmip5q.protoq.views.addReference',args=(component_id,))
-        
-    else: url=reverse('cmip5q.protoq.views.addReference')
-    
-    if request.method=='POST':
-        rform=ReferenceForm(request.POST)
-        if rform.is_valid():
-            ref=rform.save()
-            c=Component.objects.get(pk=component_id)
-            c.references.add(ref)
-            c.save()
-            logging.info('Added reference %s to component %s'%(ref.id,c.id))
-            if component_id is None:
-                return HttpResponseRedirect(reverse('cmip5q.protoq.views.references',args=(c.centere_id,)))
-            else:
-                return HttpResponseRedirect(reverse('cmip5q.protoq.views.componentRefs',args=(component_id,)))
-        else:
-            print rform.errors
-    else:
-        rform=ReferenceForm()
-    return render_to_response('reference.html',{'rform':rform,'url':url,'label':'add','notAjax':not request.is_ajax()})
-        
-def editReference(request,reference_id):
-    r=Reference.objects.get(pk=reference_id)
-    if request.method=='POST':
-        rform=ReferenceForm(request.POST,instance=r)
-        if rform.is_valid():
-            rform.save()
-            return HttpResponseRedirect(reverse('cmip5q.protoq.views.references'))
-    else:
-        rform=ReferenceForm(instance=r)
-    url='/cmip5/references/edit/%s/'%reference_id
-    return render_to_response('reference.html',{'rform':rform,'url':url,'label':'update','notAjax':not request.is_ajax()})
+def referenceEdit(request,centre_id,reference_id=None):
+    ''' Display or edit one reference '''
+    rH=referenceHandler(centre_id)
+    return rH.edit(request,reference_id,request.is_ajax())
     
 def assignReference(request,component_id,reference_id):
     ''' Make the link between a reference and a component '''
