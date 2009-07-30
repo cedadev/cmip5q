@@ -22,15 +22,12 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/validate/$','cmip5q.protoq.views.componentValidate'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/view/$','cmip5q.protoq.views.componentView'),   
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML'),   
-        #
-    # references
-    # reference/add    
+    #
+    # REFERENCES
     #          
-    (r'^cmip5/references/$','cmip5q.protoq.views.references'),
-    (r'^cmip5/references/(?P<centre_id>\d+)/$','cmip5q.protoq.views.references'),
-    (r'^cmip5/references/add/$','cmip5q.protoq.views.addReference'),
-    (r'^cmip5/references/add/(?P<component_id>\d+)/$','cmip5q.protoq.views.addReference'),
-    (r'^cmip5/references/edit/(?P<reference_id>\d+)/$','cmip5q.protoq.views.editReference'),
+    (r'^cmip5/(?P<centre_id>\d+)/references/$','cmip5q.protoq.views.referenceList'),
+    (r'^cmip5/(?P<centre_id>\d+)/reference/(?P<reference_id>\d+)/$','cmip5q.protoq.views.referenceEdit'),
+    (r'^cmip5/(?P<centre_id>\d+)/reference/$','cmip5q.protoq.views.referenceEdit'),  
     (r'^cmip5/references/assign/(?P<component_id>\d+)/(?P<reference_id>\d+)/$','cmip5q.protoq.views.assignReference'),
     (r'^cmip5/references/remove/(?P<component_id>\d+)/(?P<reference_id>\d+)/$','cmip5q.protoq.views.remReference'),
     #
