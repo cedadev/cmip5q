@@ -1,15 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
+<script type="text/javascript">
+    var ajaxme = function(formID,targetID,url) {
+        var callback = {
+            success: function(o) {  
+               document.getElementById(targetID).innerHTML = o.responseText;  }
+            };
+        YAHOO.util.Connect.setForm(formID);
+      
+        var conObj = YAHOO.util.Connect.asyncRequest('POST',url,callback);
+   }
+</script>
+<div class="boxer">
 <h1> References </h1>
+</div>
+<div class="boxer">
+<p class="guidance"> Modify references by making changes and saving individual references. Create new references using the form at the bottom of the page. </p>
+<p class="guidance"> Note that the reference list is shared between centres, once saved, please don't change a reference mnemonic abd the relationship between and it's content (although obviously feel free to correct errors of fact). If you have a different link for your citation, even though you think it's the same paper, 
+please create a new reference. </p>
+<p class="cmip5q"> Suspect this page will get too long, need to do it like the file page, and probably have the reference year and order by it </p>
 
-<table>
-<tr><td> Name</td><td>Authors</td><td>Citation</td><td></td></tr>
-{%for r in refs %}
-<tr><td><a href="/cmip5/references/edit/{{r.id}}/">{{r.name}}</a></td><td>{{r.citation}}</td>></tr>
+<table width="100%">    
+<tbody>
+{% for r in rforms %}
+    <tr class="{% cycle 'row1' 'row2' %}"><td width="95%">
+        <form action="{{r.MyEditURL}}" method="POST" id="form{{forloop.counter}}">
+        <table id="Replace{{forloop.counter}}">
+           {% include "reference.html" %} 
+        </table>
+        </td>
+        <td align="center">
+            <input id="inp{{forloop.counter}}" type="button" value="update" onClick="ajaxme('form{{forloop.counter}}','Replace{{forloop.counter}}','{{r.MyEditURL}}');"></td>
+        </tr>
+    </form>
 {% endfor %}
-<tr><td colspan="2"><form action='/cmip5/references/add' method='get'>
-<input type="submit" value="Add a new reference"/>
-</form></td></tr>
+</tbody></table>
+</div>
+<div class="boxer">
+<h2> Enter New Reference </h2>
+<p class="guidance"> Please enter citations in the form:<br/>
+    Author1, A.B, C.D. Author2,...,and Y.Z. AuthorLast (1984). "The year of the bat". Journal of Irreducable Results, 44, 1-23.<br/>
+and enter doi strings in the link box as doi:a.b.c </p>
+<table width="100%">
+<tbody>
+  {% for r in dform %}
+  <tr><td width="95%">
+    <form action="{{r.MyEditURL}}" method="POST" id="newref">
+    <table> {% include "reference.html" %} </table>
+    </td><td  align="center"><input id="newrefin" type="submit" value="update"/></td>
+  </tr>
+  {%endfor %}
+</tbody>
 </table>
+</div>
 
 {% endblock %}

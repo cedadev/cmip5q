@@ -1,9 +1,7 @@
-{% extends "base.html" %}
-{% block content %}
+<!-- Reference.html -->
+<tr width="100%"><td width="25%">Mnemonic{{r.name.errors}}:{{r.name}}</td>
+    <td width="25%">Type{{r.refType.errors}}:{{r.refType}}</td>
+    <td width="50%">Link{{r.link.errors}}:{{r.link}}</td>
+</tr>
+<tr><td colspan="3">Citation{{r.citation.errors}}:{{r.citation}}</td></tr>
 
-<h1> {{label}} a reference </h1>
-
-<form action="{{url}}" method="POST">
-{{rform.as_p}}
-<input type="submit" value="{{label}} Reference"/>
-{% endblock %}
