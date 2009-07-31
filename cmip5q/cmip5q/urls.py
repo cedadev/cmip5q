@@ -21,7 +21,10 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/refs/$','cmip5q.protoq.views.componentRefs'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/validate/$','cmip5q.protoq.views.componentValidate'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/view/$','cmip5q.protoq.views.componentView'),   
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML'),   
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML'),
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Numerics/$','cmip5q.protoq.views.componentNum'),
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Coupling/$','cmip5q.protoq.views.componentCup'),
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Outputs/$','cmip5q.protoq.views.componentOut'),
     #
     # REFERENCES
     #          
