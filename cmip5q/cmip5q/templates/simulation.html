@@ -30,14 +30,7 @@ on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr>
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
 <p class="guidance"> In this section you need to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuraiton of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
 <ul>
-<li> <p>Where you indicate the use of a file, you will need to choose a file from a dropdown list of those files which you have <em> already </em> defined.</p><p class="cmip5q"> next button broken </p>
-<form action="{{dataURL}}" method="POST">
-<input type="hidden" name="simulation" value="{{simid}}">
-<input id="fileBut" type="submit" value="(add more file(s) now)">
-</form>
-<script type="text/javascript">
-var fileButton = new YAHOO.widget.Button("fileBut",{value:"fileButvalue"}); 
-</script></li>
+<li> <p>Where you indicate the use of a file, you will need to choose a file from a dropdown list of those files which you have <em> already </em> defined. If necessary, use the Files tab button to manage your files, and return here via the Simulations Tab.</li>
 <li> <p>Where you indicate a code modification, please indicate which component was modified, using the drop down list provided. </p>
 <p class="cmip5q"> At the moment the components offered include all those from your centre,
 not just those from within the specific model ... until we fix that, watch out!</p>
