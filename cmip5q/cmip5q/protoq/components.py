@@ -15,7 +15,26 @@ import logging
 
 import os
 
- 
+class MyCouplingForm(CouplingForm):
+    ''' Subclassed to ensure we get extra attributes and right vocabs '''
+    def __init__(self,cenid,comid,r,*args,**kwargs):
+        self.vocabs=('couplingType','couplingFreq','couplingInterp','couplingDim')
+        self.Vocabs={}
+        for v in self.vocabs: self.Vocabs[v]=Vocab.objects.get(name=v)
+        CouplingForm.__init__(self,instance=r,*args,**kwargs)
+        if r is None:
+            self.MyEditURL=reverse('cmip5q.protoq.views.componentCup',
+                args=(cenid,comid,))
+        else:
+            self.MyEditURL=reverse('cmip5q.protoq.views.referenceEdit',args=(cenid,comid,r.id,))
+        for f in self.vocabs:
+            self.fields[f].queryset=Value.objects.filter(vocab=self.Vocabs[f])
+    def save(self,*args,**kwargs):
+        r=CouplingForm.save(self,*args,**kwargs)
+        for f in self.vocabs:
+            r.__setattr_(f,self.Vocabs[f])
+        return r
+
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
     centre=Centre.objects.get(pk=centre_id)
@@ -196,8 +215,14 @@ class componentHandler(object):
     def numerics(self):
         return HttpResponse('Not implemented')
         
-    def coupling(self):
-        return HttpResponse('Not implemented')
+    def coupling(self,request):
+        ''' There should be at most one coupling per component '''
+        coupling=None
+        if request.method=='POST':
+            pass
+        elif request.method=='GET':
+            cform=MyCouplingForm(self.centre_id,self.component.id,coupling)
+        return render_to_response('coupling.html',{'c':self.component,'cform':cform})
     
     def outputs(self):
         return HttpResponse('Not implemented')

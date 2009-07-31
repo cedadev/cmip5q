@@ -48,6 +48,9 @@ class Component(Doc):
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
     centre=models.ForeignKey('Centre',blank=True,null=True)
+    compiler=models.CharField(max_length=128,blank=True,null=True)
+    hardwareVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False)
+    hardware=models.ForeignKey('Value')
     #see http://metaforclimate.eu/trac/wiki/tickets/280
     
 class Experiment(models.Model):
@@ -156,9 +159,18 @@ class Coupling(models.Model):
     #we can't use a foreign key directly because it could be either:
     source=models.IntegerField()
     frequency=models.IntegerField()  # units are hours
-    interpolatorOnline=models.BooleanField() # online or offline coupling
-    usesCoupler=models.BooleanField() # if False done in model code
-    couplingReference=models.ForeignKey(Reference) # reference to coupling details
+    
+    # could do this with a many2many field and more work in the form ...
+    couplingTypeVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingType')
+    couplingType=models.ForeignKey('Value',related_name='couplingTypeVal')
+    couplingFreqVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingFreq')
+    couplingFreq=models.ForeignKey('Value',related_name='couplingFreqVal')
+    couplingInterpVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingInterp')
+    couplingInterp=models.ForeignKey('Value',related_name='couplingInterpVal')
+    couplingDimVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingDim')
+    couplingDim=models.ForeignKey('Value',related_name='couplingDimVal')
+    
+    references=models.ForeignKey(Reference) # reference to coupling details
     description=models.TextField(blank=True,null=True) # if wanted.
     def __unicode__(self):
         return 'Coupling (File:%s, Source:%s, Frequency: %s)'%(
