@@ -58,13 +58,13 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.conformanceEdit'),  
                     
     #cmip5/data/centre_id/dataobject/*
-    (r'^cmip5/data/(?P<cen_id>\d+)/(?P<object_id>\d+)/$',
+    (r'^cmip5/(?P<cen_id>\d+)/data/(?P<object_id>\d+)/$',
             'cmip5q.protoq.views.dataEdit'),
     #cmip5/data/centre_id/
-    (r'^cmip5/data/(?P<cen_id>\d+)/$',
+    (r'^cmip5/(?P<cen_id>\d+)/data/$',
             'cmip5q.protoq.views.dataEdit'),  
     #cmip5/data/centre_id/list
-    (r'^cmip5/data/(?P<cen_id>\d+)/list$',
+    (r'^cmip5/(?P<cen_id>\d+)/data/list$',
             'cmip5q.protoq.views.dataList'),      
     ##
     (r'^cmip5/(?P<cen_id>\d+)/help$',
