@@ -204,23 +204,26 @@ def dataList(request,cen_id):
     c=Centre.objects.get(pk=cen_id)
     c.url=reverse('cmip5q.protoq.views.centre',args=(cen_id,))
     surl=reverse('cmip5q.protoq.views.simulationList',args=(cen_id,))
+    editurl=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,))
     return render_to_response('dataList.html',{'files':do,'surl':surl,'c':c,
                                 'tabs':tabs(cen_id,'Files'),
+                                'dform':DataObjectForm(),
+                                'editURL':editurl,
                                 'notAjax':not request.is_ajax()})
                                 
 def dataEdit(request,cen_id,object_id=None):
     
     ''' Handle the editing of a specific data object '''
     
-    editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
-    
     if object_id is None:
+        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,))
         if request.method=='GET':
             # then we're starting afresh
             dform=DataObjectForm()
         elif request.method=='POST':
             dform=DataObjectForm(request.POST)
     else:
+        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,object_id,))
         d=DataObject.objects.get(pk=object_id)
         if request.method=='GET':
             dform=DataObjectForm(instance=d)
@@ -229,14 +232,11 @@ def dataEdit(request,cen_id,object_id=None):
   
     if request.method=='POST':
         if dform.is_valid():
-            print 'yippeee'
             d=dform.save()
             return HttpResponseRedirect(reverse('cmip5q.protoq.views.dataList',args=(cen_id,)))
-        else:
-            print 'what?'
     else:
         editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
-    return render_to_response('data_snippet.html',
+    return render_to_response('data.html',
             {'dform':dform,'editURL':editURL,'tabs':tabs(cen_id,'FileEdit'),
             'notAjax':not request.is_ajax()})
     

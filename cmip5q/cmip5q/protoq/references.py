@@ -20,7 +20,6 @@ class MyRefForm(ReferenceForm):
     def __init__(self,cid,r,*args,**kwargs):
         self.vocab=Vocab.objects.get(name='Reference Types Vocab')
         ReferenceForm.__init__(self,instance=r,*args,**kwargs)
-        self.MyEditURL=reverse
         if r is None:
             self.MyEditURL=reverse('cmip5q.protoq.views.referenceEdit',
                 args=(cid,))
@@ -50,9 +49,10 @@ class referenceHandler:
         for r in self.refs:
             rform=MyRefForm(self.cid,r)
             rforms.append(rform)
-        rform=MyRefForm(self.cid,None)
-        rforms.append(rform)
+        dform=[MyRefForm(self.cid,None)]
+        print dform[0].MyEditURL
         return render_to_response('references.html',{'rforms':rforms,
+                                  'dform':dform,
                                   'tabs':self.tabs,
                                   'linkURLbase':linkURL,
                                   'unlinkURLbase':unlinkURL})
@@ -77,12 +77,17 @@ class referenceHandler:
             rform=MyRefForm(self.cid,r,request.POST)
             if rform.is_valid():
                 r=rform.save()
-                url=reverse('cmip5q.protoq.views.referenceEdit',args=(self.cid,r.id,))
-                if not ajax:return HttpResponseRedirect(url)
+                if not ajax:
+                    url=reverse('cmip5q.protoq.views.referenceList',args=(self.cid,))
+                    return HttpResponseRedirect(url)
                 rform=MyRefForm(self.cid,r)
+            else: print rform.errors
         else:   
             rform=MyRefForm(self.cid,r)
-        return render_to_response('reference.html',{'r':rform})
+        if (ajax):    
+            return render_to_response('reference.html',{'r':rform})
+        else:
+            return render_to_response('referenceAlone.html',{'dform':[rform],'tabs':tabs(self.cid,'Refs')})
         
     def unlink(self,resource,ref_id):
         ''' Provide a reference list, which submits to a method on the resource
