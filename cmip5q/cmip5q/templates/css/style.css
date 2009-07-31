@@ -61,7 +61,7 @@ margin:5px;
 padding:5px 5px 5px 15px;
 }
 
-.boxer {margin:5px;padding:5px;background-color:#FFFFFF; border: 1px solid black;}
+
 
 .twocol{background-color:#FFFFFF;padding:0px;margin:0px;}
 /* Two equal column options */
@@ -118,14 +118,21 @@ td.space {background-color:#FFFFFF;}
 						(100% - left column width) plus (center column left and right padding) plus (left column left and right padding) plus (right column left padding) */
 	}
 
-
-.boxer h1, h4 {margin-left:2px; padding:2px}
+.boxer {margin:5px;padding:5px;background-color:#FFFFFF; border: 1px solid black;}
+.boxer h1, h4 {margin-left:2px; padding:2px }
+.boxer2  {margin:5px;padding:5px;background-color:#CDC9A5; border: 1px solid black;} /* lemonchiffon3 */
+.red {color:red;}
 .errorlist li {color:red;}
 .bad {color:red;}
 .inbox {border:1px solid; margin: 5px 20px 5px 20px;padding:2px 2px 5px 2px;}
 div.guidance {font-size:small; margin-left:20px; margin-right:20px;}
 .cmip5q{font-size:small; margin-left:20px; margin-right:20px;color:green}
 a.button {text-decoration:None;padding:1px 3px 1px 3px;border:1px solid black; background-color:#E1E1E1;}
+    
+/* support for tables */
+.row1 {background-color:#FFF8DC } /* cornsilk see http://www.somacon.com/p142.php */
+.row2 {background-color:#FFE4C4 } /* bisque */
+    
     
 /* support for in page tab navigation, munged from multiple websites */
  
@@ -168,5 +175,5 @@ background: #FFFACD;  /* needs to be the same as tabcontent */
 
 
 
-
+ 
 

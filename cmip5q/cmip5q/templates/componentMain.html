@@ -7,84 +7,109 @@
 <table class="navmain">
    <tr>
       <td valign="top" width="200px">
-      
-        <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
-        <h4>Component {{c.abbrev}}</h4>
-        <p class="guidance"> Please add details of any other relevant
-        subcomponents of this component <p>
-        <p><a id="linkbutton4" href="{{subu}}"> Add Subcomponent</a></p>
-        </div>
-        
-        <div class="boxer"><p class="cmip5q"> Placeholder for link to Coupling Page </p> </div>
         <div class="boxer">
-          <p><a id="linkbutton2" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/view/">View</a></p>
-          <p><a id="linkbutton3" href="/cmip5/{{c.centre_id}}/component/{{c.id}}/validate/">Validate</a></p>
+            <p class="red"> All buttons and links in the tabs and this column navigate away from this page. Save your work first!</p></div>
+            <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
+            <h4>Component {{c.abbrev}}</h4>
+            <p class="guidance"> Please add details of any other relevant
+            subcomponents of this component <p>
+            <p><a id="sublinkbut" href="{{urls.subcomp}}"> Add Subcomponent</a></p>
+        </div>
+        <div class="boxer"> 
+        <p> The buttons in this box navigate to pages which further describe this <b>component</b>.</p>
+            <p><a id="reflinkbut" href="{{urls.refs}}"> Modify references</a></p>
+            <p><a id="numlinkbut" href="{{urls.numerics}}"> Modify numerics </a></p>
+          
+        </div>
+        <div class="boxer">
+          <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
+          <p><a id="cuplinkbut" href="{{urls.coupling}}"> Couplings</a></p>
+          <p><a id="outlinkbut" href="{{urls.outputs}}"> Outputs</a></p>
+          <p><a id="viewlinkbut" href="{{urls.view}}">View</a></p>
+          <p><a id="vallinkbut" href="{{urls.validate}}">Validate</a></p>
         </div>
       </td>
       <td valign="top" width="900px">
       
-    <form action="{{url}}" method='post'>
-    <div class="boxer">    
-        {{cform.management_form}}
-        <!--<h4> General Characteristics </h4>-->
-        <table>
-           <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
-            <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td>{{cform.title}}</td></tr> 
-            <tr><td>Contact:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
-        </table>
-    </div>
-    <div class="boxer">
-        <!--<h4> Component Details </h4>-->
-        <!-- We don't know how many rows we have in each column, so using divs is easier -->
-        <div>
-            <div>
-                <h4> Parameters </h4>
-                <div class="guidance"><p> Not all subcomponents will have parameters associated with them </p></div>
-                <table>
-                <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
-                {% for r in pform.rows %}
-                {{r.html|safe}}
-                {% endfor %}
-                <tr><td colspan="2"> Add a new param: </td><td colspan="2"></td></tr>
-                {{pform.new|safe }}
-                </table>
-                <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
-            </div>
-            <br style="clear:both"/><!-- Hack to make div expand vertically --> 
-        </div> 
-    </div>
-    
-    <div class="boxer">
-    <h4> Additional Information </h4>
-    <center>
-    <p class="guidance">Please tell us how this component has
-    been improved from previous generations. </p>
-    <p>{{cform.geneology}}</p>
-    <p class="guidance">Any additional information about this component: </p>
-    <p>{{cform.description}}</p> 
-    <p><input id="updateButton1" type="submit" value="Update parameters and characteristics"/></p>
-    
-    </center>
-    </div>
+    <div class="boxer2">
+    <form action="{{urls.form}}" method='post'>
+        <div class="boxer">    
+            {{cform.management_form}}
+            <!--<h4> General Characteristics </h4>-->
+            <table>
+            <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
+                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td>{{cform.title}}</td></tr> 
+                <tr><td>Contact:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
+            </table>
+        </div>
         <div class="boxer">
+            <!--<h4> Component Details </h4>-->
+            <!-- We don't know how many rows we have in each column, so using divs is easier -->
+            <div>
+                <div>
+                    <h4> Parameters </h4>
+                    <div class="guidance"><p> Not all subcomponents will have parameters associated with them </p></div>
+                    <table>
+                    <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
+                    {% for r in pform.rows %}
+                    {{r.html|safe}}
+                    {% endfor %}
+                    <tr><td colspan="2"> Add a new param: </td><td colspan="2"></td></tr>
+                    {{pform.new|safe }}
+                    </table>
+                    <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
+                </div>
+                <br style="clear:both"/><!-- Hack to make div expand vertically --> 
+            </div> 
+        </div>
+    
+        <div class="boxer">
+            <h4> Additional Information </h4>
+            <center>
+            <p class="guidance">Please tell us how this component has
+            been improved from previous generations. </p>
+            <p>{{cform.geneology}}</p>
+            <p class="guidance">Any additional information about this component: </p>
+            <p>{{cform.description}}</p>  
+            </center>
+        </div>
+    <center><input id="updateButton1" type="submit" value="Save"/></center>
+    </form>
+    </div>
+    <div class="boxer">
+        <h4> Component Numerics </h4>
+        <p class="guidance"> Update this list using the numerics button </p>
+    </div>
+    <div class="boxer">
         <h4> References (associated with this component) </h4>
+        <p class="guidance"> Update this list using the modify reference button</p>
         <table width="100%" class="backgrey">
             {% for r in refs%}
             <tr><td width="33%"><a href="{{r.link}}">{{r.name}}</a></td><td>{{r.citation}}</td></tr>
             {% endfor %}
         </table>
-        <center><a id="linkbutton5" href="{{refu}}"> Modify references</a></center>
     </div>
-    </form>
+    <div class="boxer">
+        <h4> Input coupling to this component </h4>
+        <p class="guidance"> Update this list using the couplings button </p>
+    </div>
+    <div class="boxer">
+        <h4> Output files from this component </h4>
+        <p class="guidance"> Update this list using the outputs button </p>
+    </div>
+    
 
 </td></tr></table>
 
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
-        var oLinkButton4 = new YAHOO.widget.Button("linkbutton4"); 
-        var oLinkButton2 = new YAHOO.widget.Button("linkbutton2"); 
-        var oLinkButton3 = new YAHOO.widget.Button("linkbutton3"); 
-        var oLinkButton3 = new YAHOO.widget.Button("linkbutton5"); 
+        var oLinkButton1 = new YAHOO.widget.Button("viewlinkbut"); 
+        var oLinkButton2 = new YAHOO.widget.Button("vallinkbut"); 
+        var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
+        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut"); 
+        var oLinkButton5 = new YAHOO.widget.Button("numlinkbut"); 
+        var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
+        var olinkButton7 = new YAHOO.widget.Button("outlinkbut");
         var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
 </script>
 <!-- end of button javascript -->
