@@ -1,14 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<table>
-{% for d in files %}
-  <tr><td><a href="{{d.editURL}}">{{d.name}}</td><td>{{d.cftype}}<td><td>{{d.link}}</td><td>{{d.description}}</td></tr>
-{%endfor%}
-</table>
-<p><a id="linkbutton1" href="{{c.url}}">Return to centre: {{c.abbrev}}</a></p>
-<p><a id="linkbutton2" href="{{surl}}">Return to simulations for: {{c.abbrev}}</a></p>
-<script  type="text/javascript"> 
-        var oLinkButton1 = new YAHOO.widget.Button("linkbutton1"); 
-        var oLinkButton2 = new YAHOO.widget.Button("linkbutton2"); 
-</script>
+<div class="boxer">
+<h1> List of Files </h1>
+</div>
+<div class="boxer">
+    {% if files|length_is:0 %}
+    <p>No data file descriptions loaded at present</p>
+    {% else %} 
+    <table>
+    <tr><th> Name </th><th> CF Type </th><th> Link </th><th>Description</th></tr>
+    {% for d in files %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+        <td><a href="{{d.editURL}}">{{d.name}}</td>
+        <td>{{d.cftype}}</td>
+        <td>{{d.link}}</td>
+        <td>{{d.description}}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+</div>
+<div class="boxer">
+<p> Add new file description: </p>
+<div id="data">
+    <form action="{{editURL}}" method="POST">
+       <table>
+       {% include 'data_snippet.html' %}
+       </table>
+    </form>
+</div>
+</div>
 {% endblock%}

@@ -1,25 +1,17 @@
-{% extends "base.html" %}
-{% block content %}
-<div id="data">
-    <form action="{{editURL}}" method="POST">
-        <table>
-            {{dform.management_form}}
-            <tr><td width="15%">Name{{dform.name.errors}}:</td><td>{{dform.name}}</td></tr>
-            <tr><td>Link:{{dform.link.errors}}</td><td>{{dform.link}}</td></tr>
-            <tr><td>Description:{{dform.description.errors}}</td><td>{{dform.description}}</td></tr>
-            <tr><td>Standard Name:{{dform.cftype.errors}}</td><td>{{dform.cftype}}</td></tr>
-            <tr><td>(If necessary) Actual variable name within the file: {{dform.variable.errros}}</td>
-                 <td>{{dform.variable}}</td></tr>
-            <tr><td colspan="2">
-                <center>
-                <input id="subDatBut" type="submit" value="Submit Data Object">
-                <script type="text/javascript">
-                    var subDatBut = new YAHOO.widget.Button("varSubBut",
-                                        {value:"varSubButvalue"});
-                </script>
-                </center>
-            </td></tr>
-        </table>
-    </form>
-</div>
-{% endblock%} 
+
+{{dform.management_form}}
+<tr><td width="15%">Name:{{dform.name.errors}}</td><td>{{dform.name}}</td></tr>
+<tr><td>Link:{{dform.link.errors}}</td><td>{{dform.link}}</td></tr>
+<tr><td>Description:{{dform.description.errors}}</td><td>{{dform.description}}</td></tr>
+<tr><td>Standard Name:{{dform.cftype.errors}}</td><td>{{dform.cftype}}</td></tr>
+<tr><td>(If necessary) Actual variable name within the file: {{dform.variable.errros}}</td>
+        <td>{{dform.variable}}</td></tr>
+<tr><td colspan="2">
+    <center>
+    <input id="subDatBut" type="submit" value="Save File Description">
+    <script type="text/javascript">
+        var subDatBut = new YAHOO.widget.Button("varSubBut",
+                            {value:"varSubButvalue"});
+    </script>
+    </center>
+</td></tr>
