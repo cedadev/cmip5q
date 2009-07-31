@@ -91,9 +91,16 @@ class componentHandler(object):
         logging.debug('Starting editing component %s'%c.id)
         
         # find my own urls ...
-        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
-        refurl=reverse('cmip5q.protoq.views.assignReferences',args=(self.centre_id,'component',c.id,))
-        suburl=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
+        urls={}
+        urls['form']=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
+        urls['refs']=reverse('cmip5q.protoq.views.assignReferences',args=(self.centre_id,'component',c.id,))
+        urls['outputs']=reverse('cmip5q.protoq.views.componentOut',args=(self.centre_id,c.id,))
+        urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
+        urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
+        urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
+        urls['view']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
+        urls['validate']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
+        
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
         baseURL=baseURL.replace('add/','%s/edit'%template)
@@ -154,7 +161,7 @@ class componentHandler(object):
                 {'c':c,'subs':subc,'refs':refs,
                 'cform':cform,'pform':pform,
                 'navtree':navtree.html,
-                'refu':refurl,'subu':suburl,
+                'urls':urls,
                 'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
     def manageRefs(self,request):      
@@ -185,4 +192,14 @@ class componentHandler(object):
     def XML(self):
         ''' XML view of self '''
         return HttpResponse('Not implemented')
+   
+    def numerics(self):
+        return HttpResponse('Not implemented')
+        
+    def coupling(self):
+        return HttpResponse('Not implemented')
+    
+    def outputs(self):
+        return HttpResponse('Not implemented')
+        
         

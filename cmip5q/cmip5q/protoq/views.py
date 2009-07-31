@@ -107,6 +107,20 @@ def componentXML(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.xml()
   
+def componentCup(request,centre_id,component_id):
+    ''' Return couplings for a component '''
+    c=componentHandler(centre_id,component_id)
+    return c.coupling()
+
+def componentNum(request,centre_id,component_id):
+    ''' Return numerics of the component '''
+    c=componentHandler(centre_id,component_id)
+    return c.numerics()
+
+def componentOut(request,centre_id,component_id):
+   ''' return outputs of a component '''
+   c=componentHandler(centre_id,component_id)
+   return c.outputs()
    
 ###### REFERENCE HANDLING ######################################################
    
