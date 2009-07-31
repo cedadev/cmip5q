@@ -28,8 +28,8 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/references/$','cmip5q.protoq.views.referenceList'),
     (r'^cmip5/(?P<centre_id>\d+)/reference/(?P<reference_id>\d+)/$','cmip5q.protoq.views.referenceEdit'),
     (r'^cmip5/(?P<centre_id>\d+)/reference/$','cmip5q.protoq.views.referenceEdit'),  
-    (r'^cmip5/references/assign/(?P<component_id>\d+)/(?P<reference_id>\d+)/$','cmip5q.protoq.views.assignReference'),
-    (r'^cmip5/references/remove/(?P<component_id>\d+)/(?P<reference_id>\d+)/$','cmip5q.protoq.views.remReference'),
+    (r'^cmip5/(?P<centre_id>\d+)/assignRefs/(?P<resourceType>\D+)/(?P<resource_id>\d+)/$',
+            'cmip5q.protoq.views.assignReferences'),
     #
     # SIMULATIONS
     #
@@ -65,7 +65,13 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.dataEdit'),  
     #cmip5/data/centre_id/list
     (r'^cmip5/data/(?P<cen_id>\d+)/list$',
-            'cmip5q.protoq.views.dataList'),        
+            'cmip5q.protoq.views.dataList'),      
+    ##
+    (r'^cmip5/(?P<cen_id>\d+)/help$',
+            'cmip5q.protoq.views.help'),                  
+    (r'^cmip5/(?P<cen_id>\d+)/about$',
+            'cmip5q.protoq.views.about'),                   
+                          
     #
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

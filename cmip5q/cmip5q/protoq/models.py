@@ -240,7 +240,7 @@ class ReferenceForm(forms.ModelForm):
     class Meta:
         model=Reference
         #exclude=('refTypes')
-        
+    
 class PlatformForm(forms.ModelForm):
     class Meta:
         model=Platform

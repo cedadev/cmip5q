@@ -16,28 +16,39 @@ class tab:
 class tabs(list):
     ''' Build a list of tabs to be used on each page, passed to base.html '''
     def __init__(self,centre_id,active):
+        list.__init__(self)
         t={}
         c=Centre.objects.get(id=centre_id)
         t['Sum']=tab('Home:%s'%c.abbrev,
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
+        self.append(t['Sum'])
+        
+        models=[Component.objects.get(pk=m.id) for m in c.component_set.filter(scienceType='model')]
+        for m in models:
+            t[m.abbrev]=tab(m.abbrev,
+                reverse('cmip5q.protoq.views.componentEdit',args=(centre_id,m.id,))) 
+            self.append(t[m.abbrev])
         t['Sims']=tab('Simulations',
                 reverse('cmip5q.protoq.views.simulationList',args=(centre_id,)))
         t['Refs']=tab('References',
                 reverse('cmip5q.protoq.views.referenceList',args=(centre_id,)))
         t['Files']=tab('Files',
                 reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
+        t['Help']=tab('Help',
+                reverse('cmip5q.protoq.views.help',args=(centre_id,)))
+        t['About']=tab('About',
+                reverse('cmip5q.protoq.views.about',args=(centre_id,)))
         if active in t.keys(): 
             t[active].activate()
         else:
             t['Extra']=tab(str(active),'',1)
-        list.__init__(self)
-        for key in ('Sum','Sims','Files','Refs'):self.append(t[key])
+       
+        for key in ('Sims','Files','Refs'):self.append(t[key])
         if 'Extra' in t.keys(): self.append(t['Extra'])
+        for key in ('Help','About'): self.append(t[key])
 
 class ParamRow(object):
-    
     ''' used to monkey patch our special parameter forms '''
-    
     def __init__(self,name):
         self.name=name 
 
@@ -137,11 +148,3 @@ class PropertyForm:
                         new=p[0]
                         new.value=qdict[key]
                         new.save()
-
-                        
-                        
-                        
-                        
-                        
-
-  

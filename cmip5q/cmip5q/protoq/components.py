@@ -92,7 +92,7 @@ class componentHandler(object):
         
         # find my own urls ...
         url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
-        refurl=reverse('cmip5q.protoq.views.componentRefs',args=(self.centre_id,c.id,))
+        refurl=reverse('cmip5q.protoq.views.assignReferences',args=(self.centre_id,'component',c.id,))
         suburl=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'

@@ -89,9 +89,49 @@ class referenceHandler:
         which unlinks '''
         pass
     
-    def link(self,resource,ref_id):
-        ''' Provid a reference list, which submits to a method on the resource
-        which links '''
-        pass
-    
-    
+    def assign(self,request,resourceType,resource_id):
+        ''' Assign references to a specific resource '''
+        
+        if resourceType=='component':
+            res=Component.objects.get(id=resource_id)
+            postURL=reverse('cmip5q.protoq.views.componentEdit',args=(self.cid,resource_id))
+        # add other things with references to this choice list ...
+        
+        values=res.references.values()
+        print values
+        initial=[i['name'] for i in values]
+        print 'I',initial
+            
+        title='Assign references to %s %s'%(resourceType,res)
+
+        data=[(str(r),str(r)) for r in self.refs]
+       
+        class AssignRefs(forms.Form):
+            ''' Used for producing a form for selecting some references '''
+            choose=forms.MultipleChoiceField(choices=data,
+                          widget=forms.CheckboxSelectMultiple())
+                          
+        if request.method=='POST':
+            rform=AssignRefs(request.POST)
+            if rform.is_valid():
+                #now parse these up and assign to the resource
+                res.references.clear()
+                new=rform.cleaned_data['choose']
+                for n in new:
+                    r=self.refs.get(name=n)
+                    res.references.add(r)
+                return HttpResponseRedirect(postURL)
+        elif request.method=='GET':
+            rform=AssignRefs({'choose':initial})
+                
+        url=reverse('cmip5q.protoq.views.assignReferences',args=(self.cid,resourceType,resource_id,))
+        return render_to_response('selectRef.html',
+            {'rform':rform,
+                'title':title,
+                'tabs':tabs(self.cid,'Chooser'),'url':url})
+        
+                    
+            
+                 
+                 
+                 

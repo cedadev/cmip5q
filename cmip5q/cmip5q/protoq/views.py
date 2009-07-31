@@ -120,32 +120,10 @@ def referenceEdit(request,centre_id,reference_id=None):
     rH=referenceHandler(centre_id)
     return rH.edit(request,reference_id,request.is_ajax())
     
-def assignReference(request,component_id,reference_id):
+def assignReferences(request,centre_id,resourceType,resource_id):
     ''' Make the link between a reference and a component '''
-    url=reverse('cmip5q.protoq.views.componentRefs',args=(component_id,))
-    try:
-        c=Component.objects.get(pk=component_id)
-        r=Reference.objects.get(pk=reference_id)
-    except:
-        message="Unable to handle component %s and/or reference %s"%(component_id,reference_id)
-        return render_to_response('error.html',{'message':message,'url':url})
-    c.references.add(r)
-    c.save()
-    return HttpResponseRedirect(url)
-
-def remReference(request,component_id,reference_id):
-    ''' Break link between a reference and a specific component '''
-    url=reverse('cmip5q.protoq.views.componentRefs',args=(component_id,))
-    try:
-        c=Component.objects.get(pk=component_id)
-        r=Reference.objects.get(pk=reference_id)
-    except:
-        message="Unable to handle component %s and/or reference %s"%(component_id,reference_id)
-        return render_to_response('error.html',{'message':message,'url':url})
-    c.references.remove(r)
-    c.save()
-    return HttpResponseRedirect(url)
-
+    rH=referenceHandler(centre_id)
+    return rH.assign(request,resourceType,resource_id)
     
 ###### SIMULATION HANDLING ######################################################
 
@@ -209,6 +187,14 @@ def viewExperiment(request,experiment_id):
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'notAjax':not request.is_ajax()})
 
+######## HELP and ABOUT ###############
+
+def help(request,cen_id):
+    return render_to_response('help.html',{'tabs':tabs(cen_id,'Help')})
+ 
+def about(request,cen_id):
+    return render_to_response('about.html',{'tabs':tabs(cen_id,'About')})
+
 ############ DATA VIEWS ######################
 
 def dataList(request,cen_id):
@@ -221,7 +207,7 @@ def dataList(request,cen_id):
     return render_to_response('dataList.html',{'files':do,'surl':surl,'c':c,
                                 'tabs':tabs(cen_id,'Files'),
                                 'notAjax':not request.is_ajax()})
-
+                                
 def dataEdit(request,cen_id,object_id=None):
     
     ''' Handle the editing of a specific data object '''
