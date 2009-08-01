@@ -9,7 +9,7 @@ import vocab
 
 class Doc(models.Model):
     ''' Abstract class for general properties '''
-    title=models.CharField(max_length=128)
+    title=models.CharField(max_length=128,blank=True,null=True)
     abbrev=models.SlugField(max_length=20)
     contact=models.EmailField(blank=True)
     description=models.TextField(blank=True,null=True)
@@ -47,10 +47,16 @@ class Component(Doc):
     
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
-    centre=models.ForeignKey('Centre',blank=True,null=True)
-    compiler=models.CharField(max_length=128,blank=True,null=True)
-    hardwareVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False)
-    hardware=models.ForeignKey('Value')
+    centre=models.ForeignKey('Centre')
+    compiler=models.CharField(max_length=128)
+    vendor=models.CharField(max_length=128)
+    compilerVersion=models.CharField(max_length=32)
+    maxProcessors=models.IntegerField()
+    coresPerProcessor=models.IntegerField()
+    operatingSystem=models.CharField(max_length=128)
+    hardware=models.ForeignKey('Value',related_name='hardwareVal')
+    processor=models.ForeignKey('Value',related_name='processorVal')
+    interconnect=models.ForeignKey('Value',related_name='interconnectVal')
     #see http://metaforclimate.eu/trac/wiki/tickets/280
     
 class Experiment(models.Model):
@@ -254,8 +260,12 @@ class ReferenceForm(forms.ModelForm):
         #exclude=('refTypes')
     
 class PlatformForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
+    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}))
+    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}))
     class Meta:
         model=Platform
+        exclude=('centre','uri')
         
 #class ParamForm(ModelForm):
 #    class Meta:

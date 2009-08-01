@@ -15,6 +15,7 @@ import logging
 
 import os
 
+#FIXME: change to the simpler way it's done in Platforms.
 class MyCouplingForm(CouplingForm):
     ''' Subclassed to ensure we get extra attributes and right vocabs '''
     def __init__(self,cenid,comid,r,*args,**kwargs):

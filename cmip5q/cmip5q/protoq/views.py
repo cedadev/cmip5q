@@ -59,7 +59,7 @@ def centre(request,centre_id):
         s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id))
     
     newmodURL=reverse('cmip5q.protoq.views.componentAdd',args=(c.id,))
-    newplatURL=reverse('cmip5q.protoq.views.platformAdd',args=(c.id,))
+    newplatURL=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,))
     viewsimURL=reverse('cmip5q.protoq.views.simulationList',args=(c.id,))
     
     
@@ -168,31 +168,51 @@ def conformanceEdit(request,cen_id,sim_id,req_id):
     return s.conformanceEdit(request,req_id)
             
 ##### PLATFORM HANDLING ###########################################################
-# we can do this simply because p doesn't have any mandatory links.
 
-def platformAdd(request,centre_id):
-    ''' Add a new platform to a centre '''
-    u=str(uuid.uuid1())
-    p=Platform(centre=Centre.objects.get(pk=centre_id),uri=u,title='abcd',abbrev='abcd')
-    p.save()
-    return HttpResponseRedirect(
-        reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,p.id,)))
-        
-def platformEdit(request,centre_id,platform_id):
+
+class MyPlatformForm(PlatformForm):
+    def __init__(self,*args,**kwargs):
+        PlatformForm.__init__(self,*args,**kwargs)
+        self.vocabs={'hardware':Vocab.objects.get(name='hardwareType'),
+                     'processor':Vocab.objects.get(name='processorType'),
+                     'interconnect':Vocab.objects.get(name='interconnectType')}
+        for key in self.vocabs:
+            self.fields[key].queryset=Value.objects.filter(vocab=self.vocabs[key])
+
+def platformEdit(request,centre_id,platform_id=None):
     ''' Handle platform editing '''
-    p=Platform.objects.get(pk=platform_id)
-    if request.method=='POST':
-        pform=PlatformForm(request.POST,instance=p)
-        if pform.is_valid():
-            pform.save()
-            return HttpResponseRedirect(
-                reverse('cmip5q.protoq.views.centre',args=[p.centre_id,]))
+    c=Centre.objects.get(id=centre_id)
+    # start by getting a form ...
+    if platform_id is None:
+        editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,))
+        if request.method=='GET':
+            pform=MyPlatformForm()
+        elif request.method=='POST':
+            pform=MyPlatformForm(request.POST)
+        pname=''
+        puri=str(uuid.uuid1())
     else:
-        pform=PlatformForm(instance=p)
-    url=reverse('cmip5q.protoq.views.platformEdit',args=(p.centre_id,p.id,))
+        editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))
+        p=Platform.objects.get(pk=platform_id)
+        puri=p.uri
+        pname=p.abbrev
+        if request.method=='GET':
+            pform=MyPlatformForm(instance=p)
+        elif request.method=='POST':
+            pform=MyPlatformForm(request.POST,instance=p)
+    # now we've got a form, handle it        
+    if request.method=='POST':
+        if pform.is_valid():
+            p=pform.save(commit=False)
+            p.centre=c
+            p.uri=puri
+            p.save()
+            return HttpResponseRedirect(
+                reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
+    
     return render_to_response('platform.html',
-                {'pform':pform,'centre_id':p.centre_id,'platform_id':p.id,
-                'url':url})
+                {'pform':pform,'url':editURL,'c':c,'pname':pname,
+                'tabs':tabs(centre_id,'Chooser')})
         
 ########## EXPERIMENT VIEWS ##################
     
@@ -248,6 +268,7 @@ def dataEdit(request,cen_id,object_id=None):
         if dform.is_valid():
             d=dform.save()
             return HttpResponseRedirect(reverse('cmip5q.protoq.views.dataList',args=(cen_id,)))
+    #FIXME: Should this be indented?
     else:
         editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
     return render_to_response('data.html',
