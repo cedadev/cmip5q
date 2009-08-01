@@ -1,10 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2> Platform </h2>
 <div class="inner">
+    <div class="boxer">
+        <h2> Edit platform {{pname}} for {{c}}</h2>
+    </div>
+    <div class="boxer">
     <form action='{{url}}' method='post'>
-    {{pform.as_p}}
-    <input type="submit" value="Submit Platform"/>
+        {{pform.management_form}}
+        <table>
+        <tr>
+            <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
+            <td>Vendor:{{pform.vendor.errors}}</td><td>{{pform.vendor}}</td>
+        </tr><tr>
+            <td>Compiler:{{pform.compiler.errors}}</td><td>{{pform.compiler}}</td>
+            <td>Compiler Version:{{pform.compilerVersion.errors}}</td><td>{{pform.compilerVersion}}</td>
+        </tr><tr>
+            <td>Operating System:{{pform.operatingSystem.errors}}</td><td>{{pform.operatingSystem}}</td>
+            <td colspan="2">Maximum Processors:{{pform.maxProcessors.errors}}{{pform.maxProcessors}}
+                Cores Per Processor:{{pform.coresPerProcessor.errors}}{{pform.coresPerProcessor}}</td>
+        </tr><tr>
+        <td colspan="4">Hardware:{{pforms.hardware.errors}}{{pform.hardware}}
+                        Processor Type: {{pforms.processor.errors}}{{pform.processor}}
+                        Interconnect Type: {{pforms.interconnnect.errors}}{{pform.interconnect}}</td>
+        </tr><tr>
+        <td>Any extra information:{{pforms.description.errors}}</td><td colspan="3">{{pform.description}}</td>
+        </tr>.     
+        </table>
+        <center> <input type="submit" value="Save"/></center>
     </form>
+    </div>
 </div>
 {% endblock %}
