@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     # platforms/edit/platform_id
     #
     (r'^cmip5/(?P<centre_id>\d+)/platform/add$',
-            'cmip5q.protoq.views.platformAdd'),
+            'cmip5q.protoq.views.platformEdit'),
     (r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/edit$',
             'cmip5q.protoq.views.platformEdit'),
     #

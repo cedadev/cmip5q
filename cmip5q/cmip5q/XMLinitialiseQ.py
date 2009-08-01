@@ -30,7 +30,11 @@ interpolationDims=('2D','3D')
 frequencies=('seconds','minutes','hours','days','months','years','decades')
 
 # and these will support platforms
-hardware=('Vector','Cluster','Parallel')
+hardware=('Vector','Parallel','Beowulf')
+#following extended from top500 site:
+processorFamily=('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64','Other Intel','Other AMD','Other')
+interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed','NUMAlink','SP Switch',
+    'Cray Interconnect','Fat Tree','Other')
 
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
@@ -59,5 +63,7 @@ def initialise():
     loadvocab('couplingDim',interpolationDims)
     
     #support for platforms
-    loadvocab('HardwareType',hardware)
+    loadvocab('hardwareType',hardware)
+    loadvocab('processorType',processorFamily)
+    loadvocab('interconnectType',interconnectFamily)
     
