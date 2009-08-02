@@ -19,22 +19,18 @@ import os
 class MyCouplingForm(CouplingForm):
     ''' Subclassed to ensure we get extra attributes and right vocabs '''
     def __init__(self,cenid,comid,r,*args,**kwargs):
-        self.vocabs=('couplingType','couplingFreq','couplingInterp','couplingDim')
-        self.Vocabs={}
-        for v in self.vocabs: self.Vocabs[v]=Vocab.objects.get(name=v)
         CouplingForm.__init__(self,instance=r,*args,**kwargs)
+        self.vocabs={'couplingType':Vocab.objects.get(name='couplingType'),
+                     'couplingFreq':Vocab.objects.get(name='couplingFreq'),
+                     'couplingInterp':Vocab.objects.get(name='couplingInterp'),
+                     'couplingDim':Vocab.objects.get(name='couplingDim')}
         if r is None:
             self.MyEditURL=reverse('cmip5q.protoq.views.componentCup',
                 args=(cenid,comid,))
         else:
             self.MyEditURL=reverse('cmip5q.protoq.views.referenceEdit',args=(cenid,comid,r.id,))
         for f in self.vocabs:
-            self.fields[f].queryset=Value.objects.filter(vocab=self.Vocabs[f])
-    def save(self,*args,**kwargs):
-        r=CouplingForm.save(self,*args,**kwargs)
-        for f in self.vocabs:
-            r.__setattr_(f,self.Vocabs[f])
-        return r
+            self.fields[f].queryset=Value.objects.filter(vocab=self.vocabs[f])
 
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
@@ -140,6 +136,12 @@ class componentHandler(object):
         # this is the automatic machinery ...
         refs=Reference.objects.filter(component__id=c.id)
         
+        #am I a realm level component?
+        realms=[str(i) for i in Value.objects.filter(vocab=Vocab.objects.get(name="Realms"))]
+        if c.scienceType in realms:
+            realm=1
+        else:realm=0
+        
         pform=PropertyForm(c,prefix='props')
         postOK=True
         if request.method=="POST":
@@ -168,7 +170,7 @@ class componentHandler(object):
             if postOK:
                 #redirect, so repainting the page doesn't resubmit
                 logging.debug('Finished handling post to %s'%c.id)
-                return HttpResponseRedirect(url)
+                return HttpResponseRedirect(urls['form'])
             else:
                 pass
                 # don't reset the forms so the user gets an error response.
@@ -182,6 +184,7 @@ class componentHandler(object):
                 'cform':cform,'pform':pform,
                 'navtree':navtree.html,
                 'urls':urls,
+                'realm':realm,
                 'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
     def manageRefs(self,request):      

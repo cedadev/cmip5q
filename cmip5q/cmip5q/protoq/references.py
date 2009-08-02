@@ -127,7 +127,10 @@ class referenceHandler:
                     res.references.add(r)
                 return HttpResponseRedirect(postURL)
         elif request.method=='GET':
-            rform=AssignRefs({'choose':initial})
+            #need to ensure that if there are none already chosen, we don't bind the form ...
+            if len(initial)==0:
+                rform=AssignRefs()
+            else:rform=AssignRefs({'choose':initial})
                 
         url=reverse('cmip5q.protoq.views.assignReferences',args=(self.cid,resourceType,resource_id,))
         return render_to_response('selectRef.html',

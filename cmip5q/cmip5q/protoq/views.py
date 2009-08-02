@@ -169,7 +169,6 @@ def conformanceEdit(request,cen_id,sim_id,req_id):
             
 ##### PLATFORM HANDLING ###########################################################
 
-
 class MyPlatformForm(PlatformForm):
     def __init__(self,*args,**kwargs):
         PlatformForm.__init__(self,*args,**kwargs)

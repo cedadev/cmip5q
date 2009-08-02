@@ -33,16 +33,21 @@ class Component(Doc):
     ''' A model component '''
     # this is the vocabulary NAME of this component:
     scienceType=models.SlugField(max_length=64,blank=True,null=True)
-    #
+    
+    # these next three are to support the questionnaire function
     implemented=models.BooleanField(default=1)
     visited=models.BooleanField(default=0)
-    #
+    controlled=models.BooleanField(default=0)
+    
+    # the following are common parameters
     geneology=models.TextField(blank=True,null=True)
-    #
-    components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
+    yearReleased=models.IntegerField(blank=True,null=True)
+    otherVersion=models.CharField(max_length=128,blank=True,null=True)
     references=models.ManyToManyField(Reference,blank=True,null=True)
     
-    #relations=generic.GenericRelation(Relation,blank=True,null=True)
+    # children components:
+    components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
+    
     centre=models.ForeignKey('Centre',blank=True,null=True)
     
 class Platform(Doc):
@@ -89,26 +94,10 @@ class Simulation(Doc):
     platform=models.ForeignKey(Platform)
     #each simulation run by one centre
     centre=models.ForeignKey('Centre')
-    
-class Conformance(models.Model):
-    ''' This relates a numerical requirement to an actual solution in the simulation '''
-    # centre (for access control)
-    centre=models.ForeignKey('Centre')
-    # the identifier of the numerical requirement:
-    requirement=models.ForeignKey(NumericalRequirement)
-    # simulation owning the requirement 
-    simulation=models.ForeignKey(Simulation)
-    # if we didn't use a file, it will be code
-    method=models.CharField(max_length=30)
-    # so we enter some text (particuarly if we do a code modification)
-    description=models.TextField()
-    # this is the target component that has been modified (if any has)
-    component=models.ForeignKey(Component,blank=True,null=True)
-    # this is the file object that has been used (if any)
-    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
-    def __unicode__(self):
-        return "%s (s:%s,r:%s,c:%s)"%(
-                self.description,self.simulation,self.requirement,self.centre)
+    #
+    initialCondition=models.TextField(blank=True,null=True)
+    #Boundary Conditions:
+    boundaryConditions=models.ManyToManyField('Coupling',blank=True,null=True)
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -157,23 +146,42 @@ class DataObject(models.Model):
     def __unicode__(self):
         return self.name
     
+class Conformance(models.Model):
+    ''' This relates a numerical requirement to an actual solution in the simulation '''
+    # centre (for access control)
+    centre=models.ForeignKey('Centre')
+    # the identifier of the numerical requirement:
+    requirement=models.ForeignKey(NumericalRequirement)
+    # simulation owning the requirement 
+    simulation=models.ForeignKey(Simulation)
+    # if we didn't use a file, it will be code
+    method=models.CharField(max_length=30)
+    # so we enter some text (particuarly if we do a code modification)
+    description=models.TextField()
+    # this is the target component that has been modified (if any has)
+    component=models.ForeignKey(Component,blank=True,null=True)
+    # this is the file object that has been used (if any)
+    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
+    def __unicode__(self):
+        return "%s (s:%s,r:%s,c:%s)"%(
+                self.description,self.simulation,self.requirement,self.centre) 
+    
 class Coupling(models.Model):
-    ''' Holds the coupling class description based on ticket 256 mindmaps '''
+    ''' Holds the coupling class description based on ticket 256 mindmaps.
+    Also used for basic boundary conditions '''
+    
     #use an integer so we can point at the id of a file or component
     #flag if it's a file (False means a component):
     sourceIsFile=models.BooleanField()
-    #we can't use a foreign key directly because it could be either:
-    source=models.IntegerField()
+    #one of the following will be relevant:
+    component=models.ForeignKey(Component,blank=True,null=True)
+    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
+    
     frequency=models.IntegerField()  # units are hours
     
-    # could do this with a many2many field and more work in the form ...
-    couplingTypeVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingType')
     couplingType=models.ForeignKey('Value',related_name='couplingTypeVal')
-    couplingFreqVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingFreq')
     couplingFreq=models.ForeignKey('Value',related_name='couplingFreqVal')
-    couplingInterpVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingInterp')
     couplingInterp=models.ForeignKey('Value',related_name='couplingInterpVal')
-    couplingDimVocab=models.ForeignKey('Vocab',null=True,blank=True,editable=False,related_name='couplingDim')
     couplingDim=models.ForeignKey('Value',related_name='couplingDimVal')
     
     references=models.ForeignKey(Reference) # reference to coupling details
@@ -181,8 +189,7 @@ class Coupling(models.Model):
     def __unicode__(self):
         return 'Coupling (File:%s, Source:%s, Frequency: %s)'%(
             self.sourceIsFile,self.source,self.frequency)
-        
-##
+
 ### FORMS FOLLOW
 ## We only need forms for the things the punters fill in,
 ## we can use the admin interface for the things we fill in
@@ -225,8 +232,9 @@ class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
+    initialCondition=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     class Meta:
         model=Simulation
         #these are enforced by the workflow leading to the form
@@ -238,11 +246,12 @@ class ComponentForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
-    #uri=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
     scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
     implemented=forms.BooleanField(required=True)
+    yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
+    otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
     class Meta:
         model=Component
         exclude=('centre','uri')
