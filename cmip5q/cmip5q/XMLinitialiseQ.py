@@ -14,13 +14,16 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
          ('MOHC','UK Met Office Hadley Centre'),
          ('GFDL','US Geophysical Fluid Dynamics Laboratory'),
          ('IPSL','FR Institute Simone Pierre Laplace'),
-         ('MPIM','DE Max Planck Institute for Meteorology'),
-             )
+         ('MPIM','DE Max Planck Institute for Meteorology'), )
+     
+# this is the controlled vocabularly for realms:
+# that is, the top level areas under the model definitions.
+realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBioGeoChemistry')
              
 # this tuple should provide a controlled vocabulary for referenceTypes
-referenceTypes=('Webpage','Online Refereed Publication',
-                'Offline Refereed Publication','Online Document',
-                'Offline Document')
+referenceTypes=('Webpage','Online Refereed',
+                'Offline Refereed','Online Other',
+                'Offline Other')
 
 # these support couplings 
 couplingTypes=('None','offline','OASIS2','OASIS3','OASIS4','Other')
@@ -35,6 +38,9 @@ hardware=('Vector','Parallel','Beowulf')
 processorFamily=('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64','Other Intel','Other AMD','Other')
 interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed','NUMAlink','SP Switch',
     'Cray Interconnect','Fat Tree','Other')
+    
+#geneology 
+relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf')
 
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
@@ -52,6 +58,9 @@ def initialise():
         u=str(uuid.uuid1())
         c=Centre(abbrev=centre[0],title=centre[1],uri=u)
         c.save()
+    
+    #add the realm vocabularies
+    loadvocab('Realms',realms)
         
     #now add reference type vocabulary
     loadvocab('Reference Types Vocab',referenceTypes)
@@ -66,4 +75,7 @@ def initialise():
     loadvocab('hardwareType',hardware)
     loadvocab('processorType',processorFamily)
     loadvocab('interconnectType',interconnectFamily)
+    
+    #support for geneologies
+    loadvocab('relations',relations)
     
