@@ -16,15 +16,16 @@
             <p><a id="sublinkbut" href="{{urls.subcomp}}"> Add Subcomponent</a></p>
         </div>
         <div class="boxer"> 
-        <p> The buttons in this box navigate to pages which further describe this <b>component</b>.</p>
+        <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
             <p><a id="reflinkbut" href="{{urls.refs}}"> Modify references</a></p>
+            {% if realm %}
             <p><a id="numlinkbut" href="{{urls.numerics}}"> Modify numerics </a></p>
-          
+            {% endif %}
         </div>
         <div class="boxer">
           <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
-          <p><a id="cuplinkbut" href="{{urls.coupling}}"> Couplings</a></p>
-          <p><a id="outlinkbut" href="{{urls.outputs}}"> Outputs</a></p>
+          {% if realm %} <p><a id="cuplinkbut" href="{{urls.coupling}}"> Couplings</a></p> {% endif %}
+          <!--<p><a id="outlinkbut" href="{{urls.outputs}}"> Outputs</a></p>-->
           <p><a id="viewlinkbut" href="{{urls.view}}">View</a></p>
           <p><a id="vallinkbut" href="{{urls.validate}}">Validate</a></p>
         </div>
@@ -43,43 +44,52 @@
             </table>
         </div>
         <div class="boxer">
-            <!--<h4> Component Details </h4>-->
-            <!-- We don't know how many rows we have in each column, so using divs is easier -->
-            <div>
-                <div>
-                    <h4> Parameters </h4>
-                    <div class="guidance"><p> Not all subcomponents will have parameters associated with them </p></div>
-                    <table>
-                    <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
-                    {% for r in pform.rows %}
-                    {{r.html|safe}}
-                    {% endfor %}
-                    <tr><td colspan="2"> Add a new param: </td><td colspan="2"></td></tr>
-                    {{pform.new|safe }}
-                    </table>
-                    <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
-                </div>
-                <br style="clear:both"/><!-- Hack to make div expand vertically --> 
-            </div> 
+            <h4> Attributes </h4>
+            <table>
+            {% if pform.rows %}
+            <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
+            {% for r in pform.rows %}
+            {{r.html|safe}}
+            {% endfor %}
+            {% else %}
+            <tr><td> Name </td><td>Value</td></tr>
+            {% endif %}
+            <tr><td colspan="4"> You can record additional attributes of the {{c.scienceType}} here:</td></tr>
+            {{pform.new|safe }}
+            </table>
+            <p class="guidance"> (An additional attribute can be entered each time the form is saved.)</p>
+            <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
+                
         </div>
     
         <div class="boxer">
-            <h4> Additional Information </h4>
+            <h4> History </h4>
             <center>
+            <p> Year Released:{{cform.yearReleased.errors}}{{cform.yearReleased}}. Previous Version (name):
+            {{cform.otherVersion.errors}}{{cform.otherVersion}} </p>
             <p class="guidance">Please tell us how this component has
-            been improved from previous generations. </p>
+            been improved from that previous version. </p>
             <p>{{cform.geneology}}</p>
-            <p class="guidance">Any additional information about this component: </p>
-            <p>{{cform.description}}</p>  
             </center>
+            <h4> Additional Information</h4>
+            <center>
+            <p class="guidance">Pleaes provide additional information about this component as necessary.</p>
+            <p>{{cform.description}}</p> 
+            </center> 
         </div>
     <center><input id="updateButton1" type="submit" value="Save"/></center>
     </form>
     </div>
+    {% if realm %}
     <div class="boxer">
         <h4> Component Numerics </h4>
         <p class="guidance"> Update this list using the numerics button </p>
+    </div> 
+    <div class="boxer">
+        <h4> Input coupling to this component </h4>
+        <p class="guidance"> Update this list using the couplings button </p>
     </div>
+    {% endif %}
     <div class="boxer">
         <h4> References (associated with this component) </h4>
         <p class="guidance"> Update this list using the modify reference button</p>
@@ -89,16 +99,6 @@
             {% endfor %}
         </table>
     </div>
-    <div class="boxer">
-        <h4> Input coupling to this component </h4>
-        <p class="guidance"> Update this list using the couplings button </p>
-    </div>
-    <div class="boxer">
-        <h4> Output files from this component </h4>
-        <p class="guidance"> Update this list using the outputs button </p>
-    </div>
-    
-
 </td></tr></table>
 
 <!-- button specific javascript follows -->
@@ -109,7 +109,7 @@
         var oLinkButton4 = new YAHOO.widget.Button("sublinkbut"); 
         var oLinkButton5 = new YAHOO.widget.Button("numlinkbut"); 
         var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
-        var olinkButton7 = new YAHOO.widget.Button("outlinkbut");
+        //var olinkButton7 = new YAHOO.widget.Button("outlinkbut");//
         var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
 </script>
 <!-- end of button javascript -->

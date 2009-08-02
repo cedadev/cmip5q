@@ -16,7 +16,8 @@
 <tr><td> Simulation used:  </td><td>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
 on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
 <tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}</td></tr>
-<tr><td>Description (notes)</td><td>{{simform.description}}</td></tr>
+<tr><td>Initial Condition (description){{simform.initialCondition.errors}}</td><td>{{simform.initialCondition}}</td></tr>
+<tr><td>Description (notes){{simform.description.errors}}</td><td>{{simform.description}}</td></tr>
 <tr><td colspan="2">
 <center><input id="simFormButton" type="submit" value="{{label}}"/>
 <script type="text/javascript">
@@ -28,7 +29,12 @@ on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr>
 </div>
 <div class="boxer backgrey">
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
-<p class="guidance"> In this section you need to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuraiton of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
+{% ifnotequal label "Update" %}
+<p class="red"> This section cannot be filled in until the general characteristics have been submitted </p>
+{% endifnotequal %}
+<p class="guidance"> Each experiment within CMIP5 has a set of defined requirements, which might be to use specific boundary conditions, or
+to make changes to some code to make some specific thing happen. Some requirements might be met by either approach. In this
+section we ask you to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuration of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
 <ul>
 <li> <p>Where you indicate the use of a file, you will need to choose a file from a dropdown list of those files which you have <em> already </em> defined. If necessary, use the Files tab button to manage your files, and return here via the Simulations Tab.</li>
 <li> <p>Where you indicate a code modification, please indicate which component was modified, using the drop down list provided. </p>
@@ -75,9 +81,7 @@ not just those from within the specific model ... until we fix that, watch out!<
 {% endfor %}
 </table>
 {% endifequal %}
-{% ifnotequal label "Update" %}
-<p> This section cannot be filled in until the general characteristics have been submitted </p>
-{% endifnotequal %}
+
 </div>
         
 {% endblock %}
