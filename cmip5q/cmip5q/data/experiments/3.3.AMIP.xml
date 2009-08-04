@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<numericalExperiment documentVersion="1" control="false"
+<numericalExperiment documentVersion="2" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -44,19 +44,19 @@
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing concentrations of natural aerosols</description>
-        <id xsi:type="Identifier">3.3.bc.nat_aer.conc</id>
+        <id xsi:type="Identifier">3.3.bc.aer_nat.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing concentrations of anthropogenic aerosols</description>
-        <id xsi:type="Identifier">3.3.bc.anthrop_aer.conc</id>
+        <id xsi:type="Identifier">3.3.bc.aer_anth.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing concentrations of natural aerosol precursors</description>
-        <id xsi:type="Identifier">3.3.bc.nat_aer_precur.conc</id>
+        <id xsi:type="Identifier">3.3.bc.aer_pre_nat.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing concentrations of anthropogenic aerosol precursors</description>
-        <id xsi:type="Identifier">3.3.bc.anthrop_aer_precur.conc</id>
+        <id xsi:type="Identifier">3.3.bc.aer_pre_anth.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of short lived gas species</description>
@@ -64,11 +64,11 @@
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of natural aerosols </description>
-        <id xsi:type="Identifier">3.3.bc.nat_aer.em</id>
+        <id xsi:type="Identifier">3.3.bc.aer_nat.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of anthropogenic aerosols</description>
-        <id xsi:type="Identifier">3.3.bc.anthrop_aer.em</id>
+        <id xsi:type="Identifier">3.3.bc.aer_anth.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing solar forcing</description>

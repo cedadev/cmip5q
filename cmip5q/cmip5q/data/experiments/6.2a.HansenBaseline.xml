@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<numericalExperiment documentVersion="1" control="true"
+<numericalExperiment documentVersion="2" control="true"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -26,7 +26,7 @@
 
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
-        <description> Initial conditions are from experiment 3.1.PreIndustrialControl </description>
+        <description> Initial conditions are from experiment 3.1_pi-control </description>
         <id xsi:type="Identifier">6.2a.ic</id>
         <!-- 6.1.ic -->
         <!-- 6.2b.ic -->
@@ -36,39 +36,39 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Prescribed concentration of well mixed Gas: CO2 is the same as
-            3.1.PreIndustrialControl</description>
+            3.1_pi-control</description>
         <id xsi:type="Identifier">6.2a.bc.CO2.conc</id>
         <!-- 3.1.bc.CO2.conc -->
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Sea surface temperature is the climatology SST from the
-            3.1.PreIndustrialControl</description>
+            3.1_pi-control</description>
         <id xsi:type="Identifier">6.2a.sst.clim</id>
         <!-- 6.2b.sst.clim -->
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Sea ice is the sea ice climatology from the
-            3.1.PreIndustrialControl</description>
+            3.1_pi-control</description>
         <id xsi:type="Identifier">6.2a.SeaIce.clim</id>
         <!-- 6.2b.SeaIce.clim -->
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Unperturbed Land Use Same as for the 3.1.PreIndustrialControl</description>
+        <description>Unperturbed Land Use Same as for the 3.1_pi-control</description>
         <id xsi:type="Identifier">6.2a.bc.LandUse</id>
         <!-- 3.1.bc.LandUse -->
         <!-- 6.2b.bc.LandUse -->
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>CO2 partial pressure dissolved in ocean, climatology from the
-            3.1.PreIndustrialControl</description>
+            3.1_pi-control</description>
         <id xsi:type="Identifier">6.2a.bc.Ocean_CO2</id>
         <!-- 6.2b.bc.Ocean_CO2 -->
     </numericalRequirement>
     <numericalRequirement xsi:type="SpatioTemporalConstraint">
-        <outputPeriod>for one year between 0 and 25</outputPeriod>
+        <outputPeriod>for one year between year 0 and year 25</outputPeriod>
         <outputFrequency>monthly</outputFrequency>
         <numericalRequirement xsi:type="BoundaryCondition">
-            <description>Instantaneous 4X CO2 concentration applied to radiation
+            <description>Instantaneous quadrupling of CO2 concentration applied to radiation
                 scheme</description>
             <id xsi:type="Identifier">6.2a.bc.4XCO2.conc</id>
         </numericalRequirement>

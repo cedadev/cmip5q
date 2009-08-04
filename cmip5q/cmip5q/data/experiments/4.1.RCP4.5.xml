@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<numericalExperiment documentVersion="1" control="false"
+<numericalExperiment documentVersion="2" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -29,46 +29,44 @@
 
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of well mixed gases, including CO2
-            (RCP4.5)</description>
+        <description>Imposed changing concentrations of RCP4.5 well mixed gases, including CO2</description>
         <id xsi:type="Identifier">4.1.bc.wmg.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of short lived gas species (RCP4.5)</description>
+        <description>Imposed changing concentrations of RCP4.5 short lived gas species </description>
         <id xsi:type="Identifier">4.1.bc.sls.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of aerosols (RCP4.5)</description>
+        <description>Imposed changing concentrations of RCP4.5 aerosols</description>
         <id xsi:type="Identifier">4.1.bc.aer.conc</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of aerosol precursors (RCP4.5)</description>
-        <id xsi:type="Identifier">4.1.bc.aer_precur.conc</id>
+        <description>Imposed changing concentrations of RCP4.5 aerosol precursors </description>
+        <id xsi:type="Identifier">4.1.bc.aer_pre.conc</id>
     </numericalRequirement>    
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing emissions of well mixed gases, including CO2
-            (RCP4.5)</description>
+        <description>Imposed changing emissions of RCP4.5 well mixed gases, including CO2</description>
         <id xsi:type="Identifier">4.1.bc.wmg.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing emissions of short lived gas species (RCP4.5)</description>
+        <description>Imposed changing emissions of RCP4.5 short lived gas species</description>
         <id xsi:type="Identifier">4.1.bc.sls.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing emissions of aerosols (RCP4.5)</description>
+        <description>Imposed changing emissions of RCP4.5 aerosols </description>
         <id xsi:type="Identifier">4.1.bc.aer.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing emissions of aerosol precursors (RCP4.5)</description>
-        <id xsi:type="Identifier">4.1.bc.aer_precur.em</id>
+        <description>Imposed changing emissions of RCP4.5 aerosol precursors</description>
+        <id xsi:type="Identifier">4.1.bc.aer_pre.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing land use (RCP4.5)</description>
+        <description>Imposed changing RCP4.5 land use</description>
         <id xsi:type="Identifier">4.1.bc.LandUse</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
-        <id xsi:type="Identifier">4.1.bc.volc_aer.conc</id>
+        <id xsi:type="Identifier">4.1.bc.aer_volc.conc</id>
     </numericalRequirement>
 
     <CalendarType>

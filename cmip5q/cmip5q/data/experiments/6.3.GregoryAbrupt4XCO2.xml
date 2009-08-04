@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<numericalExperiment documentVersion="1" control="false"
+<numericalExperiment documentVersion="2" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -24,7 +24,7 @@
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <description>
-            Initial conditions are from experiment 3.1.PreIndustrialControl
+            Initial conditions are from experiment 3.1_pi-control
         </description>
         <id xsi:type="Identifier">6.3.ic</id>
         <!-- 3.2.ic -->
@@ -36,7 +36,7 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Prescribed concentration of well mixed Gas: CO2 
-            Instantaneous quadrupling of 3.1.PreIndustrialControl concentration</description>
+            Instantaneous quadrupling of 3.1_pi-control concentration</description>
         <id xsi:type="Identifier">6.3.bc.4XCO2.conc</id>
         <!-- 6.2b.bc.4XCO2.conc -->
     </numericalRequirement> 

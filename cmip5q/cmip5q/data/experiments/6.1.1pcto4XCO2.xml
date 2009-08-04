@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<numericalExperiment documentVersion="1" control="false"
+<numericalExperiment documentVersion="2" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -12,7 +12,7 @@
         Evaluate model response without complications of aerosols, land-use change etc.
     </rationale>
     <Why>
-        Diagnostic experiment for understanding the long-term simulations
+        Diagnostic experiment for understanding the long-term simulations.
     </Why>
     <!-- Idealized 1%/yr run to 4XCO2
     Evaluate model response without complications of aerosols, land-use change etc.
@@ -24,7 +24,7 @@
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <description>
-            Initial conditions are from experiment 3.1.PreIndustrialControl
+            Initial conditions are from experiment 3.1_pi-control
         </description>
         <id xsi:type="Identifier">6.1.ic</id>
         <!-- 6.2a.ic -->
@@ -35,8 +35,8 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryContition">
         <description>
-            Prescribed concentration of well mixed Gas: CO2 
-            1% per year increase from 3.1.PreIndustrialControl concentration to 4X[CO2]
+            Prescribed concentration of well mixed Gas: CO2 with
+            1% per year increase from 3.1_pi-control concentration to quadrupling
         </description>
         <id xsi:type="Identifier">6.1.bc.1%CO2.conc</id>
     </numericalRequirement>

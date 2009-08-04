@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<numericalExperiment documentVersion="2" control="false"
+<numericalExperiment documentVersion="1" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 C:\Users\clp73\Desktop\Metafor\subversion\CIM\branches\dev0p3\activity.xsd"
@@ -11,62 +11,46 @@
     <rationale> Future projection (2006-2100) forced by RCP8.5.
         RCP8.5 is a representative concentration pathway which approximately results in a radiative 
         forcing of 8.5 W m-2 at year 2100, relative to pre-industrial conditions.
-        RCPs are time-dependent, consistent projections of emissions and concentrations 
-        of radiatively active gases and particles.
+        Emissions-forced (with atmospheric CO2 determined by the model itself).
         </rationale>
-    <Why>Provide estimate of future antrhopogenic climate change.</Why>
+    <Why>Exploring the impact of climate-carbon cycle coupling in 
+        quantifying the carbon cycle feedback for future climate change projetions.</Why>
     <!-- Representative Concentration Pathway Experiment (2006-2100)
-         * Initial conditions from 3.2::historical 
-         * Radiative forcing stabilizes at ~8.5 W m-2 after 2100 wrt 3.1::pi-control
+         * Initial conditions from 3.2_historical
+         * Radiative forcing stabilizes at ~8.5 W m-2 after 2100 wrt 3.1_pi-control
          (If ESM (Earth System Model), save CO2 fluxes from the surface 
           to calculate allowable emissions to compare to experiment 5.4) -->
 
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <description> Initial conditions are from experiment 3.2 </description>
-        <id xsi:type="Identifier">4.2.ic</id>
+        <id xsi:type="Identifier">5.3.ic</id>
     </numericalRequirement>
 
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of RCP8.5 well mixed gases, including CO2</description>
-        <id xsi:type="Identifier">4.2.bc.wmg.conc</id>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of RCP8.5 short lived gas species</description>
-        <id xsi:type="Identifier">4.2.bc.sls.conc</id>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of RCP8.5 aerosols </description>
-        <id xsi:type="Identifier">4.2.bc.aer.conc</id>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <description>Imposed changing concentrations of RCP8.5 aerosol precursors </description>
-        <id xsi:type="Identifier">4.2.bc.aer_pre.conc</id>
-    </numericalRequirement>    
-    <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of RCP8.5 well mixed gases, including CO2</description>
-        <id xsi:type="Identifier">4.2.bc.wmg.em</id>
+        <id xsi:type="Identifier">5.3.bc.wmg.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of RCP8.5 short lived gas species </description>
-        <id xsi:type="Identifier">4.2.bc.sls.em</id>
+        <id xsi:type="Identifier">5.3.bc.sls.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of RCP8.5 aerosols </description>
-        <id xsi:type="Identifier">4.2.bc.aer.em</id>
+        <id xsi:type="Identifier">5.3.bc.aer.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing emissions of RCP8.5 aerosol precursors </description>
-        <id xsi:type="Identifier">4.2.bc.aer_pre.em</id>
+        <id xsi:type="Identifier">5.3.bc.aer_pre.em</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed changing RCP8.5 land use </description>
-        <id xsi:type="Identifier">4.2.bc.LandUse</id>
+        <id xsi:type="Identifier">5.3.bc.LandUse</id>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
-        <id xsi:type="Identifier">4.2.bc.aer_volc.conc</id>
+        <id xsi:type="Identifier">5.3.bc.aer_volc.conc</id>
     </numericalRequirement>
 
     <CalendarType>
@@ -80,7 +64,7 @@
         <lengthYears>94</lengthYears>
     </requiredDuration>
     <author>Charlotte Pascoe</author>
-    <creationDate>2009-07-28T15:24:00Z</creationDate>
-    <documentID xsi:type="Identifier">4.2_rcp8.5 </documentID>
+    <creationDate>2009-08-04T15:54:00Z</creationDate>
+    <documentID xsi:type="Identifier">5.3_esm-rcp8.5 </documentID>
 
 </numericalExperiment>
