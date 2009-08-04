@@ -42,6 +42,9 @@ interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed'
 #geneology 
 relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf')
 
+#types of conformance, we'll allow more than one to be chosen
+conformanceTypes=('Boundary Condition','Initial Condition', 'Code Modification')
+
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
     v=Vocab(uri=str(uuid.uuid1()),name=name)
@@ -79,3 +82,5 @@ def initialise():
     #support for geneologies
     loadvocab('relations',relations)
     
+    #support for conformanceTypes
+    loadvocab('conformanceTypes',conformanceTypes)

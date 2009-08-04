@@ -58,15 +58,17 @@ class componentHandler(object):
         if component_id is None:
             ''' This is a brand new component '''
             component=makeComponent(centre_id,scienceType='model')
-            author='bnl@foo.bar'  # FIXME
-            component.contact=author
+            authorN='joe bloggs'
+            authorE='bnl@foo.bar'  # FIXME
+            component.email=authorE
+            component.contact=authorN
             component.title='GCM Template'
             component.abbrev='GCM Template'
             mindmaps=[os.path.join(componentHandler.mindMapDir, f) 
                       for f in os.listdir(componentHandler.mindMapDir)
                       if f.endswith('.xml')]
             for m in mindmaps:
-                x=XMLVocabReader(m, centre_id,author)
+                x=XMLVocabReader(m, centre_id,authorN,authorE)
                 x.doParse()
                 xx=Component.objects.get(pk=x.topLevelID)
                 component.components.add(xx)

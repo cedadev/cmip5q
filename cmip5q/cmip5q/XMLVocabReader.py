@@ -11,12 +11,13 @@ import logging
 class XMLVocabReader:
 
 	''' Reads XML vocab structure. '''
-	def __init__(self,filename, centre,author):
+	def __init__(self,filename, centre, authorName, authorEmail):
 		''' Initialise from mindmap file '''
 		self.etree=ET.parse(filename)
 		self.root=self.etree.getroot() # should be the "vocab" element
 		self.centreID=centre
-                self.author=author
+                self.authorName=authorName
+                self.authorEmail=authorEmail
 		try:
                     self.modelCentre=Centre.objects.get(pk=centre)
                 except:
@@ -28,7 +29,7 @@ class XMLVocabReader:
 		logging.info("New component: %s for centre %s"%(model.attrib['name'],self.centreID))
 		# remember element that is immediate child of vocab
 		# Initiate new top-level component in django
-		modelParser = ComponentParser(model, self.root, self.modelCentre, self.author)
+		modelParser = ComponentParser(model, self.root, self.modelCentre, (self.authorName, self.authorEmail))
 		modelParser.add(True)
                 self.topLevelID=modelParser.topLevelID
 		
@@ -78,7 +79,7 @@ class ComponentParser(Parser):
                         title='',
 			scienceType=self.item.attrib['name'],
 			abbrev=self.item.attrib['name'],
-                        uri=u,centre=self.centre,contact=self.author)
+                        uri=u,centre=self.centre,contact=self.author[0],email=self.author[1])
 		component.save() # we need a primary key value so we can add subcomponents later
                 self.component=component # used to assign parameters ...
                 
@@ -110,5 +111,5 @@ if __name__=="__main__":
 	import sys
 	filename=sys.argv[1]
 	centre=sys.argv[2]
-	XMLVocabReader(filename, centre,'a@foo.bar').doParse()
+	XMLVocabReader(filename, centre,'Joe Bloggs','a@foo.bar').doParse()
 	

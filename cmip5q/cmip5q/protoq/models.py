@@ -11,7 +11,8 @@ class Doc(models.Model):
     ''' Abstract class for general properties '''
     title=models.CharField(max_length=128,blank=True,null=True)
     abbrev=models.SlugField(max_length=20)
-    contact=models.EmailField(blank=True)
+    email=models.EmailField(blank=True)
+    contact=models.CharField(max_length=128,blank=True,null=True)
     description=models.TextField(blank=True,null=True)
     uri=models.CharField(max_length=64,unique=True)
     def __unicode__(self):
@@ -45,7 +46,7 @@ class Component(Doc):
     otherVersion=models.CharField(max_length=128,blank=True,null=True)
     references=models.ManyToManyField(Reference,blank=True,null=True)
     
-    # children components:
+    # direct children components:
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     
     centre=models.ForeignKey('Centre',blank=True,null=True)
@@ -247,7 +248,8 @@ class ComponentForm(forms.ModelForm):
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
-    contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
+    email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
+    contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
     implemented=forms.BooleanField(required=True)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
