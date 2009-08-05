@@ -4,6 +4,7 @@ from django.contrib.contenttypes import generic
 from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
+from django.core.urlresolvers import reverse
 
 import vocab
 
@@ -98,7 +99,6 @@ class Simulation(Doc):
     #
     initialCondition=models.TextField(blank=True,null=True)
     #Boundary Conditions:
-    boundaryConditions=models.ManyToManyField('Coupling',blank=True,null=True)
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -168,58 +168,45 @@ class Conformance(models.Model):
                 self.description,self.simulation,self.requirement,self.centre) 
     
 class Coupling(models.Model):
-    ''' Holds the coupling class description based on ticket 256 mindmaps.
-    Also used for basic boundary conditions '''
-    
-    #use an integer so we can point at the id of a file or component
-    #flag if it's a file (False means a component):
-    sourceIsFile=models.BooleanField()
-    #one of the following will be relevant:
-    component=models.ForeignKey(Component,blank=True,null=True)
-    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
-    
-    frequency=models.IntegerField()  # units are hours
-    
+    #parent component:
+    component=models.ForeignKey(Component)
+    #cupling details
     couplingType=models.ForeignKey('Value',related_name='couplingTypeVal')
     couplingFreq=models.ForeignKey('Value',related_name='couplingFreqVal')
-    couplingInterp=models.ForeignKey('Value',related_name='couplingInterpVal')
-    couplingDim=models.ForeignKey('Value',related_name='couplingDimVal')
-    
-    references=models.ForeignKey(Reference) # reference to coupling details
-    description=models.TextField(blank=True,null=True) # if wanted.
+    couplingVar=models.CharField(max_length=128)
+    # I reckon the following is a temporal thing:
+    couplingInputTransform=models.ForeignKey('CouplingTransform',blank=True,null=True)
+    # I reckon the following is a spatial thing:
+    regridder=models.ForeignKey('Regridder',blank=True,null=True)
+    #Subclasses patched into the base class because when I subclassed
+    #I had problems with related name clashes:
+    internal=models.BooleanField()
+    target=models.ForeignKey(Component,related_name='couplingTarget',blank=True,null=True)
+    file=models.ForeignKey(DataObject,blank=True,null=True)
     def __unicode__(self):
-        return 'Coupling (File:%s, Source:%s, Frequency: %s)'%(
-            self.sourceIsFile,self.source,self.frequency)
-
-### FORMS FOLLOW
-## We only need forms for the things the punters fill in,
-## we can use the admin interface for the things we fill in
-## (Exxperiment, Centre)
-#
-
+        return 'Coupling for %s to %s or %s'%(self.component,self.target,self.file)
+    
+class CouplingTransform(models.Model):
+    ''' Eventually replace with mindmap stuff '''
+    abbrev=models.SlugField()
+    description=models.TextField(blank=True,null=True)
+    
+class Regridder(models.Model):
+    ''' Eventually replace with mindmap stuff '''
+    abbrev=models.SlugField()
+    description=models.TextField(blank=True,null=True)
+    interpType=models.ForeignKey('Value',related_name='interpTypeVal')
+    dimensionality=models.ForeignKey('Value',related_name='dimensionalityVal')
+    
+class CouplingForm(forms.ModelForm):
+    couplingVar=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    class Meta:
+        model=Coupling
+        exclude=('component')
+        
 class ConformanceForm(forms.ModelForm):
-    ''' Handles material needed to establish conformance '''
-    mychoices=(
-    ('File','External File'),('Code','Modified Code'),('Standard ','Standard Configuration'),)
-    method=forms.ChoiceField(choices=mychoices)
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
     class Meta:
         model=Conformance
-        # the following are known via the URI used ...
-        exclude=('centre','requirement','simulation')
-    def clean(self):
-        ''' Check cross field requirements '''
-        cleaned_data=self.cleaned_data
-        method=cleaned_data['method']
-        file=cleaned_data['dataObject']
-        component=cleaned_data['component']
-        if method=='File' and file is None:
-            msg='External File requires File detail'
-            self._errors['dataObject']=ErrorList([msg])
-        if method=='Code' and component is None: 
-            msg='Modified Code needs component detail'
-            self._errors['component']=ErrorList([msg])
-        return cleaned_data
 
 class DataObjectForm(forms.ModelForm):
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
@@ -234,7 +221,8 @@ class SimulationForm(forms.ModelForm):
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
-    contact=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
+    email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
+    contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     initialCondition=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     class Meta:
         model=Simulation
@@ -257,11 +245,6 @@ class ComponentForm(forms.ModelForm):
     class Meta:
         model=Component
         exclude=('centre','uri')
-        
-class CouplingForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    class Meta:
-        model=Coupling
 
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))
@@ -278,13 +261,3 @@ class PlatformForm(forms.ModelForm):
         model=Platform
         exclude=('centre','uri')
         
-#class ParamForm(ModelForm):
-#    class Meta:
-#        model=Param
-        
-ParamFormSet=modelformset_factory(Param,fields=('name','value','ptype'))
-        
-
-    
-    
-    

@@ -3,6 +3,7 @@ from django.template import Context, loader
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.forms.models import modelformset_factory
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
@@ -15,22 +16,45 @@ import logging
 
 import os
 
-#FIXME: change to the simpler way it's done in Platforms.
+CouplingFormSet=modelformset_factory(Coupling,exclude=('internal','component'))
+
 class MyCouplingForm(CouplingForm):
     ''' Subclassed to ensure we get extra attributes and right vocabs '''
-    def __init__(self,cenid,comid,r,*args,**kwargs):
-        CouplingForm.__init__(self,instance=r,*args,**kwargs)
+    def __init__(self,*args,**kwargs):
+        CouplingForm.__init__(self,*args,**kwargs)
         self.vocabs={'couplingType':Vocab.objects.get(name='couplingType'),
-                     'couplingFreq':Vocab.objects.get(name='couplingFreq'),
-                     'couplingInterp':Vocab.objects.get(name='couplingInterp'),
-                     'couplingDim':Vocab.objects.get(name='couplingDim')}
-        if r is None:
-            self.MyEditURL=reverse('cmip5q.protoq.views.componentCup',
-                args=(cenid,comid,))
-        else:
-            self.MyEditURL=reverse('cmip5q.protoq.views.referenceEdit',args=(cenid,comid,r.id,))
+                     'couplingFreq':Vocab.objects.get(name='couplingFreq')}
         for f in self.vocabs:
-            self.fields[f].queryset=Value.objects.filter(vocab=self.vocabs[f])
+            self.fields[f].queryset=Value.objects.filter(vocab=self.vocabs[f])       
+
+class MyCouplingFormSet(CouplingFormSet):
+    ''' This is my implementation of the functionality of Django formsets, but 
+    which supports constraining the field querysets etc in a more natural manner '''
+    #http://docs.djangoproject.com/en/dev/topics/forms/modelforms/#id1
+    def __init__(self,component,internal,data=None,prefix=''):
+        
+        self.component=component
+        self.internal=internal
+        # limit the queryset to couplings for this component only ...
+        # we expect to handle internal and external couplings with different forms ...
+        qset=Coupling.objects.filter(component=self.component).filter(internal=internal)
+        CouplingFormSet.__init__(self,data,prefix='',queryset=qset)
+    
+    def specialise(self):
+        ''' It looks like we can't do this in a formset when we have data, it somehow stuffs
+        the recovery of the data from the form, so we only do it if we have to reissue the
+        query '''
+        vocabs={'couplingType':Vocab.objects.get(name='couplingType'),
+                     'couplingFreq':Vocab.objects.get(name='couplingFreq')}
+        for form in self.forms:
+            for key in vocabs: form.fields[key].queryset=Value.objects.filter(vocab=vocabs[key])
+    def save(self):
+        ''' Wrap the call to valid by adding the stuff we excluded '''
+        instances=CouplingFormSet.save(self,commit=False)
+        for f in instances:
+            f.internal=self.internal
+            f.component=self.component
+            f.save()
 
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
@@ -221,14 +245,42 @@ class componentHandler(object):
     def numerics(self):
         return HttpResponse('Not implemented')
         
-    def coupling(self,request):
-        ''' There should be at most one coupling per component '''
-        coupling=None
+    def coupling(self,request,ctype=None):
+        ''' Handle the construction of component couplings '''
+        okURL=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,self.id,))
+        urls={'Int':reverse('cmip5q.protoq.views.componentCup',
+                args=(self.centre_id,self.id,'internal')),
+              'Ext':reverse('cmip5q.protoq.views.componentCup',
+                args=(self.centre_id,self.id,'external'))}
+                
         if request.method=='POST':
-            pass
+            if ctype == 'internal':
+                Intform=MyCouplingFormSet(self.component,1,request.POST,prefix='Int')
+                if Intform.is_valid():
+                    Intform.save()
+                    return HttpResponseRedirect(okURL)
+                else:
+                    Intform.specialise()
+                    Extform=MyCouplingFormSet(self.component,0,prefix='Ext')
+                    Extform.specialise()
+            elif ctype == 'external':
+                Extform=MyCouplingFormSet(self.component,0,request.POST,prefix='Ext')
+                if Extform.is_valid():
+                    Extform.save()
+                    return HttpResponseRedirect(okURL)
+                else:
+                    Extform.specialise()
+                    Intform=MyCouplingFormSet(self.component,0,prefix='Int')
+                    Intform.specialise()
+            else:
+                return HttpResponse('<p>Not supposed to be possible, contact programmer with cheque book</p>')
         elif request.method=='GET':
-            cform=MyCouplingForm(self.centre_id,self.component.id,coupling)
-        return render_to_response('coupling.html',{'c':self.component,'cform':cform})
+            Intform=MyCouplingFormSet(self.component,1,prefix='Int')
+            Intform.specialise()
+            Extform=MyCouplingFormSet(self.component,0,prefix='Ext')
+            Extform.specialise()
+        return render_to_response('coupling.html',{'c':self.component,'urls':urls,
+        'Intform':Intform,'Extform':Extform,'tabs':tabs(self.centre_id,'tmp')})
     
     def outputs(self):
         return HttpResponse('Not implemented')

@@ -107,10 +107,10 @@ def componentXML(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.xml()
   
-def componentCup(request,centre_id,component_id):
+def componentCup(request,centre_id,component_id,ctype=None):
     ''' Return couplings for a component '''
     c=componentHandler(centre_id,component_id)
-    return c.coupling(request)
+    return c.coupling(request,ctype)
 
 def componentNum(request,centre_id,component_id):
     ''' Return numerics of the component '''
