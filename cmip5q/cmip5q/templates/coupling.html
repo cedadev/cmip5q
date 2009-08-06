@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Coupling to "{{c.abbrev}}"</h1>
+<h1> Coupling from "{{c.abbrev}}" component</h1>
 </div>
 <div class="boxer">
     <p class="red"> There are two sets of forms on this page, one for internal coupling, and one for external
@@ -15,7 +15,10 @@
     <p class="cmip5q"> Someone should ticket the necessity to do output transformations for internal
     transformations if we only do one side of the coupling </p>
     <p class="cmip5q"> We need to make it only ask for the file or the component in the right piece </p>
-    
+    <p> Some important definitions<p>
+        <ul><li> Coupling Flux: this is a "notional" name for the quantity as understood by both the source and target. If this flux is aggregated from more than one component into the target, then all sources should use the same term for this flux. It does not necessarily correspond to a variable in either the source or target, and is simply an identifier for this "coupling".</li>
+        </ul>
+    </p>
     <div class="boxer">
     <h4> Internal Couplings </h4>
     

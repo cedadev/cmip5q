@@ -79,12 +79,19 @@ class simulationHandler(object):
         
     def __handle(self,request,s,e,url,label,fix):
         ''' This method handles the form itself for both the add and edit methods '''
-        print 'entering handle routine'
+        logging.debug('entering simulation handle routine')
         reqs=e.requirements.all()
-        dataurl=reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid))
-        print 'dataurl',dataurl
         
-        if label=="Update": reqs=self.__conformances(s,reqs)
+        urls={
+              'data':reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid)),
+              'url':url
+                }
+        if label=='Update':
+            urls['ic']=reverse('cmip5q.protoq.views.assign',
+                    args=(self.centreid,'simulation',s.id,'initialcondition',))
+            urls['bc']=reverse('cmip5q.protoq.views.edit',args=(self.centreid,'boundarycondition')),
+            reqs=self.__conformances(s,reqs)
+        print urls
         
         if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
@@ -103,8 +110,7 @@ class simulationHandler(object):
             simform.centre(self.centre)
         
         return render_to_response('simulation.html',
-            {'simform':simform,'url':url,'label':label,'exp':e,'reqs':reqs,'dataURL':dataurl,'tabs':tabs(self.centreid,'Update'),
-            'notAjax':not request.is_ajax()})
+            {'simform':simform,'urls':urls,'label':label,'exp':e,'reqs':reqs,'tabs':tabs(self.centreid,'Update')})
         
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''

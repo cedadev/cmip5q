@@ -26,7 +26,7 @@ referenceTypes=('Webpage','Online Refereed',
                 'Offline Other')
 
 # these support couplings 
-couplingTypes=('None','offline','OASIS2','OASIS3','OASIS4','Other')
+couplingTypes=('None','offline','ESMF','OASIS3','OASIS4','Other')
 interpolationTypes=('None','Weighted Nearest Neighbour','Weights and Addresses File',
                    'Bilinear','Bicubic','Conservative','Other')
 interpolationDims=('2D','3D')

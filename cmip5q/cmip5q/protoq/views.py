@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
+from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import PropertyForm, tabs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
@@ -274,5 +275,65 @@ def dataEdit(request,cen_id,object_id=None):
             {'dform':dform,'editURL':editURL,'tabs':tabs(cen_id,'FileEdit'),
             'notAjax':not request.is_ajax()})
     
+############ Simple Generic Views ########################
+
+#pattern: resource class, resourcetype, form, and html templates ...
+SupportedResources={'initialcondition':[
+                            InitialCondition,
+                            'initialCondition',
+                            InitialConditionForm,
+                            'initial_condition_edit.html',
+                            'initial_condition_list.html',
+                            'initial_condition_assign.html'],
+                    'file':[
+                            DataObject,
+                            'file',
+                            DataObjectForm,
+                            'file_edit.html',
+                            'file_list.html',
+                            'file_assign.html']
+                            }
+
+def edit(request,cen_id,resourceType,obj_id=None):
+    ''' This is the generic simple view editor '''
+    
+    if resourceType not in SupportedResources:
+        return HttpResponse('Unknown resource %s for editing'%resourceType)
+    
+    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
+    return handler.edit(request,obj_id)
+
+def list(request,cen_id,resourceType):
+    ''' This is the generic simple view lister '''
+    
+    if resourceType not in SupportedResources:
+        return HttpResponse('Unknown resource %s for editing'%resourceType)
+    
+    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
+    return handler.list()
+
+def assign(request,cen_id,targetType,target_id,resourceType):
+    ''' Provide a page to allow the assignation of resources of type resourceType
+    to resource target_id of type targetType '''
+    
+    if resourceType not in SupportedResources:
+        return HttpResponse('Unknown resource %s for assignation'%resourceType)
+    if resourceType not in SupportedResources:
+        return HttpResponse('Unknown target %s for assignation'%targetType)
+     
+    try:
+        target={'simulation':Simulation}[targetType].objects.get(id=target_id)
+    except Exception,e:
+        return HttpResponse(str(e))
+    targetURL={'simulation':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,target_id,))
+        }[targetType]
+  
+    # FIXME: THIS WILL ABSOLUTELY NOT WORK TO GET BACK TO SIMULATIONS ... FOR NOW ...
+    #targetURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,targetType,target_id))
+  
+    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
+    return handler.assign(request,target,targetURL)
     
     
+    
+

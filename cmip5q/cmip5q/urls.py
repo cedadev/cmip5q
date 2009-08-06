@@ -70,13 +70,22 @@ urlpatterns = patterns('',
     #cmip5/data/centre_id/list
     (r'^cmip5/(?P<cen_id>\d+)/data/list$',
             'cmip5q.protoq.views.dataList'),      
-    ##
-    (r'^cmip5/(?P<cen_id>\d+)/help$',
+    ## help and about
+    (r'^cmip5/(?P<cen_id>\d+)/help/$',
             'cmip5q.protoq.views.help'),                  
-    (r'^cmip5/(?P<cen_id>\d+)/about$',
+    (r'^cmip5/(?P<cen_id>\d+)/about/$',
             'cmip5q.protoq.views.about'),                   
                           
-    #
+    #### generic simple views
+    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/$',
+            'cmip5q.protoq.views.edit'),
+    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<obj_id>\d+)/$',
+            'cmip5q.protoq.views.edit'),
+    ('^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/$',
+            'cmip5q.protoq.views.list'),
+    ('^cmip5/(?P<cen_id>\d+)/assign/(?P<targetType>\D+)/(?P<target_id>\d+)/(?P<resourceType>\D+)/$',
+            'cmip5q.protoq.views.assign'),       
+
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

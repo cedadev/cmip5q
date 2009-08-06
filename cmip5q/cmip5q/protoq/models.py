@@ -87,7 +87,10 @@ class NumericalRequirement(models.Model):
     
 class Simulation(Doc):
     ''' A CMIP5 Simulation '''
-    #models may be used for multiple simulations
+    # models may be used for multiple simulations
+    # note that we don't need dates, we can those from the data output, assuming
+    # data is output for the entire duration. FIXME: might not have access to
+    # that information for all of CMIP5. 
     numericalModel=models.ForeignKey(Component)
     ensembleMembers=models.PositiveIntegerField(default=1)
     #each simulation corresponds to one experiment
@@ -97,8 +100,9 @@ class Simulation(Doc):
     #each simulation run by one centre
     centre=models.ForeignKey('Centre')
     #
-    initialCondition=models.TextField(blank=True,null=True)
-    #Boundary Conditions:
+    # enforce the following as required via q'logical validation, not form validation.
+    initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
+    boundaryCondition=models.ManyToManyField('BoundaryCondition',blank=True,null=True)
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -198,6 +202,28 @@ class Regridder(models.Model):
     interpType=models.ForeignKey('Value',related_name='interpTypeVal')
     dimensionality=models.ForeignKey('Value',related_name='dimensionalityVal')
     
+class InitialCondition(models.Model):
+    ''' Simulation initial condition '''
+    description=models.TextField(blank=True,null=True)
+    date=models.DateField() # watch out, model calendars ...
+    #actually we want to replace this with a choice into CF ... but need to
+    #work out how to handle this. The assumption is that the files will be
+    #in the archive, so we don't need to ask for them. If we know their
+    #CF name, then we know them.
+    variables=models.TextField(blank=True,null=True)
+    def __unicode__(self):
+        return str(self.date)
+     
+class BoundaryCondition(models.Model):
+    ''' Simulation boundary conditions '''
+    description=models.TextField(blank=True,null=True)
+    files=models.ManyToManyField(DataObject,blank=True,null=True)
+    couplings=models.ManyToManyField(Coupling,blank=True,null=True)
+    
+class InitialConditionForm(forms.ModelForm):
+    class Meta:
+        model=InitialCondition
+    
 class CouplingForm(forms.ModelForm):
     couplingVar=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     class Meta:
@@ -223,11 +249,10 @@ class SimulationForm(forms.ModelForm):
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
     contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
-    initialCondition=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     class Meta:
         model=Simulation
         #these are enforced by the workflow leading to the form
-        exclude=('centre','experiment','uri')
+        exclude=('centre','experiment','uri','intialcondition')
 
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
