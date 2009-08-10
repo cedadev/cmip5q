@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %} 
+<div class="boxer"><h1>{{title}}</h1></div>
+<div class="boxer">
+{% if showChoices %}
+<form action='{{chooseURL}}' method='post'>
+  {{rform}}
+  <input type="submit" value="Save"/>
+</form>
+{% else %}
+<p> There are currently none to chose from <p>
+{% endif %}
+</div>
+<div class="boxer">
+<p> Add {% if showChoices %} another{% else %} one{% endif %}: </p>
+<div id="data">
+    <form action="{{editURL}}" method="POST">
+       <table>
+       {% include editTemplate %}
+       </table>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+    var oLinkButton1 = new YAHOO.widget.Button("morelinkbut"); 
+</script>
+</div>
+{% endblock %}

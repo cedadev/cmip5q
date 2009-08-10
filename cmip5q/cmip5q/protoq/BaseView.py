@@ -142,13 +142,11 @@ class BaseViewHandler:
                 new=rform.cleaned_data['choose']
                 if JustOne:
                     self.target.__setattr__(self.resourceType,objects.get(id=new))
-                    print 'Assigned?',self.target.__getattribute__(self.resourceType)
                 else:
                     for n in new:
                         r=objects.get(id=n)
                         manager.add(r)
                 self.target.save()
-                print self.target.initialCondition
                 return HttpResponseRedirect(self.targetURL)
         elif request.method=='GET':
             #need to ensure that if there are none already chosen, we don't bind the form ...

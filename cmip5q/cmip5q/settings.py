@@ -77,6 +77,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     "/home/bnl/meta4q/cmip5q/templates"
 )
+TEMPLATE_STRING_IF_INVALID = 'what happened here?'
 STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
 
 #TEMPLATE_DIRS = (

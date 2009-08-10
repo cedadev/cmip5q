@@ -1,15 +1,13 @@
 <div class="boxer">
 <table>
-{{form.management_form}}
-
 <tr class="row1"><td>Coupling Flux:{{form.couplingVar.errors}}</td><td>{{form.couplingVar}}</td>
     <td>Coupling Type:{{form.couplingType.errors}}</td><td>{{form.couplingType}}</td>
     <td>Coupling Frequency:{{form.couplingFreq.errors}}</td><td>{{form.couplingFreq}}</td></tr>
 <tr class="row2"><td> Regridder:{{form.regridder.errors}}</td><td>{{form.regridder}}</td>
     <td> Input Transformation:{{form.couplingInputTransform.errors}}</td>
     <td>{{form.couplingInputTransform}}</td>
-    <td>Target:{{form.target.errors}}{{form.file.errors}}</td>
-    <td>{{form.target}}</td></tr> 
-<!--{{form.as_p}}-->
+    <td>Target:{{form.target.errors}}</td><td>{{form.target}}</td></tr>
+    {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+<!--{{Aform.as_table}}-->
 </table>
 </div>

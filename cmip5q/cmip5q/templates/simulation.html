@@ -64,10 +64,16 @@
     <h4> Initial and Boundary Conditions </h4>
     <p>(You can modify these using the buttons on the left hand menu.)</p>
     <table>
-    {% for bc in s.boundaryCondition.values %}
-    <tr><td>Boundary Condition</td><td>{{bc}}</td></tr>
+    {% if s.initialCondition %}
+    <tr class="{% cycle 'row1' 'row2'%}"><td>Inital Condition</td><td>{{s.initialCondition}}</td></tr>
+    {% else %}
+    <tr><td colspan="2"> You need to set an initial Condition</td></tr>
+    {% endif %}
+    {% for bc in s.boundaryCondition.get_query_set %}
+    <tr class="{%cycle  'row2' 'row1'%}"><td>Boundary Condition</td><td>{{bc}}</td></tr>
     {% endfor %}
     </table>
+    <p class="cmip5q"> Need to put some guidance on status of filling out boundary conditions </p>
 </div>
 <div class="boxer backgrey">
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>

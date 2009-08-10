@@ -103,6 +103,7 @@ class Simulation(Doc):
     # enforce the following as required via q'logical validation, not form validation.
     initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
     boundaryCondition=models.ManyToManyField('BoundaryCondition',blank=True,null=True)
+    physicalEnsemble=models.BooleanField(default=False)
     
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -228,6 +229,18 @@ class BoundaryCondition(models.Model):
     coupling=models.ForeignKey(Coupling,blank=True,null=True)
     def __unicode__(self):
         return '%s:%s'%(self.coupling,self.files)
+    
+class CodeModification(models.Model):
+    mnemonic=models.SlugField()
+    component=models.ForeignKey(Component)
+    description=models.TextField()
+    #we could try and get to the parameter values as well ...
+    def __unicode__(self):
+        return "%s (%s)"%(self.mnemonic,self.component)
+
+class PhysicalEnsemble(models.Model):
+    ensembleDescription=models.TextField(blank=True,null=True)
+    codeMods=models.ManyToManyField(CodeModification)
     
 class InitialConditionForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
