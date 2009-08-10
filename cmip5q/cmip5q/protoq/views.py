@@ -277,63 +277,74 @@ def dataEdit(request,cen_id,object_id=None):
     
 ############ Simple Generic Views ########################
 
-#pattern: resource class, resourcetype, form, and html templates ...
-SupportedResources={'initialcondition':[
-                            InitialCondition,
-                            'initialCondition',
-                            InitialConditionForm,
-                            'initial_condition_edit.html',
-                            'initial_condition_list.html',
-                            'initial_condition_assign.html'],
-                    'file':[
-                            DataObject,
-                            'file',
-                            DataObjectForm,
-                            'file_edit.html',
-                            'file_list.html',
-                            'file_assign.html']
-                            }
+class ViewHandler(BaseViewHandler):
+    ''' Specialises Base View for the various resource understood as a "simple"
+    view '''
+    #pattern: resource class, resourcetype, form
+    SupportedResources={'initialcondition':[
+                                InitialCondition,
+                                'initialCondition',
+                                InitialConditionForm],
+                        'boundarycondition':[
+                                BoundaryCondition,
+                                'boundaryCondition',
+                                BoundaryConditionForm],
+                        'file':[
+                                DataObject,
+                                'file',
+                                DataObjectForm]
+                                }
+    def __init__(self,cen_id,resourceType,obj_id,target_id,targetType):
+        ''' We can have some combination of the above at initialiation time '''
+        
+        if resourceType not in self.SupportedResources:
+            return HttpResponse('Unknown resource type %s '%resourceType)
+        
+        constraints,targetURL,target=None,None,None
+        if targetType is not None:
+            try:
+                target={'simulation':Simulation}[targetType].objects.get(id=target_id)
+            except Exception,e:
+                return HttpResponse(str(e))
+            targetURL={'simulation':reverse('cmip5q.protoq.views.simulationEdit',
+                                                       args=(cen_id,target_id,))
+                      }[targetType]
 
-def edit(request,cen_id,resourceType,obj_id=None):
+        #We may need a constraint tuple to be used by specialisation methods 
+        if resourceType=='boundarycondition' and targetType=='simulation':
+            # we need to constrain the boundary condition form to the right boundary conditions
+            model=target.numericalModel
+            constraints=(model,)
+           
+        SupportedResource=self.SupportedResources[resourceType]
+        # The base view handler needs some or all of this:   
+        data={'centre':cen_id,
+              'resource':{'type':SupportedResource[1],'id':obj_id,
+                           'class':SupportedResource[0]},
+              'target':{'type':targetType,'id':target_id,'url':targetURL,'instance':target},
+              'form':SupportedResource[2],
+              'constraints':constraints}
+              
+        BaseViewHandler.__init__(self,data)
+
+def edit(request,cen_id,resourceType,obj_id=None,target_id=None,targetType=None):
     ''' This is the generic simple view editor '''
     
-    if resourceType not in SupportedResources:
-        return HttpResponse('Unknown resource %s for editing'%resourceType)
-    
-    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
-    return handler.edit(request,obj_id)
+    h=ViewHandler(cen_id,resourceType,obj_id,target_id,targetType)
+    return h.edit(request)
 
 def list(request,cen_id,resourceType):
     ''' This is the generic simple view lister '''
-    
-    if resourceType not in SupportedResources:
-        return HttpResponse('Unknown resource %s for editing'%resourceType)
-    
-    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
-    return handler.list()
+   
+    h=ViewHandler(cen_id,resourceType,None,None,None)
+    return h.list()
 
 def assign(request,cen_id,targetType,target_id,resourceType):
     ''' Provide a page to allow the assignation of resources of type resourceType
     to resource target_id of type targetType '''
-    
-    if resourceType not in SupportedResources:
-        return HttpResponse('Unknown resource %s for assignation'%resourceType)
-    if resourceType not in SupportedResources:
-        return HttpResponse('Unknown target %s for assignation'%targetType)
-     
-    try:
-        target={'simulation':Simulation}[targetType].objects.get(id=target_id)
-    except Exception,e:
-        return HttpResponse(str(e))
-    targetURL={'simulation':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,target_id,))
-        }[targetType]
-  
-    # FIXME: THIS WILL ABSOLUTELY NOT WORK TO GET BACK TO SIMULATIONS ... FOR NOW ...
-    #targetURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,targetType,target_id))
-  
-    handler=BaseViewHandler(cen_id,*SupportedResources[resourceType])
-    return handler.assign(request,target,targetURL)
-    
+   
+    h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
+    return h.assign(request) 
     
     
 

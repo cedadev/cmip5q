@@ -148,6 +148,10 @@ class DataObject(models.Model):
     variable=models.CharField(max_length=128,blank=True)
     # and if possible the CF name
     cftype=models.CharField(max_length=512,blank=True)
+    # references (including web pages)
+    reference=models.ForeignKey(Reference,blank=True,null=True)
+    #format
+    format=models.ForeignKey('Value',blank=True,null=True)
     def __unicode__(self):
         return self.name
     
@@ -186,9 +190,12 @@ class Coupling(models.Model):
     #I had problems with related name clashes:
     internal=models.BooleanField()
     target=models.ForeignKey(Component,related_name='couplingTarget',blank=True,null=True)
-    file=models.ForeignKey(DataObject,blank=True,null=True)
+    #we don't couple to files ... because boundary conditions make that link.
     def __unicode__(self):
-        return 'Coupling for %s to %s or %s'%(self.component,self.target,self.file)
+        if self.internal:
+            return '%s %s couplingto %s'%(self.component,self.couplingVar,self.target)
+        else:
+            return '%s %s coupling'%(self.component,self.couplingVar) 
     
 class CouplingTransform(models.Model):
     ''' Eventually replace with mindmap stuff '''
@@ -217,13 +224,27 @@ class InitialCondition(models.Model):
 class BoundaryCondition(models.Model):
     ''' Simulation boundary conditions '''
     description=models.TextField(blank=True,null=True)
-    files=models.ManyToManyField(DataObject,blank=True,null=True)
-    couplings=models.ManyToManyField(Coupling,blank=True,null=True)
+    files=models.ForeignKey(DataObject,blank=True,null=True)
+    coupling=models.ForeignKey(Coupling,blank=True,null=True)
+    def __unicode__(self):
+        return '%s:%s'%(self.coupling,self.files)
     
 class InitialConditionForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+    variables=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
     class Meta:
         model=InitialCondition
-    
+        
+class BoundaryConditionForm(forms.ModelForm):
+    ''' Simulation boundary condition form '''
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+    class Meta:
+        model=BoundaryCondition
+    def specialise(self,model):
+        ''' Specialise as it's own method to avoid confusion with POST and GET '''
+        realms=model.components.all()
+        self.fields['coupling'].queryset=Coupling.objects.filter(component__in=realms).filter(internal=0)
+       
 class CouplingForm(forms.ModelForm):
     couplingVar=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     class Meta:
@@ -241,6 +262,10 @@ class DataObjectForm(forms.ModelForm):
     cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
     class Meta:
         model=DataObject
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        v=Vocab.objects.get(name='FileFormats')
+        self.fields['format'].queryset=Value.objects.filter(vocab=v)
 
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 

@@ -89,7 +89,8 @@ class simulationHandler(object):
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'simulation',s.id,'initialcondition',))
-            urls['bc']=reverse('cmip5q.protoq.views.edit',args=(self.centreid,'boundarycondition')),
+            urls['bc']=reverse('cmip5q.protoq.views.assign',
+                    args=(self.centreid,'simulation',s.id,'boundarycondition'))
             reqs=self.__conformances(s,reqs)
         print urls
         
@@ -110,7 +111,8 @@ class simulationHandler(object):
             simform.centre(self.centre)
         
         return render_to_response('simulation.html',
-            {'simform':simform,'urls':urls,'label':label,'exp':e,'reqs':reqs,'tabs':tabs(self.centreid,'Update')})
+            {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,'reqs':reqs,
+                        'tabs':tabs(self.centreid,'Update')})
         
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''

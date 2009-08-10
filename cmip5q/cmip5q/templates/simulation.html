@@ -18,7 +18,7 @@
             {% else %}
             <h4> File Dependencies </h4>
             <p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>
-            Boundary Conditions
+            <p><a id="bclinkbut" href="{{urls.bc}}">Boundary Conditions</a></p>
             <h4> Experiment Criteria</h4>
             Conformance
             <h4> Ensemble Characteristics </h4>
@@ -57,10 +57,17 @@
 </table>
 <script type="text/javascript">
     var oLinkButton1 = new YAHOO.widget.Button("iclinkbut"); 
+     var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
     var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
 </script>
 <div class="boxer">
-
+    <h4> Initial and Boundary Conditions </h4>
+    <p>(You can modify these using the buttons on the left hand menu.)</p>
+    <table>
+    {% for bc in s.boundaryCondition.values %}
+    <tr><td>Boundary Condition</td><td>{{bc}}</td></tr>
+    {% endfor %}
+    </table>
 </div>
 <div class="boxer backgrey">
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>

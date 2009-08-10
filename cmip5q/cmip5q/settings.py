@@ -12,7 +12,8 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = os.path.join(thisDir, 'sqlite.db') # Or path to database file if using sqlite3.
+#DATABASE_NAME = os.path.join(thisDir, 'sqlite.db') # Or path to database file if using sqlite3.
+DATABASE_NAME = '/home/bnl/meta4q/cmip5q/sqlite.db'
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -70,21 +71,21 @@ ROOT_URLCONF = 'cmip5q.urls'
 
 # Switch for PJK's sandbox.  
 # TODO: Does Django have a better way of doing this e.g. env variable?
-#TEMPLATE_DIRS = (
-#    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-#    # Always use forward slashes, even on Windows.
-#    # Don't forget to use absolute paths, not relative paths.
-#    "/home/bnl/meta4q/cmip5q/templates"
-#)
-#STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
-
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(thisDir, "templates")
+    "/home/bnl/meta4q/cmip5q/templates"
 )
-STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css")
+STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+
+#TEMPLATE_DIRS = (
+#    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+#    # Always use forward slashes, even on Windows.
+#    # Don't forget to use absolute paths, not relative paths.
+#    os.path.join(thisDir, "templates")
+#)
+#STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css")
 
 INSTALLED_APPS = (
     'django.contrib.auth',

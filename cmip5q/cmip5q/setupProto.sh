@@ -15,9 +15,17 @@ ${PYTHON:-python} manage.py shell << EOF
 from protoq.models import *
 from XMLinitialiseQ import initialise
 from XMLActivityReader import NumericalExperiment
+from initialiseRefs import *
+from initialiseFiles import *
 
 # Initialise the Questionnaire
 initialise()
+
+# load cmip5 input files
+initialiseFiles()
+
+# load cmip5 input references
+initialiseRefs()
 
 # create experiments
 

@@ -16,9 +16,12 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
          ('IPSL','FR Institute Simone Pierre Laplace'),
          ('MPIM','DE Max Planck Institute for Meteorology'), )
      
-# this is the controlled vocabularly for realms:
+# this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
 realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBioGeoChemistry')
+             
+# controlled vocabulary for file formats
+FileFormats=('NetCDF','Grib','PP','Excel','Text','HDF','Other')
              
 # this tuple should provide a controlled vocabulary for referenceTypes
 referenceTypes=('Webpage','Online Refereed',
@@ -84,3 +87,6 @@ def initialise():
     
     #support for conformanceTypes
     loadvocab('conformanceTypes',conformanceTypes)
+    
+    #support for file formats
+    loadvocab('FileFormats',FileFormats)
