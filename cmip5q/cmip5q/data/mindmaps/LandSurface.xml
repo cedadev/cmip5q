@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r646 (mariepierre, 2009-07-06) of LandSurface.mm" defnversion="">
+  <component name="LandSurface">
+    <component name="LandSurfaceTiling">
+      <parameter name="Tiling" choice="XOR">
+        <value name="common to all LS subcomponents"/>
+        <value name="specific to each LS subomponents"/>
+      </parameter>
+      <parameter name="TilingMethod" choice="XOR" note="Only if LandSurfaceTiling = &quot;common to all components&quot;.">
+        <value name="dynamic"/>
+        <value name="fixed number of types"/>
+      </parameter>
+    </component>
+    <component name="LandSurfaceSoil">
+      <component name="SoilMap">
+        <parameter name="Texture" choice="keyboard">
+          <value format="string" name="description and reference"/>
+        </parameter>
+        <parameter name="Structure" choice="keyboard">
+          <value format="string" name="description and reference"/>
+        </parameter>
+        <parameter name="Albedo" choice="keyboard">
+          <value format="string" name="description and reference"/>
+        </parameter>
+        <parameter name="WaterTable" choice="keyboard">
+          <value format="string" name="description and reference"/>
+        </parameter>
+        <parameter name="Other" choice="keyboard">
+          <value format="string" name="name, description and reference"/>
+        </parameter>
+      </component>
+      <component name="SoilHydrology">
+        <parameter name="SpecificTiling" choice="XOR">
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="NumberOfGroundWaterLayers" choice="keyboard">
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="WaterStorageMethod" choice="XOR">
+          <value name="Bucket"/>
+          <value name="Force-Restore"/>
+          <value name="Choisnel"/>
+          <value name="Explicit diffusion"/>
+          <value name="Other"/>
+        </parameter>
+        <component name="SoilMoistureFreezing">
+          <parameter name="NumberOfGroundIceLayers" choice="keyboard">
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="IceStorageMethod" choice="keyboard">
+            <value format="string" name="description and reference"/>
+          </parameter>
+          <parameter name="Permafrost" choice="OR">
+            <value name="specific treatment"/>
+            <value name="specific tiling"/>
+          </parameter>
+        </component>
+        <component name="Runoff/Drainage">
+          <parameter name="Method" choice="XOR">
+            <value name="Bulk (undifferentiated drainage and runoff)"/>
+            <value name="Differentiated drainage and runoff"/>
+          </parameter>
+          <parameter name="Properties" choice="OR" note="Only if Method = &quot;Differenciated drainage and runoff&quot;.">
+            <value name="deep drainage"/>
+            <value name="saturated surface runoff"/>
+            <value name="subgrid drainage"/>
+            <value name="infiltration excess runoff"/>
+            <value name="water table recharge"/>
+            <value name="subgrid"/>
+          </parameter>
+        </component>
+      </component>
+      <component name="SoilHeatTreatment">
+        <parameter name="SpecificTiling" choice="XOR">
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="NumberOfGroundHeatLayers" choice="keyboard">
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="HeatStorageMethod" choice="XOR">
+          <value name="Force-Restore"/>
+          <value name="Explicit diffusion"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="PhysicalProcesses" choice="OR">
+          <value name="soil moisture freeze-thaw"/>
+          <value name="other"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="LandSurfaceSnow">
+      <parameter name="SpecificTiling" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="NumberOfSnowLayers" choice="keyboard">
+        <value format="numerical" name=""/>
+      </parameter>
+      <parameter name="SnowCoverFractions" choice="OR">
+        <value name="ground snow fraction"/>
+        <value name="vegetation snow franction"/>
+        <value name="other"/>
+      </parameter>
+      <parameter name="PhysicalProcesses" choice="OR">
+        <value name="snow interception"/>
+        <value name="snow melting"/>
+        <value name="other"/>
+      </parameter>
+      <component name="SnowVariables">
+        <parameter name="SnowAlbedo" choice="XOR">
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+          <value name="constant"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SnowDensity" choice="XOR">
+          <value name="prognostic"/>
+          <value name="constant"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SnowWaterEquivalent" choice="XOR">
+          <value name="prognostic"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SnowHeatContent" choice="XOR">
+          <value name="prognostic"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SnowTemperature" choice="XOR">
+          <value name="prognostic"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SnowLiquidWaterContent" choice="XOR">
+          <value name="prognostic"/>
+          <value name="other"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="LandSurfaceVegetation">
+      <parameter name="SpecificTiling" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="Interception" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <component name="VegetationVariables">
+        <parameter name="Pnenology" choice="XOR">
+          <value name="progostic"/>
+          <value name="diagnostic (vegetation map)"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="LAI" choice="XOR">
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="Biomass" choice="XOR">
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="BioGeography" choice="XOR">
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="SurfaceEnergyBalance">
+      <parameter name="SpecificTiling" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="SubsurfaceTiling" choice="XOR" note="Only if SpecialTiling = &quot;yes&quot;.">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="TypeOfEvaporationFormulation" choice="XOR">
+        <value name="alpha"/>
+        <value name="beta"/>
+        <value name="combined"/>
+        <value name="Monteith potential evaporation"/>
+        <value name="Other"/>
+      </parameter>
+      <parameter name="PhysicalProcesses" choice="OR">
+        <value name="transpiration"/>
+        <value name="other"/>
+      </parameter>
+    </component>
+    <component name="LandSurfaceAlbedo">
+      <parameter name="SpecialTiling" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <component name="SnowFreeAlbedo">
+        <parameter name="Type" choice="XOR">
+          <value name="prognostic"/>
+          <value name="prescribed"/>
+        </parameter>
+        <parameter name="FunctionOf" choice="OR" note="Only if Type = &quot;prognostic&quot;.">
+          <value name="vegetation type"/>
+          <value name="soil humidity"/>
+          <value name="vegetation state"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="DistinctionOfDirect/DiffuseAlbedo" choice="XOR" note="Only if Type = &quot;prognostic&quot;.&#10;(mpm: I don't understand this restriction. To check)">
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="NumberOfWavelenghBands" choice="keyboard" note="Only if Type = &quot;prognostic&quot;.&#10;(mpm: I don't understand this restriction. To check)">
+          <value format="numerical" name=""/>
+        </parameter>
+      </component>
+      <component name="SnowAlbedo">
+        <parameter name="FunctionOf" choice="OR" note="Only if Type = &quot;prognostic&quot;.">
+          <value name="vegetation type"/>
+          <value name="Snow age"/>
+          <value name="Snow density"/>
+          <value name="Snow grain type"/>
+          <value name="Other"/>
+        </parameter>
+      </component>
+    </component>
+    <component name="LandSurfaceCarbonCycle">
+      <component name="Vegetation">
+        <component name="Photosynthesis">
+          <parameter name="Method" choice="XOR">
+            <value name="biochemical approach"/>
+            <value name="light use efficiency approach (LUE)"/>
+            <value name="carbon assimilation approach"/>
+          </parameter>
+        </component>
+        <parameter name="NumberOfCarbonPools" choice="keyboard">
+          <value format="numerical" name=""/>
+        </parameter>
+      </component>
+      <component name="Soil">
+        <parameter name="Method" choice="OR">
+          <value name="heterotrophic respiration"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="NumberOfCarbonPools" choice="keyboard">
+          <value format="numerical" name=""/>
+        </parameter>
+      </component>
+      <component name="Permafrost"/>
+    </component>
+    <component name="RiverRouting">
+      <parameter name="SpecificTiling" choice="XOR" note="i.e. tiling of basins.">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="RiverRoutingResolution" choice="XOR">
+        <value name="inherited from Land Surface"/>
+        <value name="independent"/>
+      </parameter>
+      <parameter name="NumberOfReservoirs" choice="keyboard">
+        <value format="numerical" name=""/>
+      </parameter>
+      <parameter name="RiverPrognoticVariables" choice="OR">
+        <value name="heat"/>
+        <value name="water"/>
+        <value name="tracers"/>
+        <value name="Other"/>
+      </parameter>
+      <parameter name="WaterRe-evaporation" choice="OR">
+        <value name="flood plains"/>
+        <value name="irrigation"/>
+      </parameter>
+      <component name="OceanicDischarge">
+        <parameter name="Type" choice="XOR">
+          <value name="direct (large rivers)"/>
+          <value name="diffuse"/>
+        </parameter>
+        <parameter name="QuantitiesTransported" choice="OR">
+          <value name="heat"/>
+          <value name="water"/>
+          <value name="tracers"/>
+          <value name="others"/>
+        </parameter>
+      </component>
+      <parameter name="InteractionWithAtmosphere" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="QuantitiesExchangedWithAtmosphere" choice="OR" note="Only if InteractionWithAtmosphere = &quot;yes&quot;.">
+        <value name="heat"/>
+        <value name="water"/>
+        <value name="tracers"/>
+        <value name="others"/>
+      </parameter>
+    </component>
+    <component name="LandSurfaceLakes">
+      <parameter name="Properties" choice="OR">
+        <value name="ice treatment"/>
+        <value name="prognostic lakes albedo"/>
+        <value name="dynamic lakes extent"/>
+        <value name="endorehic basins" note="i.e. not flowing to ocean."/>
+        <value name="other"/>
+      </parameter>
+      <parameter name="LakesDynamics" choice="XOR">
+        <value name="vertical"/>
+        <value name="horizontal"/>
+        <value name="vertical + horizontal"/>
+        <value name="none"/>
+      </parameter>
+      <parameter name="CouplingWithRivers" choice="XOR">
+        <value name="yes"/>
+        <value name="no"/>
+      </parameter>
+      <parameter name="QuantitiesExchangedWithRivers" choice="OR" note="Only if CouplingWithRivers = &quot;yes&quot;.">
+        <value name="heat"/>
+        <value name="water"/>
+        <value name="tracers"/>
+        <value name="others"/>
+      </parameter>
+    </component>
+  </component>
+</vocab>
