@@ -48,6 +48,10 @@ relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf
 #types of conformance, we'll allow more than one to be chosen
 conformanceTypes=('Boundary Condition','Initial Condition', 'Code Modification')
 
+# types of numerical requirement (nb: at the moment we don't use these, it's hardwired)
+# would need to modify the numerical requiremnet class, and the conformance code.
+numrecTypes=('BoundaryCondition','InitialCondition')
+
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
     v=Vocab(uri=str(uuid.uuid1()),name=name)
@@ -85,8 +89,9 @@ def initialise():
     #support for geneologies
     loadvocab('relations',relations)
     
-    #support for conformanceTypes
+    #support for conformanceTypes and numericalRequirementTypes
     loadvocab('conformanceTypes',conformanceTypes)
+    loadvocab('numericalRequirementTypes',numrecTypes)
     
     #support for file formats
     loadvocab('FileFormats',FileFormats)

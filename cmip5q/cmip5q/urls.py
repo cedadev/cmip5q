@@ -43,7 +43,8 @@ urlpatterns = patterns('',
                 'cmip5q.protoq.views.simulationAdd'),
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/edit/$',
                 'cmip5q.protoq.views.simulationEdit'),  
-                    
+    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/conformance/$',
+                'cmip5q.protoq.views.conformanceMain'),                 
     #           
     # platforms/add/centre_id
     # platforms/edit/platform_id
@@ -83,16 +84,18 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.ensemble'),                                               
                           
     #### generic simple views
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/$',
+    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>\D+)/$',
             'cmip5q.protoq.views.edit'),
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>[^0-9/]+)/(?P<obj_id>\d+)/$',
+    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>[^0-9/]+)/(?P<obj_id>\d+)/$',
             'cmip5q.protoq.views.edit'),
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>[^0-9/]+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
+    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>[^0-9/]+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.edit'),            
-     ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<obj_id>\d+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
+     ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>\D+)/(?P<obj_id>\d+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.edit'),                    
     ('^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/$',
             'cmip5q.protoq.views.list'),
+    ('^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)$',
+            'cmip5q.protoq.views.list'),            
     ('^cmip5/(?P<cen_id>\d+)/assign/(?P<targetType>\D+)/(?P<target_id>\d+)/(?P<resourceType>\D+)/$',
             'cmip5q.protoq.views.assign'),       
 
