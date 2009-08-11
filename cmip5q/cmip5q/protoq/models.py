@@ -155,27 +155,7 @@ class DataObject(models.Model):
     format=models.ForeignKey('Value',blank=True,null=True)
     def __unicode__(self):
         return self.name
-    
-class Conformance(models.Model):
-    ''' This relates a numerical requirement to an actual solution in the simulation '''
-    # centre (for access control)
-    centre=models.ForeignKey('Centre')
-    # the identifier of the numerical requirement:
-    requirement=models.ForeignKey(NumericalRequirement)
-    # simulation owning the requirement 
-    simulation=models.ForeignKey(Simulation)
-    # if we didn't use a file, it will be code
-    method=models.CharField(max_length=30)
-    # so we enter some text (particuarly if we do a code modification)
-    description=models.TextField()
-    # this is the target component that has been modified (if any has)
-    component=models.ForeignKey(Component,blank=True,null=True)
-    # this is the file object that has been used (if any)
-    dataObject=models.ForeignKey('DataObject',blank=True,null=True)
-    def __unicode__(self):
-        return "%s (s:%s,r:%s,c:%s)"%(
-                self.description,self.simulation,self.requirement,self.centre) 
-    
+        
 class Coupling(models.Model):
     #parent component:
     component=models.ForeignKey(Component)
@@ -243,6 +223,37 @@ class PhysicalEnsemble(models.Model):
     codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
     simulation=models.ForeignKey(Simulation)
     
+class Conformance(models.Model):
+    ''' This relates a numerical requirement to an actual solution in the simulation '''
+    # the identifier of the numerical requirement:
+    requirement=models.ForeignKey(NumericalRequirement)
+    # simulation owning the requirement 
+    simulation=models.ForeignKey(Simulation)
+    # conformance type from the controlled vocabulary
+    ctype=models.ForeignKey(Value,blank=True,null=True)
+    # code modification 
+    codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
+    initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
+    boundaryCondition=models.ForeignKey(BoundaryCondition,blank=True,null=True)
+    def __unicode__(self):
+        return "%s for %s"%(self.ctype,self.requirement)
+
+#class ConformanceForm(forms.ModelForm):
+#    class Meta:
+#        model=Conformance
+#    def specialise(self,centre):
+#        # FIXME: need to specialise onto only components owned by the model in the simulation
+#        # FIXME: likewise onto initial and boundary conditions owned by this simulation
+#        pass
+#    def clean(self):
+#       #http://docs.djangoproject.com/en/dev/ref/forms/validation/
+#        cleaned_data=self.cleaned_data
+#       ftype=cleaned_data.get('ctype')
+#       cmods=cleaned_data.get('codeModification')
+#        ic,bc=cleaned_data.get('initialCondition'),cleaned_data.get('boundaryCondition')
+#       print 'learning',ftype,cmods,ic,bc
+#       return cleaned_data
+
 class EnsembleForm(forms.Form):
     #We don't build it from a model form, because we only really want
     #the description from the user, we do the rest by hand.
@@ -254,6 +265,7 @@ class EnsembleForm(forms.Form):
         return data
     
 class CodeModificationForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
     class Meta:
         model=CodeModification
     
@@ -278,10 +290,6 @@ class CouplingForm(forms.ModelForm):
     class Meta:
         model=Coupling
         exclude=('component')
-        
-class ConformanceForm(forms.ModelForm):
-    class Meta:
-        model=Conformance
 
 class DataObjectForm(forms.ModelForm):
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
@@ -306,6 +314,10 @@ class SimulationForm(forms.ModelForm):
         model=Simulation
         #these are enforced by the workflow leading to the form
         exclude=('centre','experiment','uri','intialcondition')
+    def specialise(self,centre):
+        self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
+        self.fields['numericalModel'].queryset=Component.objects.filter(
+                            scienceType='model').filter(centre=centre)
 
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 

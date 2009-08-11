@@ -18,15 +18,6 @@ import os
 
 CouplingFormSet=modelformset_factory(Coupling,exclude=('internal','component'))
 
-class MyCouplingForm(CouplingForm):
-    ''' Subclassed to ensure we get extra attributes and right vocabs '''
-    def __init__(self,*args,**kwargs):
-        CouplingForm.__init__(self,*args,**kwargs)
-        self.vocabs={'couplingType':Vocab.objects.get(name='couplingType'),
-                     'couplingFreq':Vocab.objects.get(name='couplingFreq')}
-        for f in self.vocabs:
-            self.fields[f].queryset=Value.objects.filter(vocab=self.vocabs[f])       
-
 class MyCouplingFormSet(CouplingFormSet):
     ''' This is my implementation of the functionality of Django formsets, but 
     which supports constraining the field querysets etc in a more natural manner '''

@@ -161,6 +161,10 @@ def simulationView(request,centre_id,simulation_id):
 def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)
+
+def conformanceMain(request,centre_id,simulation_id):
+    s=simulationHandler(centre_id,simulation_id)
+    return s.conformanceMain(request)
    
 #### CONFORMANCE HANDLING APPEARS IN THE SIMULATION FILE  ###########################################################
  
@@ -312,6 +316,8 @@ def ensemble(request,cen_id,sim_id,ens_id=None):
     return render_to_response('ensemble.html',
                {'s':s,'e':e,'urls':urls,'eform':eform,'codeMods':codeMods,
                'tabs':tabs(cen_id,'tmp')})
+               
+               
     
 ############ Simple Generic Views ########################
 
@@ -373,16 +379,16 @@ class ViewHandler(BaseViewHandler):
               
         BaseViewHandler.__init__(self,data)
 
-def edit(request,cen_id,resourceType,obj_id=None,target_id=None,targetType=None):
+def edit(request,cen_id,returnType,resourceType,obj_id=None,target_id=None,targetType=None):
     ''' This is the generic simple view editor '''
     
     h=ViewHandler(cen_id,resourceType,obj_id,target_id,targetType)
-    return h.edit(request)
+    return h.edit(request,returnType)
 
-def list(request,cen_id,resourceType):
+def list(request,cen_id,resourceType,targetType=None,target_id=None):
     ''' This is the generic simple view lister '''
    
-    h=ViewHandler(cen_id,resourceType,None,None,None)
+    h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.list()
 
 def assign(request,cen_id,targetType,target_id,resourceType):

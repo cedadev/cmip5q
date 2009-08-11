@@ -47,10 +47,15 @@ class BaseViewHandler:
     def list(self):
         ''' Show a list of the basic entities '''
         objects=self.resource.objects.all()
+        if self.targetType is None:
+            args=[self.cid,'list',self.resourceType4url]
+        else:
+            args=[self.cid,'list',self.resourceType4url,self.targetType,self.targetID]
         for o in objects:
-            o.editURL= reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url,o.id),)
+            args.insert(3,o.id)
+            o.editURL= reverse('cmip5q.protoq.views.edit',args=args)
         c=Centre.objects.get(id=self.cid)
-        editURL=reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url),)
+        editURL=reverse('cmip5q.protoq.views.edit',args=args)
         return render_to_response(self.listHTML,{
                 'objects':objects,
                 'tabs':tabs(self.cid,self.resourceType),
@@ -58,19 +63,23 @@ class BaseViewHandler:
                 'editURL':editURL
                 })
                 
-    def edit(self,request):
+    def edit(self,request,returnType):
         ''' Edit/Update a specific object, or provide a form for a new object '''
+        if returnType not in ['list','assign','ajax']:
+            raise ValueError('unknown type of editing reuqest %s'%returnType)
+        if self.targetType is None:
+            args=[self.cid,returnType,self.resourceType4url,]
+        else: args=[self.cid,returnType,self.resourceType4url,self.targetType,self.targetID,]
         if self.resourceID is None:
-            #editURL=reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url,))
-            editURL=reverse('cmip5q.protoq.views.edit',
-                   args=(self.cid,self.resourceType4url,self.targetType,self.targetID))
+            editURL=reverse('cmip5q.protoq.views.edit',args=args)
             if request.method=='GET':
                 #then we're starting afresh
                 form=self._constructForm('GET')
             elif request.method=='POST':
                 form=self._constructForm('POST',request.POST)
         else:
-            editURL=reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url,self.resourceID,self.targetType,self.targetID,),)
+            args=args.insert(3,self.resource_id)
+            editURL=reverse('cmip5q.protoq.views.edit',args=args)
             instance=self.resource.objects.get(id=self.resourceID)
             if request.method=='GET':
                 form=self._constructForm('GET',instance=instance)
@@ -81,13 +90,16 @@ class BaseViewHandler:
             if form.is_valid():
                 f=form.save()
                 if self.targetType is not None:
-                    url=reverse('cmip5q.protoq.views.assign',
+                    url=reverse('cmip5q.protoq.views.%s'%returnType,
                             args=(self.cid,self.targetType,self.targetID,self.resourceType4url,))
                 else:
-                    url=reverse('cmip5q.protoq.views.list',
+                    url=reverse('cmip5q.protoq.views.%s'%returnType,
                             args=(self.cid,self.resourceType4url,))
                 logging.debug('Successful edit post, redirecting to %s'%url)
-                return HttpResponseRedirect(url)
+                if returnType =='ajax':
+                    return HttpResponse('not implemented')
+                else:
+                    return HttpResponseRedirect(url)
             else:
                 if self.constraints: form.specialise(*self.constraints)
                           
@@ -157,7 +169,7 @@ class BaseViewHandler:
                 
         url=''#reverse('cmip5q.protoq.views.assignReferences',args=(self.cid,resourceType,resource_id,))
         editURL=reverse('cmip5q.protoq.views.edit',
-            args=(self.cid,self.resourceType4url,self.targetType,self.targetID))
+            args=(self.cid,'assign',self.resourceType4url,self.targetType,self.targetID))
         return render_to_response(self.selectHTML,
             {'showChoices':showChoices,
                 'rform':rform,

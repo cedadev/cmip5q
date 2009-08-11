@@ -13,41 +13,38 @@ from django import forms
 import uuid
 import logging
 
-class MyConformanceForm(ConformanceForm):
-    ''' Handles requirements specificity '''
-    def __init__(self,*args,**kwargs):
-        ConformanceForm.__init__(self,*args,**kwargs)
-    def specialise(self,centre):
-        # FIXME, we should make this queryset include just component within a specific model
-        self.fields['component'].queryset=Component.objects.filter(centre=centre)
-        #FIXME and we need to limit files to specific centre
 
-class MySimForm(SimulationForm):
-    ''' Handles specific issues for a SimulationForm '''
-    def __init__(self,*args,**kwargs):
-        SimulationForm.__init__(self,*args,**kwargs)
-    def centre(self,centre):
-        self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
-        self.fields['numericalModel'].queryset=Component.objects.filter(scienceType='model').filter(centre=centre)
-        
+ConformanceFormSet=modelformset_factory(Conformance,exclude=('simulation','requirement'))
 
-def GetConformance(req,cen,sim):
-    c=Conformance.objects.filter(
-            requirement=req,centre=cen,simulation=sim)
-    if len(c)==0:
-        return None
-    elif len(c)==1:
-        return c[0]
-    else:
-        logging.info('Multiple conformances for %s,%s,%s'%(req,cen,sim))
-        return c[0]
-
-class conform:
-    ''' Just used to munge urls and forms together '''
-    def __init__(self,url,form):
-        self.url=url
-        self.form=form
-                
+class MyConformanceFormSet(ConformanceFormSet):
+    ''' Mimics the function of a formset for the situation where we want to edit the
+    known conformances '''
+    def __init__(self,simulation,data=None):
+        self.extra=0
+        qset=Conformance.objects.filter(simulation=simulation)
+        ConformanceFormSet.__init__(self,data,queryset=qset)
+        self.r=[c.requirement.description for c in qset]
+        self.s=simulation
+    def specialise(self):
+        # FIXME: Can't specialise on the code modifications, because we can't get at them
+        # should really do it via modifications on this model ... which means we need to
+        # have model parent known to all component.
+        # FIXME: Can only get to boundary conditions by following the coupling links ...
+        # monkey patch some additional information to show on the forms
+        if len(self.r)!=len(self.forms):
+            raise ValueError('queryset %s and forms %s out of step'%(len(self.r),len(self.forms)))
+        v=Vocab.objects.get(name='conformanceTypes')
+        for index in range(len(self.r)):
+            self.forms[index].req=self.r[index]
+            self.forms[index].fields['ctype'].queryset=Value.objects.filter(vocab=v)
+    def save(self): 
+        instances=ConformanceFormSet.save(self,commit=False)
+        for index in range(len(instances)):
+            f=instances[index]
+            f.simulation=self.s
+            f.requirement=self.r[index]
+            f.save()
+          
 class simulationHandler(object):
     
     def __init__(self,centre_id,simid=None,expid=None):
@@ -58,29 +55,9 @@ class simulationHandler(object):
         self.expid=expid
         self.errors={}
         
-    def __conformances(self,s,reqs):
-        ''' We monkey patch onto the requirements what is needed to put up a conformance
-        form as well '''
-        
-        s=Simulation.objects.get(id=s.id)
-        for r in reqs:
-            # attach variables for a conformance request form
-            # need an id, a url, and a form 
-            url=reverse('cmip5q.protoq.views.conformanceEdit',args=(self.centreid,s.id,r.id))
-            i=GetConformance(r,self.centre,s)
-            if r not in self.errors:
-                form=MyConformanceForm(instance=i)
-                form.specialise(s.centre)
-            else:
-                form=self.errors[r]
-            r.con=conform(url,form)
-            
-        return reqs
-        
     def __handle(self,request,s,e,url,label,fix):
         ''' This method handles the form itself for both the add and edit methods '''
         logging.debug('entering simulation handle routine')
-        reqs=e.requirements.all()
         ensemble=0
         
         urls={
@@ -92,7 +69,8 @@ class simulationHandler(object):
                     args=(self.centreid,'simulation',s.id,'initialcondition',))
             urls['bc']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'simulation',s.id,'boundarycondition'))
-            reqs=self.__conformances(s,reqs)
+            urls['con']=reverse('cmip5q.protoq.views.conformanceMain',
+                    args=(self.centreid,s.id,))
             if s.ensembleMembers > 1:
                 urls['ens']=reverse('cmip5q.protoq.views.ensemble',
                     args=(self.centreid,s.id,))
@@ -103,19 +81,19 @@ class simulationHandler(object):
             # s.id is for a new simulation
             #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
             afterURL=reverse('cmip5q.protoq.views.simulationList',args=(self.centreid,))
-            simform=MySimForm(request.POST,instance=s)
-            simform.centre(self.centre)
+            simform=SimulationForm(request.POST,instance=s)
+            simform.specialise(self.centre)
             if simform.is_valid():
                 s=simform.save()
                 return HttpResponseRedirect(afterURL)
             else:
                 print 'SIMFORM not valid [%s]'%simform.errors
         else:
-            simform=MySimForm(instance=s)
-            simform.centre(self.centre)
+            simform=SimulationForm(instance=s)
+            simform.specialise(self.centre)
         
         return render_to_response('simulation.html',
-            {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,'reqs':reqs,
+            {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
                         'ensemble':ensemble,'tabs':tabs(self.centreid,'Update')})
         
     def edit(self,request,fix=False):
@@ -185,40 +163,41 @@ class simulationHandler(object):
             {'c':c,'experiments':exp,
             'tabs':tabs(c.id,'Sims'),'notAjax':not request.is_ajax()})
  
-    def conformanceEdit(self,request,req_id):
-        ''' Handle a specific conformance within a simulation '''
-        # this should only be called as a form post ...
-        backURL=reverse('cmip5q.protoq.views.simulationEdit',
-            args=(self.centreid,self.simid,))
-        if request.method=='GET':
-            return HttpResponseRedirect(backURL)
-        elif request.method=='POST':
-            c,s,r=(self.centre,
-                Simulation.objects.get(pk=self.simid),
-                NumericalRequirement.objects.get(pk=req_id))
-            conformance=GetConformance(r,c,s)
-            cform=MyConformanceForm(request.POST,instance=conformance)
-            cform.specialise(c)
-            url=reverse('cmip5q.protoq.views.conformanceEdit',args=(c.id,s.id,r.id))
-            if cform.is_valid():
-                if conformance is None:
-                    co=cform.save(commit=False)
-                    co.centre=c
-                    co.simulation=s
-                    co.requirement=r
-                    co.save()
-                else: cform.save()
-                if request.is_ajax():
-                    r.con=conform(url,cform)
-                    return render_to_response('conformance.html',{'r':r})
-                else:return HttpResponseRedirect(backURL)
+    def conformanceMain(self,request):
+        ''' Displays the main conformance view '''
+
+        print 'ss',self.simid
+        s=Simulation.objects.get(pk=self.simid)
+        e=s.experiment
+        
+        urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
+                    args=(self.centreid,s.id,)),
+              'mods':reverse('cmip5q.protoq.views.list',
+                    args=(self.centreid,'codemodification','simulation',s.id,)),
+              'sim':reverse('cmip5q.protoq.views.simulationEdit',
+                    args=(self.centreid,s.id,))
+                    }
+        con=Conformance.objects.filter(simulation=s)
+        if len(con)==0:
+            # we need to set up the conformances!
+             reqs=e.requirements.all()
+             for r in reqs:
+                 c=Conformance(requirement=r,simulation=s)
+                 c.save()
+                 
+        if request.method=='POST':
+            cformset=MyConformanceFormSet(s,request.POST)
+            if cformset.is_valid():
+                cformset.save()
+                return HttpResponseRedirect(urls['self'])
             else:
-                # need to hand it back somehow ...
-                self.errors[r]=cform
-                if request.is_ajax():
-                    #just return a conformance form alone ...
-                    r.con=conform(url,cform)
-                    return render_to_response('conformance.html',{'r':r})
-                else: return self.edit(request,fix=True)
-       
+                cformset.specialise()
+        elif request.method=='GET':
+            cformset=MyConformanceFormSet(s)
+            cformset.specialise()
+          
+        return render_to_response('conformance.html',{'s':s,'e':e,'cform':cformset,
+                    'urls':urls,'tabs':tabs(self.centreid,'tmp')})
+  
+    
                 
