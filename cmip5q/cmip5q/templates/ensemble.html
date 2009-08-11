@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<h1> Physical Ensemble Characteristics for simulation: "{{s}}" </h1>
+</div>
+<div class="boxer">
+<div class="boxer2">
+<center>
+<form action={{urls.self}} method="POST">
+<table>
+{{eform.as_table}}
+</table>
+<input id="subDatBut" type="submit" value="Save Description">
+</form>
+</center>
+</div>
+<div class="boxer">
+<h4> Code Modifications associated with this ensemble </h4>
+<table>
+{% for c in codeMods %}
+<tr class="{% cycle 'row1' 'row2'%}"><td><a href="{{c.editURL}}">{{c}}</a></td></tr>
+{% endfor %}
+</table>
+</div>
+<div>
+<center>
+<a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>,
+<a id="codebut" href="{{urls.mods}}"> Assign Code Modifications </a>
+</center>
+</div>
+</div>
+<script type="text/javascript">
+var subDatBut = new YAHOO.widget.Button("varSubBut",
+                {value:"varSubButvalue"});
+var oLinkButton1 = new YAHOO.widget.Button("simbut");
+var oLinkButton2 = new YAHOO.widget.Button("codebut");
+</script>
+
+
+{% endblock%}

@@ -81,6 +81,7 @@ class simulationHandler(object):
         ''' This method handles the form itself for both the add and edit methods '''
         logging.debug('entering simulation handle routine')
         reqs=e.requirements.all()
+        ensemble=0
         
         urls={
               'data':reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid)),
@@ -92,7 +93,10 @@ class simulationHandler(object):
             urls['bc']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'simulation',s.id,'boundarycondition'))
             reqs=self.__conformances(s,reqs)
-        print urls
+            if s.ensembleMembers > 1:
+                urls['ens']=reverse('cmip5q.protoq.views.ensemble',
+                    args=(self.centreid,s.id,))
+                ensemble=PhysicalEnsemble.objects.filter(simulation=s)
         
         if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
@@ -112,7 +116,7 @@ class simulationHandler(object):
         
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,'reqs':reqs,
-                        'tabs':tabs(self.centreid,'Update')})
+                        'ensemble':ensemble,'tabs':tabs(self.centreid,'Update')})
         
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''

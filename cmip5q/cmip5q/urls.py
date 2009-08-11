@@ -74,7 +74,13 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<cen_id>\d+)/help/$',
             'cmip5q.protoq.views.help'),                  
     (r'^cmip5/(?P<cen_id>\d+)/about/$',
-            'cmip5q.protoq.views.about'),                   
+            'cmip5q.protoq.views.about'),     
+                              
+    # ensembles ...
+    ('^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/$',
+            'cmip5q.protoq.views.ensemble'),
+    ('^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/(?P<ens_id>\d+)/$',
+            'cmip5q.protoq.views.ensemble'),                                               
                           
     #### generic simple views
     ('^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/$',

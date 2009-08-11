@@ -13,20 +13,24 @@
         </div>
         <div class="boxer">
             {% ifnotequal label "Update" %}
-            <p>After you have saved the initial simulation description, a set of buttons to add further
-            simulation characteristics will appear here.</p>
+                <p>After you have saved the initial simulation description, a set of buttons to 
+                add further simulation characteristics will appear here.</p>
             {% else %}
-            <h4> File Dependencies </h4>
-            <p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>
-            <p><a id="bclinkbut" href="{{urls.bc}}">Boundary Conditions</a></p>
-            <h4> Experiment Criteria</h4>
-            Conformance
-            <h4> Ensemble Characteristics </h4>
-             {% if ensemble %}
-             Physical or Initial
-            {% else %}
-            Not an ensemble
-            {% endif %}
+                <h4> File Dependencies </h4>
+                <p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>
+                <p><a id="bclinkbut" href="{{urls.bc}}">Boundary Conditions</a></p>
+                <h4> Experiment Criteria</h4>
+                Conformance
+                <h4> Ensemble Characteristics </h4>
+                {% ifnotequal ensemble 0 %}
+                    {% if s.physicalEnsemble %}
+                    <p><a id="enslinkbut" href="{{urls.ens}}"> Describe Ensemble</a></p>
+                    {% else %}
+                    <p> Initial Condition ensemble </p>
+                    {% endif %}
+                {% else %}
+                    Not an ensemble
+                {% endifnotequal %}
             {% endifnotequal %}
         </div>
         </td>
@@ -43,7 +47,10 @@
                 <tr><td>Contact Name:{{simform.contact.errors}} </td><td>{{simform.contact}}</td></tr>
                 <tr><td> Simulation used:  </td><td>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
                 on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
-                <tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}</td></tr>
+                <tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
+                    (physical ensemble:{{simform.physicalEnsemble.errors}}
+                    {{simform.physicalEnsemble}})
+                </td></tr>
                 <tr><td>Description (notes){{simform.description.errors}}</td><td>{{simform.description}}</td></tr>
                 <tr><td colspan="2">
                 <center><input id="simFormButton" type="submit" value="{{label}}"/>
@@ -57,11 +64,17 @@
 </table>
 <script type="text/javascript">
     var oLinkButton1 = new YAHOO.widget.Button("iclinkbut"); 
-     var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
+    var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
+    var oLinkButton3 = new YAHOO.widget.Button("enslinkbut"); 
     var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
 </script>
+
 <div class="boxer">
     <h4> Initial and Boundary Conditions </h4>
+    {% ifnotequal label "Update" %}
+    <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
+    {% endifnotequal %}
+    {% ifequal label "Update" %}
     <p>(You can modify these using the buttons on the left hand menu.)</p>
     <table>
     {% if s.initialCondition %}
@@ -74,12 +87,14 @@
     {% endfor %}
     </table>
     <p class="cmip5q"> Need to put some guidance on status of filling out boundary conditions </p>
+    {% endifequal %}
 </div>
 <div class="boxer backgrey">
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
 {% ifnotequal label "Update" %}
-<p class="red"> This section cannot be filled in until the general characteristics have been submitted </p>
+<p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
 {% endifnotequal %}
+
 <p class="guidance"> Each experiment within CMIP5 has a set of defined requirements, which might be to use specific boundary conditions, or
 to make changes to some code to make some specific thing happen. Some requirements might be met by either approach. In this
 section we ask you to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuration of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
@@ -129,7 +144,6 @@ not just those from within the specific model ... until we fix that, watch out!<
 {% endfor %}
 </table>
 {% endifequal %}
-
 </div>
         
 {% endblock %}

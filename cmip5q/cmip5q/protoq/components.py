@@ -266,9 +266,6 @@ class componentHandler(object):
             elif ctype == 'external':
                 Extform=MyCouplingFormSet(self.component,0,request.POST,prefix='Ext')
                 if Extform.is_valid():
-                    f=file('findoutwhy.html','w')
-                    f.write(str(Extform))
-                    f.close()
                     Extform.save()
                     return HttpResponseRedirect(okURL)
                 else:

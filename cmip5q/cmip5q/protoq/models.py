@@ -240,7 +240,22 @@ class CodeModification(models.Model):
 
 class PhysicalEnsemble(models.Model):
     ensembleDescription=models.TextField(blank=True,null=True)
-    codeMods=models.ManyToManyField(CodeModification)
+    codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
+    simulation=models.ForeignKey(Simulation)
+    
+class EnsembleForm(forms.Form):
+    #We don't build it from a model form, because we only really want
+    #the description from the user, we do the rest by hand.
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    def clean_description(self):
+        data=self.cleaned_data['description']
+        if data=='Describe me':
+            raise forms.ValidationError('Please change the default')
+        return data
+    
+class CodeModificationForm(forms.ModelForm):
+    class Meta:
+        model=CodeModification
     
 class InitialConditionForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))

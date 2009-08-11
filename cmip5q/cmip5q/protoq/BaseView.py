@@ -70,8 +70,8 @@ class BaseViewHandler:
             elif request.method=='POST':
                 form=self._constructForm('POST',request.POST)
         else:
-            editURL=reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url,self.resrourceID,self.targetType,self.targetID,),)
-            instance=self.resource.objects.get(id=self.resurceID)
+            editURL=reverse('cmip5q.protoq.views.edit',args=(self.cid,self.resourceType4url,self.resourceID,self.targetType,self.targetID,),)
+            instance=self.resource.objects.get(id=self.resourceID)
             if request.method=='GET':
                 form=self._constructForm('GET',instance=instance)
             elif request.method=='POST':

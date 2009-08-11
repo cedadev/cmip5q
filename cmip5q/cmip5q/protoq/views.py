@@ -274,6 +274,44 @@ def dataEdit(request,cen_id,object_id=None):
     return render_to_response('data.html',
             {'dform':dform,'editURL':editURL,'tabs':tabs(cen_id,'FileEdit'),
             'notAjax':not request.is_ajax()})
+            
+############# Ensemble View ###############################            
+            
+def ensemble(request,cen_id,sim_id,ens_id=None):
+    ''' Show the physical ensemble description page '''
+    if ens_id is None:
+        s=Simulation.objects.get(id=sim_id)
+        e=PhysicalEnsemble.objects.filter(simulation=s)
+        if len(e)==0:
+            e=PhysicalEnsemble(ensembleDescription='Describe me',simulation=s)
+            e.save()
+        else: e=e[0]     
+    else:
+        e=PhysicalEnsemble.objects.get(id=ens_id)
+        s=e.simulation
+    
+    
+    urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
+          'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
+          'mods':reverse('cmip5q.protoq.views.assign',
+                     args=(cen_id,'ensemble',e.id,'codemodification'))}
+                     
+    if request.method=='GET':
+        eform=EnsembleForm({'description':e.ensembleDescription})
+    elif request.method=='POST':
+        eform=EnsembleForm(request.POST)
+    if request.method=='POST':
+        if eform.is_valid():
+            d=eform.cleaned_data['description']
+            e.ensembleDescription=d
+            e.save()
+            return HttpResponseRedirect(urls['self'])
+    codeMods=e.codeModification.get_query_set()
+    for c in codeMods:
+        c.editURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,'codemodification',c.id,'ensemble',e.id))
+    return render_to_response('ensemble.html',
+               {'s':s,'e':e,'urls':urls,'eform':eform,'codeMods':codeMods,
+               'tabs':tabs(cen_id,'tmp')})
     
 ############ Simple Generic Views ########################
 
@@ -292,22 +330,30 @@ class ViewHandler(BaseViewHandler):
                         'file':[
                                 DataObject,
                                 'file',
-                                DataObjectForm]
+                                DataObjectForm],
+                        'codemodification':[
+                                CodeModification,
+                                'codeModification',
+                                CodeModificationForm]
                                 }
     def __init__(self,cen_id,resourceType,obj_id,target_id,targetType):
         ''' We can have some combination of the above at initialiation time '''
         
         if resourceType not in self.SupportedResources:
-            return HttpResponse('Unknown resource type %s '%resourceType)
+            raise ValueError('Unknown resource type %s '%resourceType)
         
         constraints,targetURL,target=None,None,None
         if targetType is not None:
             try:
-                target={'simulation':Simulation}[targetType].objects.get(id=target_id)
+                target={'simulation':Simulation,
+                        'ensemble':PhysicalEnsemble
+                       }[targetType].objects.get(id=target_id)
             except Exception,e:
                 return HttpResponse(str(e))
             targetURL={'simulation':reverse('cmip5q.protoq.views.simulationEdit',
-                                                       args=(cen_id,target_id,))
+                                            args=(cen_id,target_id,)),
+                       'ensemble':reverse('cmip5q.protoq.views.ensemble',
+                                           args=(cen_id,0,target_id,))
                       }[targetType]
 
         #We may need a constraint tuple to be used by specialisation methods 
