@@ -6,7 +6,6 @@
     </div>
     <div class="boxer">
     <form action='{{url}}' method='post'>
-        {{pform.management_form}}
         <table>
         <tr>
             <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
@@ -21,7 +20,7 @@
         </tr><tr>
         <td colspan="4">Hardware:{{pform.hardware.errors}}{{pform.hardware}}
                         Processor Type: {{pform.processor.errors}}{{pform.processor}}
-                        Interconnect Type: {{pform.interconnnect.errors}}{{pform.interconnect}}</td>
+                        Interconnect Type: {{pform.interconnect.errors}}{{pform.interconnect}}</td>
         </tr><tr>
         <td>Any extra information:{{pform.description.errors}}</td><td colspan="3">{{pform.description}}</td>
         </tr>.     

@@ -1,17 +1,60 @@
-<tr><td>Method: {{r.con.form.method.errors}}</td><td>{{r.con.form.method}}</td>
-    <td>File: {{r.con.form.dataObject.errors}}</td><td>{{r.con.form.dataObject}}</td>
-    <td>Component: {{r.con.form.component.errors}}</td><td>{{r.con.form.component}}</td></tr>
-<tr><td>Description: {{r.con.form.description.errors}}</td><td colspan="5">{{r.con.form.description}}</td></tr>
-<tr><td colspan="6">
-    <center>
-    <input id="inpform{{r.id}}" type="button" value="submit conformance" onClick="conRequest{{r.id}}();">
-    <!-- 
-    <input id="inpform{{r.id}}" type="submit" value="submit conformance">
-    <script type="text/javascript">
-        var conformSubBut{{r.id}} = new YAHOO.widget.Button("conformSubBut{{r.id}}",
-                            {value:"conformSubBut{{r.id}}value"});
-    </script>
-    -->
-    </center>
-</td></tr>
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<h1> How "{{s}}" conforms to the requirements of "{{e}}" </h1>
+</div>
+<div class="boxer">
+<table width="100%">
+<tr><td width="85%">
+<p> On this page we ask you explain how the experimental requirements are satisfied by
+your simulation. The most likely case is that you have chosen initial and boundary
+conditions appropriately, and so you can simply run down each row, and choose which
+initial or boundary condition matches this requirement. In some cases you may have
+made an additional code modification, in which case you probably need to go to
+the code modifications page, describe the code modification(s) and then come
+back to this page so that you can choose the appropriate code modification for a 
+specific requirement. (You might also first need to return to your simulation to
+ensure that all the appropriate boundary and initial conditions are described.)
+</p>
 
+<p class="cmip5q"> Actually we know the conformance type, so we can probably simplify
+this form somewhat. </p>
+</td><td align="right">
+<p class="red"> Save conformances before navigating away </p>
+<p><a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a></p>
+<p><a id="codebut" href="{{urls.mods}}"> Code Modifications </a></p>
+</td></tr>
+</table>
+<div id="data" class="boxer2">
+    <form action="{{urls.self}}" method="POST">
+    {{cform.management_form}}
+    {% for form in cform.forms %}
+        <div class="boxer">
+        <table>
+            <tr><td>
+            <table>
+            <tr class="{% cycle 'row1' 'row2'%}"><td colspan="3">{{form.req}}</td></tr>
+            <tr class="{% cycle 'row2' 'row1'%}">
+            <td>Type:{{form.ctype.errors}}{{form.ctype}}</td>
+            <td>Initial Condition: {{form.initialCondition.errors}}{{form.initialCondition}}</td>
+            <td>Boundary Condition: {{form.boundaryCondition.errors}}{{form.boundaryCondition}}</td>
+            </table>
+            </td>
+            <td> Code Modification: {{form.codeModification.errors}}{{form.codeModification}}</td>
+            </tr>
+        </table> 
+        {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+        </div>
+    {% endfor %}
+    <center>
+    <input id="subDatBut" type="submit" value="Save Conformances"></center>
+    </form>
+</div>
+</div>
+<script type="text/javascript">
+var subDatBut = new YAHOO.widget.Button("varSubBut",
+                {value:"varSubButvalue"});
+var oLinkButton1 = new YAHOO.widget.Button("simbut");
+var oLinkButton2 = new YAHOO.widget.Button("codebut");
+</script>
+{% endblock%} 

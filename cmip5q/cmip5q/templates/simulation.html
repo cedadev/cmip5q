@@ -20,7 +20,7 @@
                 <p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>
                 <p><a id="bclinkbut" href="{{urls.bc}}">Boundary Conditions</a></p>
                 <h4> Experiment Criteria</h4>
-                Conformance
+                <p><a id="conlinkbut" href="{{urls.con}}">Conformance</a></p>
                 <h4> Ensemble Characteristics </h4>
                 {% ifnotequal ensemble 0 %}
                     {% if s.physicalEnsemble %}
@@ -32,6 +32,9 @@
                     Not an ensemble
                 {% endifnotequal %}
             {% endifnotequal %}
+        </div>
+        <div class="boxer">
+        <p class="cmip5q"> Placeholder for validate and view buttons </p>
         </div>
         </td>
         <td valign="top" width="900px">
@@ -66,6 +69,7 @@
     var oLinkButton1 = new YAHOO.widget.Button("iclinkbut"); 
     var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
     var oLinkButton3 = new YAHOO.widget.Button("enslinkbut"); 
+    var oLinkButton4 = new YAHOO.widget.Button("conlinkbut"); 
     var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
 </script>
 
@@ -93,57 +97,10 @@
 <h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
 {% ifnotequal label "Update" %}
 <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
+{% else %}
+<p class="cmip5q"> Placeholder for conformances</p>
 {% endifnotequal %}
 
-<p class="guidance"> Each experiment within CMIP5 has a set of defined requirements, which might be to use specific boundary conditions, or
-to make changes to some code to make some specific thing happen. Some requirements might be met by either approach. In this
-section we ask you to indicate <em> for each requirement </em>  whether the requirement was met by one of <ol><li> the standard configuration of the model,</li> <li> whether an input data file was used, or</li><li>a specific code modification was carried out.</li></ol></p>
-<ul>
-<li> <p>Where you indicate the use of a file, you will need to choose a file from a dropdown list of those files which you have <em> already </em> defined. If necessary, use the Files tab button to manage your files, and return here via the Simulations Tab.</li>
-<li> <p>Where you indicate a code modification, please indicate which component was modified, using the drop down list provided. </p>
-<p class="cmip5q"> At the moment the components offered include all those from your centre,
-not just those from within the specific model ... until we fix that, watch out!</p>
-{% ifequal label "Update" %}
-</li>
-</ul>
-<p class="cmip5q"> We can make the defaults for the file/code to be files for i.c and b.c ... </p>
-<p class="cmip5q"> ?? Do we want to ask for references with conformances ?? </p>
-<table width="100%">
-{%for r in reqs %}
-    <!-- FIXME: make this a function -->
-    <!-- Useful for debugging to firefox firebug:
-         console.log("text");
-         console.dir(o{{r.id}});
-         -->
-    <script type="text/javascript">
-        var callback{{r.id}} = {
-            success: function(o{{r.id}})
-                {
-                document.getElementById('replaceMe{{r.id}}').innerHTML = o{{r.id}}.responseText;
-                }
-            };
-        function conRequest{{r.id}}() {
-        YAHOO.log("Initiating AJAX conformance {{r.id}}","info","example");
-        YAHOO.util.Connect.setForm('form{{r.id}}');
-        var connectionObj{{r.id}} = YAHOO.util.Connect.asyncRequest('POST','{{r.con.url}}',callback{{r.id}}); }
-    </script> 
-    <tr>
-    <td width="30%"><table>
-            <tr><td><b>{{r.name}}</b></td></tr>
-            <tr><td>{{r.description}}</td></tr>
-    </table></td>
-    <td id="conform{{r.id}}">
-        <form action="{{r.con.url}}" method="POST" id="form{{r.id}}">
-        {{r.con.form.management}}
-        <table id="replaceMe{{r.id}}">
-            {% include "conformance.html" %}
-        </table>
-        </form>
-    </td>
-    </tr>
-{% endfor %}
-</table>
-{% endifequal %}
 </div>
         
 {% endblock %}
