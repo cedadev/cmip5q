@@ -60,10 +60,7 @@ class simulationHandler(object):
         logging.debug('entering simulation handle routine')
         ensemble=0
         
-        urls={
-              'data':reverse('cmip5q.protoq.views.dataEdit',args=(self.centreid)),
-              'url':url
-                }
+        urls={'url':url}
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'simulation',s.id,'initialcondition',))

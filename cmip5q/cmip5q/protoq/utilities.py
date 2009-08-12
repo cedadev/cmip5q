@@ -8,10 +8,12 @@ class tab:
         self.name=name # what is seen in the tab
         self.url=url
         self.active=active
+        print 't[%s,%s]'%(self.name,self.url)
     def activate(self):
         self.active=1
     def deactivate(self):
         self.active=0
+
 
 class tabs(list):
     ''' Build a list of tabs to be used on each page, passed to base.html '''
@@ -33,6 +35,7 @@ class tabs(list):
         t['Refs']=tab('References',
                 reverse('cmip5q.protoq.views.referenceList',args=(centre_id,)))
         t['Files']=tab('Files',
+                #reverse('cmip5q.protoq.views.list',args=(centre_id,'file',)))
                 reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
         t['Help']=tab('Help',
                 reverse('cmip5q.protoq.views.help',args=(centre_id,)))
@@ -46,6 +49,7 @@ class tabs(list):
         for key in ('Sims','Files','Refs'):self.append(t[key])
         if 'Extra' in t.keys(): self.append(t['Extra'])
         for key in ('Help','About'): self.append(t[key])
+        print self
 
 class ParamRow(object):
     ''' used to monkey patch our special parameter forms '''

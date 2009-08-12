@@ -12,12 +12,10 @@
 {% endif %}
 </div>
 <div class="boxer">
-<p> Add {% if showChoices %} another{% else %} one{% endif %}: </p>
+<h4> Add {% if showChoices %} another{% else %} one{% endif %}: </h4>
 <div id="data">
     <form action="{{editURL}}" method="POST">
-       <table>
        {% include editTemplate %}
-       </table>
     </form>
 </div>
 

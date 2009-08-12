@@ -176,7 +176,7 @@ class Coupling(models.Model):
         if self.internal:
             return '%s %s couplingto %s'%(self.component,self.couplingVar,self.target)
         else:
-            return '%s %s coupling'%(self.component,self.couplingVar) 
+            return '%s (%s)'%(self.couplingVar,self.component) 
     
 class CouplingTransform(models.Model):
     ''' Eventually replace with mindmap stuff '''
@@ -208,7 +208,7 @@ class BoundaryCondition(models.Model):
     files=models.ForeignKey(DataObject,blank=True,null=True)
     coupling=models.ForeignKey(Coupling,blank=True,null=True)
     def __unicode__(self):
-        return '%s:%s'%(self.coupling,self.files)
+        return 'Coupling "%s" to file "%s"'%(self.coupling,self.files)
     
 class CodeModification(models.Model):
     mnemonic=models.SlugField()
