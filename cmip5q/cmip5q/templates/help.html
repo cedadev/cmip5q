@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 {% block content %} 
-Help Content to Appear Here
+<h1> General Introduction </h1>
+<p class="cmip5q"> Clearly much more has to be written here </p>
+<h4> Basic Concepts </h4>
+<ol>
+<li> Each CMIP5 modelling centre is running <em> Simulations </em> which run <em> Models </em> on <em> Platforms </em>.</li>
+<li>The <em> Models </em> are made up of <em>Components</em></li>
+<li>The top level components under models can be <em> coupled </em> to other components, or to files. 
+Coupling to other components are termed <em> internal couplings</em>, those which are intended to be coupled to files are termed <em> external couplings</em>. We resolve internal couplings when we describe models. We resolve external couplings as part of <em> boundary condition </em> descriptions when describing <em> simulations </em>.</li>
+<li> When describing simulations we also have to clearly explain how the simulation has met the 
+<em> numerical requirements </em> of the <em> experiment </em> with which it is associated. This is done via the <em> conformance </em> page, which maps the requirements onto initial and boundary conditions (and if necessary <em> code modifications </em>).
+</li>
+</ol>
 
-<h4> Frequently Asked Questions </h4>
+<h1> Frequently Asked Questions </h1>
 <ol>
 <li> <p>Why don't you ask about the outputs from components?</p>
 <p> Because we tie the outputs to the "realms" (the top level components under
