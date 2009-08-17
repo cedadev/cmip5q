@@ -14,10 +14,11 @@
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition" >
+		<id xsi:type="Identifier">6.7c.ic</id>
+		<name>InitCond_PreInd3.1</name>
 		<description>
 			Initial Conditions are supplied from the Pre-Industrial control run 3.1
 		</description>
-		<id xsi:type="Identifier">6.7c.ic</id>
 	</numericalRequirement>
 		
 	<!-- Boundary/Forcing Conditions -->
