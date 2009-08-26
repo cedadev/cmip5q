@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
+
+    
+    <rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
+    <why/>
+        
+    <!-- Initial Conditions -->
+	<numericalRequirement xsi:type="InitialCondition">
+        <id xsi:type="Identifier">ic.021</id>
+        <name>3.2E.ic</name>
+        <description>Additional runs, initialised at different points in the control run</description>
+    </numericalRequirement>
+    
+    <!-- Boundary/Forcing Conditions -->
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.011</id>
+        <name>3.2E.bc.wmg_anth.conc</name>
+        <description>Imposed changing concentrations of historical anthropogenic well mixed gases, including CO2</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.012</id>
+        <name>3.2E.bc.wmg_volc.conc</name>
+        <description>Imposed changing concentrations of historical volcanic well mixed gases, including CO2</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.013</id>
+        <name>3.2E.bc.sls.conc</name>
+        <description>Imposed changing concentrations of historical short lived gas species</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.014</id>
+        <name>3.2E.bc.aer_nat.conc</name>
+        <description>Imposed changing concentrations of historical natural aerosols</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.015</id>
+        <name>3.2E.bc.aer_anth.conc</name>
+        <description>Imposed changing concentrations of historical anthropogenic aerosols</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.016</id>
+        <name>3.2E.bc.aer_pre_nat.conc</name>
+        <description>Imposed changing concentrations of historical natural aerosol precursors</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.017</id>
+        <name>3.2E.bc.aer_pre_anth.conc</name>
+        <description>Imposed changing concentrations of historical anthropogenic aerosol precursors</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.018</id>
+        <name>3.2E.bc.sls.em</name>
+        <description>Imposed changing emissions of historical short lived gas species</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.019</id>
+        <name>3.2E.bc.aer_nat.em</name>
+        <description>Imposed changing emissions of historical natural aerosols </description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.020</id>
+        <name>3.2E.bc.aer_anth.em</name>
+        <description>Imposed changing emissions of historical anthropogenic aerosols</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.021</id>
+        <name>3.2E.bc.solar</name>
+        <description>Imposed historical changing solar forcing</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.022</id>
+        <name>3.2E.bc.LandUse</name>
+        <description>Imposed historical changing land use</description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.049</id>
+        <name>3.2E.bc.aer_pre_nat.em</name>
+        <description>Imposed changing emissions of historical natural aerosol precursors </description>
+    </numericalRequirement>
+    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.050</id>
+        <name>3.2E.bc.aer_anth.em</name>
+        <description>Imposed changing emissions of historical anthropogenic aerosol precursors</description>
+    </numericalRequirement>
+    
+    <shortName>
+		CMIP5_NumReq_3.2E
+	</shortName>
+    <longName> 
+		CMIP5 Tier 1 long-term experiment 3.2E - Historical ensemble
+	</longName>
+    
+    <calendar>
+		<daily-360>
+			<range>
+				<closedDateRange></closedDateRange>
+			</range>
+		</daily-360>
+	</calendar>
+	
+    <requiredDuration xsi:type="ClosedDateRange">
+        <startDate>1850-01-01T00:00:00Z</startDate>
+        <endDate>2006-01-01T00:00:00Z</endDate>
+    </requiredDuration>
+    <author>
+		<gmd:CI_ResponsibleParty>
+			<gmd:individualName>
+				<gco:CharacterString>
+					Gerard Devine
+				</gco:CharacterString>
+			</gmd:individualName>
+			<gmd:organisationName>
+				<gco:CharacterString>
+					NCAS-CMS, University of Reading
+				</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:electronicMailAddress>
+								<gco:CharacterString>
+									g.m.devine@reading.ac.uk
+								</gco:CharacterString>
+							</gmd:electronicMailAddress>
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeList="originator"/>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</author>
+	<documentID xsi:type="Identifier">
+	</documentID>
+	<creationDate>
+		2009-06-23T15:00:00Z
+	</creationDate>
+    
+</numericalExperiment>
