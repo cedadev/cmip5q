@@ -18,7 +18,7 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
      
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
-realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBioGeoChemistry')
+realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBioGeoChemistry','AtmosChem','Aerosol')
              
 # controlled vocabulary for file formats
 FileFormats=('NetCDF','Grib','PP','Excel','Text','HDF','Other')

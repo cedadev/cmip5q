@@ -151,7 +151,7 @@ class simulationHandler(object):
         for e in Experiment.objects.all():
             sims=[s for s in e.simulation_set.filter(centre=c.id)]
             for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))
-            exp.append(etmp(e.docID,sims,e.id))
+            exp.append(etmp(e.longName,sims,e.id))
             print 'loading experiment %s (%s)'%(e.id,e.docID)
         
         logging.info('Viewing simulation %s'%c.id)

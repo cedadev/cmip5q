@@ -89,6 +89,8 @@ class Experiment(models.Model):
     why=models.TextField(blank=True,null=True)
     requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
     docID=models.CharField(max_length=128)
+    shortName=models.CharField(max_length=64)
+    longName=models.CharField(max_length=256,blank=True,null=True)
     startDate=models.CharField(max_length=32)
     endDate=models.CharField(max_length=32)
     def __unicode__(self):

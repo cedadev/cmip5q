@@ -23,19 +23,20 @@ class numericalRequirement:
     def __init__(self,elem):
         self.description=getText(elem,'description')
         self.id=getText(elem,'id')
+        self.name=getText(elem,'name')
         
         if typekey in elem.attrib.keys():
             self.type=elem.attrib[typekey]
         else: self.type=''
        
-        if not self.id or self.id=='':
+        if not self.name or self.name=='':
             logging.debug('Numerical Requirement %s [%s,%s]'%(self.id,self.description,self.type))
         # FIXME assumes no xlinks
 
     def load(self):
         ''' Load into django database '''
         n=NumericalRequirement(description=self.description,
-                               name=self.id,
+                               name=self.name,
                                type=self.type)
         n.save()
         return n.id
@@ -64,7 +65,10 @@ class NumericalExperiment:
         self.duration=[getText2(self.root,i) for i in (s,e)]
                       
         self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
-        logging.debug('Experiment %s has %s requirements'%(self.docID,len(self.numericalRequirements)))
+        self.shortName=getText(self.root,'shortName')
+        self.longName=getText(self.root,'longName')
+        logging.debug(
+           'Experiment %s has %s requirements'%(self.shortName,len(self.numericalRequirements)))
    
     def load(self):
         ''' Loads information into the django database '''
@@ -72,8 +76,10 @@ class NumericalExperiment:
         E=Experiment(rationale=self.rationale,
                      why=self.why,
                      docID=self.docID,
+                     shortName=self.shortName,
                      startDate=self.duration[0],
                      endDate=self.duration[1])
+        if self.longName is not None: E.longName=self.longName
         
         E.save()   # we need to do this before we can have a manytomany field instance
         
