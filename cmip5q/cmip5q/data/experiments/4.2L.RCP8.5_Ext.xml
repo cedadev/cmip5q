@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
+    
+    <rationale> Extended future projection (2006-2300) forced by RCP8.5.
+        RCP8.5 is a representative concentration pathway which approximately results in a radiative 
+        forcing of 8.5 W m-2 at year 2100, relative to pre-industrial conditions.
+        RCPs are time-dependent, consistent projections of emissions and concentrations 
+        of radiatively active gases and particles
+    </rationale>
+    <why/>
+    
+    
+    <!-- Initial Conditions -->
+    <numericalRequirement xsi:type="InitialCondition">
+        <id xsi:type="Identifier">ic.004</id>
+        <name>4.2L.ic</name>
+        <description> Initial conditions are from the end of experiment 3.2_historical </description>
+    </numericalRequirement>
+    
+    <!-- Boundary/Forcing Conditions -->
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.035</id>
+        <name>4.2L.bc.wmg.conc</name>
+        <description>Imposed changing concentrations of RCP8.5 well mixed gases, including CO2</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.036</id>
+        <name>4.2L.bc.sls.conc</name>
+        <description>Imposed changing concentrations of RCP8.5 short lived gas species</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.037</id>
+        <name>4.2L.bc.aer.conc</name>
+        <description>Imposed changing concentrations of RCP8.5 aerosols </description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.038</id>
+        <name>4.2L.bc.aer_pre.conc</name>
+        <description>Imposed changing concentrations of RCP8.5 aerosol precursors </description>
+    </numericalRequirement>    
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.039</id>
+        <name>4.2L.bc.wmg.em</name>
+        <description>Imposed changing emissions of RCP8.5 well mixed gases, including CO2</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.040</id>
+        <name>4.2L.bc.sls.em</name>
+        <description>Imposed changing emissions of RCP8.5 short lived gas species </description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.041</id>
+        <name>4.2L.bc.aer.em</name>
+        <description>Imposed changing emissions of RCP8.5 aerosols </description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.042</id>
+        <name>4.2L.bc.aer_pre.em</name>
+        <description>Imposed changing emissions of RCP8.5 aerosol precursors </description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.043</id>
+        <name>4.2L.bc.LandUse</name>
+        <description>Imposed changing RCP8.5 land use </description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.034</id>
+        <name>4.2L.bc.aer_volc.conc</name>
+        <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
+    </numericalRequirement>
+    
+    <numericalRequirement>
+        <id xsi:type="Identifier">bc.095</id>
+        <name>4.2L.bc.ext2300</name>
+        <description>RCP8.5 conditions extended through year 2300</description>
+    </numericalRequirement>
+    
+    
+    <shortName>
+		CMIP5_NumReq_4.2L
+	</shortName>
+    <longName> CMIP5 Tier-2 future experiment 4.2L</longName>
+    
+    <calendar>
+		<daily-360>
+			<range>
+				<closedDateRange></closedDateRange>
+			</range>
+		</daily-360>
+	</calendar>
+	<requiredDuration xsi:type="ClosedDateRange">
+		<startDate>2006-01-01T00:00:00Z</startDate>
+        <endDate>2300-01-01T00:00:00Z</endDate>
+	</requiredDuration>
+	
+	<author>
+		<gmd:CI_ResponsibleParty>
+			<gmd:individualName>
+				<gco:CharacterString>
+					Gerard Devine
+				</gco:CharacterString>
+			</gmd:individualName>
+			<gmd:organisationName>
+				<gco:CharacterString>
+					NCAS-CMS, University of Reading
+				</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:electronicMailAddress>
+								<gco:CharacterString>
+									g.m.devine@reading.ac.uk
+								</gco:CharacterString>
+							</gmd:electronicMailAddress>
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeList="originator"/>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</author>
+	<documentID xsi:type="Identifier">
+	</documentID>
+	<creationDate>
+		2009-06-23T15:00:00Z
+	</creationDate>
+</numericalExperiment>
