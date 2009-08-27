@@ -40,6 +40,8 @@ class Component(Doc):
     implemented=models.BooleanField(default=1)
     visited=models.BooleanField(default=0)
     controlled=models.BooleanField(default=0)
+    model=models.ForeignKey('self',blank=True,null=True,related_name="parent_model")
+    realm=models.ForeignKey('self',blank=True,null=True,related_name="parent_realm")
     
     # the following are common parameters
     geneology=models.TextField(blank=True,null=True)
@@ -49,8 +51,23 @@ class Component(Doc):
     
     # direct children components:
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
-    
+   
     centre=models.ForeignKey('Centre',blank=True,null=True)
+    
+class ComponentInput(models.Model):
+    ''' This class is used to capture the inputs required by a component '''
+    handle=models.CharField(max_length=24)
+    name=models.CharField(max_length=128)
+    #mainly we're going to be interested in boundary condition inputs:
+    bc=models.BooleanField(default=True)
+    #the component which owns this input (might bubble up from below realm)
+    owner=models.ForeignKey(Component,related_name="input_owner")
+    #strictly we don't need this, we should be able to get it by parsing
+    #the owners for their parent realms, but it's stored when we create
+    #it to improve performance:
+    realm=models.ForeignKey(Component,related_name="input_realm")
+    def __unicode__(self):
+        return '%s:%s'%(owner,handle)
     
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''

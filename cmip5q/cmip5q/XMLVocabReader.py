@@ -7,6 +7,7 @@ from protoq.models import *
 from xml.etree import ElementTree as ET
 import uuid
 import logging
+from XMLinitialiseQ import realms
 
 class XMLVocabReader:
 
@@ -73,7 +74,7 @@ class ComponentParser(Parser):
                 p.save()
                 logging.info('Added parameter %s to component %s (%s)'%(paramName,self.component.abbrev,self.component.id))
                
-	def add(self, doSubs):
+	def add(self, doSubs, model=None, realm=None):
                 u=str(uuid.uuid1())
 		component = Component(
                         title='',
@@ -86,7 +87,16 @@ class ComponentParser(Parser):
 		if self.parent.tag != "component":
 			logging.debug("Top-level component %s"%self.item.attrib['name'])
                         self.topLevelID=component.id
-
+                        model=component
+                elif component.scienceType in realms:
+                    realm=component
+                    component.model=model
+                else:
+                    component.model=model
+                    # if realm doesn't exist, then somehow we've broken our controlled vocab
+                    # realm relationship.
+                    component.realm=realm
+                  
 		if doSubs:
 			''' go ahead and process subelements, too '''
 			# 1. Component children of this parent
@@ -95,7 +105,7 @@ class ComponentParser(Parser):
 					logging.debug("Found child : %s"%subchild.tag)
 					subComponentParser = ComponentParser(subchild, self.item, self.centre, self.author)
 					# Handle child components of this one (True = recursive)
-					child=subComponentParser.add(True)
+					child=subComponentParser.add(True,model=model,realm=realm)
                                         logging.debug("Adding sub-component %s to component %s"%(child.abbrev, component.abbrev))
 		                        component.components.add(child)
                                 #2. Parameter children of this parent
