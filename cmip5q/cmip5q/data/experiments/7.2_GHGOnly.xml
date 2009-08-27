@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
+
+	<rationale/>
+	<why/>
+	
+	<!-- Initial Conditions -->
+    <numericalRequirement xsi:type="InitialCondition">
+        <id xsi:type="Identifier">ic.002</id>
+        <name>7.2.ic</name>
+        <description> Initial conditions are from experiment 3.1.pi-control </description>
+    </numericalRequirement>
+    
+    <!-- Boundary/Forcing conditions -->
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.011</id>
+        <name xsi:type="Identifier">7.2.bc.wmg_anth.conc</name>
+        <description>Imposed changing concentrations of historical anthropogenic well mixed gases, including CO2</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.003</id>
+        <name xsi:type="Identifier">7.2.bc.sls.conc</name>
+        <description>Prescribed atmospheric concentration of pre-industrial short lived (reactive)
+            gas species</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.004</id>
+        <name xsi:type="Identifier">7.2.bc.nat_aer.conc</name>
+        <description>Prescribed concentrations of pre-industrial natural aerosols</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.005</id>
+        <name xsi:type="Identifier">7.2.bc.nat_aer_precur.conc</name>
+        <description>Prescribed concentrations of pre-industrial natural aerosol
+            precursors</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.006</id>
+        <name xsi:type="Identifier">7.2.bc.sl_aer.conc</name>
+        <description>Prescribed concentrations of pre-industrial short lived (reactive) aerosol
+            species</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.007</id>
+        <name xsi:type="Identifier">7.2.bc.nat_aer.em</name>
+        <description>Prescribed emissions of pre-industrial natural aerosols</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.008</id>
+        <name xsi:type="Identifier">7.2.bc.nat_aer_precur.em</name>
+        <description>Prescribed emissions of pre-industrial natural aerosol precursors</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.009</id>
+        <name xsi:type="Identifier">7.2.bc.sl_aer.em</name>
+        <description>Prescribed emissions of pre-industrial short lived (reactive) aerosol
+            species</description>
+    </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.010</id>
+        <name xsi:type="Identifier">7.2.bc.LandUse</name>
+        <description>Unperturbed Pre-Industrial Land Use</description>
+    </numericalRequirement>
+
+            
+   
+   <shortName>
+		CMIP5_NumReq_7.2
+	</shortName>
+    <longName> 
+		CMIP5 Tier 1 experiment 7.2 - GHG-only.
+	</longName>
+     
+   <calendar>
+		<daily-360>
+			<range>
+				<closedDateRange></closedDateRange>
+			</range>
+		</daily-360>
+	</calendar>
+    <requiredDuration xsi:type="ClosedDateRange">
+		<!-- Idealised run so dates given here are only dummy values -->
+		<startDate> 1850-01-01T00:00:00Z</startDate>
+		<endDate> 2006-01-01T00:00:00Z</endDate>
+	</requiredDuration>
+    <author>
+		<gmd:CI_ResponsibleParty>
+			<gmd:individualName>
+				<gco:CharacterString>
+					Gerard Devine
+				</gco:CharacterString>
+			</gmd:individualName>
+			<gmd:organisationName>
+				<gco:CharacterString>
+					NCAS-CMS, University of Reading
+				</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:electronicMailAddress>
+								<gco:CharacterString>
+									g.m.devine@reading.ac.uk
+								</gco:CharacterString>
+							</gmd:electronicMailAddress>
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeList="originator"/>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</author>
+    <documentID xsi:type="Identifier">
+    </documentID>
+    <creationDate>
+		2009-06-26T12:34:00Z
+	</creationDate>   
+</numericalExperiment>
