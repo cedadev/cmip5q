@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<h1> Inputs for component: "{{c.abbrev}}"</h1>
+{% if c.isRealm %} <p>Note that these should include all inputs from components described
+beneath this one </p> {% endif %}
+</div>
+
+<div class="boxer">
+<div class="boxer2">
+    <form action="{{urls.ok}}" method="POST">
+        {{form}} 
+    <center><input id="InternalBut" type="submit" value="Save"></center>
+    </form>
+</div>
+<p><a href="{{urls.self}}"> Return to {{c.abbrev}}</a></p>
+</div>
+
+{% endblock%} 

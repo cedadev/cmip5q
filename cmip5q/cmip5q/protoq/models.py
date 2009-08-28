@@ -69,7 +69,7 @@ class ComponentInput(models.Model):
     #it to improve performance:
     realm=models.ForeignKey(Component,related_name="input_realm")
     def __unicode__(self):
-        return '%s:%s'%(owner,handle)
+        return '%s:%s'%(self.owner,self.abbrev)
     
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''

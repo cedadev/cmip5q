@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Coupling/$','cmip5q.protoq.views.componentCup'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Coupling/(?P<ctype>\D+)/$$','cmip5q.protoq.views.componentCup'),  
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Outputs/$','cmip5q.protoq.views.componentOut'),
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Inputs/$','cmip5q.protoq.views.componentInp'),   
     #
     # REFERENCES
     #          

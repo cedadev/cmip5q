@@ -112,6 +112,11 @@ def componentCup(request,centre_id,component_id,ctype=None):
     c=componentHandler(centre_id,component_id)
     return c.coupling(request,ctype)
 
+def componentInp(request,centre_id,component_id):
+    ''' Return inputs for a component '''
+    c=componentHandler(centre_id,component_id)
+    return c.inputs(request)
+
 def componentNum(request,centre_id,component_id):
     ''' Return numerics of the component '''
     c=componentHandler(centre_id,component_id)

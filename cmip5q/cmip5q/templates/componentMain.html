@@ -86,6 +86,12 @@
     <div class="boxer">
         {% if inps|length %}
         <h4> Inputs required by this component are: </h4>
+        <table>
+        <tr><th> Short Name </th><th> Description </th></tr>
+        {% for i in inps %}
+        <tr><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
+        {% endfor %} 
+        </table>
         {% if isRealm %}
         <p class="guidance"> Update this list using the "Modify Inputs" button </p>
         {% endif %}

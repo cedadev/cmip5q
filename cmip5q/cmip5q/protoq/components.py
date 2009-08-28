@@ -17,6 +17,7 @@ import logging
 import os
 
 CouplingFormSet=modelformset_factory(Coupling,exclude=('internal','component'))
+ComponentInputFormSet=modelformset_factory(ComponentInput,exclude=('owner','realm'))
 
 class MyCouplingFormSet(CouplingFormSet):
     ''' This is my implementation of the functionality of Django formsets, but 
@@ -46,6 +47,24 @@ class MyCouplingFormSet(CouplingFormSet):
             f.internal=self.internal
             f.component=self.component
             f.save()
+            
+class MyComponentInputFormSet(ComponentInputFormSet):
+    def __init__(self,component,realm=False,data=None):
+        self.component=component
+        if realm:
+            qset=ComponentInput.objects.filter(realm=component)
+        else:
+            qset=ComponentInput.objects.filter(owner=component)
+        ComponentInputFormSet.__init__(self,data,queryset=qset)
+    def specialise(self):
+        pass
+    def save(self):
+        instances=ComponentInputFormSet.save(self,commit=False)
+        for i in instances:
+            i.owner=self.component
+            i.realm=self.component.realm
+            i.save()
+       
 
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
@@ -75,11 +94,12 @@ class componentHandler(object):
         
         self.tabs=tabs(centre_id,'Update')
         self.component=Component.objects.get(pk=component_id)
-    
+        self.url=reverse('cmip5q.protoq.views.componentEdit',
+                         args=(self.centre_id,self.component.id))
+   
     def add(self):
         '''Add a new root component, essentially all we need to do is return a redirection to an edit '''
-        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,self.component.id,))
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(self.url)
             
     def addsub(self):
         ''' Add a subcomponent to a parent, essentially, we create a subcomponent, and return
@@ -104,13 +124,13 @@ class componentHandler(object):
         
         # find my own urls ...
         urls={}
-        urls['form']=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
+        urls['form']=self.url
         urls['refs']=reverse('cmip5q.protoq.views.assignReferences',args=(self.centre_id,'component',c.id,))
         urls['outputs']=reverse('cmip5q.protoq.views.componentOut',args=(self.centre_id,c.id,))
         urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
         urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
         urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
-        urls['inputs']='FIXME'
+        urls['inputs']=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,c.id))
         urls['view']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
         urls['validate']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
         
@@ -132,7 +152,7 @@ class componentHandler(object):
     
         # this is the automatic machinery ...
         refs=Reference.objects.filter(component__id=c.id)
-        inps=Component.objects.filter(input_owner__id=c.id)
+        inps=ComponentInput.objects.filter(owner__id=c.id)
         
         pform=PropertyForm(c,prefix='props')
         postOK=True
@@ -248,7 +268,25 @@ class componentHandler(object):
             Extform.specialise()
         return render_to_response('coupling.html',{'c':self.component,'urls':urls,
         'Intform':Intform,'Extform':Extform,'tabs':tabs(self.centre_id,'tmp')})
-    
+        
+    def inputs(self,request):
+        ''' Handle the construction of input requirements into a component '''
+        okURL=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,self.id,))
+        urls={'ok':okURL,'self':self.url}
+        if request.method=='POST':
+            Inpform=MyComponentInputFormSet(self.component,self.component.isRealm,
+                                            request.POST)
+            if Inpform.is_valid():
+                Inpform.save()
+                return HttpResponseRedirect(okURL)
+            else:
+                Inpform.specialise()
+        elif request.method=='GET':
+            Inpform=MyComponentInputFormSet(self.component,self.component.isRealm)  
+            Inpform.specialise()
+        return render_to_response('inputs.html',{'c':self.component,'urls':urls,
+                                   'form':Inpform,'tabs':tabs(self.centre_id,'tmp')})
+        
     def outputs(self):
         return HttpResponse('Not implemented')
         

@@ -145,6 +145,7 @@ class ComponentParser:
             realm=component
             component.model=self.model
             component.isRealm=True
+            component.realm=component
         else:
             component.model=self.model
             # if realm doesn't exist, then somehow we've broken our controlled vocab
@@ -158,7 +159,7 @@ class ComponentParser:
                     subComponentParser = ComponentParser(subchild, self.model)
                     # Handle child components of this one (True = recursive)
                     child=subComponentParser.add(True,realm=realm)
-                    logging.debug("Adding sub-component %s to component %s"%(child.abbrev, component.abbrev))
+                    logging.debug("Adding sub-component %s to component %s (model %s, realm %s)"%(child.abbrev, component.abbrev,child.model,child.realm))
                     component.components.add(child)
                 elif subchild.tag == 'parameter': 
                     self.__handleParam(subchild)
@@ -188,5 +189,6 @@ class TestFunctions(unittest.TestCase):
             self.assertEqual(True,c.scienceType in realms)
             self.assertEqual(True,c.isRealm)
             self.assertEqual(False,c.isModel)
+            
                                 
                                 
