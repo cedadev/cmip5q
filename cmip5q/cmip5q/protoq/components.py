@@ -8,7 +8,7 @@ from django.forms.models import modelformset_factory
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import PropertyForm,tabs
-from cmip5q.XMLVocabReader import XMLVocabReader
+from cmip5q.NumericalModel import NumericalModel
 
 from django import forms
 import uuid
@@ -59,10 +59,6 @@ def makeComponent(centre_id,scienceType='sub'):
     return c
     
 class componentHandler(object):
-    # Data directory for retrieving mindmap XML files
-    mindMapDir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                              'data',
-                              'mindmaps')
     
     def __init__(self,centre_id,component_id=None):
         ''' Instantiate a component handler, by loading existing component information '''
@@ -72,26 +68,9 @@ class componentHandler(object):
         
         if component_id is None:
             ''' This is a brand new component '''
-            component=makeComponent(centre_id,scienceType='model')
-            authorN='joe bloggs'
-            authorE='bnl@foo.bar'  # FIXME
-            component.email=authorE
-            component.contact=authorN
-            component.title='GCM Template'
-            component.abbrev='GCM Template'
-            mindmaps=[os.path.join(componentHandler.mindMapDir, f) 
-                      for f in os.listdir(componentHandler.mindMapDir)
-                      if f.endswith('.xml')]
-            for m in mindmaps:
-                x=XMLVocabReader(m, centre_id,authorN,authorE)
-                x.doParse()
-                xx=Component.objects.get(pk=x.topLevelID)
-                component.components.add(xx)
-                #don't know why I have to use the real component instead of ID here.
-                logging.debug('Mindmap %s added with component id %s'%(m,x.topLevelID))
-            component.save()
-            logging.info('Created new component %s in centre %s'%(component.id,centre_id)) 
-            for x in component.components.all(): logging.debug('...component includes %s'%x.abbrev)
+            nm=NumericalModel(0,centre=Centre.objects.get(id=centre_id))
+            nm.read()
+            component=nm.component
             component_id=component.id
         
         self.tabs=tabs(centre_id,'Update')
@@ -131,6 +110,7 @@ class componentHandler(object):
         urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
         urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
         urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
+        urls['inputs']='FIXME'
         urls['view']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
         urls['validate']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
         
@@ -152,12 +132,7 @@ class componentHandler(object):
     
         # this is the automatic machinery ...
         refs=Reference.objects.filter(component__id=c.id)
-        
-        #am I a realm level component?
-        realms=[str(i) for i in Value.objects.filter(vocab=Vocab.objects.get(name="Realms"))]
-        if c.scienceType in realms:
-            realm=1
-        else:realm=0
+        inps=Component.objects.filter(input_owner__id=c.id)
         
         pform=PropertyForm(c,prefix='props')
         postOK=True
@@ -197,11 +172,12 @@ class componentHandler(object):
     
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
-                {'c':c,'subs':subc,'refs':refs,
+                {'c':c,'subs':subc,'refs':refs,'inps':inps,
                 'cform':cform,'pform':pform,
                 'navtree':navtree.html,
                 'urls':urls,
-                'realm':realm,
+                'isRealm':c.isRealm,
+                'isModel':c.isModel,
                 'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
     def manageRefs(self,request):      

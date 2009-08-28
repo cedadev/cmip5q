@@ -43,6 +43,7 @@ class Component(Doc):
     model=models.ForeignKey('self',blank=True,null=True,related_name="parent_model")
     realm=models.ForeignKey('self',blank=True,null=True,related_name="parent_realm")
     isRealm=models.BooleanField(default=False)
+    isModel=models.BooleanField(default=False)
     
     # the following are common parameters
     geneology=models.TextField(blank=True,null=True)
@@ -57,8 +58,8 @@ class Component(Doc):
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
-    handle=models.CharField(max_length=24)
-    name=models.CharField(max_length=128)
+    abbrev=models.CharField(max_length=24)
+    description=models.TextField(blank=True,null=True)
     #mainly we're going to be interested in boundary condition inputs:
     bc=models.BooleanField(default=True)
     #the component which owns this input (might bubble up from below realm)
@@ -384,6 +385,16 @@ class ConformanceForm(forms.ModelForm):
         self.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=relevant_components)
         #self.fields['initialCondition'].queryset
         self.fields['boundaryCondition'].queryset=Coupling.objects.filter(component=model)
+        
+class ComponentInputForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"2"}),required=False)
+    abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
+    class Meta:
+        model=ComponentInput
+    exclude=('owner','realm') # we know these
+    
+    
+    
     
     
         

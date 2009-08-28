@@ -18,7 +18,7 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
      
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
-realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBioGeoChemistry','AtmosChem','Aerosol')
+realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBiogeoChemistry','AtmosChemAndAerosols','Aerosol','LandSurface')
              
 # controlled vocabulary for file formats
 FileFormats=('NetCDF','Grib','PP','Excel','Text','HDF','Other')
@@ -29,10 +29,10 @@ referenceTypes=('Webpage','Online Refereed',
                 'Offline Other')
 
 # these support couplings 
-couplingTypes=('None','offline','ESMF','OASIS3','OASIS4','Other')
-interpolationTypes=('None','Weighted Nearest Neighbour','Weights and Addresses File',
+couplingTypes=('ESMF','OASIS3','OASIS4','Other')
+spatialRegridding=('None','Weighted Nearest Neighbour','Weights and Addresses File',
                    'Bilinear','Bicubic','Conservative','Other')
-interpolationDims=('2D','3D')
+temporalRegridding=('lastAvailable','linearBetween','averaged')
 frequencies=('seconds','minutes','hours','days','months','years','decades')
 
 # and these will support platforms
@@ -77,9 +77,9 @@ def initialise():
     
     #now add couplings vocabularies
     loadvocab('couplingType',couplingTypes)
-    loadvocab('couplingFreq',frequencies)
-    loadvocab('couplingInterp',interpolationTypes)
-    loadvocab('couplingDim',interpolationDims)
+    loadvocab('FreqUnits',frequencies)
+    loadvocab('SpatialRegridding',spatialRegridding)
+    loadvocab('TemporalRegridding',temporalRegridding)
     
     #support for platforms
     loadvocab('hardwareType',hardware)

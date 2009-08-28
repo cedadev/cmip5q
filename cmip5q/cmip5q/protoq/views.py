@@ -11,7 +11,6 @@ from cmip5q.protoq.utilities import PropertyForm, tabs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.references import referenceHandler
-from cmip5q.XMLVocabReader import XMLVocabReader
 from django import forms
 import uuid
 import logging
@@ -329,10 +328,6 @@ class ViewHandler(BaseViewHandler):
                                 InitialCondition,
                                 'initialCondition',
                                 InitialConditionForm],
-                        'boundarycondition':[
-                                BoundaryCondition,
-                                'boundaryCondition',
-                                BoundaryConditionForm],
                         'file':[
                                 DataObject,
                                 'file',
@@ -363,10 +358,10 @@ class ViewHandler(BaseViewHandler):
                       }[targetType]
 
         #We may need a constraint tuple to be used by specialisation methods 
-        if resourceType=='boundarycondition' and targetType=='simulation':
-            # we need to constrain the boundary condition form to the right boundary conditions
-            model=target.numericalModel
-            constraints=(model,)
+        #if resourceType=='boundarycondition' and targetType=='simulation':
+        #    # we need to constrain the boundary condition form to the right boundary conditions
+        #    model=target.numericalModel
+        #    constraints=(model,)
            
         SupportedResource=self.SupportedResources[resourceType]
         # The base view handler needs some or all of this:   
