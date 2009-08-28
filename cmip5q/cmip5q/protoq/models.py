@@ -42,6 +42,7 @@ class Component(Doc):
     controlled=models.BooleanField(default=0)
     model=models.ForeignKey('self',blank=True,null=True,related_name="parent_model")
     realm=models.ForeignKey('self',blank=True,null=True,related_name="parent_realm")
+    isRealm=models.BooleanField(default=False)
     
     # the following are common parameters
     geneology=models.TextField(blank=True,null=True)
@@ -121,7 +122,7 @@ class Simulation(Doc):
     #
     # enforce the following as required via q'logical validation, not form validation.
     initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
-    boundaryCondition=models.ManyToManyField('BoundaryCondition',blank=True,null=True)
+    boundaryCondition=models.ManyToManyField('Coupling',blank=True,null=True)
     physicalEnsemble=models.BooleanField(default=False)
     
 class Centre(Doc):
@@ -176,39 +177,40 @@ class DataObject(models.Model):
         return self.name
         
 class Coupling(models.Model):
-    #parent component:
+    #parent component, must be a model for CMIP5:
     component=models.ForeignKey(Component)
-    #cupling details
+    #coupling for:
+    targetInput=models.ForeignKey(ComponentInput)
+    #coupling details
     couplingType=models.ForeignKey('Value',related_name='couplingTypeVal')
-    couplingFreq=models.ForeignKey('Value',related_name='couplingFreqVal')
-    couplingVar=models.CharField(max_length=128)
-    # I reckon the following is a temporal thing:
-    couplingInputTransform=models.ForeignKey('CouplingTransform',blank=True,null=True)
-    # I reckon the following is a spatial thing:
-    regridder=models.ForeignKey('Regridder',blank=True,null=True)
-    #Subclasses patched into the base class because when I subclassed
-    #I had problems with related name clashes:
-    internal=models.BooleanField()
-    target=models.ForeignKey(Component,related_name='couplingTarget',blank=True,null=True)
-    #we don't couple to files ... because boundary conditions make that link.
+    couplingFreqUnits=models.ForeignKey('Value',related_name='couplingFreqUnits')
+    couplingFreq=models.IntegerField()
+    manipulation=models.TextField(blank=True,null=True)
+    #closures
+    internalClosures=models.ManyToManyField('InternalClosure',blank=True,null=True,symmetrical=False)
+    externalClosures=models.ManyToManyField('ExternalClosure',blank=True,null=True,symmetrical=False)
     def __unicode__(self):
-        if self.internal:
-            return '%s %s couplingto %s'%(self.component,self.couplingVar,self.target)
-        else:
-            return '%s (%s)'%(self.couplingVar,self.component) 
-    
-class CouplingTransform(models.Model):
-    ''' Eventually replace with mindmap stuff '''
-    abbrev=models.SlugField()
-    description=models.TextField(blank=True,null=True)
-    
-class Regridder(models.Model):
-    ''' Eventually replace with mindmap stuff '''
-    abbrev=models.SlugField()
-    description=models.TextField(blank=True,null=True)
-    interpType=models.ForeignKey('Value',related_name='interpTypeVal')
-    dimensionality=models.ForeignKey('Value',related_name='dimensionalityVal')
-    
+        return 'Coupling %s'%self.targetInput
+        
+class CouplingClosure(models.Model):
+    ''' Handles a specific closure to a component '''
+    closed=models.BooleanField(default=False)
+    #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
+    spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridder')
+    temporalRegridding=models.ForeignKey('Value',related_name='%(class)s_TemporalRegridder')
+    inputDescription=models.TextField(blank=True,null=True)
+    def __unicode__(self):
+        return 'Closure %s'%target
+    class Meta:
+        abstract=True
+   
+class InternalClosure(CouplingClosure): 
+    target=models.ForeignKey(Component)
+
+class ExternalClosure(CouplingClosure):
+    ''' AKA boundary condition '''
+    target=models.ForeignKey('DataObject')
+        
 class InitialCondition(models.Model):
     ''' Simulation initial condition '''
     description=models.TextField(blank=True,null=True)
@@ -220,15 +222,7 @@ class InitialCondition(models.Model):
     variables=models.TextField(blank=True,null=True)
     def __unicode__(self):
         return str(self.date)
-     
-class BoundaryCondition(models.Model):
-    ''' Simulation boundary conditions '''
-    description=models.TextField(blank=True,null=True)
-    files=models.ForeignKey(DataObject,blank=True,null=True)
-    coupling=models.ForeignKey(Coupling,blank=True,null=True)
-    def __unicode__(self):
-        return 'Coupling "%s" to file "%s"'%(self.coupling,self.files)
-    
+         
 class CodeModification(models.Model):
     mnemonic=models.SlugField()
     component=models.ForeignKey(Component)
@@ -253,25 +247,9 @@ class Conformance(models.Model):
     # code modification 
     codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
     initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
-    boundaryCondition=models.ForeignKey(BoundaryCondition,blank=True,null=True)
+    boundaryCondition=models.ForeignKey(Coupling,blank=True,null=True)
     def __unicode__(self):
         return "%s for %s"%(self.ctype,self.requirement)
-
-#class ConformanceForm(forms.ModelForm):
-#    class Meta:
-#        model=Conformance
-#    def specialise(self,centre):
-#        # FIXME: need to specialise onto only components owned by the model in the simulation
-#        # FIXME: likewise onto initial and boundary conditions owned by this simulation
-#        pass
-#    def clean(self):
-#       #http://docs.djangoproject.com/en/dev/ref/forms/validation/
-#        cleaned_data=self.cleaned_data
-#       ftype=cleaned_data.get('ctype')
-#       cmods=cleaned_data.get('codeModification')
-#        ic,bc=cleaned_data.get('initialCondition'),cleaned_data.get('boundaryCondition')
-#       print 'learning',ftype,cmods,ic,bc
-#       return cleaned_data
 
 class EnsembleForm(forms.Form):
     #We don't build it from a model form, because we only really want
@@ -296,20 +274,46 @@ class InitialConditionForm(forms.ModelForm):
         
 class BoundaryConditionForm(forms.ModelForm):
     ''' Simulation boundary condition form '''
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+    inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
     class Meta:
-        model=BoundaryCondition
+        model=ExternalClosure
     def specialise(self,model):
         ''' Specialise as it's own method to avoid confusion with POST and GET '''
-        realms=model.components.all()
-        self.fields['coupling'].queryset=Coupling.objects.filter(component__in=realms).filter(internal=0)
+        pass
        
 class CouplingForm(forms.ModelForm):
-    couplingVar=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    manipulation=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
     class Meta:
         model=Coupling
-        exclude=('component')
+        exclude=('component',  # we should always know this
+                 'targetInput', # we generate couplings from these 
+                )
+    #def __init__(self,*args,**kwargs):
+    #    forms.ModelForm.__init__(self,*args,**kwargs)
+    #    vc=Vocab.objects.get(name='CouplingType')
+    #    vu=Vocab.objects.get(name='FreqUnits')
+    #    self.fields['couplingType'].queryset=Value.objects.filter(vocab=vc)
+    #   self.fields['couplingFreqUnits'].queryset=Value.objects.filter(vocab=vu)
+                
+class InternalClosureForm(forms.ModelForm):
+     inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+     class Meta:
+         model=InternalClosure
+     def __init__(self,*args,**kwargs):
+         forms.ModelForm.__init__(self,*args,**kwargs)
+         vs=Vocab.objects.get(name='SpatialRegridding')
+         vt=Vocab.objects.get(name='TemporalRegridding')
+         self.fields['spatialRegridding'].queryset=Value.objects.filter(vocab=vs)
+         self.fields['temporalRegridding'].queryset=Value.objects.filter(vocab=vt)
+     def specialise(self,model):
+         self.fields['target'].queryset=Component.objects.filter(model=model).filter(realm=True)
 
+class ExternalClosureForm(InternalClosureForm):
+     class Meta:
+         model=ExternalClosure
+     def specialise(self,model):
+         pass
+                
 class DataObjectForm(forms.ModelForm):
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
@@ -369,4 +373,17 @@ class PlatformForm(forms.ModelForm):
     class Meta:
         model=Platform
         exclude=('centre','uri')
+        
+class ConformanceForm(forms.ModelForm):
+    class Meta:
+        model=Conformance
+        exclude=('simulation') # we know it
+    def specialise(self,model,simulation):
+        #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
+        relevant_components=Component.objects.filter(model=model)
+        self.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=relevant_components)
+        #self.fields['initialCondition'].queryset
+        self.fields['boundaryCondition'].queryset=Coupling.objects.filter(component=model)
+    
+    
         
