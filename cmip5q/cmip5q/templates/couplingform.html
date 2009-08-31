@@ -1,13 +1,22 @@
 <div class="boxer">
+<h4>{{f.title}}</h4>
+<p>Coupling Type: {{f.cf.couplingType.errors}}{{f.cf.couplingType}}&nbsp;
+Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
+{{f.cf.couplingFreqUnits.errors}}{{f.cf.couplingFreqUnits}}</p>
+<p> Enter zero or more inputs from other components: </p>
+{{ f.ic.management_form}}
 <table>
-<tr class="row1"><td>Coupling Flux:{{form.couplingVar.errors}}</td><td>{{form.couplingVar}}</td>
-    <td>Coupling Type:{{form.couplingType.errors}}</td><td>{{form.couplingType}}</td>
-    <td>Coupling Frequency:{{form.couplingFreq.errors}}</td><td>{{form.couplingFreq}}</td></tr>
-<tr class="row2"><td> Regridder:{{form.regridder.errors}}</td><td>{{form.regridder}}</td>
-    <td> Input Transformation:{{form.couplingInputTransform.errors}}</td>
-    <td>{{form.couplingInputTransform}}</td>
-    <td>Target:{{form.target.errors}}</td><td>{{form.target}}</td></tr>
-    {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
-<!--{{Aform.as_table}}-->
+{% for ff in f.ic.forms %}
+{% include 'closure.html' %}
+{% endfor %}
 </table>
+<p> Enter zero or more inputs from files:</p>
+{{f.ec.management_form}}
+<table>
+{% for ff in f.ec.forms %}
+{% include 'closure.html' %}
+{% endfor %}
+</table>
+<p> Describe how these input(s) were manipulated into {{c.abbrev}}</p>
+{{f.cf.manipulation.errors}}{{f.cf.manipulation}}
 </div>

@@ -43,6 +43,8 @@ class NumericalModel:
         component.title=title
         component.abbrev=abbrev
         component.save()
+        component.model=component
+        component.save()
         return component
         
     def read(self):

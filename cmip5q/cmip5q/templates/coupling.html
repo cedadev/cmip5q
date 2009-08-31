@@ -1,56 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Coupling from "{{c.abbrev}}" component</h1>
+<h1> Coupling to "{{c.abbrev}}" inputs</h1>
 </div>
 <div class="boxer">
-    <p class="red"> There are two sets of forms on this page, one for internal coupling, and one for external
-    couplings. Please modify these one at a time:
-        <ul><li>If you make changes to both sets of forms, only those
-        changes made to the one you save survive ...
-        <li> You can make multiple changes within one set of forms.
-        <li>Each time you save a form with a new entry, a new blank entry form will appear for a new entry.
-        </ul>
+    <p class="red"> Stuff
         </p>
-    <p class="cmip5q"> Someone should ticket the necessity to do output transformations for internal
-    transformations if we only do one side of the coupling </p>
     <p class="cmip5q"> We need to make it only ask for the file or the component in the right piece </p>
-    <p> Some important definitions<p>
-        <ul><li> Coupling Flux: this is a "notional" name for the quantity as understood by both the source and target. If this flux is aggregated from more than one component into the target, then all sources should use the same term for this flux. It does not necessarily correspond to a variable in either the source or target, and is simply an identifier for this "coupling".</li>
-        </ul>
-    </p>
     <div class="boxer">
-    <h4> Internal Couplings </h4>
+    <h4> Couplings </h4>
     
     <div class="boxer2">
-    <p> These are internal couplings between model components. For CMIP5 we only consider
-    coupling between the CMIP5 realms:</p>
-    <p class="cmip5q"> We could consider a controlled vocab to help with this!</p>
-    <form action="{{urls.Int}}" method="POST">
-    {{Intform.management_form}}
-    {% for form in Intform.forms %}
-    {% include 'couplingform.html' %}
-    {% endfor %}
+    <form action="{{urls.self}}" method="POST">
+    {% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}
     <center><input id="InternalBut" type="submit" value="Save"></center>
     </form>
     </div></div>
-    <div class="boxer">
-    <h4> External Couplings </h4>
-   <div class="boxer2">
-    <p> These are the couplings to external files - also known as boundary conditions <p>
-    <form action="{{urls.Ext}}" method="POST">
-    {{Extform.management_form}}
-    {% for form in Extform.forms %}
-    {% include 'couplingform.html' %}
-    {% endfor %}    
-    <center><input id="ExternalBut" type="submit" value="Save"></center>
-    </form>
-    </div> </div>
     <script type="text/javascript">
         var InternalBut = new YAHOO.widget.Button("InternalBut",
-                            {value:"InternalButvalue"});
-        var ExternalBut = new YAHOO.widget.Button("ExternalBut",
-                            {value:"ExternalButvalue"});                 
+                            {value:"InternalButvalue"});           
     </script>
     
 </div>

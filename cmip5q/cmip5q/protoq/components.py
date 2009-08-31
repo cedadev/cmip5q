@@ -9,6 +9,7 @@ from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import PropertyForm,tabs
 from cmip5q.NumericalModel import NumericalModel
+from cmip5q.protoq.coupling import MyCouplingFormSet
 
 from django import forms
 import uuid
@@ -16,37 +17,7 @@ import logging
 
 import os
 
-CouplingFormSet=modelformset_factory(Coupling,exclude=('internal','component'))
 ComponentInputFormSet=modelformset_factory(ComponentInput,exclude=('owner','realm'))
-
-class MyCouplingFormSet(CouplingFormSet):
-    ''' This is my implementation of the functionality of Django formsets, but 
-    which supports constraining the field querysets etc in a more natural manner '''
-    #http://docs.djangoproject.com/en/dev/topics/forms/modelforms/#id1
-    def __init__(self,component,internal,data=None,prefix=''):
-        
-        self.component=component
-        self.internal=internal
-        # limit the queryset to couplings for this component only ...
-        # we expect to handle internal and external couplings with different forms ...
-        qset=Coupling.objects.filter(component=self.component).filter(internal=internal)
-        CouplingFormSet.__init__(self,data,prefix='',queryset=qset)
-    
-    def specialise(self):
-        ''' It looks like we can't do this in a formset when we have data, it somehow stuffs
-        the recovery of the data from the form, so we only do it if we have to reissue the
-        query '''
-        vocabs={'couplingType':Vocab.objects.get(name='couplingType'),
-                     'couplingFreq':Vocab.objects.get(name='couplingFreq')}
-        for form in self.forms:
-            for key in vocabs: form.fields[key].queryset=Value.objects.filter(vocab=vocabs[key])
-    def save(self):
-        ''' Wrap the call to valid by adding the stuff we excluded '''
-        instances=CouplingFormSet.save(self,commit=False)
-        for f in instances:
-            f.internal=self.internal
-            f.component=self.component
-            f.save()
             
 class MyComponentInputFormSet(ComponentInputFormSet):
     def __init__(self,component,realm=False,data=None):
@@ -57,14 +28,27 @@ class MyComponentInputFormSet(ComponentInputFormSet):
             qset=ComponentInput.objects.filter(owner=component)
         ComponentInputFormSet.__init__(self,data,queryset=qset)
     def specialise(self):
+        ''' No local specialisation, yet '''
         pass
     def save(self):
+        ''' Loop over form instances, add extra material, and couplings as necessary'''
         instances=ComponentInputFormSet.save(self,commit=False)
         for i in instances:
             i.owner=self.component
             i.realm=self.component.realm
+            newCoupling=0
+            if i.id is None:
+                #This is a new instance, and we need to create a coupling for it
+                #at the same time. Actually doing this makes me realise we could to
+                #back to creating couplings at input declaration time. THey're the
+                #same thing. However, the reason for separating them is about when
+                #we interact with them.
+                newCoupling=1
             i.save()
-       
+            if newCoupling:
+                c=Coupling(component=self.component.model,
+                           targetInput=i)
+                c.save()
 
 def makeComponent(centre_id,scienceType='sub'):
     ''' Just make and return a new component instance'''
@@ -234,40 +218,25 @@ class componentHandler(object):
         
     def coupling(self,request,ctype=None):
         ''' Handle the construction of component couplings '''
+        # we do the couplings for the parent model of a component
+        model=self.component.model
         okURL=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,self.id,))
-        urls={'Int':reverse('cmip5q.protoq.views.componentCup',
-                args=(self.centre_id,self.id,'internal')),
-              'Ext':reverse('cmip5q.protoq.views.componentCup',
-                args=(self.centre_id,self.id,'external'))}
+        urls={'self':reverse('cmip5q.protoq.views.componentCup',
+                args=(self.centre_id,self.id,))
+              }
                 
         if request.method=='POST':
-            if ctype == 'internal':
-                Intform=MyCouplingFormSet(self.component,1,request.POST,prefix='Int')
-                if Intform.is_valid():
-                    Intform.save()
-                    return HttpResponseRedirect(okURL)
-                else:
-                    Intform.specialise()
-                    Extform=MyCouplingFormSet(self.component,0,prefix='Ext')
-                    Extform.specialise()
-            elif ctype == 'external':
-                Extform=MyCouplingFormSet(self.component,0,request.POST,prefix='Ext')
-                if Extform.is_valid():
-                    Extform.save()
-                    return HttpResponseRedirect(okURL)
-                else:
-                    Extform.specialise()
-                    Intform=MyCouplingFormSet(self.component,0,prefix='Int')
-                    Intform.specialise()
+            Intform=MyCouplingFormSet(model,request.POST)
+            if Intform.is_valid():
+                Intform.save()
+                return HttpResponseRedirect(okURL)
             else:
-                return HttpResponse('<p>Not supposed to be possible, contact programmer with cheque book</p>')
+                Intform.specialise()
         elif request.method=='GET':
-            Intform=MyCouplingFormSet(self.component,1,prefix='Int')
+            Intform=MyCouplingFormSet(model)
             Intform.specialise()
-            Extform=MyCouplingFormSet(self.component,0,prefix='Ext')
-            Extform.specialise()
-        return render_to_response('coupling.html',{'c':self.component,'urls':urls,
-        'Intform':Intform,'Extform':Extform,'tabs':tabs(self.centre_id,'tmp')})
+        return render_to_response('coupling.html',{'c':model,'urls':urls,
+        'Intform':Intform,'tabs':tabs(self.centre_id,'tmp')})
         
     def inputs(self,request):
         ''' Handle the construction of input requirements into a component '''

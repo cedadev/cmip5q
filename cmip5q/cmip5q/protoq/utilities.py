@@ -49,7 +49,7 @@ class tabs(list):
         for key in ('Sims','Files','Refs'):self.append(t[key])
         if 'Extra' in t.keys(): self.append(t['Extra'])
         for key in ('Help','About'): self.append(t[key])
-        print self
+       
 
 class ParamRow(object):
     ''' used to monkey patch our special parameter forms '''

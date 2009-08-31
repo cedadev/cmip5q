@@ -183,19 +183,17 @@ class Coupling(models.Model):
     #coupling for:
     targetInput=models.ForeignKey(ComponentInput)
     #coupling details
-    couplingType=models.ForeignKey('Value',related_name='couplingTypeVal')
-    couplingFreqUnits=models.ForeignKey('Value',related_name='couplingFreqUnits')
-    couplingFreq=models.IntegerField()
+    couplingType=models.ForeignKey('Value',related_name='couplingTypeVal',blank=True,null=True)
+    couplingFreqUnits=models.ForeignKey('Value',related_name='couplingFreqUnits',blank=True,null=True)
+    couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
-    #closures
-    internalClosures=models.ManyToManyField('InternalClosure',blank=True,null=True,symmetrical=False)
-    externalClosures=models.ManyToManyField('ExternalClosure',blank=True,null=True,symmetrical=False)
     def __unicode__(self):
         return 'Coupling %s'%self.targetInput
         
 class CouplingClosure(models.Model):
     ''' Handles a specific closure to a component '''
-    closed=models.BooleanField(default=False)
+    # we don't need a closed attribute, since the absence of a target means it's open.
+    coupling=models.ForeignKey(Coupling)
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
     spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridder')
     temporalRegridding=models.ForeignKey('Value',related_name='%(class)s_TemporalRegridder')
@@ -206,11 +204,11 @@ class CouplingClosure(models.Model):
         abstract=True
    
 class InternalClosure(CouplingClosure): 
-    target=models.ForeignKey(Component)
+    target=models.ForeignKey(Component,blank=True,null=True)
 
 class ExternalClosure(CouplingClosure):
     ''' AKA boundary condition '''
-    target=models.ForeignKey('DataObject')
+    target=models.ForeignKey('DataObject',blank=True,null=True)
         
 class InitialCondition(models.Model):
     ''' Simulation initial condition '''
@@ -283,7 +281,7 @@ class BoundaryConditionForm(forms.ModelForm):
         pass
        
 class CouplingForm(forms.ModelForm):
-    manipulation=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}))
     class Meta:
         model=Coupling
         exclude=('component',  # we should always know this
@@ -300,16 +298,11 @@ class InternalClosureForm(forms.ModelForm):
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=InternalClosure
-     def __init__(self,*args,**kwargs):
-         forms.ModelForm.__init__(self,*args,**kwargs)
-         vs=Vocab.objects.get(name='SpatialRegridding')
-         vt=Vocab.objects.get(name='TemporalRegridding')
-         self.fields['spatialRegridding'].queryset=Value.objects.filter(vocab=vs)
-         self.fields['temporalRegridding'].queryset=Value.objects.filter(vocab=vt)
      def specialise(self,model):
-         self.fields['target'].queryset=Component.objects.filter(model=model).filter(realm=True)
+         pass
 
 class ExternalClosureForm(InternalClosureForm):
+     inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=ExternalClosure
      def specialise(self,model):
