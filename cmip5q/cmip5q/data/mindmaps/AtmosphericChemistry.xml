@@ -57,7 +57,7 @@
           <value format="numerical" name="time step" units="hours"/>
         </parameter>
       </component>
-      <component name="EmissionsAndConcentrations">
+      <component name="EmissionAndConcentration">
         <component name="2D-Sources">
           <parameter name="SpeciesEmitted" choice="keyboard">
             <value format="string" name="user to provide a list of species"/>
@@ -168,7 +168,7 @@
         </component>
       </component>
       <component name="GasPhaseChemistry">
-        <component name="NumberOfReactionsAndSpecies">
+        <component name="NumOfReactionsAndSpecies">
           <parameter name="NumberOfBimolecularReactions" choice="keyboard">
             <value format="numerical" name=""/>
           </parameter>
@@ -215,7 +215,7 @@
       </component>
       <component name="HeterogeneousChemistry">
         <component name="Stratospheric">
-          <component name="NumberOfReactionsAndSpecies">
+          <component name="NumOfReactionsAndSpecies">
             <parameter name="NumberOfReactions" choice="keyboard">
               <value format="numerical" name=""/>
             </parameter>
@@ -253,7 +253,7 @@
           </component>
         </component>
         <component name="Tropospheric">
-          <component name="NumberOfReactionsAndSpecies">
+          <component name="NumOfReactionsAndSpecies">
             <parameter name="NumberOfReactions" choice="keyboard">
               <value format="numerical" name=""/>
             </parameter>
@@ -298,7 +298,7 @@
         </component>
       </component>
       <component name="PhotoChemistry">
-        <component name="NumberOfReactionsAndSpecies">
+        <component name="NumOfReactionsAndSpecies">
           <parameter name="NumberOfReactions" choice="keyboard">
             <value format="numerical" name=""/>
           </parameter>
@@ -325,7 +325,7 @@
         <value name="Bulk Scheme"/>
         <value name="Other"/>
       </parameter>
-      <parameter name="ConcentrationOrEmissions" choice="XOR">
+      <parameter name="ConcentrationOrEmission" choice="XOR">
         <value name="Concentrations"/>
         <value name="Emissions"/>
       </parameter>

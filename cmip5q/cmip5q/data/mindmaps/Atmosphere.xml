@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vocab>
+<vocab mmversion="based on r557 (mariepierre, 2009-06-09) of Atmosphere.mm" defnversion="">
   <component name="Atmosphere">
     <component name="DynamicalCore">
       <parameter name="BasicApproximations" choice="OR">
@@ -29,22 +29,22 @@
           <value name="Fixed Grid"/>
           <value name="Other" note="Other: enter horizontal discretisation method&#10;"/>
         </parameter>
-        <parameter name="SpectralTruncatureNumber" choice="keyboard" note="Only if SchemeType = Spectral.">
+        <parameter name="SpectralTruncatureNumber" choice="keyboard" note="[constraint]Only required if 'Spectral' is selected for 'SchemeType'.[/constraint]">
           <value format="numerical" name=""/>
         </parameter>
-        <parameter name="NumberOfZonalGridBoxes" choice="keyboard" note="Only if ShemeType = Fixed grid.&#10;">
+        <parameter name="NumberOfZonalGridBoxes" choice="keyboard" note="[constraint]Only required if 'Fixed Grid' is selected for 'SchemeType'.[/constraint]">
           <value format="numerical" name=""/>
         </parameter>
-        <parameter name="NumberOfMeridionalGridBoxes" choice="keyboard" note="Only if ShemeType = Fixed grid.">
+        <parameter name="NumberOfMeridionalGridBoxes" choice="keyboard" note="[constraint]Only required if 'Fixed Grid' is selected for 'SchemeType'.[/constraint]">
           <value format="numerical" name=""/>
         </parameter>
-        <parameter name="Method" choice="XOR" note="Only if ShemeType = Fixed grid.">
+        <parameter name="Method" choice="XOR" note="[constraint]Only required if 'Fixed Grid' is selected for 'SchemeType'.[/constraint]">
           <value name="Finite emement"/>
           <value name="Finite volume"/>
           <value name="Finite differences"/>
           <value name="Centered finite differences"/>
         </parameter>
-        <parameter name="Order" choice="keyboard" note="Only if Method = (Finite difference) or (Centered finite difference).">
+        <parameter name="Order" choice="keyboard" note="[constraint]Only required if 'Finite differences' or 'Centered finite differences' is selected for 'Method'.[/constraint]">
           <value format="numerical" name=""/>
         </parameter>
       </component>
@@ -135,13 +135,13 @@
         <value name="Other" note="Other: enter further green house gasses"/>
       </parameter>
     </component>
-    <component name="TurbulenceConvectionClouds">
+    <component name="TurbulenceConvectionCloud">
       <component name="BoundaryLayerTurbulence">
         <parameter name="SchemeName" choice="XOR">
           <value name="Mellor-Yamada"/>
           <value name="Other"/>
         </parameter>
-        <parameter name="ClosureOrder" choice="keyboard" note="If SchemeName = Mellor-Yamada.">
+        <parameter name="ClosureOrder" choice="keyboard" note="[constraint]Only required if 'Mellor-Yamada' is selected for 'SchemeName'.[/constraint]">
           <value format="numerical" name="N.x"/>
         </parameter>
         <parameter name="Method" choice="XOR">
@@ -164,7 +164,7 @@
           <value name="Adjustment"/>
           <value name="Other"/>
         </parameter>
-        <parameter name="Method" choice="OR" note="If SchemeType = Mass-flux (to be confirmed).">
+        <parameter name="Method" choice="OR" note="[incomplete]Only required if &quot;Mass-flux&quot; is selected for &quot;SchemeType&quot; (to be confirmed).[/incomplete]">
           <value name="Mass flux determined by CAPE"/>
           <value name="Bulk mass flux scheme"/>
         </parameter>
@@ -182,17 +182,17 @@
           <value name="included in Boundary layer turbulence"/>
           <value name="separated"/>
         </parameter>
-        <parameter name="SchemeName" choice="XOR" note="Only if Method = Separated.">
+        <parameter name="SchemeName" choice="XOR" note="[constraint]Only required if 'separated' is selected for 'Method'.[/constraint]">
           <value name="Other"/>
         </parameter>
-        <parameter name="Scheme" choice="XOR" note="Only if Method = Separated.">
+        <parameter name="Scheme" choice="XOR" note="[constraint]Only required if 'separated' is selected for 'Method'.[/constraint]">
           <value name="none"/>
           <value name="Mass-flux"/>
           <value name="Other"/>
         </parameter>
       </component>
-      <component name="AtmosCloudScheme">
-        <component name="SubGridScaleWaterDistribution">
+      <component name="CloudScheme">
+        <component name="SubGridScaleWaterDistrib">
           <parameter name="Type" choice="XOR">
             <value name="Prognostic"/>
             <value name="Diagnostic"/>
@@ -217,7 +217,7 @@
           <value name="Other" note="Other: enter further properties for Cloud Scheme."/>
         </parameter>
       </component>
-      <component name="AtmosLargeScalePrecipitation">
+      <component name="LargeScalePrecipitation">
         <parameter name="SchemeName" choice="XOR">
           <value name="Other"/>
         </parameter>

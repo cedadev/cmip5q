@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vocab>
+<vocab mmversion="based on r524 (mariepierre, 2009-05-29) of SeaIce.mm" defnversion="">
   <component name="SeaIce">
     <parameter name="SeaIceRepresentation" choice="XOR">
       <value name="2 levels"/>

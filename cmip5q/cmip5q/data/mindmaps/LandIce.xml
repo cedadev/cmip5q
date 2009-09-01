@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vocab>
+<vocab mmversion="based on r646 (mariepierre, 2009-07-06) of LandIce.mm" defnversion="">
   <component name="LandIce">
     <component name="LandGlaciers">
       <parameter name="Properties" choice="OR">

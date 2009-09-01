@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vocab>
+<vocab mmversion="based on r580 (mariepierre, 2009-06-15) of OceanBioGeoChemistry.mm" defnversion="">
   <component name="OceanBiogeoChemistry">
     <component name="OceanBioTransport">
       <parameter name="Method" choice="XOR" note="If method for transport calculations is different from the one for Ocean Tracers, then describe these differences.">
