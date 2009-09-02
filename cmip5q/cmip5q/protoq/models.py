@@ -5,6 +5,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
+import uuid
 
 import vocab
 
@@ -56,6 +57,50 @@ class Component(Doc):
    
     centre=models.ForeignKey('Centre',blank=True,null=True)
     
+    def getNewCopy(self,model=None,realm=None,email=None,contact=None):
+        ''' Carry out a deep copy of a model '''
+        ######### NOT YET TESTED  ##############################################
+        attrs=['title','abbrev','description',
+               'scienceType','controlled','isRealm','isModel',
+               'references','email','contact']
+        kwargs={}
+        for i in attrs: kwargs[i]=self.__getAttribute__(i)
+        if email:kwargs['email']=email
+        if contact: kwargs['contact']=contact
+        kwargs['uri']=str(uuid.uuid1())
+        
+        new=Component(**kwargs)
+        new.save() # we want an id
+       
+        if model is None:
+            if self.isModel:
+                model=new
+            else:
+                return ValueError('Deep copy called with invalid model arguments')
+        elif realm is None:
+            if self.isRealm:
+                realm=new
+            else:
+                return ValueError('Deep copy called within invalid realm arguments')
+        new.model=model
+        new.realm=realm
+       
+        for c in self.components:
+            r=c.getNewCopy(model=model,realm=realm,email=kwargs['email'],contact=kwargs['contact'])
+            new.components.add(r)
+            
+        #### Now we need to deal with the parameter settings too ..
+        pset=Parameter.objects.filter(component=self)
+        for p in pset: p.getNewCopy(new)
+        
+        ### And deal with the component inputs too ..
+        inputset=ComponentInput.objects.filter(owner=self)
+        for i in inputset: i.getNewCopy(new)
+        
+        new.save()
+        return new
+        
+    
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
     abbrev=models.CharField(max_length=24)
@@ -70,6 +115,10 @@ class ComponentInput(models.Model):
     realm=models.ForeignKey(Component,related_name="input_realm")
     def __unicode__(self):
         return '%s:%s'%(self.owner,self.abbrev)
+    def getNewCopy(self,component):
+        new=ComponentInput(abbrev=self.abbrev,description=self.description,bc=self.bc,
+                           owner=component,realm=component.realm)
+        new.save()
     
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
@@ -123,7 +172,8 @@ class Simulation(Doc):
     #
     # enforce the following as required via q'logical validation, not form validation.
     initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
-    boundaryCondition=models.ManyToManyField('Coupling',blank=True,null=True)
+    # don't need this any more, since we link back to simulations from copulings
+    #boundaryCondition=models.ManyToManyField('Coupling',blank=True,null=True)
     physicalEnsemble=models.BooleanField(default=False)
     
 class Centre(Doc):
@@ -157,6 +207,10 @@ class Param(models.Model):
     value=models.CharField(max_length=512,blank=True)
     def __unicode__(self):
         return self.name
+    def getNewCopy(self,component):
+        new=Param(name=self.name,component=component,ptype=self.ptype,
+                      vocab=self.vocab,value=self.value)
+        new.save()
     
 class DataObject(models.Model):
     ''' Holds the data object information agreed in Paris '''
@@ -182,6 +236,8 @@ class Coupling(models.Model):
     component=models.ForeignKey(Component)
     #coupling for:
     targetInput=models.ForeignKey(ComponentInput)
+    #optionally associated with simulation:
+    simulation=models.ForeignKey(Simulation,blank=True,null=True)
     #coupling details
     couplingType=models.ForeignKey('Value',related_name='couplingTypeVal',blank=True,null=True)
     couplingFreqUnits=models.ForeignKey('Value',related_name='couplingFreqUnits',blank=True,null=True)
@@ -189,6 +245,18 @@ class Coupling(models.Model):
     manipulation=models.TextField(blank=True,null=True)
     def __unicode__(self):
         return 'Coupling %s'%self.targetInput
+    def getNewCopy(self,simulation):
+        ''' Create a copy of an existing coupling, for modification in a new simulation '''
+        if simulation==self.simulation:
+            raise ValueError('Cannot copy a coupling instance to itself (%s)'%self.simulation)
+        c=Coupling(component=self.component,
+                   targetInput=self.targetInput,
+                   simulation=simulation,
+                   couplingType=self.couplingType,
+                   couplingFreq=self.couplingFreq,
+                   couplingFreqUnits=self.couplingFreqUnits,
+                   manipulation=self.manipulation)
+        return c.save()
         
 class CouplingClosure(models.Model):
     ''' Handles a specific closure to a component '''
@@ -286,6 +354,7 @@ class CouplingForm(forms.ModelForm):
         model=Coupling
         exclude=('component',  # we should always know this
                  'targetInput', # we generate couplings from these 
+                 'simulation', # we generate these if it's a simulation
                 )
     #def __init__(self,*args,**kwargs):
     #    forms.ModelForm.__init__(self,*args,**kwargs)

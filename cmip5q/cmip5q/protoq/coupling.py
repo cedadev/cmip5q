@@ -58,13 +58,15 @@ class MyCouplingFormSet:
     coupling instance, and we can do that using formsets, but not the couplings themselves '''
      #http://docs.djangoproject.com/en/dev/topics/forms/modelforms/#id1
     
-    def __init__(self,component,data=None):
+    def __init__(self,component,data=None,simulation=None):
         ''' Initialise the forms needed to interact for a (model) component '''
         
         self.component=component
+        self.simulation=simulation
+        
         self.model=self.component.model
         self.queryset=Coupling.objects.filter(component=self.component)
-        
+       
         # setup our vocabularies
         couplingType=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
         couplingFreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
@@ -127,6 +129,7 @@ class MyCouplingFormSet:
             cf=f.cf.save(commit=False)
             cf.component=self.component
             cf.targetInput=self.queryset.get(id=cf.id).targetInput
+            if self.simulation: cf.simulation=self.simulation
             cf.save()
             # now the external closures formset ...
             instances=f.ec.save()
