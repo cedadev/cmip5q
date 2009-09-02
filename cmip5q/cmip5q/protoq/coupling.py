@@ -7,8 +7,6 @@ from django import forms
 
 from cmip5q.protoq.models import *
 
-
-CouplingFormSet=modelformset_factory(Coupling,extra=0,exclude=('component','targetInput'))
 InternalClosureFormSet=modelformset_factory(InternalClosure,can_delete=True,
                                     form=InternalClosureForm,
                                     exclude=('coupling'))
@@ -65,8 +63,13 @@ class MyCouplingFormSet:
         self.simulation=simulation
         
         self.model=self.component.model
-        self.queryset=Coupling.objects.filter(component=self.component)
-       
+        if self.simulation:
+            self.queryset=Coupling.objects.filter(component=self.component)
+            formClass=SimCouplingForm
+        else:
+            self.queryset=SimCoupling.objects.filter(simulation=self.simulation)
+            formClass=CouplingForm
+            
         # setup our vocabularies
         couplingType=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
         couplingFreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
@@ -78,10 +81,6 @@ class MyCouplingFormSet:
         self.closureVocabs={'spatialRegridding':spatialRegridding,
                 'temporalRegridding':temporalRegridding}
                 
-        # Haven't worked out how to do this directly to forms in formsets, and this is commont to both
-        # anyway
-        self.widgets={'inputDescription':forms.Textarea({'cols':"100",'rows':"2"})}
-        
         # rather than use a django formset for the couplings, we'll do them by
         # hand, but do the closures using a formset ...
         
@@ -89,7 +88,7 @@ class MyCouplingFormSet:
         # this is the list of relevant realm level components:
         BaseInternalQueryset=Component.objects.filter(model=self.model).filter(isRealm=True)
         for q in self.queryset:
-            cf=CouplingForm(data,instance=q,prefix=q)
+            cf=formClass(data,instance=q,prefix=q)
             title='Coupling into: %s'%q.targetInput
             for key in self.couplingVocabs:
                 cf.fields[key].queryset=self.couplingVocabs[key]
@@ -129,7 +128,6 @@ class MyCouplingFormSet:
             cf=f.cf.save(commit=False)
             cf.component=self.component
             cf.targetInput=self.queryset.get(id=cf.id).targetInput
-            if self.simulation: cf.simulation=self.simulation
             cf.save()
             # now the external closures formset ...
             instances=f.ec.save()
