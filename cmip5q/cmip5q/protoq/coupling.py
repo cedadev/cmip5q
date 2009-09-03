@@ -177,11 +177,6 @@ class couplingHandler:
               'return':reverse('cmip5q.protoq.views.simulationEdit',args=(self.centre_id,simulation_id,)),
               'returnName':'simulation',
               }
-      
-        
-        # FIXME: We also need to ensure that we handle the original information with the form
-        # copies ...
-        
         return self.__handle(simulation)
     def __handle(self,simulation=None):
         model=self.component.model
@@ -205,6 +200,7 @@ class couplingHandler:
         coupling=Coupling.objects.get(id=coupling_id)
         reset=ClosureReset(self.centre_id,simulation_id,coupling,ctype)
         return reset.reset()
+        
     
         
             

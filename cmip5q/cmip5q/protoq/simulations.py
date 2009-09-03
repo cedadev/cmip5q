@@ -13,7 +13,9 @@ import uuid
 import logging
 
 
-ConformanceFormSet=modelformset_factory(Conformance,exclude=('simulation','requirement'))
+ConformanceFormSet=modelformset_factory(Conformance,
+                                        form=ConformanceForm,
+                                        exclude=('simulation','requirement'))
 
 class MyConformanceFormSet(ConformanceFormSet):
     ''' Mimics the function of a formset for the situation where we want to edit the
@@ -22,27 +24,16 @@ class MyConformanceFormSet(ConformanceFormSet):
         self.extra=0
         qset=Conformance.objects.filter(simulation=simulation)
         ConformanceFormSet.__init__(self,data,queryset=qset)
-        self.r=[c.requirement.description for c in qset]
         self.s=simulation
+        self.q=qset
     def specialise(self):
-        # FIXME: Can't specialise on the code modifications, because we can't get at them
-        # should really do it via modifications on this model ... which means we need to
-        # have model parent known to all component.
-        # FIXME: Can only get to boundary conditions by following the coupling links ...
-        # monkey patch some additional information to show on the forms
-        if len(self.r)!=len(self.forms):
-            raise ValueError('queryset %s and forms %s out of step'%(len(self.r),len(self.forms)))
         v=Vocab.objects.get(name='conformanceTypes')
-        for index in range(len(self.r)):
-            self.forms[index].req=self.r[index]
-            self.forms[index].fields['ctype'].queryset=Value.objects.filter(vocab=v)
-    def save(self): 
-        instances=ConformanceFormSet.save(self,commit=False)
-        for index in range(len(instances)):
-            f=instances[index]
-            f.simulation=self.s
-            f.requirement=self.r[index]
-            f.save()
+        allowedComponents=Component.objects.filter(model=self.s.numericalModel)
+        for form in self.forms:
+            form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+            form.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=allowedComponents)
+            form.fields['boundaryCondition'].queryset=Coupling.objects.filter(simulation=self.s)
+    # we don't need a subclass save method, because we initialise from instances in the queryset
           
 class simulationHandler(object):
     
@@ -177,7 +168,7 @@ class simulationHandler(object):
             # we need to set up the conformances!
              reqs=e.requirements.all()
              for r in reqs:
-                 c=Conformance(requirement=r,simulation=s)
+                 c=Conformance(requirement=r,simulation=s, ctype=r.ctype)
                  c.save()
                  
         if request.method=='POST':

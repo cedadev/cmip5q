@@ -145,13 +145,13 @@ class Experiment(models.Model):
     startDate=models.CharField(max_length=32)
     endDate=models.CharField(max_length=32)
     def __unicode__(self):
-        return self.docID
+        return self.shortName
     
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
     description=models.TextField()
     name=models.CharField(max_length=128)
-    type=models.CharField(max_length=32,blank=True,null=True)
+    ctype=models.ForeignKey('Value',blank=True,null=True)
     def __unicode__(self):
         return self.name
     
@@ -350,6 +350,8 @@ class Conformance(models.Model):
     codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
     initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
     boundaryCondition=models.ForeignKey(Coupling,blank=True,null=True)
+    # notes
+    description=models.TextField(blank=True,null=True)
     def __unicode__(self):
         return "%s for %s"%(self.ctype,self.requirement)
 
@@ -468,6 +470,7 @@ class PlatformForm(forms.ModelForm):
         exclude=('centre','uri')
         
 class ConformanceForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"100",'rows':"2"}),required=False)
     class Meta:
         model=Conformance
         exclude=('simulation') # we know it
@@ -476,7 +479,7 @@ class ConformanceForm(forms.ModelForm):
         relevant_components=Component.objects.filter(model=model)
         self.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=relevant_components)
         #self.fields['initialCondition'].queryset
-        self.fields['boundaryCondition'].queryset=Coupling.objects.filter(component=model)
+        self.fields['boundaryCondition'].queryset=Coupling.objects.filter(simulation=simulation)
         
 class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"2"}),required=False)
