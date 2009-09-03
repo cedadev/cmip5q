@@ -46,7 +46,7 @@ interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed'
 relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf')
 
 #types of conformance, we'll allow more than one to be chosen
-conformanceTypes=('Boundary Condition','Initial Condition', 'Code Modification')
+conformanceTypes=('BoundaryCondition','InitialCondition', 'CodeModification')
 
 # types of numerical requirement (nb: at the moment we don't use these, it's hardwired)
 # would need to modify the numerical requiremnet class, and the conformance code.

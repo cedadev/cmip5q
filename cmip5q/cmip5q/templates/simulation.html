@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-    <h2> {{label}} a simulation in {{exp.docID}}</h2>
+    <h2> {{label}} a simulation in {{exp}}</h2>
     <p>({{exp.rationale}} {{exp.why}})</p>
 </div>
 
@@ -82,23 +82,27 @@
     <p>(You can modify these using the buttons on the left hand menu.)</p>
     <table>
     {% if s.initialCondition %}
-    <tr class="{% cycle 'row1' 'row2'%}"><td>Inital Condition</td><td>{{s.initialCondition}}</td></tr>
+    <tr class="{% cycle 'row1' 'row2'%}"><td>Inital Condition:&nbsp;</td><td>{{s.initialCondition}}</td></tr>
     {% else %}
-    <tr><td colspan="2"> You need to set an initial Condition</td></tr>
+    <tr><td colspan="2"> <span class="red">You need to set an initial Condition</span></td></tr>
     {% endif %}
-    {% for bc in s.boundaryCondition.get_query_set %}
-    <tr class="{%cycle  'row2' 'row1'%}"><td>Boundary Condition</td><td>{{bc}}</td></tr>
+    {% for bc in cset %}
+    <tr class="{%cycle  'row2' 'row1'%}"><td>Boundary Condition:&nbsp;</td><td>{{bc.name}} uses {{bc.nic}} internal link(s) and {{bc.nec}} link(s) to files. {% if not bc.valid %} <span class="red"> Incomplete </span> {% endif %} </td></tr>
     {% endfor %}
     </table>
-    <p class="cmip5q"> Need to put some guidance on status of filling out boundary conditions </p>
+    <p class="guidance"> (Each boundary condition must have at least one internal or external coupling.) </p>
     {% endifequal %}
 </div>
 <div class="boxer backgrey">
-<h4> Conformance: How this simulation conformed to the Numerical Requirements </h4>
+<h4> Conformance: How this simulation conforms to the Numerical Requirements </h4>
 {% ifnotequal label "Update" %}
 <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
 {% else %}
-<p class="cmip5q"> Placeholder for conformances</p>
+<table>
+{% for c in coset %}
+<tr class="{% cycle 'row1' 'row2'%}"><td>{{c.name}}</td></tr>
+{% endfor %}
+</table>
 {% endifnotequal %}
 
 </div>

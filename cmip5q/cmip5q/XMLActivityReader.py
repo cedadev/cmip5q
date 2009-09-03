@@ -26,18 +26,25 @@ class numericalRequirement:
         self.name=getText(elem,'name')
         
         if typekey in elem.attrib.keys():
-            self.type=elem.attrib[typekey]
-        else: self.type=''
+            ctype=elem.attrib[typekey]
+        else: ctype=''
+        v=Vocab.objects.get(name='conformanceTypes')
+        ctypeVals=Value.objects.filter(vocab=v)
+        try:
+            self.ctype=ctypeVals.get(value=ctype)
+        except:
+            logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,self.name,self.id))
+            self.ctype=None
        
         if not self.name or self.name=='':
-            logging.debug('Numerical Requirement %s [%s,%s]'%(self.id,self.description,self.type))
+            logging.debug('Numerical Requirement %s [%s,%s]'%(self.id,self.description,self.ctype))
         # FIXME assumes no xlinks
 
     def load(self):
         ''' Load into django database '''
         n=NumericalRequirement(description=self.description,
                                name=self.name,
-                               type=self.type)
+                               ctype=self.ctype)
         n.save()
         return n.id
 

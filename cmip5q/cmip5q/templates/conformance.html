@@ -35,7 +35,7 @@ is not yet in place, and filtering of the options isn't yet right. </p>
         <table>
             <tr><td>
             <table>
-            <tr class="{% cycle 'row1' 'row2'%}"><td colspan="3">{{form.req}}</td></tr>
+            <tr class="{% cycle 'row1' 'row2'%}"><td colspan="3">{{form.instance.requirement}}:{{form.instance.requirement.description}}</td></tr>
             <tr class="{% cycle 'row2' 'row1'%}">
             <td>Type:{{form.ctype.errors}}{{form.ctype}}</td>
             <td>Initial Condition: {{form.initialCondition.errors}}{{form.initialCondition}}</td>

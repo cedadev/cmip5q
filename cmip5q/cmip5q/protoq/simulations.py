@@ -25,7 +25,6 @@ class MyConformanceFormSet(ConformanceFormSet):
         qset=Conformance.objects.filter(simulation=simulation)
         ConformanceFormSet.__init__(self,data,queryset=qset)
         self.s=simulation
-        self.q=qset
     def specialise(self):
         v=Vocab.objects.get(name='conformanceTypes')
         allowedComponents=Component.objects.filter(model=self.s.numericalModel)
@@ -79,9 +78,23 @@ class simulationHandler(object):
             simform=SimulationForm(instance=s)
             simform.specialise(self.centre)
         
+        # work out what we want to say about couplings 
+        cs=Coupling.objects.filter(simulation=s)
+        cset=[{'name':str(i),'nic':len(InternalClosure.objects.filter(coupling=i)),
+                             'nec':len(ExternalClosure.objects.filter(coupling=i)),
+                             } for i in cs]
+        for i in cset:
+            i['valid']=i['nic']+i['nec'] > 0 # need at least one closure
+            
+        # now work out what we want to say about conformances.
+        cs=Conformance.objects.filter(simulation=s)
+        coset=[]
+        for i in cs:
+            coset.append({'name':i.requirement})
+            
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
-                        'ensemble':ensemble,'tabs':tabs(self.centreid,'Update')})
+             'cset':cset,'coset':coset,'ensemble':ensemble,'tabs':tabs(self.centreid,'Update')})
         
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''
