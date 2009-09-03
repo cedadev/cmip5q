@@ -172,8 +172,8 @@ class Simulation(Doc):
     #
     # enforce the following as required via q'logical validation, not form validation.
     initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
-    boundaryCondition=models.ManyToManyField('SimCoupling',blank=True,null=True)
     physicalEnsemble=models.BooleanField(default=False)
+    # boundary conditions link to us, not the other way round
     
     def save(self):
         Doc.save(self)
@@ -183,15 +183,12 @@ class Simulation(Doc):
     def updateCoupling(self):
         ''' Update my couplings, in case the user has made some changes in the model '''
         #each one of these should appear in one of my boundary conditions.
-        modelCouplings=Coupling.objects.filter(component=self.numericalModel)
+        modelCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=None)
         #myCouplings=[original for m in self.boundaryCondition.get_query_set()]
-        myCouplings=[m['original_id'] for m in self.boundaryCondition.values()]
+        myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
         for m in modelCouplings:
-            if m.id not in myCouplings: 
-                r=SimCoupling(m) 
-                # we don't need to save the instances because of the way SimCoupling is constructed
-            self.boundaryCondition.add(r)
-        Doc.save(self)
+            if m not in myCouplings: 
+                r=m.duplicate4sim(self)
 
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -248,60 +245,55 @@ class DataObject(models.Model):
     def __unicode__(self):
         return self.name
         
-class RawCoupling(models.Model):
-    #parent component, must be a model for CMIP5:
+class Coupling(models.Model):
+    # parent component, must be a model for CMIP5:
     component=models.ForeignKey(Component)
-    #coupling for:
+    # coupling for:
     targetInput=models.ForeignKey(ComponentInput)
-    #coupling details
+    # may also be associated with a simulation, in which case there is an original
+    simulation=models.ForeignKey(Simulation,blank=True,null=True)
+    original=models.ForeignKey('Coupling',blank=True,null=True)
+    # coupling details
     couplingType=models.ForeignKey('Value',related_name='%(class)s_couplingTypeVal',blank=True,null=True)
     couplingFreqUnits=models.ForeignKey('Value',related_name='%(class)s_couplingFreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
-    class Meta:
-        abstract=True
-        
-class Coupling(RawCoupling):
     def __unicode__(self):
-        return 'Coupling %s'%self.targetInput
-    
-class SimCoupling(RawCoupling):
-    ''' Simulation Instances are always set up as copies of the others '''
-    args=['component','targetInput',
+        if self.simulation:
+            return 'Coupling %s ( for %s )'%(self.targetInput,self.simulation)
+        else:
+            return 'Coupling %s'%self.targetInput
+    def duplicate4sim(self,simulation):
+        '''Make a copy of self, and associate with a simulation'''
+        # first make a copy of self
+        args=['component','targetInput',
           'couplingType','couplingFreq','couplingFreqUnits',
           'manipulation']
-    original=models.ForeignKey(Coupling)
-    def __init__(self,original):
-        kw={'original':original}
-        for a in self.args: kw[a]=original.__getattribute__(a)
-        RawCoupling.__init__(self,**kw)
-        self.save() # we need this, so we can copy the closures
-        self.__setClosures()
-    def reset(self):
-        o=self.original
-        for a in args: self.__setattr__(a,o.__getattribute__(a))
-        self.__setClosures()
-    def __setClosures(self):
-        icset=InternalClosure.objects.filter(coupling=self.original)
-        ecset=ExternalClosure.objects.filter(coupling=self.original)
-        for i in icset:
-            i.makeNewCopy(self)
-        for i in ecset:
-            i.makeNewCopy(self)
-    def __unicode__(self):
-        return '(sim)Coupling %s'%self.targetInput
+        kw={'original':self,'simulation':simulation}
+        for a in args:kw[a]=self.__getattribute__(a)
+        new=Coupling(**kw)
+        new.save()
+        # and now copy all the original closures
+        # icset=InternalClosure.objects.filter(coupling=self)
+        # ecset=ExternalClosure.objects.filter(coupling=self)
+        # for i in icset:
+        #    i.makeNewCopy(self)
+        # for i in ecset:
+        #    i.makeNewCopy(self)
+        # Actually, we'll let the user decide to do this in the form ...
+        return new
     
 class CouplingClosure(models.Model):
     ''' Handles a specific closure to a component '''
     # we don't need a closed attribute, since the absence of a target means it's open.
-    coupling=models.ForeignKey(Coupling)
+    coupling=models.ForeignKey(Coupling,blank=True,null=True)
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
     spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridder')
     temporalRegridding=models.ForeignKey('Value',related_name='%(class)s_TemporalRegridder')
     inputDescription=models.TextField(blank=True,null=True)
-    def __unicode__(self):
-        return 'Closure %s'%target
+   
     def makeNewCopy(self,coupling):
+        ''' Copy closure to a new coupling '''
         kw={'coupling':coupling}
         for key in ['spatialRegridding','temporalRegridding','inputDescription','target']:
             kw[key]=self.__getattribute__(key)
@@ -312,10 +304,14 @@ class CouplingClosure(models.Model):
 
 class InternalClosure(CouplingClosure): 
     target=models.ForeignKey(Component,blank=True,null=True)
-
+    def __unicode__(self):
+        return 'iClosure %s'%self.target
+    
 class ExternalClosure(CouplingClosure):
     ''' AKA boundary condition '''
     target=models.ForeignKey('DataObject',blank=True,null=True)
+    def __unicode__(self):
+        return 'eClosure %s'%self.target    
         
 class InitialCondition(models.Model):
     ''' Simulation initial condition '''
@@ -393,27 +389,22 @@ class CouplingForm(forms.ModelForm):
         model=Coupling
         exclude=('component',  # we should always know this
                  'targetInput', # we generate couplings from these 
+                 'simulation', # we hold these across ...
+                 'original'
                 )
-class SimCouplingForm(forms.ModelForm):
-    manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}))
-    class Meta:
-        model=SimCoupling
-        exclude=('component',  # we should always know this
-                 'targetInput', # we generate couplings from these 
-                )
-                
+
 class InternalClosureForm(forms.ModelForm):
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=InternalClosure
-     def specialise(self,model):
+     def specialise(self):
          pass
 
 class ExternalClosureForm(InternalClosureForm):
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=ExternalClosure
-     def specialise(self,model):
+     def specialise(self):
          pass
                 
 class DataObjectForm(forms.ModelForm):

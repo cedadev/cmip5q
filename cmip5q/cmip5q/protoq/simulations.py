@@ -63,8 +63,8 @@ class simulationHandler(object):
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'simulation',s.id,'initialcondition',))
-            urls['bc']=reverse('cmip5q.protoq.views.assign',
-                    args=(self.centreid,'simulation',s.id,'boundarycondition'))
+            urls['bc']=reverse('cmip5q.protoq.views.simulationCup',
+                    args=(self.centreid,s.id,))
             urls['con']=reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,))
             if s.ensembleMembers > 1:
@@ -162,7 +162,6 @@ class simulationHandler(object):
     def conformanceMain(self,request):
         ''' Displays the main conformance view '''
 
-        print 'ss',self.simid
         s=Simulation.objects.get(pk=self.simid)
         e=s.experiment
         

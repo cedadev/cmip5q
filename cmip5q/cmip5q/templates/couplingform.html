@@ -1,22 +1,35 @@
 <div class="boxer">
-<h4>{{f.title}}</h4>
+<h3>{{f.title}}</h3>
+<hr>
+<p> (1) This section describes the coupling method and how often the coupling occurred </p>
 <p>Coupling Type: {{f.cf.couplingType.errors}}{{f.cf.couplingType}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {{f.cf.couplingFreqUnits.errors}}{{f.cf.couplingFreqUnits}}</p>
-<p> Enter zero or more inputs from other components: </p>
+<hr>
+<p>(2) <b> Internal Boundary Conditions</b> This section describes how other components provide input </p> 
+{% if s %} 
+<p>If you have set values for these in your model description, you can copy them using this link: <a id="iclink{{f.cf.icreset.coupling.id}}" href="{{f.cf.icreset.url}}">Copy</a></p>
+{% endif %}
+<p> Enter zero or more inputs from other components (a new blank form will appear after each save): </p>
 {{ f.ic.management_form}}
 <table>
 {% for ff in f.ic.forms %}
 {% include 'closure.html' %}
 {% endfor %}
 </table>
-<p> Enter zero or more inputs from files:</p>
+<hr> 
+<p>(3) <b> Boundary Conditions</b> This section describes coupling to files.</p>
+{% if s %}
+<p>If you have set values for these in your model description, you can copy them using this link: <a id="eclink{{f.cf.ecreset.coupling.id}}" href="{{f.cf.ecreset.url}}">Copy</a></p>
+{% endif %}
+<p> Enter zero or more inputs from files: (a new blank form will appear afer each save)</p>
 {{f.ec.management_form}}
 <table>
 {% for ff in f.ec.forms %}
 {% include 'closure.html' %}
 {% endfor %}
 </table>
-<p> Describe how these input(s) were manipulated into {{c.abbrev}}</p>
+<hr>
+<p> (4) Describe how these input(s) were manipulated when providing input into {{c.abbrev}}</p>
 {{f.cf.manipulation.errors}}{{f.cf.manipulation}}
 </div>

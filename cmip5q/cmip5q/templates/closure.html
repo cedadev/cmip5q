@@ -1,8 +1,8 @@
-<tr><td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} (delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
+<tr class="{% cycle 'row1' 'row2' %}"><td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
 <td colspan="2">
 Spatial Regridding: {{ff.spatialRegridding.errors}} {{ff.spatialRegridding}} &nbsp;
 Temporal Regridding: {{ff.temporalRegridding.errors}} {{ff.temporalRegridding}} &nbsp; </td>
 </tr>
-<tr><td></td><td> Describe any per input details if required:</td>
+<tr class="{% cycle 'row1' 'row2' %}"><td></td><td> Describe any per input details if required:</td>
 <td>{{ff.inputDescription.errors}}{{ff.inputDescription}}</td></tr>
 {% for hid in ff.hidden_fields %} {{hid}}{% endfor %}

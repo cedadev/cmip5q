@@ -11,6 +11,7 @@ from cmip5q.protoq.utilities import PropertyForm, tabs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.references import referenceHandler
+from cmip5q.protoq.coupling import couplingHandler
 from django import forms
 import uuid
 import logging
@@ -107,10 +108,10 @@ def componentXML(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.xml()
   
-def componentCup(request,centre_id,component_id,ctype=None):
+def componentCup(request,centre_id,component_id):
     ''' Return couplings for a component '''
-    c=componentHandler(centre_id,component_id)
-    return c.coupling(request,ctype)
+    c=couplingHandler(centre_id,request)
+    return c.component(component_id)
 
 def componentInp(request,centre_id,component_id):
     ''' Return inputs for a component '''
@@ -169,6 +170,14 @@ def simulationList(request,centre_id):
 def conformanceMain(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simulation_id)
     return s.conformanceMain(request)
+
+def simulationCup(request,centre_id,simulation_id,coupling_id=None,ctype=None):
+    ''' Return couplings for a component '''
+    c=couplingHandler(centre_id,request)
+    if ctype:
+        return c.resetClosures(simulation_id,coupling_id,ctype)
+    else:
+        return c.simulation(simulation_id)
    
 #### CONFORMANCE HANDLING APPEARS IN THE SIMULATION FILE  ###########################################################
  
