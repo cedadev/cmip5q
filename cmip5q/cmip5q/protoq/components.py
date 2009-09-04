@@ -17,7 +17,7 @@ import logging
 
 import os
 
-ComponentInputFormSet=modelformset_factory(ComponentInput,exclude=('owner','realm'))
+ComponentInputFormSet=modelformset_factory(ComponentInput,form=ComponentInputForm,exclude=('owner','realm'),can_delete=True)
             
 class MyComponentInputFormSet(ComponentInputFormSet):
     def __init__(self,component,realm=False,data=None):
@@ -173,6 +173,13 @@ class componentHandler(object):
         else:
             #get some forms
             cform=ComponentForm(instance=c,prefix='gen')
+        
+        if c.isModel:
+            #we'd better decide what we want to say about couplings. Same code in simulation!
+            cs=Coupling.objects.filter(component=c).filter(simulation=None)
+            cset=[{'name':str(i),'nic':len(InternalClosure.objects.filter(coupling=i)),
+                             'nec':len(ExternalClosure.objects.filter(coupling=i)),
+                             } for i in cs]
     
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
@@ -182,6 +189,7 @@ class componentHandler(object):
                 'urls':urls,
                 'isRealm':c.isRealm,
                 'isModel':c.isModel,
+                'cset':cset,
                 'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
     def manageRefs(self,request):      

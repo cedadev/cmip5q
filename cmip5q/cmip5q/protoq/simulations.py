@@ -90,7 +90,22 @@ class simulationHandler(object):
         cs=Conformance.objects.filter(simulation=s)
         coset=[]
         for i in cs:
-            coset.append({'name':i.requirement})
+            new={'name':i.requirement,'method':'','detail':''}
+            if i.ctype.value=='BoundaryCondition':
+                if i.boundaryCondition:
+                    new['method']='conforms via boundary condition %s'%i.boundaryCondition
+            elif i.ctype.value=='InitialCondition':
+                if i.initialCondition:
+                    new['method']='conforms via initial condition %s'%i.initialCondition
+            else:
+                new['method']='Contact Programmer'
+            # are there any code modifications?
+            cm=i.codeModification.values()
+            if len(cm): 
+                if new['method']=='': new['method']+=' and '
+                new['method']+='code modification'
+            new['detail']=i.description
+            coset.append(new)
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
