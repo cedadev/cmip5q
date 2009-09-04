@@ -115,6 +115,11 @@
     {% if isModel %}
     <div class="boxer">
     <h4> Couplings </h4>
+    <table>
+    {% for bc in cset %}
+    <tr class="{%cycle  'row2' 'row1'%}"><td>Boundary Condition:&nbsp;</td><td>{{bc.name}} uses {{bc.nic}} internal link(s) and {{bc.nec}} file link(s) by default.</tr>
+    {% endfor %}
+    </table>
     </div>
     {% endif %}
 </td></tr></table>
