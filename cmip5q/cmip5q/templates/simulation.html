@@ -79,7 +79,7 @@
     <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
     {% endifnotequal %}
     {% ifequal label "Update" %}
-    <p>(You can modify these using the buttons on the left hand menu.)</p>
+    <p>(You can modify these using the button on the left hand menu.)</p>
     <table>
     {% if s.initialCondition %}
     <tr class="{% cycle 'row1' 'row2'%}"><td>Inital Condition:&nbsp;</td><td>{{s.initialCondition}}</td></tr>
@@ -94,13 +94,14 @@
     {% endifequal %}
 </div>
 <div class="boxer backgrey">
-<h4> Conformance: How this simulation conforms to the Numerical Requirements </h4>
+<h4> Conformance: How this simulation conforms to the numerical requirements of experiment {{exp}}</h4>
 {% ifnotequal label "Update" %}
 <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
 {% else %}
+ <p>(You can modify these using the button on the left hand menu.)</p>
 <table>
 {% for c in coset %}
-<tr class="{% cycle 'row1' 'row2'%}"><td>{{c.name}}</td></tr>
+<tr class="{% cycle 'row1' 'row2'%}"><td>{{c.name}}</td><td>{% if c.method %} {{c.method}} {% else %} <span class="red">Not conformant?</span>{% endif %}</tr>
 {% endfor %}
 </table>
 {% endifnotequal %}
