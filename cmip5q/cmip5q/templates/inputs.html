@@ -7,12 +7,28 @@ beneath this one </p> {% endif %}
 </div>
 
 <div class="boxer">
-<div class="boxer2">
-    <form action="{{urls.ok}}" method="POST">
-        {{form}} 
-    <center><input id="InternalBut" type="submit" value="Save"></center>
-    </form>
-</div>
+    <div class="boxer2">
+        <form action="{{urls.ok}}" method="POST">
+            {{ form.management_form }}
+            {% for f in form.forms %}
+            <div class="boxer">
+                <table>
+                    <tr class="{% cycle 'row1' 'row2'%}">
+                        <td>Name: {{f.abbrev.errors}} {{f.abbrev}} </td>
+                        <td>BoundaryCondition? {{f.bc.errors}} {{f.bc}} </td>
+                        <td>{% if not forloop.last %} (delete: {{f.DELETE.errors}}{{f.DELETE}}){% endif %}</td>
+                    </tr>
+                    <tr class="{% cycle 'row1' 'row2'%}">
+                    <td colspan="3">Description:{{f.description.errors}}{{f.description}}</td>
+                    </tr>
+                    {% for hid in f.hidden_fields %} {{hid}} {% endfor %}       
+                </table> 
+            </div> 
+            {% endfor %}
+            <!--{ { form.as_table } }-->
+        <center><input id="InternalBut" type="submit" value="Save"></center>
+        </form>
+    </div>
 <p><a href="{{urls.self}}"> Return to {{c.abbrev}}</a></p>
 </div>
 
