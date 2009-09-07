@@ -16,6 +16,8 @@ import uuid
 import logging
 
 import os
+from xml.etree import ElementTree as ET
+import tempfile
 
 ComponentInputFormSet=modelformset_factory(ComponentInput,form=ComponentInputForm,exclude=('owner','realm'),can_delete=True)
             
@@ -115,8 +117,8 @@ class componentHandler(object):
         urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
         urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
         urls['inputs']=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,c.id))
-        urls['view']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
-        urls['validate']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
+        urls['view']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
+        urls['validate']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
         
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
@@ -210,17 +212,65 @@ class componentHandler(object):
             'refu':refu,'baseURLa':baseURLa,'baseURLr':baseURLr,
             'tabs':self.tabs,'notAjax':not request.is_ajax()})
             
+    def getRootComponentID(self,component_id):
+        self.component_id=component_id
+        parents=Component.objects.filter(components=component_id)
+        #logging.debug("getRootComponentID component id = %d",component_id)
+        #logging.debug("getRootComponentID num parents = %d",len(parents))
+        if len(parents)==1 :
+            # recurse to next parent
+            self.getRootComponentID(parents[0].id)
+        elif len(parents)>1 or len(parents)<0 :
+            #error: there should only be 0 or 1 parent
+            logging.error("components.py:getRootComponent: There should only be one parent of a component")
+        # If the return is part of the above if clause, the type returned is a NoneType. Therefore I've written the method so that the return is at the end
+        return self.component_id
+
     def validate(self):
         ''' Validate component '''
-        return HttpResponse('Not implemented')
+
+        # find current component
+        component_id=self.component.id
+        logging.debug("Validate method called for component_id = %d",component_id)
+        # find the root component
+        root_component_id=self.getRootComponentID(component_id)
+        logging.debug("Root component id = %d",root_component_id)
+
+        # create cim instance
+        logging.debug("Creating CIM instance from internal state")
+
+        # to create CIM from current component, pass component_id
+        # to create CIM from root component, pass root_component_id
+        nm=NumericalModel(component_id)
+        # nm=NumericalModel(root_component_id)
+
+        # default creates CIM with specified component and all of its children
+        # add argument recurse=False to export method to skip any children
+        # CIMDoc=nm.export()
+        CIMDoc=nm.export(recurse=False)
+
+        # write cim instance to file & stdout
+        ET.dump(CIMDoc)
+        tree=ET.ElementTree(CIMDoc)
+        #I can't seem to get the tempfile class to write a file to disk so perform a silly hack instead ...
+        filexxx=tempfile.NamedTemporaryFile(mode='w', suffix='', prefix=self.component.abbrev+"_CIM_")
+        file=open(filexxx.name+".xml","w")
+        logging.debug("Writing CIM instance to temporary file %s",file.name)
+        tree.write(file)
+
+        file.flush()
+        return HttpResponse(ET.tostring(CIMDoc))
+        #return HttpResponse('Validate is not implemented')
     
     def view(self):
         ''' HTML view of self '''
-        return HttpResponse('Not implemented')
+        component_id=self.component.id;
+        logging.debug("Hello from view function")
+        return HttpResponse('View is not implemented')
     
     def XML(self):
         ''' XML view of self '''
-        return HttpResponse('Not implemented')
+        return HttpResponse('XML (view) is not implemented')
    
     def numerics(self):
         return HttpResponse('Not implemented')

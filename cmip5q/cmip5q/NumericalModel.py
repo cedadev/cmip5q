@@ -76,10 +76,99 @@ class NumericalModel:
         
         pass
     
-    def export(self):
+    def export(self,recurse=True):
         ''' Return an XML view of self '''
-        pass
-        
+
+        logging.debug('NumericalModel:export returning an xml document')
+        root=ET.Element('CIMRecord',{'documentVersion': '1.2'})
+        ET.SubElement(root,'id').text='[TBD]'
+        self.exportAddComponent(root,self.component,recurse)
+        return root
+
+    def exportAddComponent(self,root,c,recurse=True):
+        comp=ET.SubElement(root,'modelComponent',{'documentVersion': '[TBD]'})
+        '''composition'''
+        if recurse:
+            '''childComponent'''
+            for child in c.components.all():
+                comp2=ET.SubElement(comp,'childComponent')
+                self.exportAddComponent(comp2,child)
+        '''parentComponent'''
+        '''deployment'''
+        '''shortName'''
+        ET.SubElement(comp,'shortName').text=c.abbrev
+        '''longName'''
+        ET.SubElement(comp,'longName').text=c.title
+        '''description'''
+        ET.SubElement(comp,'description').text='[TBD]'
+        '''license'''
+        '''componentProperties'''
+        componentProperties=ET.SubElement(comp,'componentProperties')
+        pset=Param.objects.filter(component=c)
+        for p in pset:
+            componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'[TBD]'})
+            '''shortName'''
+            ET.SubElement(componentProperty,'shortName').text=p.name
+            '''longName'''
+            ET.SubElement(componentProperty,'longName').text='[TBD]'
+            '''description'''
+            '''type'''
+            ET.SubElement(componentProperty,'type').text='[TBD]'
+            '''value'''
+            ET.SubElement(componentProperty,'value').text=p.value
+            #ET.SubElement(componentProperty,'ptype').text=p.ptype
+            #ET.SubElement(componentProperty,'vocab').text=p.vocab
+        '''numericalProperties'''
+        ET.SubElement(comp,'numericalProperties')
+        '''scientificProperties'''
+        ET.SubElement(comp,'scientificProperties')
+        '''grid'''
+        '''responsibleParty'''
+        resp=ET.SubElement(comp,'responsibleParty') #type gmd:xxxx
+        #http://www.isotc211.org/2005/gmd
+        #CI_ResponsibleParty referenced in citation.xsd
+        # <gmd:individualName>
+        name=ET.SubElement(resp,'gmd:individualName')
+        ET.SubElement(name,'gco:CharacterString').text=c.contact
+        # </gmd:individualName/>
+        # <gmd:organisationName/>
+        # <gmd:positionName/>
+        # <gmd:contactInfo>
+        contact=ET.SubElement(resp,'gmd:contactInfo')
+        #     <gmd:phone/>
+        #     <gmd:address>
+        address=ET.SubElement(contact,'gmd:address')
+        #         <gmd:deliveryPoint/>
+        #         <gmd:city/>
+        #         <gmd:administrativeArea/>
+        #         <gmd:postalCode/>
+        #         <gmd:country/>
+        #         <gmd:electronicMailAddress>
+        email=ET.SubElement(address,'gmd:electronicMailAddress')
+        ET.SubElement(email,'gco:CharacterString').text=c.email
+        #         </gmd:electronicMailAddress>
+        #     </gmd:address>
+        #     <gmd:onlineResource/>
+        #     <gmd:hoursOfService/>
+        #     <gmd:contactInstructions/>
+        # </gmd:contactInfo>
+        # <gmd:roll/>
+
+        '''activity'''
+        '''type'''
+        ET.SubElement(comp,'type').text=c.scienceType
+        '''timing'''
+        ET.SubElement(comp,'timing').text='[TBD]'
+        '''documentID'''
+        ET.SubElement(comp,'documentID').text='[TBD]'
+        '''documentAuthor'''
+        '''documentCreationDate'''
+        ET.SubElement(comp,'documentCreationDate').text='[TBD]'
+        #e.text=datetime.date
+        '''documentGenealogy'''
+        '''quality'''
+        return
+
 class XMLVocabReader:
     # original author, Matt Pritchard
     ''' Reads XML vocab structure. '''
