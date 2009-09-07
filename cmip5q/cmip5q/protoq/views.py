@@ -256,7 +256,7 @@ def dataList(request,cen_id):
     c.url=reverse('cmip5q.protoq.views.centre',args=(cen_id,))
     surl=reverse('cmip5q.protoq.views.simulationList',args=(cen_id,))
     editurl=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,))
-    return render_to_response('file_list.html',{'files':do,'surl':surl,'c':c,
+    return render_to_response('file_list.html',{'objects':do,'surl':surl,'c':c,
                                 'tabs':tabs(cen_id,'Files'),
                                 'form':DataObjectForm(),
                                 'editURL':editurl,

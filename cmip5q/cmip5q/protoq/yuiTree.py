@@ -41,7 +41,7 @@ class yuiTree2:
         return '<li%s>%s<a href="%s"%s>%s</a>%s\n'%(e,ok1,url,cc,a,ok2)
     
     def __init__(self,component_id,baseURL,top='model',template='+EDID+'):
-        component=Component.objects.get(pk=component_id)        
+        component=Component.objects.get(pk=component_id)
         self.baseURL=baseURL
         self.template=template
         self.html='<ul>\n'
@@ -49,7 +49,8 @@ class yuiTree2:
         self.family=ComponentFamily(component)
         self.expanders=self.family.ancestors
         self.expanders.append(self.family.me)
-        clist=Component.objects.filter(scienceType='model').filter(centre=component.centre_id)
+        #clist=Component.objects.filter(scienceType='model').filter(centre=component.centre_id)
+        clist=Component.objects.filter(scienceType='model').filter(model=component.model)
         for c in clist: self.__walk(c)
         #self.__debug()
         self.html+='</ul>\n'

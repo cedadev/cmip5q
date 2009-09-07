@@ -180,6 +180,7 @@ class componentHandler(object):
             cset=[{'name':str(i),'nic':len(InternalClosure.objects.filter(coupling=i)),
                              'nec':len(ExternalClosure.objects.filter(coupling=i)),
                              } for i in cs]
+        else: cset=[]
     
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',

@@ -24,7 +24,6 @@ class tabs(list):
         t['Sum']=tab('Home:%s'%c.abbrev,
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
         self.append(t['Sum'])
-        
         models=[Component.objects.get(pk=m.id) for m in c.component_set.filter(scienceType='model')]
         for m in models:
             t[m.abbrev]=tab(m.abbrev,
