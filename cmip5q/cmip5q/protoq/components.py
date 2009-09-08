@@ -77,17 +77,13 @@ class componentHandler(object):
             #nm.read()
             cmip5c=Centre.objects.get(abbrev='CMIP5')
             original=Component.objects.filter(abbrev='GCM Template').get(centre=cmip5c)
-            component=original.makeNewCopy()
-            component_id=component.id
+            self.component=original.makeNewCopy(Centre.objects.get(id=centre_id))
+        else:
+            self.component=Component.objects.get(pk=component_id)
         
         self.tabs=tabs(centre_id,'Update')
-        self.component=Component.objects.get(pk=component_id)
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
-   
-    def add(self):
-        '''Add a new root component, essentially all we need to do is return a redirection to an edit '''
-        return HttpResponseRedirect(self.url)
             
     def addsub(self):
         ''' Add a subcomponent to a parent, essentially, we create a subcomponent, and return
@@ -125,18 +121,6 @@ class componentHandler(object):
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
         baseURL=baseURL.replace('add/','%s/edit'%template)
-        
-        # now get parent, if available 
-        # and monkey patch it in, all monkey patching to use prefix TC ...
-        parents=Component.objects.filter(components=c.id)
-        if len(parents)==0: 
-            c.TCparentID=None
-        else: 
-            c.TCparentID=parents[0].id
-            c.TCparentAbbrev=parents[0].abbrev
-        logging.debug('editing component %s which has parent %s'%(c.id,c.TCparentID))
-        # now get subcomponents
-        subc=c.components.all()
     
         # this is the automatic machinery ...
         refs=Reference.objects.filter(component__id=c.id)
@@ -147,11 +131,7 @@ class componentHandler(object):
         if request.method=="POST":
             cform=ComponentForm(request.POST,prefix='gen',instance=c)
             if cform.is_valid():
-                uricopy=c.uri
-                c=cform.save(commit=False)
-                #these are all the bits not in the form ...
-                c.uri=uricopy
-                c.save()
+                c=cform.save()
                 logging.debug('Saving component %s details (e.g. uri %s)'%(c.id,c.uri))
             else:
                 logging.debug('Unable to save characteristics for component %s'%c.id)
@@ -188,7 +168,7 @@ class componentHandler(object):
     
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
-                {'c':c,'subs':subc,'refs':refs,'inps':inps,
+                {'c':c,'refs':refs,'inps':inps,
                 'cform':cform,'pform':pform,
                 'navtree':navtree.html,
                 'urls':urls,

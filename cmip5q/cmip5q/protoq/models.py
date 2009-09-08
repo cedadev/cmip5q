@@ -56,7 +56,7 @@ class Component(Doc):
    
     centre=models.ForeignKey('Centre',blank=True,null=True)
     
-    def makeNewCopy(self,model=None,realm=None,email=None,contact=None):
+    def makeNewCopy(self,centre,model=None,realm=None,email=None,contact=None):
         ''' Carry out a deep copy of a model '''
         ######### NOT YET TESTED  ##############################################
         attrs=['title','abbrev','description',
@@ -67,6 +67,7 @@ class Component(Doc):
         if email:kwargs['email']=email
         if contact: kwargs['contact']=contact
         kwargs['uri']=str(uuid.uuid1())
+        kwargs['centre']=centre
         
         new=Component(**kwargs)
         new.save() # we want an id
@@ -89,9 +90,9 @@ class Component(Doc):
         new.realm=realm
        
         for c in self.components.all():
-            r=c.makeNewCopy(model=model,realm=realm,email=kwargs['email'],contact=kwargs['contact'])
+            r=c.makeNewCopy(centre,model=model,realm=realm,email=kwargs['email'],contact=kwargs['contact'])
             new.components.add(r)
-            logging.debug('Added new component %s to component %s'%(r,new))
+            logging.debug('Added new component %s to component %s (in model %s with realm %s)'%(r,new,model,realm))
             
         #### Now we need to deal with the parameter settings too ..
         pset=Param.objects.filter(component=self)
@@ -444,19 +445,22 @@ class SimulationForm(forms.ModelForm):
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
+    scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+    implemented=forms.BooleanField(required=True)
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
     contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
-    scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+   
     implemented=forms.BooleanField(required=True)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
     otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
     class Meta:
         model=Component
-        exclude=('centre','uri')
+        exclude=('centre','uri','model','realm','isRealm','isModel','visited','controlled',
+                 'references','components')
 
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))

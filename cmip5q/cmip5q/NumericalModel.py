@@ -35,6 +35,7 @@ class NumericalModel:
         klass=centre.__class__
         if klass != Centre:
             raise ValueError('Need a valid django centre class for NumericalModel, got %s'%klass)
+        self.centre=centre
         if id==0: xml=True
         if xml and id<>0:
             raise ValueError('Incompatible arguments to numerical model')
@@ -48,8 +49,8 @@ class NumericalModel:
         
     def copy(self):
         
-        new=self.top.makeNewCopy()
-        logging.debug('Made new model %s with id %s'%(new,new.id))
+        new=self.top.makeNewCopy(self.centre)
+        logging.debug('Made new model %s with id %s in %s'%(new,new.id,self.centre))
         return new
     
     def makeEmptyModel(self,

@@ -76,7 +76,7 @@ def centre(request,centre_id):
 def componentAdd(request,centre_id):
     ''' Add a component '''
     c=componentHandler(centre_id)
-    return c.add()
+    return c.edit(request)
     
 def componentEdit(request,centre_id,component_id):
     ''' Edit a component '''
