@@ -15,6 +15,7 @@ ${PYTHON:-python} manage.py shell << EOF
 from protoq.models import *
 from XMLinitialiseQ import initialise
 from XMLActivityReader import NumericalExperiment
+from NumericalModel import *
 from initialiseRefs import *
 from initialiseFiles import *
 
@@ -35,5 +36,9 @@ for f in os.listdir(experimentDir):
     if f.endswith('.xml'):
 	    x=NumericalExperiment(os.path.join(experimentDir, f)) 
 	    x.load()
+
+# initialise a model template
+initialiseModel()
+
 
 EOF

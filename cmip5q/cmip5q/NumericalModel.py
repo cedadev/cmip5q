@@ -1,7 +1,7 @@
 
 # This file has the NumericalModel class, which is independent of the django views (but not
 # the django strage), used to instantiate numerical models from xml versions of the mindmaps,
-# and to produce xml instances of the django storage ...
+# and to produce xml instances of the django storage.
 
 from protoq.models import *
 from XMLinitialiseQ import realms
@@ -12,21 +12,46 @@ import logging
 import unittest
 import os
 
+
+def initialiseModel():
+    ''' Setup a template for model copying in the dummy CMIP5 centre '''
+    try:
+        c=Centre.objects.get(abbrev='CMIP5')
+    except:
+        cl=Centre.objects.all()
+        logging.debug('Unable to read dummy CMIP5 centre description, existing centres are %s'%cl)
+        return False
+    m=NumericalModel(c,xml=True)
+    return True
+
 class NumericalModel:
     
     ''' Handles the creation of a model instance in the database, either from XML storage
     or from a pre-existing instance '''
     
-    def __init__(self,id,centre=None):
-        ''' Initialise from storage, or build a new one '''
-        if id==0:
-            if centre is None:
-                raise ValueError('Need valid centre to create a new model')
-            else:
-                self.component=self.makeEmptyModel(centre)
-        else:
-            self.component=Component.objects.get(pk=id)
+    def __init__(self,centre,id=0,xml=False):
+        ''' Initialise by copy from django storage, or build a new one from the XML '''
         
+        klass=centre.__class__
+        if klass != Centre:
+            raise ValueError('Need a valid django centre class for NumericalModel, got %s'%klass)
+        if id==0: xml=True
+        if xml and id<>0:
+            raise ValueError('Incompatible arguments to numerical model')
+        if id<>0:
+            self.top=Component.objects.get(id=id)
+        elif xml:
+            self.makeEmptyModel(centre)
+            self.read()
+        else:
+            raise ValueError('Nothing to do in NumericalModel')
+        
+    def copy(self):
+        
+        new=self.top.makeNewCopy()
+        logging.debug('Made new model %s with id %s'%(new,new.id))
+        return new
+    
     def makeEmptyModel(self,
                       centre,
                       authorName='Joe Bloggs',
@@ -45,7 +70,8 @@ class NumericalModel:
         component.save()
         component.model=component
         component.save()
-        return component
+        self.top=component
+        logging.debug('Created empty top level model %s'%component)
         
     def read(self):
        
@@ -60,21 +86,13 @@ class NumericalModel:
                     if f.endswith('.xml')]
                     
         for m in mindmaps:
-            x=XMLVocabReader(m, self.component)
+            x=XMLVocabReader(m, self.top)
             x.doParse()
-            self.component.components.add(x.component)
+            self.top.components.add(x.component)
             logging.debug('Mindmap %s added with component id %s'%(m,x.component.id))
         
-        self.component.save()
-        logging.info('Created new Model %s'%self.component.id)
-        
-    def copy(self,original):
-        ''' Construct a new model by copying a pre-existing model description '''
-        
-        logging.debug('Deep model copying not implemented')
-        # would have be pretty careful to do all the internal reference copying ...
-        
-        pass
+        self.top.save()
+        logging.info('Created new Model %s'%self.top.id)
     
     def export(self,recurse=True):
         ''' Return an XML view of self '''
@@ -263,23 +281,46 @@ class TestFunctions(unittest.TestCase):
     def setUp(self):
         try:
             self.centre=Centre.objects.get(pk=1)
-        except:
-            raise ValueError(
-            'Cannot unittest NumericalModel without a centre already saved in django database')
-        self.model=NumericalModel(0,self.centre)
+        except: 
+            u=str(uuid.uuid1())
+            c=Centre(abbrev='CMIP5',title='Dummy testing version',
+                     uri=u)
+            logging.debug('Created dummy centre for testing')
+            c.save()
+            self.centre=c 
        
-    def testReadFromXML(self):
-        self.model.read()
+    def NOtest0ReadFromXML(self):
         
-        c=self.model.component
+        nm=NumericalModel(self.centre,xml=True)
+        
+        c=nm.top
         self.assertEqual(c.scienceType,'model')
         self.assertEqual(True,c.isModel)
         self.assertEqual(False,c.isRealm)
         
-        for c in self.model.component.components.values_list():
+        for c in nm.top.components.all():
             self.assertEqual(True,c.scienceType in realms)
             self.assertEqual(True,c.isRealm)
             self.assertEqual(False,c.isModel)
+        
+        self.nm=nm
             
+    def test1CopyModel(self):
+        
+        model=Component.objects.filter(abbrev='GCM Template')[0]
+        logging.info('Test 1 using component %s'%model.id)
+        nm=NumericalModel(self.centre,id=model.id)
+        
+        model=nm.top
+        copy=nm.copy()
+         
+        self.assertEqual(str(model.title),str(copy.title))
+        self.assertEqual(str(model.model),str(copy.model))
+            
+        originalRealms=model.components.all()
+        copyRealms=copy.components.all()
+        
+        for i in range(len(originalRealms)):
+            self.assertEqual(str(originalRealms[i].abbrev),str(copyRealms[i].abbrev))
                                 
                                 

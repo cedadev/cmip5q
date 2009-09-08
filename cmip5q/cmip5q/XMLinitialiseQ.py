@@ -14,7 +14,9 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
          ('MOHC','UK Met Office Hadley Centre'),
          ('GFDL','US Geophysical Fluid Dynamics Laboratory'),
          ('IPSL','FR Institute Simone Pierre Laplace'),
-         ('MPIM','DE Max Planck Institute for Meteorology'), )
+         ('MPIM','DE Max Planck Institute for Meteorology'), 
+         ('CMIP5','Dummy Centre used to hold model template'),
+     )
      
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
