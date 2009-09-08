@@ -6,8 +6,7 @@ from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 import uuid
-
-import vocab
+import logging
 
 class Doc(models.Model):
     ''' Abstract class for general properties '''
@@ -62,9 +61,9 @@ class Component(Doc):
         ######### NOT YET TESTED  ##############################################
         attrs=['title','abbrev','description',
                'scienceType','controlled','isRealm','isModel',
-               'references','email','contact']
+               'email','contact']
         kwargs={}
-        for i in attrs: kwargs[i]=self.__getAttribute__(i)
+        for i in attrs: kwargs[i]=self.__getattribute__(i)
         if email:kwargs['email']=email
         if contact: kwargs['contact']=contact
         kwargs['uri']=str(uuid.uuid1())
@@ -72,25 +71,30 @@ class Component(Doc):
         new=Component(**kwargs)
         new.save() # we want an id
        
+        # now handle the references
+        for r in self.references.all():
+            new.references.add(r)
+       
         if model is None:
             if self.isModel:
                 model=new
             else:
-                return ValueError('Deep copy called with invalid model arguments')
+                raise ValueError('Deep copy called with invalid model arguments: %s'%self)
         elif realm is None:
             if self.isRealm:
                 realm=new
             else:
-                return ValueError('Deep copy called within invalid realm arguments')
+                raise ValueError('Deep copy called with invalid realm arguments: %s'%self)
         new.model=model
         new.realm=realm
        
-        for c in self.components:
+        for c in self.components.all():
             r=c.makeNewCopy(model=model,realm=realm,email=kwargs['email'],contact=kwargs['contact'])
             new.components.add(r)
+            logging.debug('Added new component %s to component %s'%(r,new))
             
         #### Now we need to deal with the parameter settings too ..
-        pset=Parameter.objects.filter(component=self)
+        pset=Param.objects.filter(component=self)
         for p in pset: p.makeNewCopy(new)
         
         ### And deal with the component inputs too ..

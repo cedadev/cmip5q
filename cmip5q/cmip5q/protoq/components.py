@@ -73,9 +73,11 @@ class componentHandler(object):
         
         if component_id is None:
             ''' This is a brand new component '''
-            nm=NumericalModel(0,centre=Centre.objects.get(id=centre_id))
-            nm.read()
-            component=nm.component
+            #nm=NumericalModel(0,centre=Centre.objects.get(id=centre_id))
+            #nm.read()
+            cmip5c=Centre.objects.get(abbrev='CMIP5')
+            original=Component.objects.filter(abbrev='GCM Template').get(centre=cmip5c)
+            component=original.makeNewCopy()
             component_id=component.id
         
         self.tabs=tabs(centre_id,'Update')

@@ -180,6 +180,12 @@ class couplingHandler:
         return self.__handle(simulation)
     def __handle(self,simulation=None):
         model=self.component.model
+        if model is None:
+            # This shouldn't happen, but it did at least once in testing.
+            # I assume the model creation process was somehow interrupted.
+            # This should catch this error, and allow vaguely sensible completion. 
+            logging.debug('Error: Component %s has no model'%self.component)
+            self.component.model=self.component           
         self.urls['model']=reverse('cmip5q.protoq.views.componentEdit',
                     args=(self.centre_id,model.id,))
         logging.debug('Handling %s coupling request for %s (simulation %s)'%(self.method,model,simulation))
