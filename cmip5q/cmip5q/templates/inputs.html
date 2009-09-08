@@ -4,6 +4,7 @@
 <h1> Inputs for component: "{{c.abbrev}}"</h1>
 {% if c.isRealm %} <p>Note that these should include all inputs from components described
 beneath this one </p> {% endif %}
+<p> (Each time you add a new input, it will be saved, and a new entry form will appear for subsequent inputs.) </p>
 </div>
 
 <div class="boxer">
@@ -11,6 +12,7 @@ beneath this one </p> {% endif %}
         <form action="{{urls.ok}}" method="POST">
             {{ form.management_form }}
             {% for f in form.forms %}
+            {% if forloop.last %} <p> Add a new input: </p> {% endif %}
             <div class="boxer">
                 <table>
                     <tr class="{% cycle 'row1' 'row2'%}">
