@@ -58,7 +58,7 @@ class Component(Doc):
     
     def makeNewCopy(self,centre,model=None,realm=None,email=None,contact=None):
         ''' Carry out a deep copy of a model '''
-        ######### NOT YET TESTED  ##############################################
+        
         attrs=['title','abbrev','description',
                'scienceType','controlled','isRealm','isModel',
                'email','contact']

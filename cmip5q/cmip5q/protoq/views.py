@@ -307,7 +307,6 @@ def ensemble(request,cen_id,sim_id,ens_id=None):
         e=PhysicalEnsemble.objects.get(id=ens_id)
         s=e.simulation
     
-    
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
           'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
           'mods':reverse('cmip5q.protoq.views.assign',
@@ -325,7 +324,7 @@ def ensemble(request,cen_id,sim_id,ens_id=None):
             return HttpResponseRedirect(urls['self'])
     codeMods=e.codeModification.get_query_set()
     for c in codeMods:
-        c.editURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,'codemodification',c.id,'ensemble',e.id))
+        c.editURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,'codemodification',c.id,'ensemble','assign'))
     return render_to_response('ensemble.html',
                {'s':s,'e':e,'urls':urls,'eform':eform,'codeMods':codeMods,
                'tabs':tabs(cen_id,'tmp')})
@@ -337,75 +336,99 @@ def ensemble(request,cen_id,sim_id,ens_id=None):
 class ViewHandler(BaseViewHandler):
     ''' Specialises Base View for the various resource understood as a "simple"
     view '''
-    #pattern: resource class, resourcetype, form
-    SupportedResources={'initialcondition':[
-                                InitialCondition,
-                                'initialCondition',
-                                InitialConditionForm],
-                        'file':[
-                                DataObject,
-                                'file',
-                                DataObjectForm],
-                        'codemodification':[
-                                CodeModification,
-                                'codeModification',
-                                CodeModificationForm]
-                                }
-    def __init__(self,cen_id,resourceType,obj_id,target_id,targetType):
+    
+    # The base view handler needs a mapping between the resource type
+    # as it will appear in a URL, the name it is used when an attribute, 
+    # the resource class and the resource class form
+    # (so keys need to be lower case)
+    SupportedResources={'initialcondition':{'attname':'initialCondition',
+                            'class':InitialCondition,'form':InitialConditionForm},
+                        'file':{'attname':'dataObject',
+                            'class':DataObject,'form':DataObjectForm},
+                        'codemodification':{'attname':'codeModification',
+                            'class':CodeModification,'form':CodeModificationForm},
+                        'reference':{'attname':'reference',
+                            'class':Reference,'form':ReferenceForm},
+                        }
+                        
+    # Some resources are associated with specific targets, so we need a mapping
+    # between how they appear in URLs and the associated django classes
+    # (so keys need to be lower case)                    
+                        
+    SupportedTargets={'simulation':{'class':Simulation,'attname':'simulation'},
+                      'ensemble':{'class':PhysicalEnsemble,'attname':'physicalEnsemble'},
+                      'centre':{'class':Centre,'attname':'centre'},
+                      'component':{'class':Component,'attname':'component'},
+                     }
+                     
+    # and for each of those we need to get back to the target view/edit, and for
+    # that we need the right function name
+    
+    SupportedTargetReverseFunctions={
+                      'simulation':'cmip5q.protoq.views.simulationEdit',
+                      'ensemble':'cmip5q.protoq.views.ensemble',
+                      'centre':'cmip5q.protoq.views.centre',
+                      'component':'cmip5q.protoq.views.componentEdit',
+                      }
+                        
+    # Now the expected usage of this handler is for
+    # codemodifications associated with a given model (assign to a simulation and list)
+    # references for a given component (assign to a component and list)
+    # data objects in general (list)
+    # initial conditions (assign to a simulation) and list
+    
+    
+                        
+    def __init__(self,cen_id,resourceType,resource_id,target_id,targetType):
         ''' We can have some combination of the above at initialiation time '''
         
         if resourceType not in self.SupportedResources:
             raise ValueError('Unknown resource type %s '%resourceType)
-        
-        constraints,targetURL,target=None,None,None
+     
         if targetType is not None:
+            # We grab an instance of the target
             try:
-                target={'simulation':Simulation,
-                        'ensemble':PhysicalEnsemble
-                       }[targetType].objects.get(id=target_id)
+                target=self.SupportedTargets[targetType]
+                target['type']=targetType
+                target['instance']=target['class'].objects.get(id=target_id)
             except Exception,e:
-                return HttpResponse(str(e))
-            targetURL={'simulation':reverse('cmip5q.protoq.views.simulationEdit',
-                                            args=(cen_id,target_id,)),
-                       'ensemble':reverse('cmip5q.protoq.views.ensemble',
-                                           args=(cen_id,0,target_id,))
-                      }[targetType]
+                # FIXME: Handle this more gracefully
+                raise ValueError('Unable to find resource %s with id %s'%(targetType,target_id))
+            # and work out what the url will be to return to this target instance
+            target['url']=reverse(self.SupportedTargetReverseFunctions[targetType],
+                                  args=[cen_id,target_id])
+        else: target=None 
+        
+        resource=self.SupportedResources[resourceType]
+        resource['type']=resourceType
+        resource['id']=resource_id
+     
+        BaseViewHandler.__init__(self,cen_id,resource,target)
+        
+    def objects(self):
+        ''' Returns a list of objects to display, as a function of the resource and target types'''
+        objects=self.resource['class'].objects.all()
+        if self.resource['type']=='codemodification' and self.target['type']=='simulation':
+            # for code modifications, we need to get those associated with a model for a simulation
+            constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
+            objects=objects.filter(component__in=constraintSet)
+        return objects
 
-        #We may need a constraint tuple to be used by specialisation methods 
-        #if resourceType=='boundarycondition' and targetType=='simulation':
-        #    # we need to constrain the boundary condition form to the right boundary conditions
-        #    model=target.numericalModel
-        #    constraints=(model,)
-           
-        SupportedResource=self.SupportedResources[resourceType]
-        # The base view handler needs some or all of this:   
-        data={'centre':cen_id,
-              'resource':{'type':SupportedResource[1],'id':obj_id,
-                           'class':SupportedResource[0]},
-              'target':{'type':targetType,'id':target_id,'url':targetURL,'instance':target},
-              'form':SupportedResource[2],
-              'constraints':constraints}
-              
-        BaseViewHandler.__init__(self,data)
-
-def edit(request,cen_id,returnType,resourceType,obj_id=None,target_id=None,targetType=None):
+def edit(request,cen_id,resourceType,resource_id,targetType=None,target_id=None,returnType=None):
     ''' This is the generic simple view editor '''
     
-    h=ViewHandler(cen_id,resourceType,obj_id,target_id,targetType)
+    h=ViewHandler(cen_id,resourceType,resource_id,target_id,targetType)
     return h.edit(request,returnType)
 
 def list(request,cen_id,resourceType,targetType=None,target_id=None):
     ''' This is the generic simple view lister '''
-   
+
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.list()
 
-def assign(request,cen_id,targetType,target_id,resourceType):
+def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType
     to resource target_id of type targetType '''
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 
-    
-    
-

@@ -8,100 +8,111 @@ import logging
 class BaseViewHandler:
     ''' This is a base class to be used by the editors and listers
             '''
-    def __init__(self,data):
+    def __init__(self,centre_id,resource,target):
         ''' The base view handler is initialised with stuff that is known to the url mapping
         and exploits some knowledge of the specific resources. We shouldn't know anything
         about the specific resources in this class '''
                  
-        self.cid=data['centre']
-        self.resource=data['resource']['class']
-        self.resourceType=data['resource']['type']
-        self.resourceType4url=self.resourceType.lower()
-        self.resourceID=data['resource']['id']
-        self.form=data['form']
-        self.editHTML='%s_edit.html'%self.resourceType
-        self.listHTML='%s_list.html'%self.resourceType
-        self.selectHTML='baseviewAssign.html'
-        # the following is a tuple of constraints which go into the form constructor
-        self.constraints=data['constraints']
-        self.target=data['target']['instance']
-        self.targetID=data['target']['id']
-        self.targetURL=data['target']['url']
-        self.targetType=data['target']['type']
+        self.cid=centre_id
+        self.resource=resource
+        self.target=target
         
-        logging.debug('BaseViewHandler initialised with %s'%data)
+        self.editHTML='%s_edit.html'%self.resource['type']
+        self.listHTML='%s_list.html'%self.resource['type']
+        self.selectHTML='baseviewAssign.html'
         
     def _constructForm(self,method,*args,**kwargs):
         ''' Handle form construction '''
         if method == 'POST':
-            return self.form(*args,**kwargs)
+            return self.resource['form'](*args,**kwargs)
         elif method == 'GET':
-            if self.constraints:
-                form=self.form(*args,**kwargs)
-                form.specialise(*self.constraints)
-                return form
-            else: return self.form(*args,**kwargs)
+            # FIXME we'll need to do the specialisation based on the 
+            # target information ... postpone this again for now.
+            form=self.resource['form'](*args,**kwargs)
+            #form.specialise(*self.constraints)
+            return form
         else:
             raise ValueError('Form construction only supports GET and POST')
                  
     def list(self):
-        ''' Show a list of the basic entities '''
-        objects=self.resource.objects.all()
-        if self.targetType is None:
-            args=[self.cid,'list',self.resourceType4url]
+        ''' Show a list of the basic entities, either all of them, or those
+        associated with a specific instance of a specific class '''
+        
+        objects=self.objects()
+        
+        if self.target:
+            # collapse the object queryset down to only those in the target set
+            # following syntax is how we need to handle a keyword attribute ...
+
+            # get a URL for a blank form
+            formURL=reverse('cmip5q.protoq.views.edit',
+                            args=(self.cid,self.resource['type'],0,
+                            self.target['type'],self.target['instance'].id,'list',))
+            for o in objects:
+                # monkey patch an edit URL into the object allowing for the target,
+                # saying come back here (list)
+                o.editURL=reverse('cmip5q.protoq.views.edit',
+                            args=(self.cid,self.resource['type'],o.id,
+                                  self.target['type'],self.target['instance'].id,'list',))
         else:
-            args=[self.cid,'list',self.resourceType4url,self.targetType,self.targetID]
-        for o in objects:
-            args.insert(3,o.id)
-            o.editURL= reverse('cmip5q.protoq.views.edit',args=args)
-        c=Centre.objects.get(id=self.cid)
-        editURL=reverse('cmip5q.protoq.views.edit',args=args)
+            # get a URL for a blank form
+            formURL=reverse('cmipq.protoq.views.edit',
+                            args=(self.cid,self.resource['type'],0,'list',))
+            for o in objects:
+                # monkey patch an edit URL into the object, saying come back here (list)
+                o.editURL=reverse('cmip51.protoq.views.edit',
+                            args=(self.cid,self.resource['type'],o.id,'list',))
+            
+        # we pass a form and formURL for a new instance to be created.
+        # we're doing all this because we think we have too many entities to use a formset
+        
         return render_to_response(self.listHTML,{
                 'objects':objects,
-                'tabs':tabs(self.cid,self.resourceType),
+                'tabs':tabs(self.cid,self.resource['type']),
                 'form':self._constructForm('GET'),
-                'editURL':editURL
+                'editURL':formURL
                 })
                 
     def edit(self,request,returnType):
-        ''' Edit/Update a specific object, or provide a form for a new object '''
-        if returnType not in ['list','assign','ajax']:
-            raise ValueError('unknown type of editing reuqest %s'%returnType)
-        if self.targetType is None:
-            args=[self.cid,returnType,self.resourceType4url,]
-        else: args=[self.cid,returnType,self.resourceType4url,self.targetType,self.targetID,]
-        if self.resourceID is None:
-            editURL=reverse('cmip5q.protoq.views.edit',args=args)
-            if request.method=='GET':
-                #then we're starting afresh
-                form=self._constructForm('GET')
-            elif request.method=='POST':
-                form=self._constructForm('POST',request.POST)
-        else:
-            args=args.insert(3,self.resource_id)
-            editURL=reverse('cmip5q.protoq.views.edit',args=args)
-            instance=self.resource.objects.get(id=self.resourceID)
-            if request.method=='GET':
-                form=self._constructForm('GET',instance=instance)
-            elif request.method=='POST':
-                form=self._constructForm('POST',request.POST,instance=instance)
-                    
+        ''' We normally see this method called as a GET when it's hyperlinked
+        from a list or assign page, so we want to go back there in those cases.
+        If it's a POST, then we handle it, and go back to the correct place,
+        unless there is a problem. '''
+            
+        # The basic sequence when we receive an edit form as a post, is that 
+        # if it's valid, return to where we came from. If it's not, we should show
+        # a form, complete with errors, with a submission URL which gets the user
+        # back to the right place.  A GET should set that process up.
+        
+        # Note that if the resource instance id is zero, this is a new one.
+        instance=None
+        if self.resource['id']<>'0':
+            instance=self.resource['class'].objects.get(id=self.resource['id'])
+                
         if request.method=='POST':
+            form=self._constructForm('POST',request.POST,instance=instance)
             if form.is_valid():
                 f=form.save()
-                if self.targetType is not None:
+                if returnType=='ajax': return HttpResponse('not implemented')
+                if self.target:
                     url=reverse('cmip5q.protoq.views.%s'%returnType,
-                            args=(self.cid,self.targetType,self.targetID,self.resourceType4url,))
+                            args=(self.cid,self.resource['type'],self.target['type'],self.target['instance'].id,))
                 else:
                     url=reverse('cmip5q.protoq.views.%s'%returnType,
-                            args=(self.cid,self.resourceType4url,))
+                            args=(self.cid,self.resource['type'],))
                 logging.debug('Successful edit post, redirecting to %s'%url)
-                if returnType =='ajax':
-                    return HttpResponse('not implemented')
-                else:
-                    return HttpResponseRedirect(url)
-            else:
-                if self.constraints: form.specialise(*self.constraints)
+                return HttpResponseRedirect(url)
+           
+        if request.method=='GET':
+            form=self._constructForm('GET',instance=instance)
+        
+        # form.specialise() # FIXME
+        
+        # Now construct a useful submission URL
+        args=[self.cid,self.resource['type'],self.resource['id']]
+        if self.target:args+=[self.target['type'],self.target['instance'].id]
+        if returnType: args.append(returnType)
+        editURL=reverse('cmip5q.protoq.views.edit',args=args)
                           
         return render_to_response(self.editHTML,{'form':form,'editURL':editURL})
         
@@ -113,8 +124,11 @@ class BaseViewHandler:
         target view via targetURL. We provide targetType and targetID to allow 
         the construction of return URLs when we go to the editor ...'''
          
-        title='Assign %s(s) to %s'%(self.resourceType4url,self.target)
-        objects=self.resource.objects.all()
+        title='Assign %s(s) to %s'%(self.resource['type'],self.target['instance'])
+        objects=self.objects()
+        print objects
+        print [i.id for i in objects]
+        
         data=[(r.id,str(r)) for r in objects]
         
         # two possible forms could be used, multiple choice, or single choice.
@@ -129,8 +143,9 @@ class BaseViewHandler:
         showChoices=len(data)
         
         # We have two sorts of django attributes to deal with here,
-        # foreign keys, and manytomany fields. 
-        manager=self.target.__getattribute__(self.resourceType)
+        # foreign keys, and manytomany fields.
+        target=self.target['instance'] 
+        manager=target.__getattribute__(self.resource['attname'])
         
         # is it a manytomanyfield?
         many2many="<class 'django.db.models.fields.related.ManyRelatedManager'>"
@@ -152,14 +167,16 @@ class BaseViewHandler:
                 #now parse these up and assign to the resource
                 if not JustOne:manager.clear()
                 new=rform.cleaned_data['choose']
+                print 'new',new
                 if JustOne:
-                    self.target.__setattr__(self.resourceType,objects.get(id=new))
+                    target.__setattr__(self.resource['attname'],objects.get(id=new))
                 else:
                     for n in new:
                         r=objects.get(id=n)
                         manager.add(r)
-                self.target.save()
-                return HttpResponseRedirect(self.targetURL)
+                target.save()
+                print target
+                return HttpResponseRedirect(self.target['url'])
         elif request.method=='GET':
             #need to ensure that if there are none already chosen, we don't bind the form ...
             print 'initial',initial
@@ -167,16 +184,18 @@ class BaseViewHandler:
                 rform=ActualForm()
             else:rform=ActualForm({'choose':initial})
                 
-        url=''#reverse('cmip5q.protoq.views.assignReferences',args=(self.cid,resourceType,resource_id,))
+        url=''
+        
+        #editURL and form used to add a new instance.
         editURL=reverse('cmip5q.protoq.views.edit',
-            args=(self.cid,'assign',self.resourceType4url,self.targetType,self.targetID))
+            args=(self.cid,self.resource['type'],0,self.target['type'],self.target['instance'].id,'assign'))
         return render_to_response(self.selectHTML,
             {'showChoices':showChoices,
                 'rform':rform,
                 'title':title,
                 'form':self._constructForm('GET'),
                 'editURL':editURL,
-                'editTemplate':'%s_snippet.html'%self.resourceType,
+                'editTemplate':'%s_snippet.html'%self.resource['type'],
                 'tabs':tabs(self.cid,'Chooser'),
                 'chooseURL':url})
                

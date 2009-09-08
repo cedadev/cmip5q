@@ -8,7 +8,7 @@ class tab:
         self.name=name # what is seen in the tab
         self.url=url
         self.active=active
-        print 't[%s,%s]'%(self.name,self.url)
+        #print 't[%s,%s]'%(self.name,self.url)
     def activate(self):
         self.active=1
     def deactivate(self):

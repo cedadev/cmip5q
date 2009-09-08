@@ -82,25 +82,27 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.about'),     
                               
     # ensembles ...
-    ('^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/$',
+    (r'^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/$',
             'cmip5q.protoq.views.ensemble'),
-    ('^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/(?P<ens_id>\d+)/$',
+    (r'^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/(?P<ens_id>\d+)/$',
             'cmip5q.protoq.views.ensemble'),                                               
                           
     #### generic simple views
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>\D+)/$',
+    # EDIT
+    # cmip5q/centre_id/edit/resourceType/resourceID/returnType  (resourceID=0, blank form)
+    (r'^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<returnType>\D+)/$',
             'cmip5q.protoq.views.edit'),
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>[^0-9/]+)/(?P<obj_id>\d+)/$',
+    # cmip5q/centre_id/edit/resourceType/resourceID/targetType/targetID/returnType  
+        #(resourceID=0, blank form)
+    (r'^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<targetType>\D+)/(?P<target_id>\d+)/(?P<returnType>\D+)/$',
             'cmip5q.protoq.views.edit'),
-    ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>[^0-9/]+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
-            'cmip5q.protoq.views.edit'),            
-     ('^cmip5/(?P<cen_id>\d+)/edit/(?P<returnType>[^0-9/]+)/(?P<resourceType>\D+)/(?P<obj_id>\d+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
-            'cmip5q.protoq.views.edit'),                    
-    ('^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/$',
+    # LIST
+    (r'^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/$',
             'cmip5q.protoq.views.list'),
-    ('^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)$',
-            'cmip5q.protoq.views.list'),            
-    ('^cmip5/(?P<cen_id>\d+)/assign/(?P<targetType>\D+)/(?P<target_id>\d+)/(?P<resourceType>\D+)/$',
+    (r'^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)$',
+            'cmip5q.protoq.views.list'),
+    # ASSIGN            
+    (r'^cmip5/(?P<cen_id>\d+)/assign/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.assign'),       
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

@@ -52,7 +52,7 @@ class simulationHandler(object):
         urls={'url':url}
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
-                    args=(self.centreid,'simulation',s.id,'initialcondition',))
+                    args=(self.centreid,'initialcondition','simulation',s.id,))
             urls['bc']=reverse('cmip5q.protoq.views.simulationCup',
                     args=(self.centreid,s.id,))
             urls['con']=reverse('cmip5q.protoq.views.conformanceMain',
@@ -187,7 +187,7 @@ class simulationHandler(object):
         urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,)),
               'mods':reverse('cmip5q.protoq.views.list',
-                    args=(self.centreid,'codemodification','simulation',s.id,)),
+                    args=(self.centreid,'codemodification','component',s.numericalModel.id,)),
               'sim':reverse('cmip5q.protoq.views.simulationEdit',
                     args=(self.centreid,s.id,))
                     }
