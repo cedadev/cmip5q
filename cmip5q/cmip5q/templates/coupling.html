@@ -14,13 +14,16 @@
 </div>
     <div class="boxer">
     <h4> Couplings </h4>
-    
+    {% if Intform.forms|length %}
     <div class="boxer2">
     <form action="{{urls.ok}}" method="POST">
     {% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}
     <center><input id="InternalBut" type="submit" value="Save"></center>
     </form>
-    </div></div>
+    </div>
+    {% else %} <p class="red"> You need to enter inputs in your components before
+    we can ask questions about how those inputs are coupled to files (or other components).</p> {% endif %}
+    </div>
 <div class="boxer">
     <p> <a id="returnBut" href="{{urls.return}}">Return to {{urls.returnName}} {% if simulation %} {{s}} {% else %} {{c}} {% endif %} </a>
 </div>
