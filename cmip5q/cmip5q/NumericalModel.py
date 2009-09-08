@@ -101,7 +101,7 @@ class NumericalModel:
         logging.debug('NumericalModel:export returning an xml document')
         root=ET.Element('CIMRecord',{'documentVersion': '1.2'})
         ET.SubElement(root,'id').text='[TBD]'
-        self.exportAddComponent(root,self.component,recurse)
+        self.exportAddComponent(root,self.top,recurse)
         return root
 
     def exportAddComponent(self,root,c,recurse=True):

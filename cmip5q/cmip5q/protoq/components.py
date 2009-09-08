@@ -81,7 +81,7 @@ class componentHandler(object):
         else:
             self.component=Component.objects.get(pk=component_id)
         
-        self.tabs=tabs(centre_id,'Update')
+        self.tabs=tabs(centre_id,self.component.model.abbrev)
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
             
@@ -193,20 +193,6 @@ class componentHandler(object):
             {'refs':refs,'available':available,'rform':rform,'c':c,
             'refu':refu,'baseURLa':baseURLa,'baseURLr':baseURLr,
             'tabs':self.tabs,'notAjax':not request.is_ajax()})
-            
-    def getRootComponentID(self,component_id):
-        self.component_id=component_id
-        parents=Component.objects.filter(components=component_id)
-        #logging.debug("getRootComponentID component id = %d",component_id)
-        #logging.debug("getRootComponentID num parents = %d",len(parents))
-        if len(parents)==1 :
-            # recurse to next parent
-            self.getRootComponentID(parents[0].id)
-        elif len(parents)>1 or len(parents)<0 :
-            #error: there should only be 0 or 1 parent
-            logging.error("components.py:getRootComponent: There should only be one parent of a component")
-        # If the return is part of the above if clause, the type returned is a NoneType. Therefore I've written the method so that the return is at the end
-        return self.component_id
 
     def validate(self):
         ''' Validate component '''
@@ -215,7 +201,7 @@ class componentHandler(object):
         component_id=self.component.id
         logging.debug("Validate method called for component_id = %d",component_id)
         # find the root component
-        root_component_id=self.getRootComponentID(component_id)
+        root_component_id=self.component.model.id
         logging.debug("Root component id = %d",root_component_id)
 
         # create cim instance
@@ -223,7 +209,7 @@ class componentHandler(object):
 
         # to create CIM from current component, pass component_id
         # to create CIM from root component, pass root_component_id
-        nm=NumericalModel(component_id)
+        nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
         # nm=NumericalModel(root_component_id)
 
         # default creates CIM with specified component and all of its children
