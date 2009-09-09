@@ -24,5 +24,8 @@
        
     </form>
 </div>
+{% if target %}
+<center><a href="{{target.url}}">{{target.instance}}</a></center>
+{% endif %}
 </div>
 {% endblock%}

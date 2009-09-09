@@ -21,6 +21,14 @@ class BaseViewHandler:
         self.listHTML='%s_list.html'%self.resource['type']
         self.selectHTML='baseviewAssign.html'
         
+    def objects(self):
+        ''' We use the superclass method '''
+        return []
+    
+    def constraints(self):
+        ''' We use the superclass method'''
+        return None
+    
     def _constructForm(self,method,*args,**kwargs):
         ''' Handle form construction '''
         if method == 'POST':
@@ -29,7 +37,9 @@ class BaseViewHandler:
             # FIXME we'll need to do the specialisation based on the 
             # target information ... postpone this again for now.
             form=self.resource['form'](*args,**kwargs)
-            #form.specialise(*self.constraints)
+            constraints=self.constraints()
+            print 'constraints',constraints
+            if constraints is not None: form.specialise(constraints)
             return form
         else:
             raise ValueError('Form construction only supports GET and POST')
@@ -41,8 +51,8 @@ class BaseViewHandler:
         objects=self.objects()
         
         if self.target:
-            # collapse the object queryset down to only those in the target set
-            # following syntax is how we need to handle a keyword attribute ...
+
+            # in the case of a list, the target is used to go back ...
 
             # get a URL for a blank form
             formURL=reverse('cmip5q.protoq.views.edit',
@@ -50,7 +60,8 @@ class BaseViewHandler:
                             self.target['type'],self.target['instance'].id,'list',))
             for o in objects:
                 # monkey patch an edit URL into the object allowing for the target,
-                # saying come back here (list)
+                # saying come back here (to the list). Unfortunately doing that
+                # means we lose the incoming reference.
                 o.editURL=reverse('cmip5q.protoq.views.edit',
                             args=(self.cid,self.resource['type'],o.id,
                                   self.target['type'],self.target['instance'].id,'list',))
@@ -70,7 +81,8 @@ class BaseViewHandler:
                 'objects':objects,
                 'tabs':tabs(self.cid,self.resource['type']),
                 'form':self._constructForm('GET'),
-                'editURL':formURL
+                'editURL':formURL,
+                'target':self.target
                 })
                 
     def edit(self,request,returnType):
@@ -102,11 +114,13 @@ class BaseViewHandler:
                             args=(self.cid,self.resource['type'],))
                 logging.debug('Successful edit post, redirecting to %s'%url)
                 return HttpResponseRedirect(url)
+            else:
+                constraints=self.constraints()
+                if constraints:form.specialise(constraints)
+                
            
         if request.method=='GET':
             form=self._constructForm('GET',instance=instance)
-        
-        # form.specialise() # FIXME
         
         # Now construct a useful submission URL
         args=[self.cid,self.resource['type'],self.resource['id']]

@@ -294,39 +294,37 @@ def dataEdit(request,cen_id,object_id=None):
             
 ############# Ensemble View ###############################            
             
-def ensemble(request,cen_id,sim_id,ens_id=None):
-    ''' Show the physical ensemble description page '''
-    if ens_id is None:
-        s=Simulation.objects.get(id=sim_id)
-        e=PhysicalEnsemble.objects.filter(simulation=s)
-        if len(e)==0:
-            e=PhysicalEnsemble(ensembleDescription='Describe me',simulation=s)
-            e.save()
-        else: e=e[0]     
-    else:
-        e=PhysicalEnsemble.objects.get(id=ens_id)
-        s=e.simulation
+def ensemble(request,cen_id,sim_id):
+    ''' Manage ensembles for a given simulation '''
+    s=Simulation.objects.get(id=sim_id)
+    e=Ensemble.objects.get(simulation=s)
+    members=e.ensemblemember_set.all()
+    EnsembleMemberFormset=modelformset_factory(EnsembleMember,extra=0,exclude=('ensemble','memberNumber'))
     
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
           'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
-          'mods':reverse('cmip5q.protoq.views.assign',
-                     args=(cen_id,'ensemble',e.id,'codemodification'))}
+          'mods':reverse('cmip5q.protoq.views.list',
+                     args=(cen_id,'codemodification','ensemble',s.id,)),
+          'ics':reverse('cmip5q.protoq.views.list',
+                     args=(cen_id,'initialcondition','ensemble',s.id,))}
                      
     if request.method=='GET':
-        eform=EnsembleForm({'description':e.ensembleDescription})
+        eform=EnsembleForm(instance=e,prefix='set')
+        eformset=EnsembleMemberFormset(queryset=members,prefix='members')
     elif request.method=='POST':
-        eform=EnsembleForm(request.POST)
-    if request.method=='POST':
+        eform=EnsembleForm(request.POST,instance=e,prefix='set')
+        eformset=EnsembleMemberFormset(request.POST,queryset=members,prefix='members')
+        ok=True
         if eform.is_valid():
-            d=eform.cleaned_data['description']
-            e.ensembleDescription=d
-            e.save()
-            return HttpResponseRedirect(urls['self'])
-    codeMods=e.codeModification.get_query_set()
-    for c in codeMods:
-        c.editURL=reverse('cmip5q.protoq.views.edit',args=(cen_id,'codemodification',c.id,'ensemble','assign'))
+            eform.save()
+        else: ok=False
+        if eformset.is_valid():
+            eformset.save()
+        else: ok=False
+        logging.debug('POST to ensemble is ok - %s'%ok)
+        if ok: return HttpResponseRedirect(urls['self'])
     return render_to_response('ensemble.html',
-               {'s':s,'e':e,'urls':urls,'eform':eform,'codeMods':codeMods,
+               {'s':s,'e':e,'urls':urls,'eform':eform,'eformset':eformset,
                'tabs':tabs(cen_id,'tmp')})
                
                
@@ -356,9 +354,9 @@ class ViewHandler(BaseViewHandler):
     # (so keys need to be lower case)                    
                         
     SupportedTargets={'simulation':{'class':Simulation,'attname':'simulation'},
-                      'ensemble':{'class':PhysicalEnsemble,'attname':'physicalEnsemble'},
                       'centre':{'class':Centre,'attname':'centre'},
                       'component':{'class':Component,'attname':'component'},
+                      'ensemble':{'class':Simulation,'attname':'simulation'},
                      }
                      
     # and for each of those we need to get back to the target view/edit, and for
@@ -366,9 +364,9 @@ class ViewHandler(BaseViewHandler):
     
     SupportedTargetReverseFunctions={
                       'simulation':'cmip5q.protoq.views.simulationEdit',
-                      'ensemble':'cmip5q.protoq.views.ensemble',
                       'centre':'cmip5q.protoq.views.centre',
                       'component':'cmip5q.protoq.views.componentEdit',
+                      'ensemble':'cmip5q.protoq.views.ensemble',
                       }
                         
     # Now the expected usage of this handler is for
@@ -387,6 +385,8 @@ class ViewHandler(BaseViewHandler):
      
         if targetType is not None:
             # We grab an instance of the target
+            if targetType not in self.SupportedTargets:
+                raise ValueError('Unknown target type %s'%targetType)
             try:
                 target=self.SupportedTargets[targetType]
                 target['type']=targetType
@@ -413,6 +413,16 @@ class ViewHandler(BaseViewHandler):
             constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
             objects=objects.filter(component__in=constraintSet)
         return objects
+        
+    def constraints(self):
+        ''' Return constraints for form specialisation '''
+        if self.resource['type']=='codemodification':
+            if self.target['type']=='simulation':
+                return self.target['instance'].numericalModel
+            elif self.target['type']=='component':
+                return self.target['instance']
+                   
+        return None
 
 def edit(request,cen_id,resourceType,resource_id,targetType=None,target_id=None,returnType=None):
     ''' This is the generic simple view editor '''

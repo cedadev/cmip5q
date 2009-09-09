@@ -1,31 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Physical Ensemble Characteristics for simulation: "{{s}}" </h1>
+<h1> Ensemble Characteristics for simulation: "{{s}}" </h1>
+
 </div>
 <div class="boxer">
 <div class="boxer2">
 <center>
 <form action={{urls.self}} method="POST">
 <table>
-{{eform.as_table}}
+<tr><td width="20%">Is this a perturbed physics ensemble? 
+{{eform.perturbedPhysics.errors}}
+</td>
+<td>{{eform.perturbedPhysics}}&nbsp; The default, unticked, is an Initial Condition ensemble. If you change the ensemble type from initial condition to perturbed physics (or vice versa), you will need to save the form once before the rest of the form has the right attributes for the new ensemble type!</p></td></tr>
+<tr><td>General notes about the ensemble:{{eform.description.errors}}</td>
+<td>{{eform.description}}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td colspan="2"> Now enter the details which explain how the ensemble members differ.
+</td></tr>
+{{eformset.management_form}}
+{% for form in eformset.forms %}
+<tr><td>Member {{forloop.counter}}, {% if eform.instance.perturbedPhysics %} choose a code modification: {{form.codeModification.errors}}</td><td>{{ form.codeModification}} {% else %}
+choose an inital condition: {{form.initialCondition.errors}}</td><td>{{ form.initialCondition}} {% endif %} </td></tr>
+{% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+{% endfor %}
 </table>
 <input id="subDatBut" type="submit" value="Save Description">
 </form>
 </center>
 </div>
-<div class="boxer">
-<h4> Code Modifications associated with this ensemble </h4>
-<table>
-{% for c in codeMods %}
-<tr class="{% cycle 'row1' 'row2'%}"><td><a href="{{c.editURL}}">{{c}}</a></td></tr>
-{% endfor %}
-</table>
+
 </div>
 <div>
 <center>
-<a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>,
-<a id="codebut" href="{{urls.mods}}"> Assign Code Modifications </a>
+<a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>
+{% if eform.instance.perturbedPhysics %}
+<a id="codebut" href="{{urls.mods}}">Manage Code Modifications</a>
+{% else %}
+<a id="icbut" href="{{urls.ics}}">Manage Initial Conditions</a>
+{% endif %}
 </center>
 </div>
 </div>
@@ -34,6 +47,7 @@ var subDatBut = new YAHOO.widget.Button("varSubBut",
                 {value:"varSubButvalue"});
 var oLinkButton1 = new YAHOO.widget.Button("simbut");
 var oLinkButton2 = new YAHOO.widget.Button("codebut");
+var oLinkButton3 = new YAHOO.widget.Button("icbut");
 </script>
 
 

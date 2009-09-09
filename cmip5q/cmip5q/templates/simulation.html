@@ -22,15 +22,11 @@
                 <h4> Experiment Criteria</h4>
                 <p><a id="conlinkbut" href="{{urls.con}}">Conformance</a></p>
                 <h4> Ensemble Characteristics </h4>
-                {% ifnotequal ensemble 0 %}
-                    {% if s.physicalEnsemble %}
-                    <p><a id="enslinkbut" href="{{urls.ens}}"> Describe Ensemble</a></p>
-                    {% else %}
-                    <p> Initial Condition ensemble </p>
-                    {% endif %}
+                {% ifequal s.ensembleMembers 1 %}
+                     Not an ensemble 
                 {% else %}
-                    Not an ensemble
-                {% endifnotequal %}
+                   <p><a id="enslinkbut" href="{{urls.ens}}"> Describe Ensemble</a></p>
+                {% endifequal %}
             {% endifnotequal %}
         </div>
         <div class="boxer">
@@ -40,9 +36,8 @@
         <td valign="top" width="900px">
             <div class="boxer">
                 <h4> General Characteristics of the Simulation </h4>
-                <p class="guidance"> In this box you fill out the general characteristics of the simulation. Note that you need to press the Add or Update button to update this part separately from the conformance section below.</p>
+                <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
                 <form action="{{urls.url}}" method="post">
-                {{simform.management_form}}
                 <table>
                 <tr><td>Short Name:{{simform.abbrev.errors}} </td><td>{{simform.abbrev}}</td></tr>
                 <tr><td>Long Name:{{simform.title.errors}} </td><td>{{simform.title}}</td></tr>
@@ -51,8 +46,6 @@
                 <tr><td> Simulation used:  </td><td>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
                 on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
                 <tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
-                    (physical ensemble:{{simform.physicalEnsemble.errors}}
-                    {{simform.physicalEnsemble}})
                 </td></tr>
                 <tr><td>Description (notes){{simform.description.errors}}</td><td>{{simform.description}}</td></tr>
                 <tr><td colspan="2">

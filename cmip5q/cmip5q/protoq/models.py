@@ -177,22 +177,20 @@ class Simulation(Doc):
     #
     # enforce the following as required via q'logical validation, not form validation.
     initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
-    physicalEnsemble=models.BooleanField(default=False)
     # boundary conditions link to us, not the other way round
+    # ensemble descriptions (if appropriate) link to us.
     
     def save(self):
         Doc.save(self)
-        # make sure that my couplings are up to date
-        self.updateCoupling()
         
     def updateCoupling(self):
         ''' Update my couplings, in case the user has made some changes in the model '''
         #each one of these should appear in one of my boundary conditions.
         modelCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=None)
-        #myCouplings=[original for m in self.boundaryCondition.get_query_set()]
         myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
+        myOriginals=[i.original for i in myCouplings]
         for m in modelCouplings:
-            if m not in myCouplings: 
+            if m not in myOriginals: 
                 r=m.duplicate4sim(self)
 
 class Centre(Doc):
@@ -338,10 +336,32 @@ class CodeModification(models.Model):
     def __unicode__(self):
         return "%s (%s)"%(self.mnemonic,self.component)
 
-class PhysicalEnsemble(models.Model):
-    ensembleDescription=models.TextField(blank=True,null=True)
-    codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
+class Ensemble(models.Model):
+    description=models.TextField(blank=True,null=True)
+    perturbedPhysics=models.BooleanField(default=False)
     simulation=models.ForeignKey(Simulation)
+    def updateMembers(self):
+        ''' Make sure we have enough members, this needs to be called if the
+        simulation changes it's mind over the number of members '''
+        objects=self.ensemblemember_set.all()
+        n=len(objects)
+        nShouldBe=self.simulation.ensembleMembers
+        ndif=n-nShouldBe
+        for i in range(abs(ndif)): 
+            if ndif >0:
+                objects[-1].delete()
+            elif ndif < 0:
+                e=EnsembleMember(ensemble=self,memberNumber=n+i+1)
+                e.save()
+    
+class EnsembleMember(models.Model):
+    ensemble=models.ForeignKey(Ensemble,blank=True,null=True)
+    memberNumber=models.IntegerField()
+    #  one of the following will be selected via the perturbedPhysics choice in Ensemble.
+    codeModification=models.ForeignKey(CodeModification,blank=True,null=True)
+    initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
+    def __unicode__(self):
+        return '%s ensemble member %s'%(self.ensemble.simulation,self.memberNumber)
     
 class Conformance(models.Model):
     ''' This relates a numerical requirement to an actual solution in the simulation '''
@@ -360,20 +380,18 @@ class Conformance(models.Model):
     def __unicode__(self):
         return "%s for %s"%(self.ctype,self.requirement)
 
-class EnsembleForm(forms.Form):
-    #We don't build it from a model form, because we only really want
-    #the description from the user, we do the rest by hand.
+class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
-    def clean_description(self):
-        data=self.cleaned_data['description']
-        if data=='Describe me':
-            raise forms.ValidationError('Please change the default')
-        return data
+    class Meta:
+        model=Ensemble
+        exclude=('simulation')
     
 class CodeModificationForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
     class Meta:
         model=CodeModification
+    def specialise(self,model):
+        self.fields['component'].queryset=Component.objects.filter(model=model)
     
 class InitialConditionForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
@@ -441,6 +459,15 @@ class SimulationForm(forms.ModelForm):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
                             scienceType='model').filter(centre=centre)
+    def save(self):
+        s=forms.ModelForm.save(self)
+        try:
+            e=Ensemble.objects.get(simulation=s)
+        except:
+            #couldn't find it? create it!
+            e=Ensemble(simulation=s)
+            e.save()
+        e.updateMembers()
 
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
@@ -495,7 +522,6 @@ class ComponentInputForm(forms.ModelForm):
     class Meta:
         model=ComponentInput
     exclude=('owner','realm') # we know these
-    
     
     
     

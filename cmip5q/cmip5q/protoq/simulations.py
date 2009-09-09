@@ -28,6 +28,7 @@ class MyConformanceFormSet(ConformanceFormSet):
     def specialise(self):
         v=Vocab.objects.get(name='conformanceTypes')
         allowedComponents=Component.objects.filter(model=self.s.numericalModel)
+        print allowedComponents
         for form in self.forms:
             form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
             form.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=allowedComponents)
@@ -57,10 +58,9 @@ class simulationHandler(object):
                     args=(self.centreid,s.id,))
             urls['con']=reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,))
-            if s.ensembleMembers > 1:
-                urls['ens']=reverse('cmip5q.protoq.views.ensemble',
+            urls['ens']=reverse('cmip5q.protoq.views.ensemble',
                     args=(self.centreid,s.id,))
-                ensemble=PhysicalEnsemble.objects.filter(simulation=s)
+              
         
         if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
@@ -115,6 +115,7 @@ class simulationHandler(object):
         ''' Handle providing and receiving edit forms '''
        
         s=Simulation.objects.get(pk=self.simid)
+        s.updateCoupling()
         e=s.experiment
         url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id,))
         label='Update'
