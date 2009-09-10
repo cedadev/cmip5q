@@ -473,7 +473,7 @@ class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
-    implemented=forms.BooleanField(required=True)
+    #implemented=forms.BooleanField(required=True)
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
@@ -481,7 +481,7 @@ class ComponentForm(forms.ModelForm):
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
     contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
    
-    implemented=forms.BooleanField(required=True)
+    implemented=forms.BooleanField(required=False)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
     otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
     class Meta:
