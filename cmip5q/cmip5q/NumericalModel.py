@@ -99,7 +99,7 @@ class NumericalModel:
         ''' Return an XML view of self '''
 
         logging.debug('NumericalModel:export returning an xml document')
-        root=ET.Element('CIMRecord',{'documentVersion': '1.2'})
+        root=ET.Element('CIMRecord',{'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance','xsi:noNamespaceSchemaLocation':'file:xsd/cim.xsd', 'documentVersion': '1.2','xmlns:gmd':'http://www.isotc211.org/2005/gmd','xmlns:gco':'http://www.isotc211.org/2005/gco' })
         ET.SubElement(root,'id').text='[TBD]'
         self.exportAddComponent(root,self.top,recurse)
         return root
@@ -183,7 +183,7 @@ class NumericalModel:
         '''documentAuthor'''
         '''documentCreationDate'''
         ET.SubElement(comp,'documentCreationDate').text='[TBD]'
-        #e.text=datetime.date
+        # datetime.date.today()
         '''documentGenealogy'''
         '''quality'''
         return

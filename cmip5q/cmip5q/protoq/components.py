@@ -204,9 +204,8 @@ class componentHandler(object):
         root_component_id=self.component.model.id
         logging.debug("Root component id = %d",root_component_id)
 
-        # create cim instance
+        # create our cim instance
         logging.debug("Creating CIM instance from internal state")
-
         # to create CIM from current component, pass component_id
         # to create CIM from root component, pass root_component_id
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
@@ -214,21 +213,33 @@ class componentHandler(object):
 
         # default creates CIM with specified component and all of its children
         # add argument recurse=False to export method to skip any children
-        # CIMDoc=nm.export()
-        CIMDoc=nm.export(recurse=False)
+        CIMDoc=nm.export()
+        # CIMDoc=nm.export(recurse=False)
 
-        # write cim instance to file & stdout
-        ET.dump(CIMDoc)
+        # write cim instance to file
+        # ET.dump(CIMDoc)
         tree=ET.ElementTree(CIMDoc)
-        #I can't seem to get the tempfile class to write a file to disk so perform a silly hack instead ...
-        filexxx=tempfile.NamedTemporaryFile(mode='w', suffix='', prefix=self.component.abbrev+"_CIM_")
-        file=open(filexxx.name+".xml","w")
+        #Can't get the tempfile class to write a file to disk
+        #perform a hack instead ...
+        fileHack=tempfile.NamedTemporaryFile(mode='w', suffix='', prefix=self.component.abbrev+"_CIM_")
+        file=open(fileHack.name+".xml","w")
         logging.debug("Writing CIM instance to temporary file %s",file.name)
         tree.write(file)
+        file.close()
+        fileHack.close()
 
-        file.flush()
-        return HttpResponse(ET.tostring(CIMDoc))
-        #return HttpResponse('Validate is not implemented')
+        #invoke schema checker?
+        #We use a sample xerces app to do this
+        #logging.debug("executing command : java -cp .:jars/xercesSamples.jar jaxp.SourceValidator -f -m "+file.name)
+        #os.system("java -cp .:jars/xercesSamples.jar jaxp.SourceValidator -f -i "+file.name)
+
+        #invoke schematron checker
+        #[tbd]
+
+        # return the XML view of the CIM for the moment
+        response=self.XMLMIME(file.name)
+        #response=self.XML(file.name)
+        return response
     
     def view(self):
         ''' HTML view of self '''
@@ -236,9 +247,41 @@ class componentHandler(object):
         logging.debug("Hello from view function")
         return HttpResponse('View is not implemented')
     
-    def XML(self):
-        ''' XML view of self '''
-        return HttpResponse('XML (view) is not implemented')
+    def XMLMIME(self,XMLFileName=''):
+        ''' XML view of self returned as XML'''
+        linestring=""
+        if XMLFileName=='':
+          # we need to generate an XML instance in linestring
+          linestring=linestring+"Not implemented yet"
+        else:
+          file=open(XMLFileName, 'r')
+          logging.debug("XMLMIME reading CIM XML file "+file.name)
+          linestring=linestring+file.read()
+          file.close()
+        return HttpResponse(linestring,mimetype="application/xml")
+
+    def XML(self,XMLFileName=''):
+        ''' XML view of self returned as HTML'''
+        linestring=""
+        if XMLFileName=='':
+          # we need to generate an XML instance in linestring
+          linestring=linestring+"Not implemented yet"
+        else:
+          # read an existing CIM XML file
+
+          # prettify the xml file with an xsl stylesheet
+          os.system("xsltproc xsl/xmlformat.xsl "+XMLFileName+" > "+XMLFileName+".pretty")
+          os.system("mv "+XMLFileName+".pretty "+XMLFileName)
+
+          # create and return html rendered xml using an xsl stylesheet
+          error=os.system("xsltproc xsl/xmlverbatim.xsl "+XMLFileName+" > "+XMLFileName+".html")
+          file=open(XMLFileName+".html", 'r')
+          logging.debug("XMLMIME reading CIM HTML file "+file.name)
+          linestring=linestring+file.read()
+          file.close()
+
+        return HttpResponse('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>CIM XML view</head><body>'+linestring+'</body></html>')
+        # return HttpResponse('XML (view) is not implemented')
    
     def numerics(self):
         return HttpResponse('Not implemented')
