@@ -1,0 +1,18 @@
+<table>
+<tr><td width="15%">Name:{{form.name.errors}}</td><td>{{form.name}}</td></tr>
+<tr><td>Link:{{form.link.errors}}</td><td>{{form.link}}</td></tr>
+<tr><td>Description:{{form.description.errors}}</td><td>{{form.description}}</td></tr>
+<tr><td>Reference:{{form.reference.errors}}</td><td>{{form.reference}}</td><tr>
+<tr><td>Standard Name:{{form.cftype.errors}}</td><td>{{form.cftype}}</td></tr>
+<tr><td>(If necessary) Actual variable name within the file: {{form.variable.errors}}</td>
+        <td>{{form.variable}}</td></tr>
+<tr><td colspan="2">
+    <center>
+    <input id="subDatBut" type="submit" value="Save File Description">
+    <script type="text/javascript">
+        var subDatBut = new YAHOO.widget.Button("subDatBut",
+                            {value:"subDatButvalue"});
+    </script>
+    </center>
+</td></tr>
+</table>

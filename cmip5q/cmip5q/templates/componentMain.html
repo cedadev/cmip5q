@@ -60,11 +60,13 @@
             {{pform.new|safe }}
             </table>
             <p class="guidance"> (An additional attribute can be entered each time the form is saved.)</p>
-            <p class="cmip5q">??  Not sure what to do about deletions. Do we want to allow them??</p>
+            <p class="cmip5q"> Don't bother telling us about problems with this "Attributes" box, we will overhaul it considerably in the near future (including handlng deletions, better layout etc).
+            </p>
                 
         </div>
-    
-        <div class="boxer">
+       
+        <div class="boxer"> 
+            {% if isRealm or isModel %}
             <h4> History </h4>
             <center>
             <p> Year Released:{{cform.yearReleased.errors}}{{cform.yearReleased}}. Previous Version (name):
@@ -73,9 +75,10 @@
             been improved from that previous version. </p>
             <p>{{cform.geneology}}</p>
             </center>
+            {% endif %}
             <h4> Additional Information</h4>
             <center>
-            <p class="guidance">Pleaes provide additional information about this component as necessary.</p>
+            <p class="guidance">Please provide additional information about this component as necessary.</p>
             <p>{{cform.description}}</p> 
             </center> 
         </div>

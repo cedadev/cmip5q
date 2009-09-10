@@ -67,21 +67,23 @@ class BaseViewHandler:
                                   self.target['type'],self.target['instance'].id,'list',))
         else:
             # get a URL for a blank form
-            formURL=reverse('cmipq.protoq.views.edit',
+            formURL=reverse('cmip5q.protoq.views.edit',
                             args=(self.cid,self.resource['type'],0,'list',))
             for o in objects:
                 # monkey patch an edit URL into the object, saying come back here (list)
-                o.editURL=reverse('cmip51.protoq.views.edit',
+                o.editURL=reverse('cmip5q.protoq.views.edit',
                             args=(self.cid,self.resource['type'],o.id,'list',))
             
         # we pass a form and formURL for a new instance to be created.
         # we're doing all this because we think we have too many entities to use a formset
         
-        return render_to_response(self.listHTML,{
+        return render_to_response('baseview_list.html',{
                 'objects':objects,
                 'tabs':tabs(self.cid,self.resource['type']),
                 'form':self._constructForm('GET'),
                 'editURL':formURL,
+                'instance':self.resource,
+                'snippet_template':'%s_snippet.html'%self.resource['type'],
                 'target':self.target
                 })
                 
@@ -100,7 +102,7 @@ class BaseViewHandler:
         instance=None
         if self.resource['id']<>'0':
             instance=self.resource['class'].objects.get(id=self.resource['id'])
-                
+                    
         if request.method=='POST':
             form=self._constructForm('POST',request.POST,instance=instance)
             if form.is_valid():

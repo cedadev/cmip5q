@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> List of Initial Conditions </h1>
+<h1> List of {{instance.title}}s </h1>
 </div>
 <div class="boxer">
     {% if objects|length_is:0 %}
-    <p>No initial condition descriptions loaded at present</p>
+    <p>No {{instance.title|lower}}s loaded at present</p>
     {% else %} 
     <table>
     {% for d in objects %}
@@ -17,12 +17,10 @@
 </div>
 <div class="boxer">
 <div class="boxer2">
-<p> Add new initial description: </p>
+<h4> Add new {{instance.title|lower}}: </h4>
 <div id="data">
     <form action="{{editURL}}" method="POST">
-       <table>
-       {% include 'initialcondition_snippet.html' %}
-       </table>
+       {% include snippet_template %}
     </form>
 </div>
 </div>
@@ -32,6 +30,5 @@
         var oLinkButton1 = new YAHOO.widget.Button("returnBut"); 
 </script>
 {% endif %}
-
 </div>
 {% endblock%}

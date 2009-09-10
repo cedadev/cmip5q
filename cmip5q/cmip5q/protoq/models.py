@@ -326,7 +326,7 @@ class InitialCondition(models.Model):
     #CF name, then we know them.
     variables=models.TextField(blank=True,null=True)
     def __unicode__(self):
-        return str(self.date)
+        return 'IC%s-%s'%(self.id,self.date)
          
 class CodeModification(models.Model):
     mnemonic=models.SlugField()

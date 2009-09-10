@@ -245,52 +245,6 @@ def help(request,cen_id):
  
 def about(request,cen_id):
     return render_to_response('about.html',{'tabs':tabs(cen_id,'About')})
-
-############ DATA VIEWS ######################
-
-def dataList(request,cen_id):
-    do=DataObject.objects.all()
-    for d in do:
-        d.editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,d.id))
-    c=Centre.objects.get(pk=cen_id)
-    c.url=reverse('cmip5q.protoq.views.centre',args=(cen_id,))
-    surl=reverse('cmip5q.protoq.views.simulationList',args=(cen_id,))
-    editurl=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,))
-    return render_to_response('file_list.html',{'objects':do,'surl':surl,'c':c,
-                                'tabs':tabs(cen_id,'Files'),
-                                'form':DataObjectForm(),
-                                'editURL':editurl,
-                                'notAjax':not request.is_ajax()})
-                                
-def dataEdit(request,cen_id,object_id=None):
-    
-    ''' Handle the editing of a specific data object '''
-    
-    if object_id is None:
-        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,))
-        if request.method=='GET':
-            # then we're starting afresh
-            dform=DataObjectForm()
-        elif request.method=='POST':
-            dform=DataObjectForm(request.POST)
-    else:
-        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id,object_id,))
-        d=DataObject.objects.get(pk=object_id)
-        if request.method=='GET':
-            dform=DataObjectForm(instance=d)
-        elif request.method=='POST':
-            dform=DataObjectForm(request.POST,instance=d)
-  
-    if request.method=='POST':
-        if dform.is_valid():
-            d=dform.save()
-            return HttpResponseRedirect(reverse('cmip5q.protoq.views.dataList',args=(cen_id,)))
-    #FIXME: Should this be indented?
-    else:
-        editURL=reverse('cmip5q.protoq.views.dataEdit',args=(cen_id))
-    return render_to_response('data.html',
-            {'form':dform,'editURL':editURL,'tabs':tabs(cen_id,'FileEdit'),
-            'notAjax':not request.is_ajax()})
             
 ############# Ensemble View ###############################            
             
@@ -340,12 +294,16 @@ class ViewHandler(BaseViewHandler):
     # the resource class and the resource class form
     # (so keys need to be lower case)
     SupportedResources={'initialcondition':{'attname':'initialCondition',
+                            'title':'Initial Condition',
                             'class':InitialCondition,'form':InitialConditionForm},
                         'file':{'attname':'dataObject',
+                            'title':'File',
                             'class':DataObject,'form':DataObjectForm},
                         'codemodification':{'attname':'codeModification',
+                            'title':'Code Modification',
                             'class':CodeModification,'form':CodeModificationForm},
                         'reference':{'attname':'reference',
+                            'title':'Reference',
                             'class':Reference,'form':ReferenceForm},
                         }
                         

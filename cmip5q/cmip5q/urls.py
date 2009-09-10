@@ -65,17 +65,8 @@ urlpatterns = patterns('',
     # cmip5/conformance/centre_id/simulation_id/requirement_id/$
     (r'^cmip5/conformance/(?P<cen_id>\d+)/(?P<sim_id>\d+)/(?P<req_id>\d+)/$',
             'cmip5q.protoq.views.conformanceEdit'),  
-                    
-    #cmip5/data/centre_id/dataobject/*
-    (r'^cmip5/(?P<cen_id>\d+)/data/(?P<object_id>\d+)/$',
-            'cmip5q.protoq.views.dataEdit'),
-    #cmip5/data/centre_id/
-    (r'^cmip5/(?P<cen_id>\d+)/data/$',
-            'cmip5q.protoq.views.dataEdit'),  
-    #cmip5/data/centre_id/list
-    (r'^cmip5/(?P<cen_id>\d+)/data/list$',
-            'cmip5q.protoq.views.dataList'),      
-    ## help and about
+                     
+    # help and about
     (r'^cmip5/(?P<cen_id>\d+)/help/$',
             'cmip5q.protoq.views.help'),                  
     (r'^cmip5/(?P<cen_id>\d+)/about/$',

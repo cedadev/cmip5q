@@ -34,8 +34,8 @@ class tabs(list):
         t['Refs']=tab('References',
                 reverse('cmip5q.protoq.views.referenceList',args=(centre_id,)))
         t['Files']=tab('Files',
-                #reverse('cmip5q.protoq.views.list',args=(centre_id,'file',)))
-                reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
+                reverse('cmip5q.protoq.views.list',args=(centre_id,'file',)))
+                #reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
         t['Help']=tab('Help',
                 reverse('cmip5q.protoq.views.help',args=(centre_id,)))
         t['About']=tab('About',
