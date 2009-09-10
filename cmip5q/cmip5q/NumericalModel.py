@@ -11,7 +11,7 @@ import uuid
 import logging
 import unittest
 import os
-
+import datetime
 
 def initialiseModel():
     ''' Setup a template for model copying in the dummy CMIP5 centre '''
@@ -105,6 +105,7 @@ class NumericalModel:
         return root
 
     def exportAddComponent(self,root,c,recurse=True):
+      if c.implemented:
         comp=ET.SubElement(root,'modelComponent',{'documentVersion': '[TBD]'})
         '''composition'''
         if recurse:
@@ -119,7 +120,7 @@ class NumericalModel:
         '''longName'''
         ET.SubElement(comp,'longName').text=c.title
         '''description'''
-        ET.SubElement(comp,'description').text='[TBD]'
+        ET.SubElement(comp,'description').text=c.description
         '''license'''
         '''componentProperties'''
         componentProperties=ET.SubElement(comp,'componentProperties')
@@ -129,7 +130,7 @@ class NumericalModel:
             '''shortName'''
             ET.SubElement(componentProperty,'shortName').text=p.name
             '''longName'''
-            ET.SubElement(componentProperty,'longName').text='[TBD]'
+            ET.SubElement(componentProperty,'longName').text=p.name
             '''description'''
             '''type'''
             ET.SubElement(componentProperty,'type').text='[TBD]'
@@ -181,12 +182,14 @@ class NumericalModel:
         '''documentID'''
         ET.SubElement(comp,'documentID').text='[TBD]'
         '''documentAuthor'''
+        ET.SubElement(comp,'documentAuthor').text=c.contact
         '''documentCreationDate'''
-        ET.SubElement(comp,'documentCreationDate').text='[TBD]'
-        # datetime.date.today()
+        ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
         '''documentGenealogy'''
         '''quality'''
-        return
+      else:
+        logging.debug("component "+c.abbrev+" has implemented set to false")
+      return
 
 class XMLVocabReader:
     # original author, Matt Pritchard
