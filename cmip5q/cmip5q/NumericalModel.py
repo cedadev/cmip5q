@@ -6,7 +6,9 @@
 from protoq.models import *
 from XMLinitialiseQ import realms
 
-from xml.etree import ElementTree as ET
+# move from ElementTree to lxml.etree
+#from xml.etree import ElementTree as ET
+from lxml import etree as ET
 import uuid
 import logging
 import unittest
@@ -99,7 +101,8 @@ class NumericalModel:
         ''' Return an XML view of self '''
 
         logging.debug('NumericalModel:export returning an xml document')
-        root=ET.Element('CIMRecord',{'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance','xsi:noNamespaceSchemaLocation':'file:xsd/cim.xsd', 'documentVersion': '1.2','xmlns:gmd':'http://www.isotc211.org/2005/gmd','xmlns:gco':'http://www.isotc211.org/2005/gco' })
+        #root=ET.Element('CIMRecord',{'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance','xsi:noNamespaceSchemaLocation':'file:xsd/cim.xsd', 'documentVersion': '1.2','xmlns:gmd':'http://www.isotc211.org/2005/gmd','xmlns:gco':'http://www.isotc211.org/2005/gco' })
+        root=ET.Element('CIMRecord',{'documentVersion': '1.2'})
         ET.SubElement(root,'id').text='[TBD]'
         self.exportAddComponent(root,self.top,recurse)
         return root
@@ -111,6 +114,7 @@ class NumericalModel:
         if recurse:
             '''childComponent'''
             for child in c.components.all():
+              if child.implemented:
                 comp2=ET.SubElement(comp,'childComponent')
                 self.exportAddComponent(comp2,child)
         '''parentComponent'''
@@ -148,24 +152,30 @@ class NumericalModel:
         #http://www.isotc211.org/2005/gmd
         #CI_ResponsibleParty referenced in citation.xsd
         # <gmd:individualName>
-        name=ET.SubElement(resp,'gmd:individualName')
-        ET.SubElement(name,'gco:CharacterString').text=c.contact
+        #name=ET.SubElement(resp,'gmd:individualName')
+        #ET.SubElement(name,'gco:CharacterString').text=c.contact
+        name=ET.SubElement(resp,'individualName')
+        ET.SubElement(name,'CharacterString').text=c.contact
         # </gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
         # <gmd:contactInfo>
-        contact=ET.SubElement(resp,'gmd:contactInfo')
+        #contact=ET.SubElement(resp,'gmd:contactInfo')
+        contact=ET.SubElement(resp,'contactInfo')
         #     <gmd:phone/>
         #     <gmd:address>
-        address=ET.SubElement(contact,'gmd:address')
+        #address=ET.SubElement(contact,'gmd:address')
+        address=ET.SubElement(contact,'address')
         #         <gmd:deliveryPoint/>
         #         <gmd:city/>
         #         <gmd:administrativeArea/>
         #         <gmd:postalCode/>
         #         <gmd:country/>
         #         <gmd:electronicMailAddress>
-        email=ET.SubElement(address,'gmd:electronicMailAddress')
-        ET.SubElement(email,'gco:CharacterString').text=c.email
+        #email=ET.SubElement(address,'gmd:electronicMailAddress')
+        #ET.SubElement(email,'gco:CharacterString').text=c.email
+        email=ET.SubElement(address,'electronicMailAddress')
+        ET.SubElement(email,'CharacterString').text=c.email
         #         </gmd:electronicMailAddress>
         #     </gmd:address>
         #     <gmd:onlineResource/>

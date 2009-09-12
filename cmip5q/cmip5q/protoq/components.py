@@ -16,7 +16,10 @@ import uuid
 import logging
 
 import os
-from xml.etree import ElementTree as ET
+# move from ElementTree to lxml.etree
+#from xml.etree import ElementTree as ET
+from lxml import etree as ET
+
 import tempfile
 
 ComponentInputFormSet=modelformset_factory(ComponentInput,form=ComponentInputForm,exclude=('owner','realm'),can_delete=True)
@@ -203,27 +206,41 @@ class componentHandler(object):
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
         CIMDoc=nm.export() # add recurse=False to limit to this component only
 
-        # save CIM instance to file
-        #Can't get the tempfile class to write a file to disk: perform a hack instead ...
-        fileHack=tempfile.NamedTemporaryFile(mode='w', suffix='', prefix=my_component.abbrev+"_CIM_")
-        file=open(fileHack.name+".xml","w")
-        logging.debug("Writing CIM instance to temporary file %s",file.name)
-        ET.ElementTree(CIMDoc).write(file)
-        file.close()
+        #validate against schema
+        #CIM currently fails the schema parsing
+        #xmlschema_doc = ET.parse("xsd/cim.xsd")
+        #xmlschema = ET.XMLSchema(xmlschema_doc)
+        #if xmlschema.validate(CIMDoc):
+        #  logging.debug("CIM Document validates against the cim schema")
+        #else:
+        #  logging.debug("CIM Document fails to validate against the cim schema")
+        #log = xmlschema.error_log
+        #logging.debug("CIM Document schema errors are "+log)
 
-        #invoke schema checker
-        #We use a sample xerces app to do this
-        #logging.debug("executing command : java -cp .:jars/xercesSamples.jar jaxp.SourceValidator -f -m "+file.name)
-        #os.system("java -cp .:jars/xercesSamples.jar jaxp.SourceValidator -f -i "+file.name)
+        #validate against schematron checks
+        sct_doc = ET.parse("xsl/BasicChecks.sch")
+        schematron = ET.Schematron(sct_doc)
+        if schematron.validate(CIMDoc):
+          logging.debug("CIM Document passes the schematron tests")
+        else:
+          logging.debug("CIM Document fails the schematron tests")
 
-        #invoke schematron checker
-        #[tbd]
+        #obtain schematron report in html
+        xslt_doc = ET.parse("xsl/schematron-report.xsl")
+        transform = ET.XSLT(xslt_doc)
+        xslt_doc = transform(sct_doc)
+        transform = ET.XSLT(xslt_doc)
+        schematronhtml = transform(CIMDoc)
 
-        #temporarily return the XML as html
-        htmlstr=self.XMLasHTML(file.name)
-        response=HttpResponse('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title>CIM Validation page</title></head><body><h2>Validate not yet implemented</h2><h2>CIM XML</h2><p/>'+htmlstr+'</body></html>')
+        xslt_doc = ET.parse("xsl/xmlformat.xsl")
+        transform = ET.XSLT(xslt_doc)
+        formattedCIMDoc = transform(CIMDoc)
+        xslt_doc = ET.parse("xsl/verbid.xsl")
+        transform = ET.XSLT(xslt_doc)
+        cimhtml = transform(formattedCIMDoc)
+
+        response=HttpResponse('<html><head><title>CIM Validation page</title></head><body><h2>Validate not yet fully implemented</h2><h2>Schematron results</h2><p/>'+str(schematronhtml)+'<h2>CIM XML</h2><p/>'+str(cimhtml)+'</body></html>')
         #response=HttpResponse("Validate not implemented")
-        os.remove(file.name)
 
         return response
     
@@ -236,7 +253,8 @@ class componentHandler(object):
         ''' XML view of self'''
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
         CIMDoc=nm.export()
-        docStr=ET.tostring(CIMDoc,"UTF-8")
+        #docStr=ET.tostring(CIMDoc,"UTF-8")
+        docStr=ET.tostring(CIMDoc)
         return HttpResponse(docStr,mimetype="application/xml")
 
     def XMLasHTML(self,XMLFileName):
