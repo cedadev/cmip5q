@@ -57,12 +57,13 @@ class Component(Doc):
     centre=models.ForeignKey('Centre',blank=True,null=True)
     
     def validate(self):
+        # I don't work yet as I need my local component_id
         ''' Check to see if component is valid. Returns True/False '''
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
         CIMDoc=nm.export(recurse=False)
         sct_doc = ET.parse("xsl/BasicChecks.sch")
         schematron = ET.Schematron(sct_doc)
-        return schematron.validate(CIMFragment):
+        return schematron.validate(CIMFragment)
 
     def makeNewCopy(self,centre,model=None,realm=None,email=None,contact=None):
         ''' Carry out a deep copy of a model '''
