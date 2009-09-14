@@ -31,6 +31,7 @@ def index(request):
 def centres(request):
     ''' For choosing amongst centres '''
     p=Centre.objects.all()
+    p=p.exclude(abbrev='CMIP5')
     if request.method=='POST':
         #yep we've selected something
         try:
