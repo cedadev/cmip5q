@@ -31,6 +31,15 @@ class NumericalModel:
     ''' Handles the creation of a model instance in the database, either from XML storage
     or from a pre-existing instance '''
     
+    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.1"
+    SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
+    SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
+    CIM_URL = "cim.xsd"
+    GMD_NAMESPACE = "http://www.isotc211.org/2005/gmd"
+    GMD_NAMESPACE_BRACKETS="{"+GMD_NAMESPACE+"}"
+    GCO_NAMESPACE = "http://www.isotc211.org/2005/gco"
+    GCO_NAMESPACE_BRACKETS="{"+GCO_NAMESPACE+"}"
+
     def __init__(self,centre,id=0,xml=False):
         ''' Initialise by copy from django storage, or build a new one from the XML '''
         
@@ -101,22 +110,31 @@ class NumericalModel:
         ''' Return an XML view of self '''
 
         logging.debug('NumericalModel:export returning an xml document')
-        #root=ET.Element('CIMRecord',{'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance','xsi:noNamespaceSchemaLocation':'file:xsd/cim.xsd', 'documentVersion': '1.2','xmlns:gmd':'http://www.isotc211.org/2005/gmd','xmlns:gco':'http://www.isotc211.org/2005/gco' })
-        root=ET.Element('CIMRecord',{'documentVersion': '1.2'})
-        ET.SubElement(root,'id').text='[TBD]'
-        self.exportAddComponent(root,self.top,recurse)
+        NSMAP = {None  : self.CIM_NAMESPACE,             \
+                 "xsi" : self.SCHEMA_INSTANCE_NAMESPACE, \
+                 "gmd" : self.GMD_NAMESPACE,             \
+                 "gco" : self.GCO_NAMESPACE}
+        root=ET.Element('CIMRecord', \
+                        attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
+                        nsmap=NSMAP)
+        ET.SubElement(root,'id').text='[TBD1]'
+        self.exportAddComponent(root,self.top,1,recurse)
         return root
 
-    def exportAddComponent(self,root,c,recurse=True):
+    def exportAddComponent(self,root,c,nest,recurse=True):
+
       if c.implemented:
-        comp=ET.SubElement(root,'modelComponent',{'documentVersion': '[TBD]'})
+        if nest==1:
+          comp=ET.SubElement(root,'modelComponent',{'documentVersion': '-1'}) # TBD2
+        else:
+          comp=ET.SubElement(root,'modelComponent')
         '''composition'''
         if recurse:
             '''childComponent'''
             for child in c.components.all():
               if child.implemented:
                 comp2=ET.SubElement(comp,'childComponent')
-                self.exportAddComponent(comp2,child)
+                self.exportAddComponent(comp2,child,nest+1)
         '''parentComponent'''
         '''deployment'''
         '''shortName'''
@@ -130,14 +148,14 @@ class NumericalModel:
         componentProperties=ET.SubElement(comp,'componentProperties')
         pset=Param.objects.filter(component=c)
         for p in pset:
-            componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'[TBD]'})
+            componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'false'}) # [TBD3]
             '''shortName'''
             ET.SubElement(componentProperty,'shortName').text=p.name
             '''longName'''
             ET.SubElement(componentProperty,'longName').text=p.name
             '''description'''
             '''type'''
-            ET.SubElement(componentProperty,'type').text='[TBD]'
+            ET.SubElement(componentProperty,'type',{"value":"other"}) # TBD4
             '''value'''
             ET.SubElement(componentProperty,'value').text=p.value
             #ET.SubElement(componentProperty,'ptype').text=p.ptype
@@ -149,33 +167,36 @@ class NumericalModel:
         '''grid'''
         '''responsibleParty'''
         resp=ET.SubElement(comp,'responsibleParty') #type gmd:xxxx
+        ciresp=ET.SubElement(resp,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
         #http://www.isotc211.org/2005/gmd
         #CI_ResponsibleParty referenced in citation.xsd
         # <gmd:individualName>
         #name=ET.SubElement(resp,'gmd:individualName')
         #ET.SubElement(name,'gco:CharacterString').text=c.contact
-        name=ET.SubElement(resp,'individualName')
-        ET.SubElement(name,'CharacterString').text=c.contact
+        name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
+        ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.contact
         # </gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
         # <gmd:contactInfo>
-        #contact=ET.SubElement(resp,'gmd:contactInfo')
-        contact=ET.SubElement(resp,'contactInfo')
+        #contact=ET.SubElement(ciresp,'gmd:contactInfo')
+        contact=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'contactInfo')
+        cicontact=ET.SubElement(contact,self.GMD_NAMESPACE_BRACKETS+'CI_Contact')
         #     <gmd:phone/>
         #     <gmd:address>
-        #address=ET.SubElement(contact,'gmd:address')
-        address=ET.SubElement(contact,'address')
+        #address=ET.SubElement(cicontact,'gmd:address')
+        address=ET.SubElement(cicontact,self.GMD_NAMESPACE_BRACKETS+'address')
+        ciaddress=ET.SubElement(address,self.GMD_NAMESPACE_BRACKETS+'CI_Address')
         #         <gmd:deliveryPoint/>
         #         <gmd:city/>
         #         <gmd:administrativeArea/>
         #         <gmd:postalCode/>
         #         <gmd:country/>
         #         <gmd:electronicMailAddress>
-        #email=ET.SubElement(address,'gmd:electronicMailAddress')
+        #email=ET.SubElement(ciaddress,'gmd:electronicMailAddress')
         #ET.SubElement(email,'gco:CharacterString').text=c.email
-        email=ET.SubElement(address,'electronicMailAddress')
-        ET.SubElement(email,'CharacterString').text=c.email
+        email=ET.SubElement(ciaddress,self.GMD_NAMESPACE_BRACKETS+'electronicMailAddress')
+        ET.SubElement(email,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.email
         #         </gmd:electronicMailAddress>
         #     </gmd:address>
         #     <gmd:onlineResource/>
@@ -183,18 +204,26 @@ class NumericalModel:
         #     <gmd:contactInstructions/>
         # </gmd:contactInfo>
         # <gmd:roll/>
+        role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')#empty
 
         '''activity'''
         '''type'''
-        ET.SubElement(comp,'type').text=c.scienceType
+        comp.append(ET.Comment("value attribute in element type should have value "+c.scienceType+" but this fails the cim validation at the moment"))
+        ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
+        #ET.SubElement(comp,'type').text=c.scienceType
         '''timing'''
-        ET.SubElement(comp,'timing').text='[TBD]'
-        '''documentID'''
-        ET.SubElement(comp,'documentID').text='[TBD]'
-        '''documentAuthor'''
-        ET.SubElement(comp,'documentAuthor').text=c.contact
-        '''documentCreationDate'''
-        ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
+        comp.append(ET.Comment("Made up values for timing in order pass cim validation"))
+        timing=ET.SubElement(comp,'timing',{'units':'seconds'})
+        ET.SubElement(timing,'rate').text='1'
+        if nest==1:
+          '''documentID'''
+          ET.SubElement(comp,'documentID').text='[TBD6]'
+          '''documentAuthor'''
+          #ET.SubElement(comp,'documentAuthor').text=c.contact
+          ET.SubElement(comp,'documentAuthor')
+          '''documentCreationDate'''
+          #ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
+          ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
         '''documentGenealogy'''
         '''quality'''
       else:

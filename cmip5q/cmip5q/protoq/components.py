@@ -232,6 +232,7 @@ class componentHandler(object):
         transform = ET.XSLT(xslt_doc)
         schematronhtml = transform(CIMDoc)
 
+        #also generate the cim as html
         xslt_doc = ET.parse("xsl/xmlformat.xsl")
         transform = ET.XSLT(xslt_doc)
         formattedCIMDoc = transform(CIMDoc)
@@ -240,22 +241,20 @@ class componentHandler(object):
         cimhtml = transform(formattedCIMDoc)
 
         response=HttpResponse('<html><head><title>CIM Validation page</title></head><body><h2>Validate not yet fully implemented</h2><h2>Schematron results</h2><p/>'+str(schematronhtml)+'<h2>CIM XML</h2><p/>'+str(cimhtml)+'</body></html>')
-        #response=HttpResponse("Validate not implemented")
-
         return response
     
     def view(self):
         ''' HTML view of self '''
         ''' Return a CIM XML view for the moment'''
-        return self.XML()
+        return self.XML(mimetype="doc/cim/xml")
     
-    def XML(self):
+    def XML(self,mimetype="application/xml"):
         ''' XML view of self'''
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
         CIMDoc=nm.export()
         #docStr=ET.tostring(CIMDoc,"UTF-8")
-        docStr=ET.tostring(CIMDoc)
-        return HttpResponse(docStr,mimetype="application/xml")
+        docStr=ET.tostring(CIMDoc,pretty_print=True)
+        return HttpResponse(docStr,mimetype)
 
     def XMLasHTML(self,XMLFileName):
         ''' XML view of self supplied in a file and returned as HTML'''
