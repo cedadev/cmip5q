@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <numericalExperiment documentVersion="3" control="false"
     xmlns="http://www.metaforclimate.eu/cim/1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,16 +7,17 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     
-    <rationale>Simulation of recent past (1850 to 2005). Imposed changing conditions (consistent
-        with observations). </rationale>
-    <Why> Evaluate model performance against present climate and observed climate change </Why>
+    <rationale> Historical simulation (1850 to 2005) as in experiment 3.2_historical 
+        but emissions-forced (with atmospheric CO2 determined by the model itself)</rationale>
+    <Why> Exploring the impact of climate-carbon cycle coupling in 
+        quantifying the carbon cycle feedback during the 20th century. </Why>
     <!-- Historical (1850-2005).
         Impose changing conditions (consistent with observations), which may include:
         * atmospheric composition - including [CO2]
         - due to anthropogenic influence
         - due to volcanic influence
         * solar forcing
-        * emissions or concentrations of
+        * emissions of
         - short lived species
         - aerosols
         >natural aerosols or their precursors
@@ -27,84 +27,59 @@
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.002</id>
-        <name xsi:type="Identifier">3.2.ic</name>
-        <description> Initial conditions are from experiment 3.1.piControl </description>
+        <name xsi:type="Identifier">5.2.ic</name>
+        <description> Initial conditions are from experiment 3.1_piControl </description>
     </numericalRequirement>
     
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.011</id>
-        <name xsi:type="Identifier">3.2.bc.wmg_anth.conc</name>
-        <description>Imposed changing concentrations of historical anthropogenic well mixed gases, including CO2</description>
+        <id xsi:type="Identifier">bc.047</id>
+        <name xsi:type="Identifier">5.2.bc.wmg_anth.em</name>
+        <description>Imposed changing emissions of historical anthropogenic well mixed gases, including CO2</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.012</id>
-        <name xsi:type="Identifier">3.2.bc.wmg_volc.conc</name>
-        <description>Imposed changing concentrations of historical volcanic well mixed gases, including CO2</description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.013</id>
-        <name xsi:type="Identifier">3.2.bc.sls.conc</name>
-        <description>Imposed changing concentrations of historical short lived gas species</description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.014</id>
-        <name xsi:type="Identifier">3.2.bc.aer_nat.conc</name>
-        <description>Imposed changing concentrations of historical natural aerosols</description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.015</id>
-        <name xsi:type="Identifier">3.2.bc.aer_anth.conc</name>
-        <description>Imposed changing concentrations of historical anthropogenic aerosols</description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.016</id>
-        <name xsi:type="Identifier">3.2.bc.aer_pre_nat.conc</name>
-        <description>Imposed changing concentrations of historical natural aerosol precursors</description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.017</id>
-        <name xsi:type="Identifier">3.2.bc.aer_pre_anth.conc</name>
-        <description>Imposed changing concentrations of historical anthropogenic aerosol precursors</description>
+        <id xsi:type="Identifier">bc.048</id>
+        <name xsi:type="Identifier">5.2.bc.wmg_volc.em</name>
+        <description>Imposed changing emissions of historical volcanic well mixed gases, including CO2</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.018</id>
-        <name xsi:type="Identifier">3.2.bc.sls.em</name>
+        <name xsi:type="Identifier">5.2.bc.sls.em</name>
         <description>Imposed changing emissions of historical short lived gas species</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.019</id>
-        <name xsi:type="Identifier">3.2.bc.aer_nat.em</name>
-        <description>Imposed changing emissions of historical natural aerosols </description>
+        <name xsi:type="Identifier">5.2.bc.aer_nat.em</name>
+        <description>Imposed changing emissions of historical natural aerosols</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.020</id>
-        <name xsi:type="Identifier">3.2.bc.aer_pre_anth.em</name>
+        <name xsi:type="Identifier">5.2.bc.aer_anth.em</name>
         <description>Imposed changing emissions of historical anthropogenic aerosols</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.049</id>
-        <name xsi:type="Identifier">3.2.bc.aer_pre_nat.em</name>
-        <description>Imposed changing emissions of historical natural aerosol precursors </description>
+        <name xsi:type="Identifier">5.2.bc.aer_pre_nat.em</name>
+        <description>Imposed changing emissions of historical natural aerosol precursors</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.050</id>
-        <name xsi:type="Identifier">3.2.bc.aer_anth.em</name>
+        <name xsi:type="Identifier">5.2.bc.aer_pre_anth.em</name>
         <description>Imposed changing emissions of historical anthropogenic aerosol precursors</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.021</id>
-        <name xsi:type="Identifier">3.2.bc.solar</name>
+        <id xsi:type="Identifier">bc.021</id>        
+        <name xsi:type="Identifier">5.2.bc.solar</name>
         <description>Imposed historical changing solar forcing</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.022</id>
-        <name xsi:type="Identifier">3.2.bc.LandUse</name>
+        <name xsi:type="Identifier">5.2.bc.LandUse</name>
         <description>Imposed historical changing land use</description>
     </numericalRequirement>
     
-    <shortName>3.2_historical</shortName>
-    <longName>3.2_Historical</longName>
+    <shortName>5.2_esmHistorical</shortName>
+    <longName>5.2_EarthSystemModelHistorical</longName>
     
     <CalendarType>
         <realCalendar>
@@ -116,7 +91,6 @@
         <endDate>2006-01-01T00:00:00Z</endDate>
         <lengthYears>156</lengthYears>
     </requiredDuration>
-    
     <author>
         <gmd:CI_ResponsibleParty>
             <gmd:individualName>
@@ -145,7 +119,7 @@
         </gmd:CI_ResponsibleParty>
     </author>
     
-    <creationDate>2009-06-26T14:48:00Z</creationDate>
-    <documentID xsi:type="Identifier">3.2_historical </documentID>
+    <creationDate>2009-08-04T14:48:00Z</creationDate>
+    <documentID xsi:type="Identifier">5.2_esmHistorical </documentID>
     
 </numericalExperiment>
