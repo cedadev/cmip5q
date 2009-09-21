@@ -49,31 +49,10 @@ class tabs(list):
         if 'Extra' in t.keys(): self.append(t['Extra'])
         for key in ('Help','About'): self.append(t[key])
        
-
-class ParamRow(object):
-    ''' used to monkey patch our special parameter forms '''
-    def __init__(self,name):
-        self.name=name 
-
 class PropertyForm:
     
     ''' this class instantiates the form elements needed by a component view
     of questionnaire properties aka parameters '''
-    
-    def __VocabRowHTML(self,name,value,ptype,values):
-        ''' return the html for a vocab row '''
-        operation={'OR':'+=','XOR':'='}[ptype]
-        advice={'OR':'Multiple','XOR':'One'}[ptype]
-        logging.info('Arguments to row %s,%s,%s'%(name,operation,len(values)))
-        html='''<tr>
-             <td>%s</td><td><input name="%s-%s" id="id_%s" size="40" value="%s"></td>
-             <td>%s</td><td>
-             <select name="opt_%s" size="1" onchange="document.getElementById(\'id_%s\').value %s this.value + \'|\';">'''%(
-                name, self.prefix,name,name,value,advice,name, name, operation)
-        for v in values:
-            html+='<option value="%s">%s</option>'% (v.value, v.value)
-        html+='</select></td></tr>'
-        return html
     
     def __init__(self,component,prefix=''):
         
@@ -91,32 +70,22 @@ class PropertyForm:
         self.keys={}
         
         for o in self.orp:
-            pp=ParamRow(o.name)
-            pp.values=Value.objects.filter(vocab=o.vocab)
-            pp.html=self.__VocabRowHTML(o.name,o.value,'OR',pp.values)
-            self.rows.append(pp)
+            o.form={'type':'OR','op':'+='}
+            o.form['values']=Value.objects.filter(vocab=o.vocab)
+            self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
         
         for o in self.xorp:
-            pp=ParamRow(o.name)
-            pp.values=Value.objects.filter(vocab=o.vocab)
-            pp.html=self.__VocabRowHTML(o.name,o.value,'XOR',pp.values)
-            self.rows.append(pp)
+            o.form={'type':'XOR','op':'='}
+            o.form['values']=Value.objects.filter(vocab=o.vocab)
+            self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
             
         for o in self.other:
-            pp=ParamRow(o.name)
-            pp.value=o.value
-            pp.html='''<tr><td>%s</td><td>
-                       <input name="%s-%s" id="id_%s" size="40" value="%s"></td>
-                       <td></td><td></td></tr>'''%(
-                            o.name,self.prefix,o.name,o.name,o.value)
-            self.rows.append(pp)
+            o.form={'type':'key'}
+            self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
             
-        self.new='''<tr><td><input name="%s-newparam" id="%s-newparam" size="20"></td>
-                        <td><input name="%s-newparamval" id="%s-newparamval" size="40"></td>
-                        <td></td><td></td></tr>'''%(self.prefix,self.prefix,self.prefix,self.prefix)
                         
     def update(self,request):
         ''' Update a parameter field based on a form posted inwards '''

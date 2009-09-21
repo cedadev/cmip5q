@@ -113,7 +113,6 @@ class Component(Doc):
         
         new.save()
         return new
-        
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
@@ -127,13 +126,30 @@ class ComponentInput(models.Model):
     #the owners for their parent realms, but it's stored when we create
     #it to improve performance:
     realm=models.ForeignKey(Component,related_name="input_realm")
+    constraint=models.ForeignKey('Constraint',null=True,blank=True)
     def __unicode__(self):
         return '%s:%s'%(self.owner,self.abbrev)
     def makeNewCopy(self,component):
         new=ComponentInput(abbrev=self.abbrev,description=self.description,bc=self.bc,
                            owner=component,realm=component.realm)
         new.save()
-    
+
+class Constraint(models.Model):
+    ''' Used to ensure that something is only used if needed '''
+    # This is the constraint as it appeared on input
+    note=models.CharField(max_length=256)
+    # this is the parameter holding the constraint target
+    key=models.ForeignKey('Param',blank=True,null=True)
+    # and this is the value it must hold to be a valid constraint (ie TRUE)
+    value=models.CharField(max_length=256)
+    def __unicode__(self):
+        return note
+    def isValid(self):
+        try:
+            return str(self.key.value)==self.value
+        except:
+            #FIXME: need to make sure we have a value ...
+            return False
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
     centre=models.ForeignKey('Centre')
@@ -222,20 +238,31 @@ class Value(models.Model):
     vocab=models.ForeignKey(Vocab)
     def __unicode__(self):  
         return self.value
-        
+    
 class Param(models.Model):
     ''' This is the abstract parameter class'''
     name=models.CharField(max_length=64,blank=False)
-    component=models.ForeignKey(Component,null=True,blank=True)
+    controlled=models.BooleanField(default=True)
     ptype=models.SlugField(max_length=12,blank=True)
-    # still not sure about this ...
+    # applies to
+    component=models.ForeignKey(Component,null=True,blank=True)
+    #following used to inform users about choices:
+    info=models.CharField(max_length=256,null=True,blank=True)
+    # constraint note
+    myconstraint=models.CharField(max_length=256,null=True,blank=True)
+    # Following used to point to vocabs and their values ...
+    # If a vocab is linked, then the value must be from it!
     vocab=models.ForeignKey(Vocab,null=True,blank=True)
     value=models.CharField(max_length=512,blank=True)
+    # but it might be a numeric parameter, in which case we have more attributes
+    definition=models.CharField(max_length=128,null=True,blank=True)
+    units=models.CharField(max_length=128,null=True,blank=True)
     def __unicode__(self):
         return self.name
     def makeNewCopy(self,component):
-        new=Param(name=self.name,component=component,ptype=self.ptype,
-                      vocab=self.vocab,value=self.value)
+        new=Param(name=self.name,component=component,ptype=self.ptype,controlled=self.controlled,
+                      vocab=self.vocab,value=self.value,definition=self.definition,
+                      info=self.info,myconstraint=self.myconstraint,units=self.units)
         new.save()
     
 class DataObject(models.Model):

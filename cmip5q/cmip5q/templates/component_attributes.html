@@ -1,0 +1,38 @@
+<!-- This template works with the PropertyForm from utilities.py -->
+<table>
+<tr><th></th><th></th><th>Value</th></tr>
+{% for r in pform.rows %}
+<tr class="{% cycle 'row1' 'row2'%}">
+   <td><b>{{r.name}}</b>:&nbsp;</td>
+   <td> 
+       {% ifequal r.form.type 'key' %}
+          {% ifequal r.ptype 'keyboard' %}
+            {{r.info}}
+            {{r.constraint}}
+          {% endifequal %}
+          Enter freetext or numeric value:&nbsp;
+       {% else %} 
+            {% ifequal r.form.type 'OR' %} Choose multipe: {% endifequal %}
+            {% ifequal r.form.type 'XOR' %} Choose one of: {% endifequal %}
+            <select name="opt_{{r.name}}" size="1" onchange="document.getElementById('id_{{r.name}}').value {{r.form.op}} this.value + '|';">
+                    {% for v in r.form.values %} <option value="{{v}}">{{v}}</option> {% endfor %}
+            </select>
+       {% endifequal %}
+   </td>
+   <td width="50%">
+        <input name="{{pform.prefix}}-{{r.name}}" id="id_{{r.name}}" size="50" value="{{r.value}}">
+        {% ifequal r.ptype 'keyboard' %}
+            {{r.units}}
+        {% endifequal%}
+   </td>
+</tr>
+{% endfor %}
+</table>
+Additional parameters go here ... using the old code:
+<table>
+<tr><th> Name </th><th> Value </th></tr>
+<tr>
+    <td><input name="{{pform.prefix}}-newparam" id="{{pform.prefix}}-newparam" size="20"></td>
+    <td><input name="{{pform.prefix}}-newparamval" id="{{pform.prefix}}-newparamval" size="40"></td>
+</tr>
+</table>

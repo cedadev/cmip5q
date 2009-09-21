@@ -263,21 +263,65 @@ class ComponentParser:
         paramName=elem.attrib['name']
         choiceType=elem.attrib['choice']
         logging.debug('For %s found parameter %s with choice %s'%(self.item.attrib['name'],paramName,choiceType))
+       
         if choiceType in ['OR','XOR']:
             #create and load vocabulary
             v=Vocab(uri=str(uuid.uuid1()),name=paramName+'Vocab')
             v.save()
             logging.debug('Created vocab %s'%v.name)
+            co,info=None,None
             for item in elem:
                 if item.tag=='value':
                     value=Value(vocab=v,value=item.attrib['name'])
                     value.save()
-                    logging.debug('Added %s to vocab %s'%(value.value,v.name))
+                    #logging.debug('Added %s to vocab %s'%(value.value,v.name))
+                elif item.tag=='constraint':
+                    # better not have more than one constraint, we'd get only the last one.
+                    co=item.text
+                elif item.tag=='info':
+                    info=item.text
                 else:
                     logging.info('Found unexpected tag %s in %s'%(item.tag,paramName))
-            p=Param(name=paramName,component=self.component,ptype=choiceType,vocab=v)
+            p=Param(name=paramName,component=self.component,ptype=choiceType,vocab=v,
+                    info=info,myconstraint=co)
             p.save()
             logging.info('Added parameter %s to component %s (%s)'%(paramName,self.component.abbrev,self.component.id))
+        elif choiceType in ['keyboard']:
+            co=elem.find('constraint')
+            if co is not None: co=co.text
+            info=elem.find('info')
+            if info is not None: info=info.text
+            p=Param(name=paramName,component=self.component,ptype=choiceType,
+                    info=info,myconstraint=co)
+            #at this point expect to find one, value type
+            i=elem.find('value')
+            if i is None:
+                logging.info('Expect value within keyboard choice, ignoring %s'%paramName)
+            else:
+                ok=True
+                for a in 'format','name': 
+                    if a not in i.attrib.keys():
+                        logging.info('ERROR: Unexpected value structure')
+                        ok=False
+                if ok: 
+                    p.definition=i.attrib['name']
+                    if 'units' in i.attrib.keys(): p.units=i.attrib['units']  
+            p.save()
+            logging.info('Added parameter %s to component %s (%s)'%(paramName,self.component.abbrev,self.component.id))
+        elif choiceType in ['couple']:
+            # have we got a constraint?
+            co=elem.find('Constraint')
+            if co:
+                co=Constraint(note=co.text)
+                # FIXME, work with this later.
+            # we create an input requirement here and now ...
+            ci=ComponentInput(owner=self.component,abbrev=paramName,
+                              description='Required by controlled vocabulary for %s'%self.component,
+                              realm=self.component.realm,
+                              constraint=co)
+            logging.info('Added component input %s for %s (without param & value)'%(paramName,self.component))
+        else:
+            logging.info('ERROR: Ignoring parameter %s'%paramName)
                
     def add(self, doSubs, realm=None):
         u=str(uuid.uuid1())
@@ -315,6 +359,8 @@ class ComponentParser:
                     component.components.add(child)
                 elif subchild.tag == 'parameter': 
                     self.__handleParam(subchild)
+                else:
+                    logging.debug('Ignoring tag %s for %s'%(subchild.tag,self.component))
    	
         component.save()
         return component
@@ -332,7 +378,7 @@ class TestFunctions(unittest.TestCase):
             c.save()
             self.centre=c 
        
-    def NOtest0ReadFromXML(self):
+    def test0ReadFromXML(self):
         
         nm=NumericalModel(self.centre,xml=True)
         
@@ -348,7 +394,7 @@ class TestFunctions(unittest.TestCase):
         
         self.nm=nm
             
-    def test1CopyModel(self):
+    def NOtest1CopyModel(self):
         
         model=Component.objects.filter(abbrev='GCM Template')[0]
         logging.info('Test 1 using component %s'%model.id)
@@ -365,5 +411,4 @@ class TestFunctions(unittest.TestCase):
         
         for i in range(len(originalRealms)):
             self.assertEqual(str(originalRealms[i].abbrev),str(copyRealms[i].abbrev))
-                                
-                                
+        

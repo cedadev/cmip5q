@@ -35,7 +35,6 @@
     <div class="boxer2">
     <form action="{{urls.form}}" method='post'>
         <div class="boxer">    
-            {{cform.management_form}}
             <!--<h4> General Characteristics </h4>-->
             <table>
             <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
@@ -46,23 +45,9 @@
             </table>
         </div>
         <div class="boxer">
-            <h4> Attributes </h4>
-            <table>
-            {% if pform.rows %}
-            <tr width="100%"><th>Name</th><th>Value</th><th>Choose</th><th>Options</th></tr>
-            {% for r in pform.rows %}
-            {{r.html|safe}}
-            {% endfor %}
-            {% else %}
-            <tr><td> Name </td><td>Value</td></tr>
-            {% endif %}
-            <tr><td colspan="4"> You can record additional attributes of the {{c.scienceType}} here:</td></tr>
-            {{pform.new|safe }}
-            </table>
-            <p class="guidance"> (An additional attribute can be entered each time the form is saved.)</p>
-            <p class="cmip5q"> Don't bother telling us about problems with this "Attributes" box, we will overhaul it considerably in the near future (including handlng deletions, better layout etc).
-            </p>
-                
+        <h4> Component Attributes </h4>
+            <p> In this section enter parameters and attributes associated with this component.</p>
+            {% include 'component_attributes.html' %}
         </div>
        
         <div class="boxer"> 
