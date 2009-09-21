@@ -70,10 +70,12 @@
             <value name="Time + Space varying (Smagorinski)"/>
             <value name="Other"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if CoefficientType = &quot;Constant&quot;.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "Constant" is selected for CoefficientType. </constraint>
             <value format="numerical" name="Eddy viscosity coefficient for momentum" units="m2/s"/>
           </parameter>
-          <parameter name="SpatialVariation" choice="OR" note="Only if CoefficientType = &quot;Space varying&quot; or CoefficientType =&quot;Time + Space varying&quot;.">
+          <parameter name="SpatialVariation" choice="OR">
+            <constraint> Only if "Space varying" or "Time+Space varying" is selected for CoefficientType. </constraint>
             <value name="With depth"/>
             <value name="With latitude"/>
             <value name="With longitude"/>
@@ -102,10 +104,12 @@
             <value name="Constant"/>
             <value name="Space varying"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if CoefficientType = &quot;constant&quot;.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "Constant" is selected for CoefficientType. </constraint>
             <value format="numerical" name="Eddy viscosity coefficient for tracers" units="m2/s"/>
           </parameter>
-          <parameter name="SpatialVariation" choice="OR" note="Only if CoefficientType = &quot;Space varying&quot;.">
+          <parameter name="SpatialVariation" choice="OR">
+            <constraint> Only if "Space varying" is selected for CoefficientType. </constraint>
             <value name="With depth"/>
             <value name="With latitude"/>
             <value name="With longitude"/>
@@ -119,7 +123,8 @@
             <value name="GM scheme"/>
             <value name="Other"/>
           </parameter>
-          <parameter name="GMvalue" choice="keyboard" note="Only if CoefficientType = &quot;GM scheme&quot;.">
+          <parameter name="GMvalue" choice="keyboard">
+            <constraint> Only if "GM scheme" is selected for CoefficientType. </constraint>
             <value format="numerical" name="Eddy induced velocity coefficient" units="m2/s"/>
           </parameter>
           <parameter name="AddedDiffusivity" choice="XOR">
@@ -138,22 +143,24 @@
       <component name="MixedLayer">
         <component name="Tracers">
           <parameter name="SchemeType" choice="XOR">
-            <value name="Constant values"/>
+            <value name="constant values"/>
             <value name="turbulent closure (TKE)"/>
             <value name="turbulent closure (KPP)"/>
             <value name="turbulent closure (Mellor-Yamada)"/>
             <value name="turbulent closure (Bulk Mixed layer)"/>
             <value name="Richardson number dependent (PP)"/>
             <value name="Richardson number dependent (KT)"/>
-            <value name="Other"/>
+            <value name="other"/>
           </parameter>
-          <parameter name="ClosureOrder" choice="XOR" note="Only if SchemeType = &quot;turbulent closure&quot;.">
+          <parameter name="ClosureOrder" choice="XOR">
+            <constraint> Only if "turbulent closure" is selected for SchemeType. </constraint>
             <value name="0"/>
             <value name="1"/>
             <value name="2.5"/>
             <value name="3"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if SchemeType = &quot;Constant values&quot;.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "constant values" is selected for SchemeType. </constraint>
             <value format="numerical" name="mixing coefficient for tracers in the mixed layer" units="m2/s"/>
           </parameter>
           <parameter name="BackgroundValue" choice="keyboard">
@@ -171,13 +178,15 @@
             <value name="Richardson number dependent (KT)"/>
             <value name="Other"/>
           </parameter>
-          <parameter name="ClosureOrder" choice="XOR" note="Only if SchemeType = &quot;turbulent closure&quot;.">
+          <parameter name="ClosureOrder" choice="XOR">
+            <constraint> Only if "turbulent closure" is selected for SchemeType. </constraint>
             <value name="0"/>
             <value name="1"/>
             <value name="2.5"/>
             <value name="3"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if &quot;Constant values&quot; selected for SchemeType.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "constant values" is selected for SchemeType. </constraint>
             <value format="numerical" name="mixing coefficient for momentum in the mixed layer" units="m2/s"/>
           </parameter>
           <parameter name="BackgroundValue" choice="keyboard">
@@ -195,14 +204,16 @@
             <value name="Richardson number dependent (KT)"/>
             <value name="Other"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if SchemeType = &quot;constant values&quot;.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "constant values" is selected for SchemeType. </constraint>
             <value format="numerical" name="mixing coefficient for tracers in the ocean interior" units="m2/s"/>
           </parameter>
           <parameter name="BackgroundType" choice="XOR">
             <value name="Vertical profile"/>
             <value name="Constant value"/>
           </parameter>
-          <parameter name="BackgroundConstantValue" choice="keyboard" note="Only if BackgroundType = &quot;constant value&quot;.">
+          <parameter name="BackgroundConstantValue" choice="keyboard">
+            <constraint> Only if "constant value" is selected for BackgroundType. </constraint>
             <value format="numerical" name="background mixing coefficient for tracers in the ocean interior" units="m2/s"/>
           </parameter>
         </component>
@@ -215,14 +226,16 @@
             <value name="Richardson number dependent (KT)"/>
             <value name="Other"/>
           </parameter>
-          <parameter name="ConstantValue" choice="keyboard" note="Only if SchemeType &quot;constant values&quot;.">
+          <parameter name="ConstantValue" choice="keyboard">
+            <constraint> Only if "constant values" is selected for SchemeType. </constraint>
             <value format="numerical" name="mixing coefficient for momentum in the ocean interior" units="m2/s"/>
           </parameter>
           <parameter name="BackgroundType" choice="XOR">
             <value name="Vertical profile"/>
             <value name="Constant value"/>
           </parameter>
-          <parameter name="BackgroundConstantValue" choice="keyboard" note="Only if BackgroundType = &quot;constant value&quot;.">
+          <parameter name="BackgroundConstantValue" choice="keyboard">
+            <constraint> Only if "constant value" is selected for BackgroundType. </constraint>
             <value format="numerical" name="background mixing coefficient for momentum in the ocean interior" units="m2/s"/>
           </parameter>
         </component>
@@ -244,10 +257,11 @@
       <parameter name="BoundaryLayerType" choice="XOR">
         <value name="diffusive"/>
         <value name="advective"/>
-        <value name="advective +diffusive"/>
+        <value name="advective + diffusive"/>
         <value name="other"/>
       </parameter>
-      <parameter name="LateralMixingCoefficient" choice="keyboard" note="Only if BoundaryLayerType = &quot;diffusive&quot; or &quot;advective + diffusive&quot;.">
+      <parameter name="LateralMixingCoefficient" choice="keyboard">
+        <constraint> Only if "diffusive" or "advective+diffusive" is selected for BoundaryLayerType. </constraint>
         <value format="numerical" name="lateral mixing coefficient in the bottom boundary layer" units="m2/s"/>
       </parameter>
       <parameter name="SillOverflow " choice="XOR">
@@ -283,17 +297,21 @@
           <parameter name="FirstDepth" choice="keyboard">
             <value format="numerical" name="fisrt extinction depth" units="m"/>
           </parameter>
-          <parameter name="SecondDepth" choice="keyboard" note="Only if SchemeType = &quot;2 extinction depths&quot; or &quot;3 extinction depths&quot;.">
+          <parameter name="SecondDepth" choice="keyboard">
+            <constraint> Only if "2 extinction depths" or "3 extinction depths" is selected for SchemeType. </constraint>
             <value format="numerical" name="second exctinction depth" units="m"/>
           </parameter>
-          <parameter name="ThirdDepth" choice="keyboard" note="Only if SchemeType &quot;3 extinction depths&quot;.">
+          <parameter name="ThirdDepth" choice="keyboard">
+            <constraint> Only if "3 extinction depths" is selected for SchemeType. </constraint>
             <value format="numerical" name="third exctinction depth" units="m"/>
           </parameter>
           <parameter name="OceanColorDependant" choice="XOR">
             <value name="yes"/>
             <value name="no"/>
           </parameter>
-          <parameter name="OceanColorSource" choice="" note="Only if OceanColorDependant = &quot;yes&quot;."/>
+          <parameter name="OceanColorSource" choice="couple">
+            <constraint> Only if "yes" is selected for OceanColorDependant. </constraint>
+          </parameter>
         </component>
         <component name="SurfaceSalinity">
           <parameter name="FromAtmosphere" choice="XOR">
@@ -344,7 +362,8 @@
         <value format="string" name=""/>
       </parameter>
     </component>
-    <component name="OceanFreeSurface" note="If no free surface, then ocean surface is &quot;rigid-liquid&quot;.">
+    <component name="OceanFreeSurface">
+      <info> If no free surface, then ocean surface is rigid-liquid. </info>
       <parameter name="Type" choice="XOR">
         <value name="linear implicit"/>
         <value name="linear filtered"/>
