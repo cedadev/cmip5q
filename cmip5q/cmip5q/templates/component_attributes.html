@@ -1,4 +1,7 @@
 <!-- This template works with the PropertyForm from utilities.py -->
+{% ifequal pform.controlled|length 0 %}
+<p> There are no required attributes {% if pform.component.components.all|length%} at this level {% endif %}for this component.{% ifnotequal pform.rows|length 0 %} Your attributes:{% endifnotequal %}
+</p> {% endifequal%}
 <table>
 {% ifnotequal pform.rows|length 0 %} 
 <tr><th></th><th></th><th>Value</th></tr>
@@ -8,7 +11,7 @@
    <td>
        <b>{{r.name}}</b>:&nbsp;
        {% ifequal r.ptype 'User' %}<br/>
-       (&nbsp;Delete <input type="checkbox" name="{{pform.prefix}}-del_{{r.name}}" id="delid_{{r.name}}"/>&nbsp;) 
+       (&nbsp;Delete <input type="checkbox" name="{{pform.prefix}}-del-{{r.name}}" id="delid_{{r.name}}"/>&nbsp;) 
         {%endifequal %}
    </td>
    <td>  

@@ -65,6 +65,7 @@ class PropertyForm:
         self.orp=self.params.filter(ptype='OR')
         self.xorp=self.params.filter(ptype='XOR')
         self.other=self.params.exclude(ptype='OR').exclude(ptype='XOR')
+        self.controlled=self.params.exclude(ptype='User')
         
         self.rows=[]
         self.keys={}
