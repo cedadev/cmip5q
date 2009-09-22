@@ -1,34 +1,43 @@
 <!-- This template works with the PropertyForm from utilities.py -->
 <table>
+{% ifnotequal pform.rows|length 0 %} 
 <tr><th></th><th></th><th>Value</th></tr>
+{% endifnotequal %}
 {% for r in pform.rows %}
 <tr class="{% cycle 'row1' 'row2'%}">
-   <td><b>{{r.name}}</b>:&nbsp;</td>
-   <td> 
-       {% ifequal r.form.type 'key' %}
-          {% ifequal r.ptype 'keyboard' %}
-            {{r.info}}
-            {{r.constraint}}
-          {% endifequal %}
+   <td>
+       <b>{{r.name}}</b>:&nbsp;
+       {% ifequal r.ptype 'User' %}<br/>
+       (&nbsp;Delete <input type="checkbox" name="{{pform.prefix}}-del_{{r.name}}" id="delid_{{r.name}}"/>&nbsp;) 
+        {%endifequal %}
+   </td>
+   <td>  
+       {% ifequal r.ptype 'User' %}
+       Enter freetext or numeric value:&nbsp;
+       {% endifequal %}
+       {% ifequal r.ptype 'keyboard' %}
+            {% if r.info %} {{r.info}} {% endif %}
+            {% if r.myconstraint %} {{r.myconstraint}} {% endif %}
           Enter freetext or numeric value:&nbsp;
-       {% else %} 
-            {% ifequal r.form.type 'OR' %} Choose multipe: {% endifequal %}
-            {% ifequal r.form.type 'XOR' %} Choose one of: {% endifequal %}
+       {% endifequal %}   
+       {% ifnotequal r.form None %}
+            {% ifequal r.ptype 'OR' %} Choose one or more of: {% endifequal %}
+            {% ifequal r.ptype 'XOR' %} Choose one of: {% endifequal %}
             <select name="opt_{{r.name}}" size="1" onchange="document.getElementById('id_{{r.name}}').value {{r.form.op}} this.value + '|';">
                     {% for v in r.form.values %} <option value="{{v}}">{{v}}</option> {% endfor %}
             </select>
-       {% endifequal %}
+       {% endifnotequal %}
    </td>
    <td width="50%">
         <input name="{{pform.prefix}}-{{r.name}}" id="id_{{r.name}}" size="50" value="{{r.value}}">
         {% ifequal r.ptype 'keyboard' %}
-            {{r.units}}
+            {% if r.units %} {{r.units}} {% endif %}
         {% endifequal%}
    </td>
 </tr>
 {% endfor %}
 </table>
-Additional parameters go here ... using the old code:
+<p>Enter {% ifnotequal pform.rows|length 0 %} an additional {% else %} a {% endifnotequal %} component attribute or parameter if you wish (you can enter multiple parameters by entering one at a time):</p>
 <table>
 <tr><th> Name </th><th> Value </th></tr>
 <tr>

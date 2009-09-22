@@ -70,19 +70,19 @@ class PropertyForm:
         self.keys={}
         
         for o in self.orp:
-            o.form={'type':'OR','op':'+='}
+            o.form={'op':'+='}
             o.form['values']=Value.objects.filter(vocab=o.vocab)
             self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
         
         for o in self.xorp:
-            o.form={'type':'XOR','op':'='}
+            o.form={'op':'='}
             o.form['values']=Value.objects.filter(vocab=o.vocab)
             self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
             
         for o in self.other:
-            o.form={'type':'key'}
+            o.form=None
             self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
             
@@ -91,6 +91,7 @@ class PropertyForm:
         ''' Update a parameter field based on a form posted inwards '''
         qdict=request.POST
         lenprefix=len(self.prefix)
+        deleted=[]
         for key in qdict.keys():
             # only handle those which belong here:
             if key[0:lenprefix]==self.prefix: 
@@ -107,16 +108,28 @@ class PropertyForm:
                 elif mykey == 'newparamval':
                     #ignore, handled above
                     pass
+                elif mykey[0:3] == 'del':
+                    pname=mykey[4:]
+                    try:
+                        p=Param.objects.get(name=pname)
+                        p.delete()
+                        deleted.append(pname)
+                        logging.info('Deleted parameter %s from %s'%(pname,self.component))
+                    except:
+                        logging.info(
+                          'Attempt to delete parameter %s for component %s failed '%(
+                              pname,self.component))
                 else:
                     if mykey not in self.keys:
                         logging.info(
                         'Unexpected key %s ignored in PropertyForm (%s)'%(
                         mykey,self.keys))
                     else:
-                        pname=self.rows[self.keys[mykey]].name
-                        p=self.params.filter(name=pname)
-                        if len(p)!=1:
-                            logging.info('Unexpected queryset length for %s'%pname)
-                        new=p[0]
-                        new.value=qdict[key]
-                        new.save()
+                        if mykey not in deleted:
+                            pname=self.rows[self.keys[mykey]].name
+                            p=self.params.filter(name=pname)
+                            if len(p)!=1:
+                                logging.info('Unexpected queryset length for %s'%pname)
+                            new=p[0]
+                            new.value=qdict[key]
+                            new.save()
