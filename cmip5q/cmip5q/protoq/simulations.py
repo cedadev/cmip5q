@@ -15,7 +15,7 @@ import logging
 
 ConformanceFormSet=modelformset_factory(Conformance,
                                         form=ConformanceForm,
-                                        exclude=('simulation','requirement'))
+                                        exclude=('simulation','requirement','ctype'))
 
 class MyConformanceFormSet(ConformanceFormSet):
     ''' Mimics the function of a formset for the situation where we want to edit the
@@ -28,11 +28,11 @@ class MyConformanceFormSet(ConformanceFormSet):
     def specialise(self):
         v=Vocab.objects.get(name='conformanceTypes')
         allowedComponents=Component.objects.filter(model=self.s.numericalModel)
-        print allowedComponents
         for form in self.forms:
-            form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+            #form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
             form.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=allowedComponents)
             form.fields['boundaryCondition'].queryset=Coupling.objects.filter(simulation=self.s)
+            form.show=str(form.instance.ctype)
     # we don't need a subclass save method, because we initialise from instances in the queryset
           
 class simulationHandler(object):
