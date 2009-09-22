@@ -252,7 +252,7 @@ class ComponentParser:
         ''' initialise  parser '''
         self.item = item
         self.model = model
-        logging.debug("Instantiated Parser for %s"% item.tag)
+        #logging.debug("Instantiated Parser for %s"% item.tag)
         if item.attrib['name']:
             logging.debug("name = %s"%item.attrib['name'])
         else:
@@ -319,6 +319,7 @@ class ComponentParser:
                               description='Required by controlled vocabulary for %s'%self.component,
                               realm=self.component.realm,
                               constraint=co)
+            ci.save()
             logging.info('Added component input %s for %s (without param & value)'%(paramName,self.component))
         else:
             logging.info('ERROR: Ignoring parameter %s'%paramName)
@@ -351,7 +352,7 @@ class ComponentParser:
         if doSubs:
             for subchild in self.item:
                 if subchild.tag == "component":
-                    logging.debug("Found child : %s"%subchild.tag)
+                    #logging.debug("Found child : %s"%subchild.tag)
                     subComponentParser = ComponentParser(subchild, self.model)
                     # Handle child components of this one (True = recursive)
                     child=subComponentParser.add(True,realm=realm)

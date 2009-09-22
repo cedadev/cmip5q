@@ -21,7 +21,11 @@
        {% ifequal r.ptype 'keyboard' %}
             {% if r.info %} {{r.info}} {% endif %}
             {% if r.myconstraint %} {{r.myconstraint}} {% endif %}
-          Enter freetext or numeric value:&nbsp;
+            {% if r.units %}
+            Enter numeric value in <em>{{r.units}}</em>:&nbsp;
+            {% else %}
+            Enter freetext or numeric value::&nbsp;
+            {% endif %}
        {% endifequal %}   
        {% ifnotequal r.form None %}
             {% ifequal r.ptype 'OR' %} Choose one or more of: {% endifequal %}
@@ -33,9 +37,6 @@
    </td>
    <td width="50%">
         <input name="{{pform.prefix}}-{{r.name}}" id="id_{{r.name}}" size="50" value="{{r.value}}">
-        {% ifequal r.ptype 'keyboard' %}
-            {% if r.units %} {{r.units}} {% endif %}
-        {% endifequal%}
    </td>
 </tr>
 {% endfor %}
