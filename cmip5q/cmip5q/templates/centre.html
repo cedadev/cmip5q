@@ -25,7 +25,7 @@
 <h4> </h4>
 <table>
 <tr><td width="50%">
-    <div class="backgrey">
+    <div  class="boxer">
     <table width="100%">
         <thead>
             <tr><th colspan="3"> Models associated with {{centre.abbrev}}</th></tr>
@@ -33,7 +33,7 @@
         </thead>
         <tbody> 
         {% for m in models %}
-        <tr><td width="50%">{{m.abbrev}}</td>
+        <tr class="{% cycle 'row2' 'row1'%}"><td width="50%">{{m.abbrev}}</td>
         <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a>
         <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");
@@ -42,70 +42,72 @@
         <p class="cmip5q">placeholder</p>
         </td></tr>
         {% endfor %} 
-        <tr><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="2">Note that it can take some time to create a new model from the CMIP5 template ... be patient!</td></tr>
+        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="2">Note that it can take some time to create a new model from the CMIP5 template ... be patient!</td></tr>
         <tbody>
     </table>
-    </div>
+   
     <script type="text/javascript">
         var newmodButton = new YAHOO.widget.Button("newModButton");
     </script>
     <p class="guidance"> The status column provides an indicator of how much of the model description has
     been completed. <!--CopyAsNew should be used to describe variants of already described models.--></p>
-    <div class="backgrey">
+    </div>
+    <div class="boxer">
     <table width="100%">
         <thead>
         <tr><th colspan="2"> Computing platforms associated with {{centre.abbrev}}</td></tr>
         </thead>
         <tbody>
         {% for m in platforms %}
-        <tr><td width="50%">{{m.abbrev}}</td>
+        <tr class="{% cycle 'row2' 'row1'%}" ><td width="50%">{{m.abbrev}}</td>
         <td><a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">edit</a></td></tr>
         <script type="text/javascript">
             var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
         </script>
         {% endfor %}
         </tbody>
+        <tr class="row3"><td colspan="2"><a id="newPlatButton" href="{{newplat}}">Add a new Platform</a></td></tr>
     </table>
-    </div>
-    <a id="newPlatButton" href="{{newplat}}">Add a new Platform</a>
     <script type="text/javascript">
         var newplatButton = new YAHOO.widget.Button("newPlatButton"); 
     </script>
+    </div>
 </td>
 <td>
-    <div class="backgrey">
+    <div class="boxer">
     <table width="100%">
         <thead>
         <tr><th>Simulations associated with {{centre.abbrev}}</th><tr>
         </thead>
         <tbody>
-        <tr><td>{% for s in sims %} 
-           <a id="edSimButton{{forloop.counter}}" href="{{s.url}}">{{s.abbrev}}</a>
+        {% for sgroup in sims %}
+        <tr class="{% cycle 'row2' 'row1'%}"><td>{% for s in sgroup %} 
+           <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
            <script type="text/javascript">
-                var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{forloop.counter}}");
+                var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
            </script>
            {% endfor %}
-        <tr><td><a id="viewSimBut" href="{{viewsimurl}}"> Add new Simulation</a></td></tr>
+        {% endfor %}
+        <tr class="row3"><td><a id="viewSimBut" href="{{viewsimurl}}"> Manage Simulations (add new)</a></td></tr>
         </tbody>
         <script type="text/javascript">
             var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
         </script>
     </table>
+    </div>
     <p></p>
-    <table width="100%">
-       <thead>
-        <tr><th>Other</th><tr>
-        </thead>
-        <tbody>
-        <tr><td><p class="cmip5q"> Number of dataobjects and conformances listed here</p> </td></tr>
-        </tbody>
-    </table>  
+    <div class="boxer">
+        <table width="100%">
+            <thead><tr><th>Files and References</th></tr></thead>
+            <tbody>
+                <tr class="row2"><td> There are {{refs|length }} references associated with {{centre}} </td></tr>
+                <tr class="row1"><td> There are {{files|length }} files associated with {{centre}} </td></tr>
+            </tbody>
+        </table> 
+    </div>
 </td>        
 </tr>
 </tbody>
 </table>
-
-</div>
-
-           
+</div> 
 {% endblock %}

@@ -1,6 +1,8 @@
+<p class="guidance"> You should make one file link for each variable you need to access. (You may find that you need to have several file descriptions pointing to the same physical file object, but pointing at different variables within that physical file.)
 <table>
-<tr><td width="15%">Name:{{form.name.errors}}</td><td>{{form.name}}</td></tr>
-<tr><td>Link:{{form.link.errors}}</td><td>{{form.link}}</td></tr>
+<tr><td width="20%">Name:{{form.name.errors}}</td><td>{{form.name}}</td></tr>
+<tr><td>Link:&nbsp;(This should point either to a downloadable version of the file, or to a page from which the file can be obtained.){{form.link.errors}}</td><td>{{form.link}}</td></tr>
+<tr><td>File Format:&nbsp;(This is the ultimate file format not the format of the object returned if you dereference the link.){{form.format.errors}}</td><td>{{form.format}}</td></tr>
 <tr><td>Description:{{form.description.errors}}</td><td>{{form.description}}</td></tr>
 <tr><td>Reference:{{form.reference.errors}}</td><td>{{form.reference}}</td><tr>
 <tr><td>Standard Name:{{form.cftype.errors}}</td><td>{{form.cftype}}</td></tr>

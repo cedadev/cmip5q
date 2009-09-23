@@ -28,6 +28,7 @@ class Reference(models.Model):
     link=models.URLField(blank=True,null=True)
     refTypes=models.ForeignKey('Vocab',null=True,blank=True,editable=False)
     refType=models.ForeignKey('Value')
+    centre=models.ForeignKey('Centre',blank=True,null=True)
     def __unicode__(self):
         return self.name
     
@@ -220,7 +221,7 @@ class Simulation(Doc):
 
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
-    files=models.ForeignKey('DataObject',blank=True,null=True)
+   
 
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -281,6 +282,8 @@ class DataObject(models.Model):
     reference=models.ForeignKey(Reference,blank=True,null=True)
     #format
     format=models.ForeignKey('Value',blank=True,null=True)
+    #centre that owns this data object
+    centre=models.ForeignKey('Centre')
     def __unicode__(self):
         return self.name
         
@@ -475,10 +478,16 @@ class DataObjectForm(forms.ModelForm):
     cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
     class Meta:
         model=DataObject
+        exclude=('centre',)
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='FileFormats')
         self.fields['format'].queryset=Value.objects.filter(vocab=v)
+    def save(self,centre=None):
+        ''' Need to add the centre '''
+        o=forms.ModelForm.save(self,commit=False)
+        o.centre=centre
+        o.save()
 
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 

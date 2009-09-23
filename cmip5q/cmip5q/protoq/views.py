@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.utilities import PropertyForm, tabs
+from cmip5q.protoq.utilities import PropertyForm, tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.references import referenceHandler
@@ -64,11 +64,14 @@ def centre(request,centre_id):
     newplatURL=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,))
     viewsimURL=reverse('cmip5q.protoq.views.simulationList',args=(c.id,))
     
+    refs=Reference.objects.filter(centre=c)
+    files=DataObject.objects.filter(centre=c)
     
     logging.info('Viewing %s'%c.id)
     return render_to_response('centre.html',
         {'centre':c,'models':models,'platforms':platforms,
-        'newmod':newmodURL,'newplat':newplatURL,'sims':sims,'viewsimurl':viewsimURL,
+         'refs':refs,'files':files,
+        'newmod':newmodURL,'newplat':newplatURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
         'tabs':tabs(c.id,'Sum'),'notAjax':not request.is_ajax()})
       
 #### COMPONENT HANDLING ###########################################################

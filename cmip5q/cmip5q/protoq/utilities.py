@@ -2,6 +2,21 @@ import logging
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 
+
+def sublist(alist,n):
+    ''' Take a list, and return a list of lists, where each of the sublists has n members
+    except possibly the last '''
+    nn=len(alist)
+    nsubs=nn/n
+    fragment=0
+    if nsubs*n<nn:fragment=1
+    blist=[]
+    for i in range(nsubs):
+        blist.append(alist[i*n:(i+1)*n])
+    if fragment:
+        blist.append(alist[nsubs*n:])
+    return blist
+
 class tab:
     ''' This is a simple tab class to support navigation tabs '''
     def __init__(self,name,url,active=0):

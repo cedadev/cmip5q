@@ -14,6 +14,7 @@ class BaseViewHandler:
         about the specific resources in this class '''
                  
         self.cid=centre_id
+        self.centre=Centre.objects.get(id=centre_id)
         self.resource=resource
         self.target=target
         
@@ -106,7 +107,7 @@ class BaseViewHandler:
         if request.method=='POST':
             form=self._constructForm('POST',request.POST,instance=instance)
             if form.is_valid():
-                f=form.save()
+                f=form.save(centre=self.centre)
                 if returnType=='ajax': return HttpResponse('not implemented')
                 if self.target:
                     url=reverse('cmip5q.protoq.views.%s'%returnType,
