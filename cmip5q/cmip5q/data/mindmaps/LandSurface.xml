@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vocab mmversion="based on r646 (mariepierre, 2009-07-06) of LandSurface.mm" defnversion="">
+<vocab mmversion="based on r813 (mariepierre, 2009-08-19) of LandSurface.mm" defnversion="">
   <component name="LandSurface">
     <component name="LandSurfaceTiling">
       <parameter name="Tiling" choice="XOR">
         <value name="common to all LS subcomponents"/>
         <value name="specific to each LS subomponents"/>
       </parameter>
-      <parameter name="TilingMethod" choice="XOR" note="Only if LandSurfaceTiling = &quot;common to all components&quot;.">
+      <parameter name="TilingMethod" choice="XOR">
+        <constraint>Only required if "common to all LS subcomponents" is selected for "Tiling".</constraint>
         <value name="dynamic"/>
         <value name="fixed number of types"/>
       </parameter>
@@ -58,10 +59,11 @@
         </component>
         <component name="Runoff/Drainage">
           <parameter name="Method" choice="XOR">
-            <value name="Bulk (undifferentiated drainage and runoff)"/>
-            <value name="Differentiated drainage and runoff"/>
+            <value name="bulk (undifferentiated drainage and runoff)"/>
+            <value name="differentiated drainage and runoff"/>
           </parameter>
-          <parameter name="Properties" choice="OR" note="Only if Method = &quot;Differenciated drainage and runoff&quot;.">
+          <parameter name="Properties" choice="OR">
+            <constraint>Only required if "differentiated drainage and runoff" is selected for "Method".</constraint>
             <value name="deep drainage"/>
             <value name="saturated surface runoff"/>
             <value name="subgrid drainage"/>
@@ -106,6 +108,8 @@
       <parameter name="PhysicalProcesses" choice="OR">
         <value name="snow interception"/>
         <value name="snow melting"/>
+        <value name="snow refreezing"/>
+        <value name="blowing snow"/>
         <value name="other"/>
       </parameter>
       <component name="SnowVariables">
@@ -147,6 +151,16 @@
         <value name="yes"/>
         <value name="no"/>
       </parameter>
+      <component name="StomatalResistance">
+        <parameter name="FunctionOf" choice="OR">
+          <value name="light"/>
+          <value name="temperature"/>
+          <value name="water availability"/>
+          <value name="CO2"/>
+          <value name="O3"/>
+          <value name="other"/>
+        </parameter>
+      </component>
       <component name="VegetationVariables">
         <parameter name="Pnenology" choice="XOR">
           <value name="progostic"/>
@@ -172,9 +186,13 @@
         <value name="yes"/>
         <value name="no"/>
       </parameter>
-      <parameter name="SubsurfaceTiling" choice="XOR" note="Only if SpecialTiling = &quot;yes&quot;.">
+      <parameter name="SubsurfaceTiling" choice="XOR">
+        <constraint>Only required if "yes" is selected for "SpecificTiling".</constraint>
         <value name="yes"/>
         <value name="no"/>
+      </parameter>
+      <parameter name="NumberOfSurfaceTemperatures" choice="keyboard">
+        <value format="numerical" name=""/>
       </parameter>
       <parameter name="TypeOfEvaporationFormulation" choice="XOR">
         <value name="alpha"/>
@@ -198,22 +216,30 @@
           <value name="prognostic"/>
           <value name="prescribed"/>
         </parameter>
-        <parameter name="FunctionOf" choice="OR" note="Only if Type = &quot;prognostic&quot;.">
+        <parameter name="FunctionOf" choice="OR">
+          <constraint>Only required if "prognostic" is selected for "Type".</constraint>
           <value name="vegetation type"/>
           <value name="soil humidity"/>
           <value name="vegetation state"/>
           <value name="other"/>
         </parameter>
-        <parameter name="DistinctionOfDirect/DiffuseAlbedo" choice="XOR" note="Only if Type = &quot;prognostic&quot;.&#10;(mpm: I don't understand this restriction. To check)">
+        <parameter name="DistinctionOfDirect/DiffuseAlbedo" choice="XOR">
+          <constraint>Only required if "prognostic" is selected for "Type".</constraint>
           <value name="yes"/>
           <value name="no"/>
         </parameter>
-        <parameter name="NumberOfWavelenghBands" choice="keyboard" note="Only if Type = &quot;prognostic&quot;.&#10;(mpm: I don't understand this restriction. To check)">
+        <parameter name="NumberOfWavelenghBands" choice="keyboard">
+          <constraint>Only required if "prognostic" is selected for "Type".</constraint>
           <value format="numerical" name=""/>
         </parameter>
       </component>
       <component name="SnowAlbedo">
-        <parameter name="FunctionOf" choice="OR" note="Only if Type = &quot;prognostic&quot;.">
+        <parameter name="Type" choice="XOR">
+          <value name="prognostic"/>
+          <value name="prescribed"/>
+        </parameter>
+        <parameter name="FunctionOf" choice="OR">
+          <constraint>Only required if "prognostic" is selected for "Type".</constraint>
           <value name="vegetation type"/>
           <value name="Snow age"/>
           <value name="Snow density"/>
@@ -231,8 +257,45 @@
             <value name="carbon assimilation approach"/>
           </parameter>
         </component>
+        <component name="AutotrophicRespiration">
+          <parameter name="Method" choice="XOR">
+            <value name="parametrized"/>
+            <value name="implicit"/>
+          </parameter>
+          <parameter name="MaintenanceRespiration" choice="XOR">
+            <constraint>Only required if "parametrized" is selected for "Method".</constraint>
+            <value name="leaves + stems + roots"/>
+            <value name="leaves + stems and roots (leafy + woody)"/>
+            <value name="leaves + fine roots + stems and roots"/>
+            <value name="whole plant (no distinction)"/>
+          </parameter>
+        </component>
+        <component name="Allocation">
+          <parameter name="AllocationBins" choice="XOR">
+            <value name="leaves + stems + roots"/>
+            <value name="leaves + stems and roots (leafy + woody)"/>
+            <value name="leaves + fine roots + coarse roots + stems"/>
+            <value name="whole plant (no distinction)"/>
+          </parameter>
+          <parameter name="AllocationFractions" choice="XOR">
+            <value name="fixed"/>
+            <value name="function of vegetation type"/>
+            <value name="function of plant allometry"/>
+            <value name="explicitely calculated"/>
+          </parameter>
+        </component>
+        <component name="Phenology">
+          <parameter name="Method" choice="XOR">
+            <value name="implicit (seasonal evolution of LAI)"/>
+            <value name="implicit (spectral vegetation indices NDVI or SR)"/>
+            <value name="parametrized"/>
+          </parameter>
+        </component>
         <parameter name="NumberOfCarbonPools" choice="keyboard">
           <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="ListOfCarbonPools" choice="keyboard">
+          <value format="string" name="list of C-pools"/>
         </parameter>
       </component>
       <component name="Soil">
@@ -243,11 +306,19 @@
         <parameter name="NumberOfCarbonPools" choice="keyboard">
           <value format="numerical" name=""/>
         </parameter>
+        <parameter name="ListOfCarbonPools" choice="keyboard">
+          <value format="string" name="list of C-pools"/>
+        </parameter>
       </component>
-      <component name="Permafrost"/>
+      <component name="Permafrost">
+        <parameter name="ListOfGases" choice="keyboard">
+          <value format="string" name="list of gases"/>
+        </parameter>
+      </component>
     </component>
     <component name="RiverRouting">
-      <parameter name="SpecificTiling" choice="XOR" note="i.e. tiling of basins.">
+      <parameter name="SpecificTiling" choice="XOR">
+        <definition>Tiling of basins.</definition>
         <value name="yes"/>
         <value name="no"/>
       </parameter>
@@ -262,7 +333,7 @@
         <value name="heat"/>
         <value name="water"/>
         <value name="tracers"/>
-        <value name="Other"/>
+        <value name="other"/>
       </parameter>
       <parameter name="WaterRe-evaporation" choice="OR">
         <value name="flood plains"/>
@@ -277,18 +348,19 @@
           <value name="heat"/>
           <value name="water"/>
           <value name="tracers"/>
-          <value name="others"/>
+          <value name="other"/>
         </parameter>
       </component>
       <parameter name="InteractionWithAtmosphere" choice="XOR">
         <value name="yes"/>
         <value name="no"/>
       </parameter>
-      <parameter name="QuantitiesExchangedWithAtmosphere" choice="OR" note="Only if InteractionWithAtmosphere = &quot;yes&quot;.">
+      <parameter name="QuantitiesExchangedWithAtmosphere" choice="OR">
+        <constraint>Only required if "yes" is selected for "InteractionWithAtmosphere".</constraint>
         <value name="heat"/>
         <value name="water"/>
         <value name="tracers"/>
-        <value name="others"/>
+        <value name="other"/>
       </parameter>
     </component>
     <component name="LandSurfaceLakes">
@@ -296,7 +368,9 @@
         <value name="ice treatment"/>
         <value name="prognostic lakes albedo"/>
         <value name="dynamic lakes extent"/>
-        <value name="endorehic basins" note="i.e. not flowing to ocean."/>
+        <value name="endorehic basins">
+          <definition> basins not flowing to ocean. </definition>
+        </value>
         <value name="other"/>
       </parameter>
       <parameter name="LakesDynamics" choice="XOR">
@@ -309,11 +383,12 @@
         <value name="yes"/>
         <value name="no"/>
       </parameter>
-      <parameter name="QuantitiesExchangedWithRivers" choice="OR" note="Only if CouplingWithRivers = &quot;yes&quot;.">
+      <parameter name="QuantitiesExchangedWithRivers" choice="OR">
+        <constraint>Only required if "yes" is selected for "CouplingWithRivers".</constraint>
         <value name="heat"/>
         <value name="water"/>
         <value name="tracers"/>
-        <value name="others"/>
+        <value name="other"/>
       </parameter>
     </component>
   </component>

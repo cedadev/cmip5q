@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vocab mmversion="based on r811 (mariepierre, 2009-08-19) of AtmosphericChemistry.mm" defnversion="">
-  <component name="AtmosChemAndAerosols" note="AtmosphericChemistryAndAerosols is a temporary level-1 component.&#10;Waiting for Bryan to decide with Karl whether Aerosols is the 8th realm or not.&#10;After the decision, AtmosphericChemistryAndAerosols will no longer exist.&#10;Instead, we will have either two level-1 components (AtmospericChemistry and Aerosols) &#10;or only one level-1 component (AtmosphericChemistry) including treatment of aerosols.">
+  <component name="AtmosChemAndAerosols">
     <component name="AtmosphericChemistry">
       <parameter name="ChemSchemeScope" choice="OR">
         <value name="Troposphere"/>
@@ -18,13 +18,18 @@
           <value name="other"/>
         </parameter>
         <parameter name="MassConservation" choice="OR">
-          <value name="mass adjustment" note="adjustment is required to conserve mass."/>
-          <value name="concentrations positivity" note="negative concentrations are reset."/>
-          <value name="gradients monotony" note="Example&#10;Concept: Total chlorine is expected to have weak gradients but the individual species may have sharp gradients.&#10;Solution: Total chlorine gradients must remain weak therefore sharp gradients in chlorine concentration are smoothed."/>
+          <info>"mass adjustment": Adjustment is required to conserve mass.</info>
+          <info>"concentration positivity": Negative concentrations are reset.</info>
+          <info>"gradient monotony": Sharp gradients in concentration are smoothed.</info>
+          <value name="mass adjustment"/>
+          <value name="concentrations positivity"/>
+          <value name="gradients monotony"/>
         </parameter>
         <parameter name="Convection" choice="OR">
-          <value name="convecive fluxes connected to tracers" note="Do tracers &quot;see&quot; convection?&#10;"/>
-          <value name="vertical velocities connected to tracers" note="Are the mass flux vertical velocities connected with tracers in the atmos chemistry scheme?"/>
+          <info>"convective fluxes connected to tracers": Do tracers "see" convection?</info>
+          <info>"vertical velocities connected to tracers": Are the mass flux vertical velocities connected with tracers in the atmos chemistry scheme?</info>
+          <value name="convecive fluxes connected to tracers"/>
+          <value name="vertical velocities connected to tracers"/>
         </parameter>
         <component name="Turbulence">
           <parameter name="Type" choice="XOR">
@@ -37,7 +42,8 @@
           </parameter>
         </component>
       </component>
-      <component name="Solver" note="This is related to the time evolution of the chemistry&#10;">
+      <component name="Solver">
+        <info>This is related to the time evolution of the chemistry.</info>
         <parameter name="Type" choice="XOR">
           <value name="ImpactSolver"/>
           <value name="BackEuler"/>
@@ -49,7 +55,8 @@
           <value name="semi-implicit"/>
           <value name="Other"/>
         </parameter>
-        <parameter name="FamilyApproach" choice="XOR" note="is a family approach used by your solver?">
+        <parameter name="FamilyApproach" choice="XOR">
+          <info>Is a family approach used by your solver?</info>
           <value name="yes"/>
           <value name="no"/>
         </parameter>
@@ -62,19 +69,20 @@
           <parameter name="SpeciesEmitted" choice="keyboard">
             <value format="string" name="user to provide a list of species"/>
           </parameter>
-          <parameter name="Method" choice="XOR">
-            <value name="Climatology"/>
-            <value name="Constant"/>
-            <value name="Interactive"/>
-            <value name="Other"/>
+          <parameter name="Method" choice="OR">
+            <value name="prescribed (climatology)"/>
+            <value name="prescribed (spatially uniform)"/>
+            <value name="interactive"/>
+            <value name="other"/>
           </parameter>
-          <parameter name="ClimatologyType" choice="XOR" note="Only if Climatology has been selected for Method.">
-            <value name="Constant"/>
+          <parameter name="ClimatologyType" choice="XOR">
+            <constraint>Only required if "prescribed (climatology)" is selected for "Method".</constraint>
+            <value name="constant"/>
             <value name="interannual"/>
             <value name="annual"/>
             <value name="monthly"/>
             <value name="daily"/>
-            <value name="Other"/>
+            <value name="other"/>
           </parameter>
         </component>
         <component name="3D-Sources">
@@ -82,74 +90,78 @@
             <parameter name="SpeciesEmitted" choice="keyboard">
               <value format="string" name="user to provide a list of species"/>
             </parameter>
-            <parameter name="Method" choice="XOR">
-              <value name="Climatology"/>
-              <value name="Constant"/>
-              <value name="Other"/>
+            <parameter name="Method" choice="OR">
+              <value name="prescribed (climatology)"/>
+              <value name="prescribed (spatially uniform)"/>
+              <value name="other"/>
             </parameter>
-            <parameter name="ClimatologyType" choice="XOR" note="Only if Climatology has been selected for Method.">
-              <value name="Constant"/>
+            <parameter name="ClimatologyType" choice="XOR">
+              <constraint>Only required if "prescribed (climatology)" is selected for "Method".</constraint>
+              <value name="constant"/>
               <value name="interannual"/>
               <value name="annual"/>
               <value name="monthly"/>
               <value name="daily"/>
-              <value name="Other"/>
+              <value name="other"/>
             </parameter>
           </component>
           <component name="BiomassBurning">
             <parameter name="SpeciesEmitted" choice="keyboard">
               <value format="string" name="user to provide a list of species"/>
             </parameter>
-            <parameter name="Method" choice="XOR">
-              <value name="Climatology"/>
-              <value name="Constant"/>
-              <value name="Interactive"/>
-              <value name="Other"/>
+            <parameter name="Method" choice="OR">
+              <value name="prescribed (climatology)"/>
+              <value name="prescribed (spatially uniform)"/>
+              <value name="interactive"/>
+              <value name="other"/>
             </parameter>
-            <parameter name="ClimatologyType" choice="XOR" note="Only if Climatology has been selected for Method.">
-              <value name="Constant"/>
+            <parameter name="ClimatologyType" choice="XOR">
+              <constraint>Only required if "prescribed (climatology)" is selected for "Method".</constraint>
+              <value name="constant"/>
               <value name="interannual"/>
               <value name="annual"/>
               <value name="monthly"/>
               <value name="daily"/>
-              <value name="Other"/>
+              <value name="other"/>
             </parameter>
           </component>
           <component name="Lightning">
             <parameter name="SpeciesEmitted" choice="keyboard">
               <value format="string" name="user to provide a list of species"/>
             </parameter>
-            <parameter name="Method" choice="XOR">
-              <value name="Climatology"/>
-              <value name="Constant"/>
-              <value name="Interactive"/>
-              <value name="Other"/>
+            <parameter name="Method" choice="OR">
+              <value name="prescribed (climatology)"/>
+              <value name="prescribed (spatially uniform)"/>
+              <value name="interactive"/>
+              <value name="other"/>
             </parameter>
-            <parameter name="ClimatologyType" choice="XOR" note="Only if Climatology has been selected for Method.">
-              <value name="Constant"/>
+            <parameter name="ClimatologyType" choice="XOR">
+              <constraint>Only required if "prescribed (climatology)" is selected for "Method".</constraint>
+              <value name="constant"/>
               <value name="interannual"/>
               <value name="annual"/>
               <value name="monthly"/>
               <value name="daily"/>
-              <value name="Other"/>
+              <value name="oher"/>
             </parameter>
           </component>
           <component name="Volcanic">
             <parameter name="SpeciesEmitted" choice="keyboard">
               <value format="string" name="user to provide a list of species"/>
             </parameter>
-            <parameter name="Method" choice="XOR">
-              <value name="Climatology"/>
-              <value name="Constant"/>
-              <value name="Other"/>
+            <parameter name="Method" choice="OR">
+              <value name="prescribed (climatology)"/>
+              <value name="prescribed (spatially uniform)"/>
+              <value name="other"/>
             </parameter>
-            <parameter name="ClimatologyType" choice="XOR" note="Only if Climatology has been selected for Method.">
-              <value name="Constant"/>
+            <parameter name="ClimatologyType" choice="XOR">
+              <constraint>Only required if "prescribed (climatology)" is selected for "Method".</constraint>
+              <value name="constant"/>
               <value name="interannual"/>
               <value name="annual"/>
               <value name="monthly"/>
               <value name="daily"/>
-              <value name="Other"/>
+              <value name="other"/>
             </parameter>
           </component>
           <component name="Other">
@@ -192,12 +204,12 @@
           <value name="VOCs"/>
           <value name="ISOPRENE"/>
           <value name="H2O"/>
-          <value name="Other"/>
+          <value name="other"/>
         </parameter>
         <component name="Processes">
           <parameter name="DryDeposition" choice="XOR">
-            <value name="Prescribed"/>
-            <value name="Interactive"/>
+            <value name="prescribed"/>
+            <value name="interactive"/>
           </parameter>
           <parameter name="WetDeposition" choice="XOR">
             <value name="yes"/>
@@ -207,7 +219,8 @@
             <value name="yes"/>
             <value name="no"/>
           </parameter>
-          <parameter name="WashOut/RainOut" choice="OR" note="downward transport of soluble chmistry species in clouds&#10;">
+          <parameter name="WashOut/RainOut" choice="OR">
+            <definition>Downward transport of soluble chemistry species in clouds.</definition>
             <value name="in-cloud scavenging"/>
             <value name="below-cloud scavenging"/>
           </parameter>
@@ -246,7 +259,8 @@
               <value name="yes"/>
               <value name="no"/>
             </parameter>
-            <parameter name="Coagulation" choice="XOR" note="Implies link/coupling with aerosol scheme.">
+            <parameter name="Coagulation" choice="XOR">
+              <info>Implies link/coupling with aerosol scheme.</info>
               <value name="yes"/>
               <value name="no"/>
             </parameter>
@@ -286,11 +300,13 @@
               <value name="yes"/>
               <value name="no"/>
             </parameter>
-            <parameter name="WashOut/RainOut" choice="OR" note="downward transport of soluble chmistry species in clouds&#10;">
+            <parameter name="WashOut/RainOut" choice="OR">
+              <definition>Downward transport of soluble chemistry species in clouds.</definition>
               <value name="in-cloud scavenging"/>
               <value name="below-cloud scavenging"/>
             </parameter>
-            <parameter name="coagulation" choice="XOR" note="Implies link/coupling with aerosol scheme.">
+            <parameter name="coagulation" choice="XOR">
+              <info>Implies link/coupling with aerosol scheme.</info>
               <value name="yes"/>
               <value name="no"/>
             </parameter>
@@ -307,7 +323,8 @@
           </parameter>
         </component>
         <component name="Photolysis">
-          <parameter name="Method" choice="XOR" note="Offline: does the look up table take clouds into account with respect to effective photolysis rate for photodissociation?">
+          <parameter name="Method" choice="XOR">
+            <info>Offline: does the look up table take clouds into account with respect to effective photolysis rate for photodissociation?</info>
             <value name="Offline (clearsky)"/>
             <value name="Offline (with clouds)"/>
             <value name="Online"/>
@@ -320,7 +337,8 @@
       </component>
     </component>
     <component name="Aerosols">
-      <parameter name="SizeRepresentation" choice="XOR" note="Must be less than or equal to number of reactions&#10;">
+      <parameter name="SizeRepresentation" choice="XOR">
+        <info>Must be less than or equal to number of reactions.</info>
         <value name="Bin Scheme"/>
         <value name="Bulk Scheme"/>
         <value name="Other"/>

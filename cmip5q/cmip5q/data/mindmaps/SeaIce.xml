@@ -20,21 +20,23 @@
       <component name="Ice">
         <component name="VerticalHeatDiffusion">
           <parameter name="SchemeType" choice="XOR">
-            <value name="multi-layer on an irregular vertical  grid"/>
-            <value name="multi-layer on a regular vertical  grid"/>
+            <value name="multi-layer on an irregular vertical grid"/>
+            <value name="multi-layer on a regular vertical grid"/>
             <value name="one layer"/>
           </parameter>
-          <parameter name="NumberOfLayers" choice="XOR" note="Only if SchemeType = multi-layer on a regular vertical grid.">
+          <parameter name="NumberOfLayers" choice="XOR">
+            <constraint>Only required if "multi-layer on a regular vertical grid" is selected for "SchemeType".</constraint>
             <value name="2 layers (Semtner '76 type)"/>
             <value name="N&gt;2 layers"/>
           </parameter>
         </component>
         <parameter name="OceanToIceBasalHeatFlux" choice="XOR">
           <value name="prescribed"/>
-          <value name="parametrized" note="Tell us how and where ocean to basal heat flux is calculated (in Ocean or in SeaIce?)."/>
+          <value name="parametrized (calculated in Ocean)"/>
+          <value name="parametrized (calculated in SeaIce)"/>
         </parameter>
         <parameter name="BrineInclusions" choice="XOR">
-          <value name="no"/>
+          <value name="none"/>
           <value name="heat reservoir"/>
           <value name="thermal properties depending on S-T (fixed salinity)"/>
           <value name="thermal properties depending on S-T (varying salinity)"/>

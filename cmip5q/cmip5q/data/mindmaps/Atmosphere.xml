@@ -72,11 +72,11 @@
           </parameter>
           <parameter name="SchemeType" choice="XOR">
             <value name="Eulerian"/>
+            <value name="Lagrangian"/>
             <value name="Semi-lagrangian"/>
             <value name="Mass-conserving"/>
             <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
             <value name="other"/>
-            <value name="Lagrangian"/>
           </parameter>
           <parameter name="ConservedQuantities" choice="OR">
             <value name="other"/>
@@ -122,7 +122,6 @@
         <value name="other "/>
       </parameter>
       <parameter name="LateralBoundaryCondition" choice="XOR">
-        <info>Only if the model is a RCM.</info>
         <value name="sponge layer"/>
         <value name="radiation boundary condition"/>
         <value name="other "/>
