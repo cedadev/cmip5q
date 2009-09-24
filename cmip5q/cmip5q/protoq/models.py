@@ -177,6 +177,8 @@ class Experiment(models.Model):
     endDate=models.CharField(max_length=32)
     def __unicode__(self):
         return self.shortName
+    class Meta:
+        ordering=('shortName',)
     
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
@@ -483,11 +485,29 @@ class DataObjectForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='FileFormats')
         self.fields['format'].queryset=Value.objects.filter(vocab=v)
-    def save(self,centre=None):
+        self.hostCentre=None
+    def save(self):
         ''' Need to add the centre '''
         o=forms.ModelForm.save(self,commit=False)
-        o.centre=centre
+        o.centre=self.hostCentre
         o.save()
+    def clean(self):
+        ''' Needed to ensure reference name uniqueness within a centre '''
+        #http://docs.djangoproject.com/en/dev/ref/forms/validation/#cleaning-and-validating-fields-that-depend-on-each-other
+        cleaned_data=self.cleaned_data
+        name=cleaned_data.get('name')
+        existing=DataObject.objects.all()
+        if self.hostCentre is not None:
+            existing=existing.filter(centre=self.hostCentre)      
+        #Assume we don't want something with no centre clashing with anything
+        #since it might want to be copied in later.
+        result=existing.filter(name=name)
+        if len(result)>0:
+            #It's already there ... reject
+            msg=u'%s is aready in use, please choose a unique name/mnenonic'%name
+            self._errors["name"] = ErrorList([msg])
+            del cleaned_data["name"]
+        return cleaned_data
 
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
@@ -539,7 +559,37 @@ class ReferenceForm(forms.ModelForm):
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'55'}))
     class Meta:
         model=Reference
-        #exclude=('refTypes')
+        exclude=('centre',)
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        v=Vocab.objects.get(name='Reference Types Vocab')
+        self.fields['refType'].queryset=Value.objects.filter(vocab=v)
+        self.hostCentre=None
+    def save(self):
+        r=forms.ModelForm.save(self,commit=False)
+        r.centre=self.hostCentre
+        r.save()
+    def specialise(self,arg):
+        ''' Arg is dummy argument, we had specialisation at initialisation '''       
+        pass
+    def clean(self):
+        ''' Needed to ensure reference name uniqueness within a centre '''
+        #http://docs.djangoproject.com/en/dev/ref/forms/validation/#cleaning-and-validating-fields-that-depend-on-each-other
+        cleaned_data=self.cleaned_data
+        name=cleaned_data.get('name')
+        existing=Reference.objects.all()
+        if self.hostCentre is not None:
+            existing=existing.filter(centre=self.hostCentre)      
+        #Assume we don't want something with no centre clashing with anything
+        #since it might want to be copied in later.
+        result=existing.filter(name=name)
+        if len(result)>0:
+            #It's already there ... reject
+            msg=u'%s is aready in use, please choose a unique name/mnenonic'%name
+            self._errors["name"] = ErrorList([msg])
+            del cleaned_data["name"]
+            print msg
+        return cleaned_data
     
 class PlatformForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)

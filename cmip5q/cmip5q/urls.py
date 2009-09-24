@@ -66,12 +66,13 @@ urlpatterns = patterns('',
     (r'^cmip5/conformance/(?P<cen_id>\d+)/(?P<sim_id>\d+)/(?P<req_id>\d+)/$',
             'cmip5q.protoq.views.conformanceEdit'),  
                      
-    # help and about
+    # help, intro, about
     (r'^cmip5/(?P<cen_id>\d+)/help/$',
             'cmip5q.protoq.views.help'),                  
     (r'^cmip5/(?P<cen_id>\d+)/about/$',
             'cmip5q.protoq.views.about'),     
-                              
+    (r'^cmip5/(?P<cen_id>\d+)/intro/$',
+            'cmip5q.protoq.views.intro'),                       
     # ensembles ...
     (r'^cmip5/(?P<cen_id>\d+)/(?P<sim_id>\d+)/ensemble/$',
             'cmip5q.protoq.views.ensemble'),

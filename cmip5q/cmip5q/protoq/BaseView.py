@@ -18,8 +18,8 @@ class BaseViewHandler:
         self.resource=resource
         self.target=target
         
-        self.editHTML='%s_edit.html'%self.resource['type']
-        self.listHTML='%s_list.html'%self.resource['type']
+        self.editHTML='baseview_edit.html'#'%s_edit.html'%self.resource['type']
+        self.listHTML='baseview_list.html'#'%s_list.html'%self.resource['type']
         self.selectHTML='baseviewAssign.html'
         
     def objects(self):
@@ -45,7 +45,7 @@ class BaseViewHandler:
         else:
             raise ValueError('Form construction only supports GET and POST')
                  
-    def list(self):
+    def list(self,request):
         ''' Show a list of the basic entities, either all of them, or those
         associated with a specific instance of a specific class '''
         
@@ -66,6 +66,11 @@ class BaseViewHandler:
                 o.editURL=reverse('cmip5q.protoq.views.edit',
                             args=(self.cid,self.resource['type'],o.id,
                                   self.target['type'],self.target['instance'].id,'list',))
+                o.delURL='' # Not implemented yet
+                #o.delURL=reverse('cmip5q.protoq.views.delete',
+                #            args=(self.cid,self.resource['type'],o.id,self.currentURL)
+                # Need to be able to make sure this isn't an html get from an <a> otherwise
+                # do it as  form with a method of delete.
         else:
             # get a URL for a blank form
             formURL=reverse('cmip5q.protoq.views.edit',
@@ -78,9 +83,9 @@ class BaseViewHandler:
         # we pass a form and formURL for a new instance to be created.
         # we're doing all this because we think we have too many entities to use a formset
         
-        return render_to_response('baseview_list.html',{
+        return render_to_response(self.listHTML,{
                 'objects':objects,
-                'tabs':tabs(self.cid,self.resource['type']),
+                'tabs':tabs(request,self.cid,self.resource['tab']),
                 'form':self._constructForm('GET'),
                 'editURL':formURL,
                 'instance':self.resource,
@@ -98,7 +103,12 @@ class BaseViewHandler:
         # if it's valid, return to where we came from. If it's not, we should show
         # a form, complete with errors, with a submission URL which gets the user
         # back to the right place.  A GET should set that process up.
-        
+        if self.target:
+            okURL=reverse('cmip5q.protoq.views.%s'%returnType,
+               args=(self.cid,self.resource['type'],self.target['type'],self.target['instance'].id,))
+        else:
+            okURL=reverse('cmip5q.protoq.views.%s'%returnType,
+               args=(self.cid,self.resource['type'],))
         # Note that if the resource instance id is zero, this is a new one.
         instance=None
         if self.resource['id']<>'0':
@@ -106,17 +116,12 @@ class BaseViewHandler:
                     
         if request.method=='POST':
             form=self._constructForm('POST',request.POST,instance=instance)
+            form.hostCentre=self.centre
             if form.is_valid():
-                f=form.save(centre=self.centre)
                 if returnType=='ajax': return HttpResponse('not implemented')
-                if self.target:
-                    url=reverse('cmip5q.protoq.views.%s'%returnType,
-                            args=(self.cid,self.resource['type'],self.target['type'],self.target['instance'].id,))
-                else:
-                    url=reverse('cmip5q.protoq.views.%s'%returnType,
-                            args=(self.cid,self.resource['type'],))
-                logging.debug('Successful edit post, redirecting to %s'%url)
-                return HttpResponseRedirect(url)
+                logging.debug('Successful edit post, redirecting to %s'%okURL)
+                form.save() ##################### WHY DID I JUST ADD THIS >>>> 23/9
+                return HttpResponseRedirect(okURL)
             else:
                 constraints=self.constraints()
                 if constraints:form.specialise(constraints)
@@ -131,7 +136,10 @@ class BaseViewHandler:
         if returnType: args.append(returnType)
         editURL=reverse('cmip5q.protoq.views.edit',args=args)
                           
-        return render_to_response(self.editHTML,{'form':form,'editURL':editURL})
+        return render_to_response(self.editHTML,{'form':form,'editURL':editURL,'okURL':okURL,
+                                                 'tabs':tabs(request,self.cid,'Edit %s'%instance),
+                                                 'snippet_template':'%s_snippet.html'%self.resource['type'],
+                                                 'resource':self.resource})
         
     def assign(self,request):
         ''' This method binds to the target resource, a number of the resources managed
@@ -213,7 +221,7 @@ class BaseViewHandler:
                 'form':self._constructForm('GET'),
                 'editURL':editURL,
                 'editTemplate':'%s_snippet.html'%self.resource['type'],
-                'tabs':tabs(self.cid,'Chooser'),
+                'tabs':tabs(request,self.cid,'Assign %s'%self.resource['type']),
                 'chooseURL':url})
                
            

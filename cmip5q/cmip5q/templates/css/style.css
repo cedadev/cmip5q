@@ -167,6 +167,9 @@ padding: 5px;
 }        /* tabs sit on this div */
 
 .tabnav li a {padding: 0 5px;}                /* padd out the addresses in the tabs */
+.tabnav .subdue a {color:gray;}
+.tabnav .subdue li a:hover {background:white;}
+.tabnav .subdue li {border-color: gray; border:dotted;}
 
 .tabnav .selected {
 padding-bottom: 1px; 

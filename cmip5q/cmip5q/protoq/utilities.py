@@ -2,6 +2,14 @@ import logging
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 
+class RingBuffer:
+    def __init__(self, size):
+        self.data = [None for i in xrange(size)]
+    def append(self, x):
+        self.data.pop(0)
+        self.data.append(x)
+    def get(self):
+        return self.data
 
 def sublist(alist,n):
     ''' Take a list, and return a list of lists, where each of the sublists has n members
@@ -28,42 +36,63 @@ class tab:
         self.active=1
     def deactivate(self):
         self.active=0
-
+    def obscure(self):
+        self.active=-1
 
 class tabs(list):
-    ''' Build a list of tabs to be used on each page, passed to base.html '''
-    def __init__(self,centre_id,active):
+    ''' Build a list of tabs to be used on each page, and provide a history list, 
+        via cookie, to be passed to base.html '''
+    history_length=5
+    def __init__(self,request,centre_id,page,object_id=0):
         list.__init__(self)
-        t={}
-        c=Centre.objects.get(id=centre_id)
-        t['Sum']=tab('Home:%s'%c.abbrev,
-                reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
-        self.append(t['Sum'])
-        models=[Component.objects.get(pk=m.id) for m in c.component_set.filter(scienceType='model')]
-        for m in models:
-            t[m.abbrev]=tab(m.abbrev,
-                reverse('cmip5q.protoq.views.componentEdit',args=(centre_id,m.id,))) 
-            self.append(t[m.abbrev])
-        t['Sims']=tab('Simulations',
-                reverse('cmip5q.protoq.views.simulationList',args=(centre_id,)))
-        t['Refs']=tab('References',
-                reverse('cmip5q.protoq.views.referenceList',args=(centre_id,)))
-        t['Files']=tab('Files',
-                reverse('cmip5q.protoq.views.list',args=(centre_id,'file',)))
-                #reverse('cmip5q.protoq.views.dataList',args=(centre_id,)))
-        t['Help']=tab('Help',
-                reverse('cmip5q.protoq.views.help',args=(centre_id,)))
-        t['About']=tab('About',
-                reverse('cmip5q.protoq.views.about',args=(centre_id,)))
-        if active in t.keys(): 
-            t[active].activate()
+        self.request=request
+        self.centre=Centre.objects.get(id=centre_id)
+        # we keep the last model and simulation in the session cookie
+        if page=='Model':
+            request.session['Model']=object_id
+        elif page=='Simulation':
+            request.session['Simulation']=object_id
+        # need to allow for the case when neither have yet been viewed
+        if 'Simulation' not in request.session:request.session['Simulation']=0
+        if 'Model' not in request.session:request.session['Model']=0
+        #This is the list of tabs '''
+        self.tablist=[('Intro','cmip5q.protoq.views.intro',(centre_id,)),
+                 ('Summary','cmip5q.protoq.views.centre',(centre_id,)),
+                 ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,)),
+                 ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],)),
+                 ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],)),
+                 ('Files','cmip5q.protoq.views.list',(centre_id,'file',)),
+                 ('References','cmip5q.protoq.views.list',(centre_id,'reference',)),
+                 ('Help','cmip5q.protoq.views.help',(centre_id,)),
+                 ('About','cmip5q.protoq.views.about',(centre_id,)),
+                 ]
+        for item in self.tablist:
+            self.append(self.tabify(item,page))
+            
+        self.history(request,page)
+        
+        for i in self: print i.name,i.url,i.active
+            
+    def tabify(self,item,page):
+        if item[0] not in ['Simulation','Model']:
+            #it's easy:
+            return tab(item[0],reverse(item[1],args=item[2]),page==item[0])
         else:
-            t['Extra']=tab(str(active),'',1)
-       
-        for key in ('Sims','Files','Refs'):self.append(t[key])
-        if 'Extra' in t.keys(): self.append(t['Extra'])
-        for key in ('Help','About'): self.append(t[key])
-       
+            if item[2][1]==0:
+                return tab(item[0],'',-1)
+            else: 
+                obj={'Model':Component,'Simulation':Simulation}[item[0]].objects.get(id=item[2][1])
+                return tab('%s:%s'%(item[0][0:3],obj),
+                           reverse(item[1],args=item[2]),
+                           page==item[0])
+            
+    def history(self,request,page):
+        #initialise as necessary.
+        if 'History' not in request.session:request.session['History']=RingBuffer(self.history_length)
+        #append the path and name for later use in a link ...
+        request.session['History'].append((request.path,page))
+        
+            
 class PropertyForm:
     
     ''' this class instantiates the form elements needed by a component view

@@ -72,7 +72,7 @@ def centre(request,centre_id):
         {'centre':c,'models':models,'platforms':platforms,
          'refs':refs,'files':files,
         'newmod':newmodURL,'newplat':newplatURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
-        'tabs':tabs(c.id,'Sum'),'notAjax':not request.is_ajax()})
+        'tabs':tabs(request,c.id,'Summary'),'notAjax':not request.is_ajax()})
       
 #### COMPONENT HANDLING ###########################################################
 
@@ -233,7 +233,7 @@ def platformEdit(request,centre_id,platform_id=None):
     
     return render_to_response('platform.html',
                 {'pform':pform,'url':editURL,'c':c,'pname':pname,
-                'tabs':tabs(centre_id,'Chooser')})
+                'tabs':tabs(request,centre_id,'Platform')})
         
 ########## EXPERIMENT VIEWS ##################
     
@@ -245,10 +245,13 @@ def viewExperiment(request,experiment_id):
 ######## HELP and ABOUT ###############
 
 def help(request,cen_id):
-    return render_to_response('help.html',{'tabs':tabs(cen_id,'Help')})
+    return render_to_response('help.html',{'tabs':tabs(request,cen_id,'Help')})
  
 def about(request,cen_id):
-    return render_to_response('about.html',{'tabs':tabs(cen_id,'About')})
+    return render_to_response('about.html',{'tabs':tabs(request,cen_id,'About')})
+
+def intro(request,cen_id):
+    return render_to_response('intro.html',{'tabs':tabs(request,cen_id,'Intro')})
             
 ############# Ensemble View ###############################            
             
@@ -283,7 +286,7 @@ def ensemble(request,cen_id,sim_id):
         if ok: return HttpResponseRedirect(urls['self'])
     return render_to_response('ensemble.html',
                {'s':s,'e':e,'urls':urls,'eform':eform,'eformset':eformset,
-               'tabs':tabs(cen_id,'tmp')})
+               'tabs':tabs(request,cen_id,'Ensemble')})
                
                
     
@@ -298,16 +301,16 @@ class ViewHandler(BaseViewHandler):
     # the resource class and the resource class form
     # (so keys need to be lower case)
     SupportedResources={'initialcondition':{'attname':'initialCondition',
-                            'title':'Initial Condition',
+                            'title':'Initial Condition','tab':'IniCon',
                             'class':InitialCondition,'form':InitialConditionForm},
                         'file':{'attname':'dataObject',
-                            'title':'File',
+                            'title':'File','tab':'Files',
                             'class':DataObject,'form':DataObjectForm},
                         'codemodification':{'attname':'codeModification',
-                            'title':'Code Modification',
+                            'title':'Code Modification','tab':'CodeMods',
                             'class':CodeModification,'form':CodeModificationForm},
                         'reference':{'attname':'reference',
-                            'title':'Reference',
+                            'title':'Reference','tab':'References',
                             'class':Reference,'form':ReferenceForm},
                         }
                         
@@ -383,6 +386,8 @@ class ViewHandler(BaseViewHandler):
                 return self.target['instance'].numericalModel
             elif self.target['type']=='component':
                 return self.target['instance']
+        if self.resource['type']=='reference':
+            return True
                    
         return None
 
@@ -396,7 +401,7 @@ def list(request,cen_id,resourceType,targetType=None,target_id=None):
     ''' This is the generic simple view lister '''
 
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
-    return h.list()
+    return h.list(request)
 
 def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType

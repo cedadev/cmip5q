@@ -33,13 +33,14 @@
                 
             </div>
             <div id="banner">
-                <center> DRAFT CMIP5 QuestionNaire (alpha 4) </center>
+                <center> DRAFT CMIP5 QuestionNaire (alpha 5) </center>
             </div>
             <div class="main">
                 <div class="tabnav">
                     <ul>
                     {% for tab in tabs %}
-                    <li{% if tab.active %} class="selected"{% endif %}><a href="{{tab.url}}">{{tab.name}}</a></li>
+                    <li{% ifequal tab.active 1 %} class="selected"{%endifequal%}{% ifequal tab.active -1 %} class="subdue"{%endifequal%}>
+                    <a href="{{tab.url}}">{{tab.name}}</a></li>
                     {% endfor %}
                     </ul>
                 </div>

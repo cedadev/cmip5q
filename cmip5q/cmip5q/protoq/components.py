@@ -84,7 +84,6 @@ class componentHandler(object):
         else:
             self.component=Component.objects.get(pk=component_id)
         
-        self.tabs=tabs(centre_id,self.component.model.abbrev)
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
             
@@ -178,7 +177,8 @@ class componentHandler(object):
                 'isRealm':c.isRealm,
                 'isModel':c.isModel,
                 'cset':cset,
-                'tabs':self.tabs,'notAjax':not request.is_ajax()})
+                'tabs':tabs(request,self.centre_id,'Model',self.component.model.id),
+                'notAjax':not request.is_ajax()})
             
     def manageRefs(self,request):      
         ''' Handle references for a specific component '''
@@ -195,7 +195,8 @@ class componentHandler(object):
         return render_to_response('componentRefs.html',
             {'refs':refs,'available':available,'rform':rform,'c':c,
             'refu':refu,'baseURLa':baseURLa,'baseURLr':baseURLr,
-            'tabs':self.tabs,'notAjax':not request.is_ajax()})
+            'tabs':tabs(request,self.centre_id,'References for %s'%c),
+            'notAjax':not request.is_ajax()})
 
     def validate(self):
         ''' Validate model '''
@@ -296,7 +297,7 @@ class componentHandler(object):
             Intform=MyCouplingFormSet(model)
             Intform.specialise()
         return render_to_response('coupling.html',{'c':model,'urls':urls,
-        'Intform':Intform,'tabs':tabs(self.centre_id,'tmp')})
+        'Intform':Intform,'tabs':tabs(request,self.centre_id,'Coupling for %s'%c)})
         
     def inputs(self,request):
         ''' Handle the construction of input requirements into a component '''
@@ -314,7 +315,8 @@ class componentHandler(object):
             Inpform=MyComponentInputFormSet(self.component,self.component.isRealm)  
             Inpform.specialise()
         return render_to_response('inputs.html',{'c':self.component,'urls':urls,
-                                   'form':Inpform,'tabs':tabs(self.centre_id,'tmp')})
+                                   'form':Inpform,
+                                   'tabs':tabs(request,self.centre_id,'Inputs for %s'%self.component)})
         
     def outputs(self):
         return HttpResponse('Not implemented')

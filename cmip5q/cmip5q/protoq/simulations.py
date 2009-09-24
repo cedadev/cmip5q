@@ -109,7 +109,8 @@ class simulationHandler(object):
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
-             'cset':cset,'coset':coset,'ensemble':ensemble,'tabs':tabs(self.centreid,'Update')})
+             'cset':cset,'coset':coset,'ensemble':ensemble,
+             'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
         
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''
@@ -177,7 +178,7 @@ class simulationHandler(object):
         
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,
-            'tabs':tabs(c.id,'Sims'),'notAjax':not request.is_ajax()})
+            'tabs':tabs(request,c.id,'Experiments'),'notAjax':not request.is_ajax()})
  
     def conformanceMain(self,request):
         ''' Displays the main conformance view '''
@@ -212,7 +213,7 @@ class simulationHandler(object):
             cformset.specialise()
           
         return render_to_response('conformance.html',{'s':s,'e':e,'cform':cformset,
-                    'urls':urls,'tabs':tabs(self.centreid,'tmp')})
+                    'urls':urls,'tabs':tabs(request,self.centreid,'Conformance')})
   
     
                 
