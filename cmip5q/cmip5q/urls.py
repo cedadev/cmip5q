@@ -27,13 +27,13 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Outputs/$','cmip5q.protoq.views.componentOut'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Inputs/$','cmip5q.protoq.views.componentInp'),   
     #
-    # REFERENCES
+    # REFERENCES (now handled in base view)
     #          
-    (r'^cmip5/(?P<centre_id>\d+)/references/$','cmip5q.protoq.views.referenceList'),
-    (r'^cmip5/(?P<centre_id>\d+)/reference/(?P<reference_id>\d+)/$','cmip5q.protoq.views.referenceEdit'),
-    (r'^cmip5/(?P<centre_id>\d+)/reference/$','cmip5q.protoq.views.referenceEdit'),  
-    (r'^cmip5/(?P<centre_id>\d+)/assignRefs/(?P<resourceType>\D+)/(?P<resource_id>\d+)/$',
-            'cmip5q.protoq.views.assignReferences'),
+    #(r'^cmip5/(?P<centre_id>\d+)/references/$','cmip5q.protoq.views.referenceList'),
+    #(r'^cmip5/(?P<centre_id>\d+)/reference/(?P<reference_id>\d+)/$','cmip5q.protoq.views.referenceEdit'),
+    #(r'^cmip5/(?P<centre_id>\d+)/reference/$','cmip5q.protoq.views.referenceEdit'),  
+    #(r'^cmip5/(?P<centre_id>\d+)/assignRefs/(?P<resourceType>\D+)/(?P<resource_id>\d+)/$',
+    #        'cmip5q.protoq.views.assignReferences'),
     #
     # SIMULATIONS
     #

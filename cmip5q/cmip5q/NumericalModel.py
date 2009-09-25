@@ -320,6 +320,9 @@ class ComponentParser:
                               realm=self.component.realm,
                               constraint=co)
             ci.save()
+            #and we have to create a coupling for it too
+            cp=Coupling(component=self.component.model,targetInput=ci)
+            cp.save()
             logging.info('Added component input %s for %s (without param & value)'%(paramName,self.component))
         else:
             logging.info('ERROR: Ignoring parameter %s'%paramName)

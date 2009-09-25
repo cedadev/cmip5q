@@ -29,10 +29,15 @@ beneath this one </p> {% endif %}
             </div> 
             {% endfor %}
             <!--{ { form.as_table } }-->
-        <center><input id="InternalBut" type="submit" value="Save"></center>
+        <center><input id="internalBut" type="submit" value="Save"></center>
         </form>
     </div>
-<p><a href="{{urls.self}}"> Return to {{c.abbrev}}</a></p>
+<p><a href="{{urls.self}}" id="returnBut"> Return to {{c.abbrev}}</a></p>
+<script type="text/javascript">
+    var internalBut = new YAHOO.widget.Button("internalBut",
+                  {value:"internalButvalue"});
+    var returnBut = new YAHOO.widget.Button("returnBut");
+</script>
 </div>
 
 {% endblock%} 

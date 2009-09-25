@@ -70,8 +70,6 @@ class tabs(list):
             self.append(self.tabify(item,page))
             
         self.history(request,page)
-        
-        for i in self: print i.name,i.url,i.active
             
     def tabify(self,item,page):
         if item[0] not in ['Simulation','Model']:

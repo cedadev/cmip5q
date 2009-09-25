@@ -111,7 +111,7 @@ class Component(Doc):
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
         for i in inputset: i.makeNewCopy(new)
-        
+                
         new.save()
         return new
     
@@ -134,6 +134,9 @@ class ComponentInput(models.Model):
         new=ComponentInput(abbrev=self.abbrev,description=self.description,bc=self.bc,
                            owner=component,realm=component.realm)
         new.save()
+        # if we've made a new input, we need a new coupling
+        ci=Coupling(component=component.model,targetInput=new)
+        ci.save()
 
 class Constraint(models.Model):
     ''' Used to ensure that something is only used if needed '''
