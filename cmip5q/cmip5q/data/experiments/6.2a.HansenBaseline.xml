@@ -72,8 +72,12 @@
         </numericalRequirement>
     </numericalRequirement>
     
-    <shortName>6.2a_sstClim</shortName>
-    <longName>6.2a_ControlSSTClimatology</longName>
+    <shortName>
+		6.2a_sstClim
+	</shortName>
+    <longName>
+		Control SST Climatology
+	</longName>
     
     <CalendarType>
         <PerpetualPeriod>

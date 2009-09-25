@@ -162,10 +162,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_1.1E
+		1.1E_decadal
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 1.1E - 10 member ensemble 
+    	10-year prediction - O(10) ensemble 
 	</longName>
 	
      <calendar>

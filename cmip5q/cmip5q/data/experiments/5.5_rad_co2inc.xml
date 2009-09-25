@@ -79,10 +79,10 @@
 		
 		
 	<shortName>
-		CMIP5_NumReq_5.5
+		5.5_esm-fdbk
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 Carbon/Climate expt 5.5 
+		ESM feedback 
 	</longName>
 	
 	<calendar>

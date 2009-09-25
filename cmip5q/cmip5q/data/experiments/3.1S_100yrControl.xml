@@ -74,10 +74,10 @@
     </numericalRequirement>
 	    
 	<shortName>
-		CMIP5_NumReq_3.1S
+		3.1S_pi-control
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 3.1S - Shortened pre-industrial
+		pre-industrial control - shortened
 	</longName>
 	
     <calendar>

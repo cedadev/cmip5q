@@ -39,8 +39,13 @@
             1% per year increase from 3.1_piControl concentration to quadrupling
         </description>    
     </numericalRequirement>
-    <shortName>6.1_1pctCo2</shortName>
-    <longName>1PercentPerYearCO2</longName>
+    
+    <shortName>
+		6.1_1pct-co2
+	</shortName>
+    <longName>
+		1 percent per year CO2
+	</longName>
     
     <CalendarType>
         <realCalendar>

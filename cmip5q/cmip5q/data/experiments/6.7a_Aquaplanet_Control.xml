@@ -91,10 +91,10 @@
 	</numericalRequirement>
 		
 	<shortName>
-		CMIP5_NumReq_6.7a
+		6.7A_aqua-control
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.7a - AquaPlanet Control run
+		aqua planet control
 	</longName>
      
    <calendar>

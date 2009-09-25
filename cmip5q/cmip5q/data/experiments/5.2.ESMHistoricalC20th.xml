@@ -78,8 +78,12 @@
         <description>Imposed historical changing land use</description>
     </numericalRequirement>
     
-    <shortName>5.2_esmHistorical</shortName>
-    <longName>5.2_EarthSystemModelHistorical</longName>
+    <shortName>
+		5.2_esm-historical
+	</shortName>
+    <longName>
+		ESM historical
+	</longName>
     
     <CalendarType>
         <realCalendar>

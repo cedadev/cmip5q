@@ -102,8 +102,12 @@
         <description>Sea ice imposed from historical observations</description>
     </numericalRequirement>
     
-    <shortName>3.3_amip</shortName>
-    <longName>3.3_AtmosphericModelIntercomparisonProject</longName>
+    <shortName>
+		3.3_AMIP
+	</shortName>
+    <longName>
+		AMIP
+	</longName>
     
     <CalendarType>
         <realCalendar>

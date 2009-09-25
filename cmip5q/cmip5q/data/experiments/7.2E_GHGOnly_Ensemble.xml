@@ -77,10 +77,10 @@
     </numericalRequirement>       
    
    <shortName>
-		CMIP5_NumReq_7.2E
+		7.2E_historical-ghg
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 experiment 7.2E - GHG-only ensemble.
+		GHG-only - Ensemble
 	</longName>
      
    <calendar>

@@ -53,10 +53,10 @@
         
             
     <shortName>
-		CMIP5_NumReq_6.4
+		6.4_forcing-aerosol
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.4 - Hansen style response to aerosol
+		aerosol forcing
 	</longName>
      
    <calendar>

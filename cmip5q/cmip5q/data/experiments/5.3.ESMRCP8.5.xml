@@ -58,8 +58,12 @@
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
     </numericalRequirement>
     
-    <shortName>5.3_esmRcp85</shortName>
-    <longName>5.3_EarthSystemModelRepresentativeConcentrationPathway8.5</longName>
+    <shortName>
+		5.3_esm-rcp8.5
+	</shortName>
+    <longName>
+		ESM RCP8.5
+	</longName>
     
     <CalendarType>
         <realCalendar>

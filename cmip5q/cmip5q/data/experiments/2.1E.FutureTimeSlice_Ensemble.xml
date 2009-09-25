@@ -107,10 +107,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_2.1E
+		2.1E_sst-2030
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 Time-slice experiment 2.1E - Future "time-slice" experiment ensemble
+		2030 time-slice - Ensemble
 	</longName>
      
     <calendar>

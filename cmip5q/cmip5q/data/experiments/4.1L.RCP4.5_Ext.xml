@@ -80,9 +80,11 @@
     
 	
 	<shortName>
-		CMIP5_NumReq_4.1L
+		4.1L_rcp4.5
 	</shortName>
-    <longName> CMIP5 Tier-1 future experiment 4.1L</longName>
+    <longName> 
+		RCP4.5 - Extended
+	</longName>
     
     <calendar>
 		<daily-360>

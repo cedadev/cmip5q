@@ -174,10 +174,10 @@
 	
 	
 	<shortName>
-		CMIP5_NumReq_1.4
+		1.4_volcano-2010
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 1.4 - Pinutubo 2010
+		prediction with 2010 volcano
 	</longName>
      
     <calendar>

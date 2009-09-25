@@ -92,10 +92,10 @@
             
    
    <shortName>
-		CMIP5_NumReq_7.1
+		7.1_historical-nat
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 experiment 7.1 - Natural-only.
+		natural-only
 	</longName>
      
    <calendar>

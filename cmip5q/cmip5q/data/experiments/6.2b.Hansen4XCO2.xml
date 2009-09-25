@@ -53,8 +53,12 @@
         <description>CO2 partial pressure dissolved in ocean, climatology from experiment 3.1_piControl</description>
     </numericalRequirement> 
     
-    <shortName>6.2b_sstClim4xco2</shortName>
-    <longName>6.2b_SSTClimatologyWith4XCO2Forcing</longName>
+    <shortName>
+		6.2b_sstClim4xco2
+	</shortName>
+    <longName>
+		SST Climatology With 4XCO2 Forcing
+	</longName>
     
     <CalendarType>
         <PerpetualPeriod>

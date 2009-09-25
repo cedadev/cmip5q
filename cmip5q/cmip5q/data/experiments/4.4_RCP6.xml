@@ -64,9 +64,11 @@
     </numericalRequirement>
     
     <shortName>
-		CMIP5_NumReq_4.4
+		4.4_rcp6
 	</shortName>
-    <longName> CMIP5 Tier-1 future experiment 4.4</longName>
+    <longName> 
+		RCP6
+	</longName>
     
     <calendar>
 		<daily-360>

@@ -53,10 +53,10 @@
      
     
     <shortName>
-		CMIP5_NumReq_6.5
+		6.5_amip-4xco2
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.5 - Cloud response to an imposed 4*CO2
+		4xCO2 AMIP
 	</longName>
 	
     <calendar>

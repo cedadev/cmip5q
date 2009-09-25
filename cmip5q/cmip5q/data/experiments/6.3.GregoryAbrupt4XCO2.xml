@@ -38,8 +38,13 @@
                      is quadruple of 3.1_piControl concentration</description>
     </numericalRequirement> 
     
-    <shortName>6.3_abrupt4xco2</shortName>
-    <longName>6.3_Abrupt4XCO2</longName>
+    <shortName>
+		6.3_abrupt-4xco2
+	</shortName>
+    <longName>
+		Abrupt 4XCO2
+	</longName>
+    
     <CalendarType>
         <PerpetualPeriod>
             <range>1850</range>

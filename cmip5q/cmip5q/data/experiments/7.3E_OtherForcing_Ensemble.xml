@@ -84,11 +84,11 @@
         <description>Create multi-member ensembles initialised from different points in the control run</description>
     </numericalRequirement>    
    
-   <shortName>
-		CMIP5_NumReq_7.3E
+	<shortName>
+		7.3E_historical
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 experiment 7.3E - GHG-only ensemble.
+		other-only - Ensemble
 	</longName>
      
    <calendar>

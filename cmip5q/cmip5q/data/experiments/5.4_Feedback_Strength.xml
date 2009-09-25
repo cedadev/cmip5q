@@ -79,10 +79,10 @@
 		
 		
 	<shortName>
-		CMIP5_NumReq_5.4
+		5.4_esm-fixclim
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Carbon/Climateexpt 5.4 - Feedback strength
+		ESM fixed climate
 	</longName>
 	
 	

@@ -99,10 +99,10 @@
 	</numericalRequirement>
 		
 	<shortName>
-		CMIP5_NumReq_6.7c
+		6.7C_aqua-4k
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.7c - 4K SST increase
+		aqua planet plus 4K anomaly
 	</longName>
      
    <calendar>

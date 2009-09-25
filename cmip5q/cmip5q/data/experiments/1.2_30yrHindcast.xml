@@ -166,10 +166,10 @@
     </numericalRequirement>
 
 	<shortName>
-		CMIP5_NumReq_1.2
+		1.2_decadal
 	</shortName>
     <longName> 
-		CMIP5 Core near-term decadal experiment 1.2 - 30yr Ensemble
+		30-year prediction
 	</longName>
      
     <calendar>

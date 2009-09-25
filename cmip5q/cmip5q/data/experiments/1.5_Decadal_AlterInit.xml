@@ -170,10 +170,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_1.5
+		1.5_decadal-i
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 1.5 - Alternative Initialization
+		Initialization alternatives
 	</longName>
      
     <calendar>

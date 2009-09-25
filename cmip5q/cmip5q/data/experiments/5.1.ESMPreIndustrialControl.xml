@@ -61,8 +61,12 @@
         <description>Unperturbed Pre-Industrial Land Use</description>
     </numericalRequirement>
     
-    <shortName>5.1_esmControl</shortName>
-    <longName>5.1_EarthSystemModelControl</longName>
+    <shortName>
+		5.1_esm-control
+	</shortName>
+    <longName>
+		ESM pre-industrial control
+	</longName>
     
     <CalendarType>
         <perpetualPeriod>

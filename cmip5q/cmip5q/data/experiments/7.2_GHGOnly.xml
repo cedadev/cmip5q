@@ -65,10 +65,10 @@
             
    
    <shortName>
-		CMIP5_NumReq_7.2
+		7.2_historical-ghg
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 experiment 7.2 - GHG-only.
+		GHG-only
 	</longName>
      
    <calendar>

@@ -115,10 +115,10 @@
 	
 		
 	<shortName>
-		CMIP5_NumReq_3.3E
+		3.3E_AMIP
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 Time-slice experiment 3.3E - AMIP Ensemble
+		AMIP Ensemble
 	</longName>
      
     <calendar>

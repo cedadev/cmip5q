@@ -32,10 +32,10 @@ expt. 6.3 will serve as the 12th member of this ensemble.]
     </numericalRequirement> 
     
 	<shortName>
-		CMIP5_NumReq_6.3E
+		6.3E_abrupt-4xco2
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.3E - Gregory method ensemble.
+		Abrupt 4XCO2 - Ensemble
 	</longName>
      
    <calendar>

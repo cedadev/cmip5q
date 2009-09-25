@@ -93,10 +93,10 @@
 	</numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_6.8
+		6.8_amip-4k
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 Time-slice experiment 6.8 - Cloud response to uniform SST increase
+		AMIP plus 4K anomaly
 	</longName>
      
    <calendar>

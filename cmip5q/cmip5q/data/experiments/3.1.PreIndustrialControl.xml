@@ -72,8 +72,12 @@
         <description>Unperturbed Pre-Industrial Land Use</description>
     </numericalRequirement>
     
-    <shortName>3.1_piControl</shortName>
-    <longName>3.1_PreIndustrialControl</longName>
+    <shortName>
+		3.1_pi-control
+	</shortName>
+    <longName>
+		Pre-Industrial Control
+	</longName>
 
     <CalendarType>
         <perpetualPeriod>

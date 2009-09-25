@@ -29,10 +29,10 @@
     </numericalRequirement>
     
     <shortName>
-		CMIP5_NumReq_6.1S
+		6.1S_1pct-co2
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 6.1S - 1%/yr CO2
+		1 percent per year CO2 - Shortened
 	</longName>
 	     
 	<calendar>

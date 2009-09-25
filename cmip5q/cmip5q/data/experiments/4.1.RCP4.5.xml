@@ -80,8 +80,12 @@
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
     </numericalRequirement>
     
-    <shortName>4.1_rcp45</shortName>
-    <longName>4.1_RepresentativeConcentrationPathway4.5</longName>
+    <shortName>
+		4.1_rcp4.5
+	</shortName>
+    <longName>
+		RCP4.5
+	</longName>
     
     <CalendarType>
         <realCalendar>

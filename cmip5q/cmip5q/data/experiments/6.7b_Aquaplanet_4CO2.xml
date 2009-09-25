@@ -99,10 +99,10 @@
 	</numericalRequirement>
 		
 	<shortName>
-		CMIP5_NumReq_6.7b
+		6.7B_aqua-4xco2
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 6.7b - 4*CO2
+		4xCO2 aqua planet
 	</longName>
      
    <calendar>

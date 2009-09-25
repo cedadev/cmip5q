@@ -24,9 +24,9 @@
 	</numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_1.6
+		1.6_chemistry
 	</shortName>
-    <longName> CMIP5 Tier-1 near-term decadal experiment 1.6</longName>
+    <longName> Chemistry-focused runs</longName>
      
     <calendar>
 		<daily-360>

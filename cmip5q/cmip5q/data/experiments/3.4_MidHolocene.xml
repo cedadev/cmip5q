@@ -32,10 +32,10 @@
     
       
 	<shortName>
-		CMIP5_NumReq_3.4
+		3.4_mid-holocene
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Long-term experiment 3.4 - Mid-Holocene (6kyr ago)
+		mid-Holocene
 	</longName>
 	
     <calendar>

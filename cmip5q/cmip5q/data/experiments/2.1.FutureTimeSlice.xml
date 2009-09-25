@@ -86,10 +86,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_2.1
+		2.1_sst-2030
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Time-slice experiment 2.1 - Future "time-slice" experiment
+		2030 time-slice
 	</longName>
      
     <calendar>

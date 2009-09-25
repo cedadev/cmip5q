@@ -104,14 +104,13 @@
         <description>Create multi-member ensembles initialised from different points in the control run</description>
     </numericalRequirement>
         
-   
    <shortName>
-		CMIP5_NumReq_7.1E
+		7.1E_historical-nat
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 experiment 7.1E - Natural-only ensemble.
+		natural-only - Ensemble
 	</longName>
-     
+        
    <calendar>
 		<daily-360>
 			<range>

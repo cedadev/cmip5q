@@ -162,10 +162,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		CMIP5_NumReq_1.1I
+		1.1I-decadal
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 near-term decadal experiment 1.1I - Additional Start Dates
+		10-year prediction - additional start dates
 	</longName>
      
     <calendar>

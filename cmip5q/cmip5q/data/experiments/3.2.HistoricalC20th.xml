@@ -103,8 +103,12 @@
         <description>Imposed historical changing land use</description>
     </numericalRequirement>
     
-    <shortName>3.2_historical</shortName>
-    <longName>3.2_Historical</longName>
+    <shortName>
+		3.2_historical
+	</shortName>
+    <longName>
+		Historical
+	</longName>
     
     <CalendarType>
         <realCalendar>

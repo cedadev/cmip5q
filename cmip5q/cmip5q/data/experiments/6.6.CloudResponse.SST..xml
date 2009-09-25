@@ -106,10 +106,10 @@
 	
 	
 	<shortName>
-		CMIP5_NumReq_6.6
+		6.6_amip-future
 	</shortName>
     <longName> 
-		CMIP5 Tier 2 Time-slice experiment 6.6 - Cloud diagnostic experiments
+		AMIP plus patterned anomaly
 	</longName>
      
    <calendar>

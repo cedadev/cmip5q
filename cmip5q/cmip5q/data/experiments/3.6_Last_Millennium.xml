@@ -25,10 +25,10 @@
     </numericalRequirement>
    
     <shortName>
-		CMIP5_NumReq_3.6
+		3.6_past-1000
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Long-term experiment 3.6 - Last Millennium (850 - 1850)
+		Last millennium
 	</longName>
 	
     <calendar>

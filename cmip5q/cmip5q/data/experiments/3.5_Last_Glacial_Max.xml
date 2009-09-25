@@ -34,10 +34,10 @@
     
       
 	<shortName>
-		CMIP5_NumReq_3.5
+		3.5_lgm
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 Long-term experiment 3.5 - Last Glacial Maximum
+		Last glacial maximum
 	</longName>
 	
     <calendar>

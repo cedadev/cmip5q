@@ -77,9 +77,11 @@
     
     
     <shortName>
-		CMIP5_NumReq_4.2L
+		4.2L_rcp8.5
 	</shortName>
-    <longName> CMIP5 Tier-2 future experiment 4.2L</longName>
+    <longName> 
+		RCP8.5 - Extended
+	</longName>
     
     <calendar>
 		<daily-360>

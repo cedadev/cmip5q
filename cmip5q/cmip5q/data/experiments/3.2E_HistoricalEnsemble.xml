@@ -98,10 +98,10 @@
     </numericalRequirement>
     
     <shortName>
-		CMIP5_NumReq_3.2E
+		3.2E_historical
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 long-term experiment 3.2E - Historical ensemble
+		historical - Ensemble
 	</longName>
     
     <calendar>

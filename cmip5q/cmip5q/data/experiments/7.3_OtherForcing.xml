@@ -79,11 +79,11 @@
     </numericalRequirement>
     
    
-   <shortName>
-		CMIP5_NumReq_7.3
+	<shortName>
+		7.3_historical
 	</shortName>
     <longName> 
-		CMIP5 Tier 1 experiment 7.3 - GHG-only 
+		other-only 
 	</longName>
      
    <calendar>
