@@ -199,8 +199,10 @@ class couplingHandler:
         elif self.method=='GET':
             Intform=MyCouplingFormSet(model,simulation=simulation)
             Intform.specialise()
+        labelstr='Coupling for %s'%model
+        if simulation: labelstr+=' (in %s)'%simulation
         return render_to_response('coupling.html',{'c':model,'s':simulation,'urls':self.urls,
-        'Intform':Intform,'tabs':tabs(self.centre_id,'tmp')})
+        'Intform':Intform,'tabs':tabs(self.request,self.centre_id,labelstr)})
         
     def resetClosures(self,simulation_id,coupling_id,ctype):
         coupling=Coupling.objects.get(id=coupling_id)
