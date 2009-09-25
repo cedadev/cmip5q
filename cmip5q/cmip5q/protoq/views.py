@@ -309,7 +309,7 @@ class ViewHandler(BaseViewHandler):
                         'codemodification':{'attname':'codeModification',
                             'title':'Code Modification','tab':'CodeMods',
                             'class':CodeModification,'form':CodeModificationForm},
-                        'reference':{'attname':'reference',
+                        'reference':{'attname':'references',
                             'title':'Reference','tab':'References',
                             'class':Reference,'form':ReferenceForm},
                         }

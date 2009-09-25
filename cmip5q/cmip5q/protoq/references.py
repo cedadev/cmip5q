@@ -136,7 +136,7 @@ class referenceHandler:
         return render_to_response('selectRef.html',
             {'rform':rform,
                 'title':title,
-                'tabs':tabs(self.cid,'Chooser'),'url':url})
+                'tabs':tabs(request,self.cid,'Chooser'),'url':url})
         
                     
             

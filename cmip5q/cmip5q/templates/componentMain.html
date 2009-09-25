@@ -93,12 +93,17 @@
     
     <div class="boxer">
         <h4> References (associated with this component) </h4>
-        <p class="guidance"> Update this list using the modify reference button</p>
+        {% if refs|length_is:0 %} 
+        <p class="guidance"> No references are yet associated with this component. Use the reference button to add references</p>
+        {% else %}
+        <p class="guidance"> Update this list using the reference button.</p>
         <table width="100%" class="backgrey">
+            <tr><th> Citation</th><th>Source</th></tr>
             {% for r in refs%}
-            <tr><td width="33%"><a href="{{r.link}}">{{r.name}}</a></td><td>{{r.citation}}</td></tr>
+            <tr><td >{{r.citation}}</td><td width="10%">(<a href="{{r.link}}">link</a>)</td></tr>
             {% endfor %}
         </table>
+        {% endif %}
     </div>
     {% if isModel %}
     <div class="boxer">

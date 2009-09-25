@@ -111,7 +111,8 @@ class componentHandler(object):
         # find my own urls ...
         urls={}
         urls['form']=self.url
-        urls['refs']=reverse('cmip5q.protoq.views.assignReferences',args=(self.centre_id,'component',c.id,))
+        urls['refs']=reverse('cmip5q.protoq.views.assign',args=(self.centre_id,'reference',
+                             'component',c.id,))
         urls['outputs']=reverse('cmip5q.protoq.views.componentOut',args=(self.centre_id,c.id,))
         urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
         urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
