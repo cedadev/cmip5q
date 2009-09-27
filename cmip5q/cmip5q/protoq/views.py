@@ -10,7 +10,7 @@ from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import PropertyForm, tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
-from cmip5q.protoq.references import referenceHandler
+#from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
 from django import forms
 import uuid
@@ -133,22 +133,22 @@ def componentOut(request,centre_id,component_id):
    return c.outputs()
    
 ###### REFERENCE HANDLING ######################################################
-   
-def referenceList(request,centre_id=None):
-    ''' Handle the listing of references, including the options to edit, or add'''
-    rH=referenceHandler(centre_id)
-    return rH.list()
-
-def referenceEdit(request,centre_id,reference_id=None):
-    ''' Display or edit one reference '''
-    rH=referenceHandler(centre_id)
-    return rH.edit(request,reference_id,request.is_ajax())
-    
-def assignReferences(request,centre_id,resourceType,resource_id):
-    ''' Make the link between a reference and a component '''
-    rH=referenceHandler(centre_id)
-    return rH.assign(request,resourceType,resource_id)
-    
+#   
+#def referenceList(request,centre_id=None):
+#    ''' Handle the listing of references, including the options to edit, or add'''
+#    rH=referenceHandler(centre_id)
+#    return rH.list()
+#
+#def referenceEdit(request,centre_id,reference_id=None):
+#    ''' Display or edit one reference '''
+#    rH=referenceHandler(centre_id)
+#    return rH.edit(request,reference_id,request.is_ajax())
+#    
+#def assignReferences(request,centre_id,resourceType,resource_id):
+#    ''' Make the link between a reference and a component '''
+#    rH=referenceHandler(centre_id)
+#    return rH.assign(request,resourceType,resource_id)
+#    
 ###### SIMULATION HANDLING ######################################################
 
 def simulationEdit(request,centre_id,simulation_id):
