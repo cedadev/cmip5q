@@ -80,6 +80,9 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.ensemble'),                                               
                           
     #### generic simple views
+    # DELETE
+    (r'^cmip5/(?P<cen_id>\d+)/delete/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<returnType>\D+)/$',
+            'cmip5q.protoq.views.delete'),
     # EDIT
     # cmip5q/centre_id/edit/resourceType/resourceID/returnType  (resourceID=0, blank form)
     (r'^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<returnType>\D+)/$',

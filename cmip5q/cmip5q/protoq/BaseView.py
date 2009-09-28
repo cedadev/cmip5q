@@ -63,10 +63,10 @@ class BaseViewHandler:
                 # monkey patch an edit URL into the object allowing for the target,
                 # saying come back here (to the list). Unfortunately doing that
                 # means we lose the incoming reference.
-                o.editURL=reverse('cmip5q.protoq.views.edit',
-                            args=(self.cid,self.resource['type'],o.id,
-                                  self.target['type'],self.target['instance'].id,'list',))
-                o.delURL='' # Not implemented yet
+                args=(self.cid,self.resource['type'],o.id,
+                                  self.target['type'],self.target['instance'].id,'list',)
+                o.editURL=reverse('cmip5q.protoq.views.edit',args=args)
+                o.delURL=reverse('cmip5q.protoq.views.delete',args=args)
                 #o.delURL=reverse('cmip5q.protoq.views.delete',
                 #            args=(self.cid,self.resource['type'],o.id,self.currentURL)
                 # Need to be able to make sure this isn't an html get from an <a> otherwise
@@ -77,8 +77,9 @@ class BaseViewHandler:
                             args=(self.cid,self.resource['type'],0,'list',))
             for o in objects:
                 # monkey patch an edit URL into the object, saying come back here (list)
-                o.editURL=reverse('cmip5q.protoq.views.edit',
-                            args=(self.cid,self.resource['type'],o.id,'list',))
+                args=(self.cid,self.resource['type'],o.id,'list',)
+                o.editURL=reverse('cmip5q.protoq.views.edit',args=args)
+                o.delURL=reverse('cmip5q.protoq.views.delete',args=args)
             
         # we pass a form and formURL for a new instance to be created.
         # we're doing all this because we think we have too many entities to use a formset
@@ -140,6 +141,24 @@ class BaseViewHandler:
                                                  'tabs':tabs(request,self.cid,'Edit %s'%instance),
                                                  'snippet_template':'%s_snippet.html'%self.resource['type'],
                                                  'resource':self.resource})
+                                                 
+                                                 
+    def delete(self,request,returnType):
+        ''' Delete an item ... '''
+        if self.target:
+            okURL=reverse('cmip5q.protoq.views.%s'%returnType,
+               args=(self.cid,self.resource['type'],self.target['type'],self.target['instance'].id,))
+        else:
+            okURL=reverse('cmip5q.protoq.views.%s'%returnType,
+               args=(self.cid,self.resource['type'],))
+        if request.method=='POST':
+            if self.resource['id']<>'0':
+                instance=self.resource['class'].objects.get(id=self.resource['id'])
+                instance.delete()
+                return HttpResponseRedirect(okURL)
+            
+        #all other cases are invalid
+        return HttpResponse('Invalid')
         
     def assign(self,request):
         ''' This method binds to the target resource, a number of the resources managed

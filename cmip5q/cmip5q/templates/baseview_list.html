@@ -7,11 +7,12 @@
     {% if objects|length_is:0 %}
     <p>No {{instance.title|lower}}s loaded at present</p>
     {% else %} 
-    <table>
+    <table class="linklike">
     <tr><th>Name</th><th></th></tr>
     {% for d in objects %}
     <tr class="{% cycle 'row1' 'row2' %}">
-        <td><a href="{{d.editURL}}">{{d}}</td><td>(<a href="{{d.delURL}}">delete</a>)</td></tr>
+        <td><a href="{{d.editURL}}">{{d}}</td><td width="50%">
+          <form action="{{d.delURL}}" method="POST">(<input  type="submit" value="delete">)</form></td></tr>
     {% endfor %}
     </table>
     {% endif %}
