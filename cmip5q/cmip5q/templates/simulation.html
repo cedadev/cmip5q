@@ -67,6 +67,22 @@
 </script>
 
 <div class="boxer">
+    {% if ensemble %}
+    <h4> Ensemble Characteristics </h4>
+    <p>{{ensemble.set.description}}</p>
+    <table>
+    {% for m in ensemble.members %}
+    <tr><td>Member {{m.memberNumber}} has </td>
+    {% if ensemble.set.perturbedPhysics %}
+    <td> Code Modification: {{m.codeModification}}</td>
+    {% else %}
+     <td> Initial Condition: {{m.initialCondition}}</td>
+    {% endif %}
+    </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
     <h4> Initial and Boundary Conditions </h4>
     {% ifnotequal label "Update" %}
     <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>

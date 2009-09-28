@@ -83,6 +83,8 @@ urlpatterns = patterns('',
     # DELETE
     (r'^cmip5/(?P<cen_id>\d+)/delete/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<returnType>\D+)/$',
             'cmip5q.protoq.views.delete'),
+    (r'^cmip5/(?P<cen_id>\d+)/delete/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<targetType>\D+)/(?P<target_id>\d+)/(?P<returnType>\D+)/$',
+            'cmip5q.protoq.views.delete'),      
     # EDIT
     # cmip5q/centre_id/edit/resourceType/resourceID/returnType  (resourceID=0, blank form)
     (r'^cmip5/(?P<cen_id>\d+)/edit/(?P<resourceType>\D+)/(?P<resource_id>\d+)/(?P<returnType>\D+)/$',

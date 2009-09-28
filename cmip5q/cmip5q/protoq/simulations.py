@@ -48,7 +48,12 @@ class simulationHandler(object):
     def __handle(self,request,s,e,url,label,fix):
         ''' This method handles the form itself for both the add and edit methods '''
         logging.debug('entering simulation handle routine')
-        ensemble=0
+        
+        if s.ensembleMembers>1: 
+            set=s.ensemble_set.all()[0] # only one for any given simulation
+            members=set.ensemblemember_set.all()
+            ensemble={'set':set,'members':members}
+        else: ensemble=None
         
         urls={'url':url}
         if label=='Update':

@@ -259,7 +259,9 @@ def ensemble(request,cen_id,sim_id):
     ''' Manage ensembles for a given simulation '''
     s=Simulation.objects.get(id=sim_id)
     e=Ensemble.objects.get(simulation=s)
+    e.updateMembers()  # in case members were deleted via their code mods or ics.
     members=e.ensemblemember_set.all()
+        
     EnsembleMemberFormset=modelformset_factory(EnsembleMember,extra=0,exclude=('ensemble','memberNumber'))
     
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
