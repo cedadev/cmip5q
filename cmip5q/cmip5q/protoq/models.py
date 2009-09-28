@@ -11,7 +11,7 @@ import logging
 class Doc(models.Model):
     ''' Abstract class for general properties '''
     title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.SlugField(max_length=20)
+    abbrev=models.CharField(max_length=20)
     email=models.EmailField(blank=True)
     contact=models.CharField(max_length=128,blank=True,null=True)
     description=models.TextField(blank=True,null=True)
@@ -540,7 +540,7 @@ class SimulationForm(forms.ModelForm):
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
-    scienceType=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+    
     #implemented=forms.BooleanField(required=True)
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
@@ -552,10 +552,25 @@ class ComponentForm(forms.ModelForm):
     implemented=forms.BooleanField(required=False)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
     otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+    
+    controlled=forms.BooleanField(widget=forms.HiddenInput())
     class Meta:
         model=Component
-        exclude=('centre','uri','model','realm','isRealm','isModel','visited','controlled',
+        exclude=('centre','uri','model','realm','isRealm','isModel','visited',
                  'references','components')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        if self.instance.controlled: 
+            # We don't want this to be editable 
+            self.fields['scienceType'].widget=forms.HiddenInput()
+            self.viewableScienceType=self.instance.scienceType
+            # implementable only matters if it's controlled
+            self.showImplemented=True
+        else:
+            self.fields['scienceType'].widget=forms.TextInput(attrs={'size':'40'})
+            self.viewableScienceType=''
+            self.showImplemented=False
+
 
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))

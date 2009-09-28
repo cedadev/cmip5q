@@ -81,6 +81,7 @@ class NumericalModel:
         component.abbrev=abbrev
         component.save()
         component.model=component
+        component.controlled=True
         component.save()
         self.top=component
         logging.debug('Created empty top level model %s'%component)
@@ -333,6 +334,7 @@ class ComponentParser:
                 title='',
                 scienceType=self.item.attrib['name'],
                 abbrev=self.item.attrib['name'],
+                controlled=True,
                 uri=u,
                 centre=self.model.centre,
                 contact=self.model.contact,

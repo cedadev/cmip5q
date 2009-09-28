@@ -54,17 +54,6 @@ class MyComponentInputFormSet(ComponentInputFormSet):
                 c=Coupling(component=self.component.model,
                            targetInput=i)
                 c.save()
-
-def makeComponent(centre_id,scienceType='sub'):
-    ''' Just make and return a new component instance'''
-    centre=Centre.objects.get(pk=centre_id)
-    #ok create a new component
-    u=str(uuid.uuid1())
-    c=Component(scienceType=scienceType,centre=centre,abbrev='',uri=u)
-    #now save to database so that we get a primary key value
-    c.save()
-    logging.info('Created new component %s in centre %s (type %s)'%(c.id,centre_id,scienceType))
-    return c
     
 class componentHandler(object):
     
@@ -82,7 +71,10 @@ class componentHandler(object):
             original=Component.objects.filter(abbrev='GCM Template').get(centre=cmip5c)
             self.component=original.makeNewCopy(Centre.objects.get(id=centre_id))
         else:
-            self.component=Component.objects.get(pk=component_id)
+            try:
+                self.component=Component.objects.get(pk=component_id)
+            except:
+                return HttpResponse('Unknown component %s'%component_id)
         
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
@@ -91,14 +83,15 @@ class componentHandler(object):
         ''' Add a subcomponent to a parent, essentially, we create a subcomponent, and return
         it for editing  '''
         #we have instantiated self.component as the parent!
-        component=makeComponent(self.centre_id,scienceType='sub')
-        #default should be that children inherit parents contact.
-        component.contact=self.component.contact
-        component.abbrev='unknown'
-        component.save()
-        self.component.components.add(component)
-        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,component.id,))
-        logging.info('Created subcomponent %s to component %s'%(component.id,self.component.id))
+        #ok create a new component
+        u=str(uuid.uuid1())
+        c=Component(scienceType='sub',centre=self.component.centre,uri=u,abbrev='new',
+                    contact=self.component.contact,email=self.component.email,
+                    model=self.component.model,realm=self.component.realm)
+        c.save()
+        self.component.components.add(c)
+        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
+        logging.info('Created subcomponent %s in component %s (type "new")'%(c.id,self.component.id))
         return HttpResponseRedirect(url)
 
     def edit(self,request):

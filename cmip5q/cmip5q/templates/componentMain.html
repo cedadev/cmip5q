@@ -2,13 +2,20 @@
 {% extends "base.html" %}
 {% block content %} 
 
-<div class="boxer"><h1> Model Component {{c.abbrev }} </h1></div>
+<div class="boxer"> <table>
+<!--
+<tr><td width="800px"><h1> Model Component {{c.abbrev }} </h1></td>
+<td width="20%"> {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
+<p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
+</table>-->
+<h1> Model Component {{c.abbrev }} </h1>
+ </div>
 
 <table class="navmain">
    <tr>
       <td valign="top" width="200px">
         <div class="boxer">
-            <p class="red"> All buttons and links in the tabs and this column navigate away from this page. Save your work first!</p></div>
+            <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
             <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
             <h4>Component {{c.abbrev}}</h4>
             <p class="guidance"> Please add details of any other relevant
@@ -17,10 +24,8 @@
         </div>
         <div class="boxer"> 
         <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
-             {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
+           {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
             <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
-           
-            <!--<p><a id="numlinkbut" href="{{urls.numerics}}"> Modify numerics </a></p>-->
         </div>
         <div class="boxer">
           <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
@@ -37,13 +42,30 @@
         <div class="boxer">    
             <!--<h4> General Characteristics </h4>-->
             <table>
-            <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td><td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}},Implemented:{{cform.implemented}})</td></tr>
+                <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td>
+                <td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
+                </td></tr>
+                {% if cform.showImplemented %}
+                <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
+                <td>{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr>
+                {% endif %}
                 <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td>{{cform.title}}</td></tr> 
                 <tr><td>Contact Email:&nbsp;{{cform.email.errors}}</td><td>{{cform.email}}</td></tr>
                 <tr><td>Contact Name:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
-                
             </table>
         </div>
+        {% if isRealm or isModel %}
+        <div class="boxer">
+        <h4>Geneology</h4>
+        <p>Year First  Released:&nbsp;{{cform.yearReleased.errors}}{{cform.yearReleased}}</p>
+        <p class="guidance"> The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade.</p>
+        <center>
+        <p> Previous Version (name):&nbsp;{{cform.otherVersion.errors}}{{cform.otherVersion}} </p>
+        <p class="guidance">Please tell us how this component has been improved from that previous version. </p>
+        <p>{{cform.geneology.errors}}{{cform.geneology}}</p>
+            </center>
+        </div>
+        {% endif %}
         <div class="boxer">
         <h4> Component Attributes </h4>
             <p> In this section enter parameters and attributes associated with this component.</p>
@@ -51,19 +73,11 @@
         </div>
        
         <div class="boxer"> 
-            {% if isRealm or isModel %}
-            <h4> History </h4>
-            <center>
-            <p> Year Released:{{cform.yearReleased.errors}}{{cform.yearReleased}}. Previous Version (name):
-            {{cform.otherVersion.errors}}{{cform.otherVersion}} </p>
-            <p class="guidance">Please tell us how this component has
-            been improved from that previous version. </p>
-            <p>{{cform.geneology}}</p>
-            </center>
-            {% endif %}
             <h4> Additional Information</h4>
             <center>
-            <p class="guidance">Please provide additional information about this component as necessary.</p>
+            <p class="guidance">If you have chosen "other" in an attribute description above, please 
+            provide details of that "other" here.</p>
+            <p> Please also provide any other information that will help the interpretation of simulations using this component. </p>
             <p>{{cform.description}}</p> 
             </center> 
         </div>
@@ -81,11 +95,11 @@
         {% endfor %} 
         </table>
         {% if isRealm %}
-        <p class="guidance"> Update this list using the "Modify Inputs" button </p>
+        <p class="guidance"> Update this list using the "Runtime Inputs" button </p>
         {% endif %}
         {% else %}
         {% if isRealm %}
-        <p class="red"> Please identify key inputs to this component using the "Modify Inputs" button </p>
+        <p class="red"> Please identify key inputs to this component using the "Runtime Inputs" button </p>
         {% endif %}
         {% endif %}
     </div>
