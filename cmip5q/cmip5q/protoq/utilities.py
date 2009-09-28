@@ -56,7 +56,7 @@ class tabs(list):
         if 'Simulation' not in request.session:request.session['Simulation']=0
         if 'Model' not in request.session:request.session['Model']=0
         #This is the list of tabs '''
-        self.tablist=[('Intro','cmip5q.protoq.views.intro',(centre_id,)),
+        self.tablist=[#('Intro','cmip5q.protoq.views.intro',(centre_id,)),
                  ('Summary','cmip5q.protoq.views.centre',(centre_id,)),
                  ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,)),
                  ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],)),
