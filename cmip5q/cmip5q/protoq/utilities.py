@@ -114,13 +114,15 @@ class PropertyForm:
         
         for o in self.orp:
             o.form={'op':'+='}
-            o.form['values']=Value.objects.filter(vocab=o.vocab)
+            o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+            o.form['values'].insert(0,'------')
             self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
         
         for o in self.xorp:
             o.form={'op':'='}
-            o.form['values']=Value.objects.filter(vocab=o.vocab)
+            o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+            o.form['values'].insert(0,'------')
             self.rows.append(o)
             self.keys[o.name]=len(self.rows)-1
             
