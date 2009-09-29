@@ -562,7 +562,7 @@ class ComponentForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         if self.instance.controlled: 
             # We don't want this to be editable 
-            self.fields['scienceType'].widget=forms.HiddenInput
+            self.fields['scienceType'].widget=forms.HiddenInput()
             self.viewableScienceType=self.instance.scienceType
             # implementable only matters if it's controlled
             self.showImplemented=True
