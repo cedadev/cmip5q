@@ -4,14 +4,28 @@
 <p class="cmip5q"> Clearly much more has to be written here </p>
 <h4> Basic Concepts </h4>
 <ol>
-<li> Each CMIP5 modelling centre is running <em> Simulations </em> which run <em> Models </em> on <em> Platforms </em>.</li>
-<li>The <em> Models </em> are made up of <em>Components</em></li>
-<li>The top level components under models can be <em> coupled </em> to other components, or to files. 
-Coupling to other components are termed <em> internal couplings</em>, those which are intended to be coupled to files are termed <em> external couplings</em>. We resolve internal couplings when we describe models. We resolve external couplings as part of <em> boundary condition </em> descriptions when describing <em> simulations </em>.</li>
-<li> When describing simulations we also have to clearly explain how the simulation has met the 
-<em> numerical requirements </em> of the <em> experiment </em> with which it is associated. This is done via the <em> conformance </em> page, which maps the requirements onto initial and boundary conditions (and if necessary <em> code modifications </em>).
-</li>
+<li> Each CMIP5 modelling centre is performing <em> Simulations </em> which run <em> Models </em> on 
+    <em> Platforms</em>.</li>
+<li>The <em> Models </em> are made up of <em>Components</em>.</li>
+<li><em>Simulations </em> <em>Conform</em> to the <em>Numerical Requirements</em> of <em> Experments</em>. </li>
+<li><em>Conformances </em> consist of either specific code modifications or the use of specific boundary 
+    or initial condition <em>Files</em>.</li>
+<li>The top level components under models (also known as <em>Realms</em>) can be <em> Coupled </em> 
+    either to other components, or to files. 
+    <ul>
+        <li><em>Internal Couplings</em> describe couplings to other components.</li>
+	    <li><em>External Couplings</em> describe couplings to files.</li>
+    </ul>
+</li>		
 </ol>
+<p>The purpose of this questionnaire is to glean information about... 
+<table>
+<tr><td>Models</td><td>Components</td><td>Platforms</td></tr>
+<tr><td>Simulations</td><td>Experiments</td><td>Numerical Requirements</td></tr>
+<tr><td>Conformances</td><td>Files</td><td>Coupling</td><tr>
+</table> and/or their relationships.</p>
+
+
 
 <h4> Typical Path Through the Questionnaire </h4>
 
@@ -27,11 +41,14 @@ the experiment conformances and going back to the model to describe inputs, then
 <p> As indicated above, you will need a platform description before filling out a simulation, but that wont
 be hard ... </p>
 
-<p> Simulation descriptions are mainly about describing the initial and  boundary conditions along with how
-the simulation conformed to the numerical experiment. You will probably have to dive off and create some
-initial conditions, and if you are creating an ensemble, you'll need to describe the ensemble members.</p>
+<p>When describing simulations you will be asked to clearly explain how the simulation has met the 
+numerical requirements of the experiment with which it is associated.
+This is done via the conformance  page, which maps the numerical requirements onto initial and 
+boundary conditions (and, if necessary, onto code modifications) .  
+You will probably have to dive off and create some initial conditions. </p>
 
-<p> We have the concept of code modifications for physical ensemble members, and also for code modifications
+<p> If you are creating an ensemble, you'll need to describe the ensemble members.  We have the concept of 
+code modifications for physical ensemble members, and also for code modifications
 to a basic state model needed to conform to a numerical experiment. You can create and assign those from
 either the ensemble interface or the conformance interface. </p>
 

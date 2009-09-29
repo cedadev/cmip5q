@@ -7,16 +7,23 @@
 <div class="boxer">
 <h4> Introduction </h4>
 
-<p>Each CMIP5 modelling centre is running <em> Simulations </em> which run <em> Models </em> on <em> Platforms </em>.</p>
+<p>Each CMIP5 modelling centre is performing <em> Simulations </em> which run <em> Models </em> on <em> 
+Platforms</em>.</p>
 
-<p>The <em> Models </em> are made up of <em>Components</em></p>
+<p>The <em> Models </em> are made up of <em>Components</em>.</p>
 
-<p>The <em> Simulations </em> conform to the <em>NumericalRequirements</em> of <em> Experments</em> via what we call <em>Conformances</em> which consist of either specific code modifications or the use of specific boundary or initial condition <em>Files</em>s.</p>
-
-<p>The purpose of this questionnaire is to glean information about the entities denoted <em>thus</em> and/or their relationships.</p>
-
-<p> We expect to see each centre enter at least one model, one platform, and then multiple simulations, each of which will involve entering descriptions of how they conform to the numerical requirements via conformances. It is not possible to start entering simulation information until at least one model and one platform have been created. </p>
+<p>The <em> Simulations </em> conform to the <em>Numerical Requirements</em> of <em> Experments</em>
+ via what we call <em>Conformances</em>. Conformances will consist of either specific code modifications 
+ or the use of specific boundary or initial condition <em>Files</em>.</p>
+<p> The purpose of this questionnaire is to glean information about the entities denoted <em> in itallics</em>
+and/or their relationships.</p>
+<p> We expect each centre to enter at least one model, one platform, and then multiple simulations. 
+It is not possible to start entering simulation information until at least one model and one platform 
+have been described. For each simulation you will be asked to enter descriptions of how that simulation 
+conformed to the numerical requirements of the experiment via the <em> conformances</em>. 
 </p>
+
+
 
 </div>
 
@@ -42,14 +49,14 @@
         <p class="cmip5q">placeholder</p>
         </td></tr>
         {% endfor %} 
-        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="2">Note that it can take some time to create a new model from the CMIP5 template ... be patient!</td></tr>
+        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="2">It can take some time to create a new model from the CMIP5 template ... be patient!</td></tr>
         <tbody>
     </table>
    
     <script type="text/javascript">
         var newmodButton = new YAHOO.widget.Button("newModButton");
     </script>
-    <p class="guidance"> The status column provides an indicator of how much of the model description has
+    <p class="guidance"> The status column provides an indication of how much of the model description has
     been completed. <!--CopyAsNew should be used to describe variants of already described models.--></p>
     </div>
     <div class="boxer">
