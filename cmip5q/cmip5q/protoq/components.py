@@ -132,6 +132,7 @@ class componentHandler(object):
             else:
                 logging.debug('Unable to save characteristics for component %s'%c.id)
                 postOK=False
+                logging.debug(cform.errors)
             pform.update(request)
         
         # We separate the response handling so we can do some navigation in the

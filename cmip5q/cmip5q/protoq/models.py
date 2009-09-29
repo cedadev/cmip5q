@@ -553,7 +553,7 @@ class ComponentForm(forms.ModelForm):
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
     otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
     
-    controlled=forms.BooleanField(widget=forms.HiddenInput())
+    controlled=forms.BooleanField(widget=forms.HiddenInput,required=False)
     class Meta:
         model=Component
         exclude=('centre','uri','model','realm','isRealm','isModel','visited',
@@ -562,7 +562,7 @@ class ComponentForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         if self.instance.controlled: 
             # We don't want this to be editable 
-            self.fields['scienceType'].widget=forms.HiddenInput()
+            self.fields['scienceType'].widget=forms.HiddenInput
             self.viewableScienceType=self.instance.scienceType
             # implementable only matters if it's controlled
             self.showImplemented=True

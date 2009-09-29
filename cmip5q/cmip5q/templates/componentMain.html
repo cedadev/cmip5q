@@ -53,6 +53,8 @@
                 <tr><td>Contact Email:&nbsp;{{cform.email.errors}}</td><td>{{cform.email}}</td></tr>
                 <tr><td>Contact Name:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
             </table>
+            <!-- Following is hidden -->
+            {{cform.controlled}} 
         </div>
         {% if isRealm or isModel %}
         <div class="boxer">
