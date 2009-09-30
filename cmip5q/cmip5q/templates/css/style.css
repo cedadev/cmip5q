@@ -178,8 +178,5 @@ background: #FFFACD;  /* needs to be the same as tabcontent */
 /* following used to have inputs in tables look like underlined links rather than buttons */
 .linklike input {border:none;display:inline; background:none; text-decoration:underline;}
 
-
-
-
- 
-
+/* for component highlighting in yui tree */
+.highlight { background-color:#CDC9A5;} /* colour same as boxer2 */

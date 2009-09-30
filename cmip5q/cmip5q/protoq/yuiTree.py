@@ -58,9 +58,12 @@ class yuiTree2:
     def __walk(self,component):
         ''' Show me and my children'''
         children=component.components.all()
+        classes=[]
+        if component.id in self.expanders: classes.append('expanded')
+        if component.id == self.family.me: classes.append('highlight') 
         cstring=''
-        if component.id in self.expanders: cstring=' class="expanded"'
-       
+        for i in classes:cstring+='%s '%i
+        if cstring<>'': cstring=' class="%s"'%cstring[0:-1]
         self.html+=self.__li(cstring,component.id,component.abbrev)
         self.found.append(component.id)
         if len(children)==0: return
@@ -79,10 +82,5 @@ class yuiTree2:
                 p=Component.objects.filter(components=a.id)
                 string=str(p)
             #print '%s(%s) shown in menu: %s (%s)(%s)'%(a.abbrev,a.id,found,a.scienceType,string)
-            
-                
-        
-                
-      
     
     
