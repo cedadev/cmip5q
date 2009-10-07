@@ -379,6 +379,14 @@ class ViewHandler(BaseViewHandler):
             # for code modifications, we need to get those associated with a model for a simulation
             constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
             objects=objects.filter(component__in=constraintSet)
+        if self.resource['type']=='reference':
+            objects=objects.order_by('name')
+        elif self.resource['type']=='initialcondition':
+            objects=objects.order_by('date')
+        elif self.resource['type']=='file':
+            objects=objects.order_by('name')
+        elif self.resource['type']=='codemodification':
+            objects=objects.order_by('mnenomic')
         return objects
         
     def constraints(self):
