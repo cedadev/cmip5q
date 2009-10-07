@@ -306,7 +306,7 @@ class ComponentParser:
             p.save()
         elif choiceType in ['keyboard']:
             defn,units='',''
-            delem=elem.find('Definition')
+            delem=elem.find('definition')
             if delem: defn=delem.text
             if 'units' in elem.attrib.keys(): units=elem.attrib['units']
             p=NewParam(name=paramName,constraint=cg,ptype=choiceType,definition=defn,units=units)
@@ -434,8 +434,8 @@ class ComponentParser:
                     component.components.add(child)
                 elif subchild.tag == 'ParameterGroup': 
                     self.__handleParamGrp(subchild)
-                elif subchild.tag == 'param':
-                    self.__handelParam(subchild)
+                elif subchild.tag == 'parameter':
+                    self.__handleParam(subchild)
                 else:
                     logging.debug('Ignoring tag %s for %s'%(subchild.tag,self.component))
    	
