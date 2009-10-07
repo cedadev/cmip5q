@@ -89,8 +89,106 @@ class tabs(list):
         if 'History' not in request.session:request.session['History']=RingBuffer(self.history_length)
         #append the path and name for later use in a link ...
         request.session['History'].append((request.path,page))
+     
+class NewPropertyForm:
+    
+    def __init__(self,component,prefix=''):
         
+        self.prefix=prefix
+        self.component=component
+        
+        # filter chaining, see
+        # http://docs.djangoproject.com/en/dev/topics/db/queries/#chaining-filters
+        
+        self.pg=ParamGroup.objects.filter(component=component)
+        
+        self.keys={}
+        
+        for pg in self.pg:
+            pg.constraintGroup=ConstraintGroup.objects.filter(parentGroup=pg)
+            for cg in pg.constraintGroup:
+                
+                params=NewParam.objects.filter(constraint=cg)
+                cg.orp=params.filter(ptype='OR')
+                cg.xorp=params.filter(ptype='XOR')
+                cg.other=params.exclude(ptype='XOR').exclude(ptype='OR')
+                cg.controlled=params.exclude(ptype='User')
+             
+                cg.rows=[]
+                cg.keys=[]
+        
+                for o in cg.orp:
+                    o.form={'op':'+='}
+                    o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+                    o.form['values'].insert(0,'------')
+                    o.key=o.id
+                    cg.rows.append(o)
+                    
+                for o in cg.xorp:
+                    o.form={'op':'='}
+                    o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+                    o.form['values'].insert(0,'------')
+                    o.key=o.id
+                    cg.rows.append(o)
             
+                for o in cg.other:
+                    o.form=None
+                    o.key=o.id
+                    cg.rows.append(o)
+            
+            
+            
+    def update(self,request):
+        ''' take an incoming form and load it into the database '''
+        qdict=request.POST
+        
+        lenprefix=len(self.prefix)
+        deleted=[]
+        
+        for key in qdict.keys():
+            # only handle those which belong here:
+            if key[0:lenprefix]==self.prefix:
+                mykey=key[lenprefix+1:]
+                myids=mykey.split('/') 
+                # four cases, new params and values, deletions, and controlled values
+                if mykey == 'newparam':
+                    if qdict[key]<>'':
+                        nvalkey='%s-newparamval'%self.prefix
+                        if nvalkey not in qdict:
+                            logging.info('New param value expected, nothing added(%s)'%qdict)
+                        else:
+                            #  assumption is that the user constraint and parameter group is the last one.
+                            new=Param(name=qdict[key],value=qdict[nvalkey],ptype='User',
+                                constraint=self.pg[-1].cg[-1])
+                            new.save()
+                elif mykey == 'newparamval':
+                    #ignore, handled above
+                    pass
+                elif mykey[0:3] == 'del':
+                    # we can only delete user defined things ...
+                    pname=mykey[4:]
+                    try:
+                        p=Param.objects.get(id=pname)
+                        p.delete()
+                        deleted.append(pname)
+                        logging.info('Deleted parameter %s from %s'%(pname,self.component))
+                    except:
+                        logging.info(
+                          'Attempt to delete parameter %s for component %s failed '%(
+                              pname,self.component))
+                else:
+                    if mykey not in self.keys:
+                        logging.info(
+                        'Unexpected key %s ignored in PropertyForm (%s)'%(
+                        mykey,self.keys))
+                    else:
+                        if mykey not in deleted:
+                            p=self.params.get(id=mykey)
+                            new.value=qdict[key]
+                            new.save()
+
+     
+        
 class PropertyForm:
     
     ''' this class instantiates the form elements needed by a component view

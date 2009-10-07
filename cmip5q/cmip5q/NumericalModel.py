@@ -85,6 +85,9 @@ class NumericalModel:
         component.save()
         self.top=component
         logging.debug('Created empty top level model %s'%component)
+        # now get a placeholder paramgroup
+        p=ParamGroup(component=component)
+        p.save()
         
     def read(self):
        
@@ -258,6 +261,71 @@ class ComponentParser:
             logging.debug("name = %s"%item.attrib['name'])
         else:
             logging.debug("[no name]")
+            
+    def __handleParamGrp(self,elem):
+        ''' Handle the parameter groups consisting of parameters and constraints '''
+        p=ParamGroup(name=elem.attrib['name'],component=self.component)
+        p.save()
+        cg=None
+        for item in elem:
+            if item.tag=='constraint':
+                self.__handleConstraint(item,p)
+            elif item.tag=='parameter':
+                cg=self.__handleNewParam(item,p,cg)
+    def __handleConstraint(self,elem,pg):
+        ''' Handle Constraints'''
+        c=ConstraintGroup(name=elem.attrib['name'],parentGroup=pg)
+        c.save()
+        for item in elem:
+            self.__handleNewParam(item,pg,c)
+            
+    def __handleNewParam(self,elem,pg,cg):
+        ''' Add new parameter to cg, if cg none, create one in pg '''
+        if cg is None:
+            cg=ConstraintGroup(name='',parentGroup=pg)
+            cg.save()
+        paramName=elem.attrib['name']
+        choiceType=elem.attrib['choice']
+        logging.debug('For %s found parameter %s with choice %s'%(self.item.attrib['name'],paramName,choiceType))
+       
+        if choiceType in ['OR','XOR']:
+            #create and load vocabulary
+            v=Vocab(uri=str(uuid.uuid1()),name=paramName+'Vocab')
+            v.save()
+            logging.debug('Created vocab %s'%v.name)
+            co,info=None,None
+            for item in elem:
+                if item.tag=='value':
+                    value=Value(vocab=v,value=item.attrib['name'])
+                    value.save()
+                elif item.tag=='definition':
+                    defn=item.text
+                else:
+                    logging.info('Found unexpected tag %s in %s'%(item.tag,paramName))
+            p=NewParam(name=paramName,constraint=cg,ptype=choiceType,vocab=v,definition=defn)
+            p.save()
+        elif choiceType in ['keyboard']:
+            defn,units='',''
+            delem=elem.find('Definition')
+            if delem: defn=delem.text
+            if 'units' in elem.attrib.keys(): units=elem.attrib['units']
+            p=NewParam(name=paramName,constraint=cg,ptype=choiceType,definition=defn,units=units)
+            p.save()
+        elif choiceType in ['couple']:
+            # we create an input requirement here and now ...
+            ci=ComponentInput(owner=self.component,abbrev=paramName,
+                              description='Required by controlled vocabulary for %s'%self.component,
+                              realm=self.component.realm)
+            ci.save()
+            #and we have to create a coupling for it too
+            cp=Coupling(component=self.component.model,targetInput=ci)
+            cp.save()
+        else:
+            logging.info('ERROR: Ignoring parameter %s'%paramName)
+            return
+        logging.info('Added component input %s for %s in %s'%(paramName,cg,pg))
+        return cg
+        
 
     def __handleParam(self,elem):
         ''' Handle parameters and add their properties to parent component '''
@@ -355,6 +423,7 @@ class ComponentParser:
             component.realm=realm
             
         if doSubs:
+            #temporary
             for subchild in self.item:
                 if subchild.tag == "component":
                     #logging.debug("Found child : %s"%subchild.tag)
@@ -363,8 +432,10 @@ class ComponentParser:
                     child=subComponentParser.add(True,realm=realm)
                     logging.debug("Adding sub-component %s to component %s (model %s, realm %s)"%(child.abbrev, component.abbrev,child.model,child.realm))
                     component.components.add(child)
-                elif subchild.tag == 'parameter': 
-                    self.__handleParam(subchild)
+                elif subchild.tag == 'ParameterGroup': 
+                    self.__handleParamGrp(subchild)
+                elif subchild.tag == 'param':
+                    self.__handelParam(subchild)
                 else:
                     logging.debug('Ignoring tag %s for %s'%(subchild.tag,self.component))
    	

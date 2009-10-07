@@ -245,6 +245,49 @@ class Value(models.Model):
     def __unicode__(self):  
         return self.value
     
+class ParamGroup(models.Model):
+    ''' This holds either constraintGroups or parameters to link to components '''
+    name=models.CharField(max_length=64,default="Attributes")
+    component=models.ForeignKey(Component)
+    def copy(self,component):
+        new=ParamGroup(name=self.name,component=component)
+        for constraint in self.constraint_set():constraint.new(new)
+    def __unicode__(self):
+        return self.name
+
+class ConstraintGroup(models.Model):
+    constraint=models.CharField(max_length=256,blank=True,null=True)
+    parentGroup=models.ForeignKey(ParamGroup)
+    def __unicode__(self):
+        if self.constraint: 
+            return self.constraint
+        else: return '' 
+    def copy(self,paramgrp):
+        new=ConstraintGroup(constraint=self.constraint,parentGroup=paramgrp)
+        for param in self.newparam_set(): param.copy(constraint)
+    
+class NewParam(models.Model):
+    ''' Holds an actual parameter '''
+    name=models.CharField(max_length=64,blank=False)
+    controlled=models.BooleanField(default=True)
+    ptype=models.SlugField(max_length=12,blank=True)
+    # lives in 
+    constraint=models.ForeignKey(ConstraintGroup)
+    # should have definition
+    definition=models.CharField(max_length=128,null=True,blank=True)
+    # Following used to point to vocabs and their values ...
+    # If a vocab is linked, then the value must be from it!
+    vocab=models.ForeignKey(Vocab,null=True,blank=True)
+    value=models.CharField(max_length=512,blank=True)
+    # but it might be a numeric parameter, in which case we have more attributes
+    units=models.CharField(max_length=128,null=True,blank=True)
+    def __unicode__(self):
+        return self.name
+    def copy(self,constraint):
+        new=Param(name=self.name,constraint=self.constraint,ptype=self.ptype,controlled=self.controlled,
+                      vocab=self.vocab,value=self.value,definition=self.definition,units=self.units)
+        new.save()
+    
 class Param(models.Model):
     ''' This is the abstract parameter class'''
     name=models.CharField(max_length=64,blank=False)
