@@ -1,0 +1,52 @@
+<!-- This template works with the NewPropertyForm from utilities.py -->
+{% for pg in pform.pg %}
+<div class="boxer">
+{% if pg.anme}} <h4> {{pg.name}}</h4> {% endif %}
+{% for cg in pg.cg %} 
+<table>
+<td>{{cg.name}}</td><td>
+<table>
+{% ifnotequal pform.rows|length 0 %} 
+<tr><th></th><th></th><th>Value</th></tr>
+{% endifnotequal %}
+{% for r in cg.rows %}
+<tr class="{% cycle 'row1' 'row2'%}">
+   <td>
+       <b>{{r.name}}</b>:&nbsp;
+       {% ifequal r.ptype 'User' %}<br/>
+       (&nbsp;Delete <input type="checkbox" name="{{pform.prefix}}-del-{{r.key}}" id="delid_{{r.key}}"/>&nbsp;) 
+        {%endifequal %}
+   </td>
+   <td>  
+       {% ifequal r.ptype 'User' %}
+       Enter freetext or numeric value:&nbsp;
+       {% endifequal %}
+       {% ifequal r.ptype 'keyboard' %}
+            {% if r.units %}
+            Enter numeric value in <em>{{r.units}}</em>:&nbsp;
+            {% else %}
+            Enter freetext or numeric value::&nbsp;
+            {% endif %}
+       {% endifequal %}   
+       {% ifnotequal r.form None %}
+            {% ifequal r.ptype 'OR' %} Choose one or more of: {% endifequal %}
+            {% ifequal r.ptype 'XOR' %} Choose one of: {% endifequal %}
+            <select name="opt_{{r.key}}" size="1" onchange="document.getElementById('id_{{r.key}}').value {{r.form.op}} this.value + '|';">
+                    {% for v in r.form.values %} <option value="{{v}}">{{v}}</option> {% endfor %}
+            </select>
+       {% endifnotequal %}
+   </td>
+   <td width="50%">
+        <input name="{{pform.prefix}}-{{r.key}}" id="id_{{r.key}}" size="50" value="{{r.value}}">
+   </td>
+</tr>
+{% endfor %}
+</table></td></table>
+<p>Enter {% ifnotequal pform.rows|length 0 %} an additional {% else %} a {% endifnotequal %} component attribute or parameter if you wish (you can enter multiple parameters by entering one at a time):</p>
+<table>
+<tr><th> Name </th><th> Value </th></tr>
+<tr>
+    <td><input name="{{pform.prefix}}-newparam" id="{{pform.prefix}}-newparam" size="20"></td>
+    <td><input name="{{pform.prefix}}-newparamval" id="{{pform.prefix}}-newparamval" size="40"></td>
+</tr>
+</table>

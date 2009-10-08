@@ -41,6 +41,7 @@ class Component(Doc):
     implemented=models.BooleanField(default=1)
     visited=models.BooleanField(default=0)
     controlled=models.BooleanField(default=0)
+    
     model=models.ForeignKey('self',blank=True,null=True,related_name="parent_model")
     realm=models.ForeignKey('self',blank=True,null=True,related_name="parent_realm")
     isRealm=models.BooleanField(default=False)
@@ -350,9 +351,9 @@ class Coupling(models.Model):
     manipulation=models.TextField(blank=True,null=True)
     def __unicode__(self):
         if self.simulation:
-            return 'Coupling %s ( for %s )'%(self.targetInput,self.simulation)
+            return 'I/O into %s ( for %s )'%(self.targetInput,self.simulation)
         else:
-            return 'Coupling %s'%self.targetInput
+            return 'I/O into %s'%self.targetInput
     def duplicate4sim(self,simulation):
         '''Make a copy of self, and associate with a simulation'''
         # first make a copy of self
@@ -661,7 +662,7 @@ class PlatformForm(forms.ModelForm):
         exclude=('centre','uri')
         
 class ConformanceForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"100",'rows':"2"}),required=False)
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False)
     class Meta:
         model=Conformance
         exclude=('simulation') # we know it

@@ -315,5 +315,17 @@ class componentHandler(object):
         
     def outputs(self):
         return HttpResponse('Not implemented')
-        
-        
+    
+    def copy(self,request):
+        ''' Make a copy for later editing. Currently restricted to model components only '''
+        # Must be a post ...
+        if request.method!='POST':
+            return HtpResponse('uknown request')
+        centre=Centre.objects.get(id=self.centre_id)
+        new=self.component.makeNewCopy(centre)
+        new.abbrev=self.component.abbrev+'cp'
+        new.title=self.component.title+'cp'
+        new.save()
+        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,new.id,))
+        logging.info('Created new model %s with id %s (copy of %s)'%(new,new.id,self.component))
+        return HttpResponseRedirect(url)

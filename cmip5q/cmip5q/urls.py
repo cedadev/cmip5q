@@ -25,7 +25,8 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Numerics/$','cmip5q.protoq.views.componentNum'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/coupling/$','cmip5q.protoq.views.componentCup'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Outputs/$','cmip5q.protoq.views.componentOut'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Inputs/$','cmip5q.protoq.views.componentInp'),   
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Inputs/$','cmip5q.protoq.views.componentInp'),
+    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/copy/$','cmip5q.protoq.views.componentCopy'),
     #
     # REFERENCES (now handled in base view)
     #          

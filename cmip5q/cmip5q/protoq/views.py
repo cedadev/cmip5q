@@ -53,6 +53,7 @@ def centre(request,centre_id):
     #monkey patch the urls to edit these ...
     for m in models:
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
+        m.cpURL=reverse('cmip5q.protoq.views.componentCopy',args=(c.id,m.id))
     platforms=[Platform.objects.get(pk=p['id']) for p in c.platform_set.values()]
     for p in platforms:
         p.url=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,p.id))
@@ -131,6 +132,10 @@ def componentOut(request,centre_id,component_id):
    ''' return outputs of a component '''
    c=componentHandler(centre_id,component_id)
    return c.outputs()
+
+def componentCopy(request,centre_id,component_id):
+   c=componentHandler(centre_id,component_id)
+   return c.copy(request)
    
 ###### REFERENCE HANDLING ######################################################
 #   
@@ -386,7 +391,7 @@ class ViewHandler(BaseViewHandler):
         elif self.resource['type']=='file':
             objects=objects.order_by('name')
         elif self.resource['type']=='codemodification':
-            objects=objects.order_by('mnenomic')
+            objects=objects.order_by('mnemonic')
         return objects
         
     def constraints(self):

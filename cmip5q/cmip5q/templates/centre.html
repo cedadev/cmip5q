@@ -35,21 +35,25 @@ conformed to the numerical requirements of the experiment via the <em> conforman
     <div  class="boxer">
     <table width="100%">
         <thead>
-            <tr><th colspan="3"> Models associated with {{centre.abbrev}}</th></tr>
-            <tr><th colspan="2"></th> <th width=30%> Status </th>
+            <tr><th colspan="4"> Models associated with {{centre.abbrev}}</th></tr>
+            <tr><th colspan="3"></th> <th width=20%> Status </th>
         </thead>
         <tbody> 
         {% for m in models %}
-        <tr class="{% cycle 'row2' 'row1'%}"><td width="50%">{{m.abbrev}}</td>
-        <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a>
+        <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="45%">{{m.abbrev}}</td>
+            <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></td>
+            <td>
+             <form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+            <td><p class="cmip5q">placeholder</p></td>
+        </tr>
         <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");
+            var oSubButtom{{forloop.counter}}= new YAHOO.widget.Button("copySubmit{{forloop.counter}}",
+                  {value:"copySubmit{{forloop.counter}}value"});
         </script>    
-        </td><td>
-        <p class="cmip5q">placeholder</p>
-        </td></tr>
         {% endfor %} 
-        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="2">It can take some time to create a new model from the CMIP5 template ... be patient!</td></tr>
+        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="3">It can take some time (minutes) to create a new model or copy an existing one ... be patient!</td></tr>
         <tbody>
     </table>
    
