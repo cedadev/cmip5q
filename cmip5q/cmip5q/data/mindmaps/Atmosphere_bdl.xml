@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r557 (mariepierre, 2009-06-09) of Atmosphere.mm" defnversion="">
+  <component name="Atmosphere">
+    <definition status="missing">Definition of component type Atmosphere required</definition>
+    <parametergroup name="Atmosphere_Attributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyProperties_Attributes">
+        <parameter name="ModelFamily" choice="XOR">
+          <definition status="missing">Definition of property name ModelFamily required</definition>
+          <value name="AGCM"/>
+          <value name="ARCM"/>
+        </parameter>
+        <parameter name="BasicApproximations" choice="OR">
+          <definition status="missing">Definition of property name BasicApproximations required</definition>
+          <value name="Primitive Equations"/>
+          <value name="Non-Hydrostatic"/>
+          <value name="Anelastic"/>
+          <value name="Boussinesq"/>
+          <value name="Deep-atmosphere"/>
+          <value name="Shallow-atmosphere"/>
+          <value name="Hydrostatic"/>
+          <value name="Quasi-Hydrostatic"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <component name="GeographicalConfiguration">
+        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
+        <parametergroup name="GeographicalConfiguration_Attributes">
+          <parameter name="Orography" choice="keyboard">
+            <definition status="missing">Definition of property name Orography required</definition>
+            <value format="string" name="characteritics of the orography"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="HorizontalDomain">
+          <parameter name="Grid configuration" choice="XOR">
+            <definition status="missing">Definition of property name Grid configuration required</definition>
+            <value name="latitude-longitude retangular"/>
+            <value name="latitude-longitude"/>
+            <value name="reduced gaussian"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="MeridionalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name MeridionalExtent required</definition>
+            <value format="numerical" name="lat_min, lat_max" units="degN"/>
+          </parameter>
+          <parameter name="ZonalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name ZonalExtent required</definition>
+            <value format="numerical" name="lon_min, lon_max" units="degE"/>
+          </parameter>
+          <parameter name="Resolution" choice="keyboard">
+            <definition status="missing">Definition of property name Resolution required</definition>
+            <value format="string" name="horizontal resolution"/>
+          </parameter>
+          <parameter name="PoleSingularityTreatment" choice="XOR">
+            <definition status="missing">Definition of property name PoleSingularityTreatment required</definition>
+            <value name="filter"/>
+            <value name="pole rotation"/>
+            <value name="artificial island"/>
+            <value name="none"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="VerticalDomain">
+          <parameter name="VerticalCoordinateSystem" choice="XOR">
+            <definition status="missing">Definition of property name VerticalCoordinateSystem required</definition>
+            <value name="Fixed Pressure Surfaces"/>
+            <value name="Pressure Height"/>
+            <value name="Geometric Height"/>
+            <value name="Hybrid sigma-pressure layers"/>
+            <value name="Hybrid floating Lagrangian"/>
+            <value name="isentropic"/>
+            <value name="Sigma"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="NumberOfVerticalLevels" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfVerticalLevels required</definition>
+            <value format="numerical" name="number of vertical levels"/>
+          </parameter>
+          <parameter name="TopModelLevel" choice="keyboard">
+            <definition status="missing">Definition of property name TopModelLevel required</definition>
+            <value format="numerical" name="level at top of the model"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="DynamicalCore">
+      <definition status="missing">Definition of component type DynamicalCore required</definition>
+      <parametergroup name="DynamicalCore_Attributes">
+        <parameter name="TimeSteppingFramework" choice="XOR">
+          <definition status="missing">Definition of property name TimeSteppingFramework required</definition>
+          <value name="Adam Bashford"/>
+          <value name="Explicit"/>
+          <value name="Implicit"/>
+          <value name="Semi-Implicit"/>
+          <value name="LeapFrog"/>
+          <value name="Multi-step"/>
+          <value name="Runge Kutta fifth order"/>
+          <value name="Runge Kutta second order"/>
+          <value name="Runge Kutta third order"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="TimeStep" choice="keyboard">
+          <definition status="missing">Definition of property name TimeStep required</definition>
+          <value format="numerical" name="time step" units="time units"/>
+        </parameter>
+        <parameter name="ListOfPrognosticVariables" choice="OR">
+          <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
+          <value name="surface pressure"/>
+          <value name="wind components"/>
+          <value name="divergence/curl"/>
+          <value name="temperature"/>
+          <value name="potential temperature"/>
+          <value name="total water"/>
+          <value name="vapor/solid/liquid"/>
+          <value name="total water moments"/>
+          <value name="clouds"/>
+          <value name="radiation"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="TopBoundaryCondition" choice="XOR">
+          <definition status="missing">Definition of property name TopBoundaryCondition required</definition>
+          <value name="sponge layer"/>
+          <value name="radiation boundary condition"/>
+          <value name="other "/>
+        </parameter>
+        <parameter name="LateralBoundaryCondition" choice="XOR">
+          <definition status="missing">Definition of property name LateralBoundaryCondition required</definition>
+          <value name="sponge layer"/>
+          <value name="radiation boundary condition"/>
+          <value name="none"/>
+          <value name="other "/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="HorizontalDiscretization">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="spectral"/>
+          <value name="fixed grid"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if SchemeType is &quot;spectral&quot;">
+          <parameter name="SpectralTruncatureNumber" choice="keyboard">
+            <definition status="missing">Definition of property name SpectralTruncatureNumber required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </constraint>
+        <constraint name="if SchemeType is &quot;fixed grid&quot;">
+          <parameter name="NumberOfZonalGridBoxes" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfZonalGridBoxes required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="NumberOfMeridionalGridBoxes" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfMeridionalGridBoxes required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="finite elements"/>
+            <value name="finite volumes"/>
+            <value name="finite differences"/>
+            <value name="centered finite differences"/>
+          </parameter>
+        </constraint>
+        <constraint name="if Method is &quot;finite differences&quot; or &quot;centered finite differences&quot;">
+          <parameter name="Order" choice="keyboard">
+            <definition status="missing">Definition of property name Order required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="AtmosHorizontalDiffusion">
+        <parameter name="SchemeName" choice="XOR">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="Iterated Laplacian"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <component name="Advection">
+        <definition status="missing">Definition of component type Advection required</definition>
+        <parametergroup name="Advection_Attributes"/>
+        <parametergroup name="Tracers">
+          <parameter name="SchemeName" choice="XOR">
+            <definition status="missing">Definition of property name SchemeName required</definition>
+            <value name="Prather"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="Eulerian"/>
+            <value name="Lagrangian"/>
+            <value name="Semi-lagrangian"/>
+            <value name="Mass-conserving"/>
+            <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="ConservedQuantities" choice="OR">
+            <definition status="missing">Definition of property name ConservedQuantities required</definition>
+            <value name="other"/>
+          </parameter>
+          <parameter name="ConservationMethod" choice="OR">
+            <definition status="missing">Definition of property name ConservationMethod required</definition>
+            <value name="conservation fixer"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Momentum">
+          <parameter name="SchemeName" choice="XOR">
+            <definition status="missing">Definition of property name SchemeName required</definition>
+            <value name="other"/>
+          </parameter>
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="Eulerian"/>
+            <value name="Lagrangian"/>
+            <value name="Semi-lagrangian"/>
+            <value name="Mass-conserving"/>
+            <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="ConservedQuantities" choice="OR">
+            <definition status="missing">Definition of property name ConservedQuantities required</definition>
+            <value name="other"/>
+          </parameter>
+          <parameter name="ConservationMethod" choice="OR">
+            <definition status="missing">Definition of property name ConservationMethod required</definition>
+            <value name="conservation fixer"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="Radiation">
+      <definition status="missing">Definition of component type Radiation required</definition>
+      <parametergroup name="Radiation_Attributes">
+        <parameter name="TimeStep " choice="keyboard">
+          <definition status="missing">Definition of property name TimeStep  required</definition>
+          <value format="numerical" name="time step" units="time units"/>
+        </parameter>
+        <parameter name="AerosolTypes" choice="OR">
+          <definition status="missing">Definition of property name AerosolTypes required</definition>
+          <value name="Continental"/>
+          <value name="Urban"/>
+          <value name="Oceanic"/>
+          <value name="Desertic"/>
+          <value name="Sulphate"/>
+          <value name="Sea Salt"/>
+          <value name="Soot"/>
+          <value name="Biomass"/>
+          <value name="Soil Dust"/>
+          <value name="NAT"/>
+          <value name="Polar Stratospheric Ice"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="GHG-Types" choice="OR">
+          <definition status="missing">Definition of property name GHG-Types required</definition>
+          <value name="CO2"/>
+          <value name="CH4"/>
+          <value name="N2O"/>
+          <value name="CFC"/>
+          <value name="H2O"/>
+          <value name="O3"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Longwave">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Wide-band model"/>
+          <value name="Wide-band (Morcrette)"/>
+          <value name="K-correlated"/>
+          <value name="K-correlated (RRTM)"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="Two stream"/>
+          <value name="Layer interaction"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="NumberOfSpectralIntervals" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfSpectralIntervals required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Shortwave">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Wide-band model"/>
+          <value name="Wide-band model (Foucquart)"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="NumberOfSpectralIntervals" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfSpectralIntervals required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="CloudRadiativeProperties">
+        <parameter name="ice" choice="keyboard">
+          <definition status="missing">Definition of property name ice required</definition>
+          <value format="string" name="characteritics of ice radiative properties"/>
+        </parameter>
+        <parameter name="liquid" choice="keyboard">
+          <definition status="missing">Definition of property name liquid required</definition>
+          <value format="string" name="characteritics of liquid water radiative properties"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="TurbulenceConvectionCloud">
+      <definition status="missing">Definition of component type TurbulenceConvectionCloud required</definition>
+      <parametergroup name="TurbulenceConvectionCloud_Attributes"/>
+      <parametergroup name="BoundaryLayerTurbulence">
+        <parameter name="SchemeName" choice="XOR">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value name="Mellor-Yamada"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if SchemeName is &quot;Mellor-Yamada&quot;">
+          <parameter name="ClosureOrder" choice="keyboard">
+            <definition status="missing">Definition of property name ClosureOrder required</definition>
+            <value format="numerical" name="N.x"/>
+          </parameter>
+        </constraint>
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="TKE prognostic"/>
+          <value name="TKE diagnostic"/>
+          <value name="TKE coupled with water"/>
+          <value name=" Vertical profile of Kz"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="CounterGradient" choice="XOR">
+          <definition status="missing">Definition of property name CounterGradient required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="DeepConvection">
+        <parameter name="SchemeName" choice="XOR">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Mass-flux"/>
+          <value name="Adjustment"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if SchemeType is &quot;Mass-flux&quot;">
+          <parameter name="Method" choice="OR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="Mass flux determined by CAPE"/>
+            <value name="Bulk mass flux scheme"/>
+          </parameter>
+        </constraint>
+        <parameter name="Properties" choice="OR">
+          <definition status="missing">Definition of property name Properties required</definition>
+          <value name="vertical momentum transport"/>
+          <value name="convective momentum transport (CMT)"/>
+          <value name="penetrative convection effects included"/>
+          <value name="representation of updrafts and downdrafts"/>
+          <value name="radiative effects of anvils"/>
+          <value name="entrainment"/>
+          <value name="detrainment"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="ShallowConvection">
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="same as deep (unified)"/>
+          <value name="included in Boundary Layer Turbulence"/>
+          <value name="separated"/>
+        </parameter>
+        <constraint name="if Method is &quot;separated&quot;">
+          <parameter name="SchemeName" choice="XOR">
+            <definition status="missing">Definition of property name SchemeName required</definition>
+            <value name="other"/>
+          </parameter>
+          <parameter name="Scheme" choice="XOR">
+            <definition status="missing">Definition of property name Scheme required</definition>
+            <value name="none"/>
+            <value name="Mass-flux"/>
+            <value name="other"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="MidLevelConvection">
+        <parameter name="SchemeName" choice="XOR">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Mass-flux"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <component name="CloudScheme">
+        <definition status="missing">Definition of component type CloudScheme required</definition>
+        <parametergroup name="CloudScheme_Attributes">
+          <parameter name="SeparatedCloudTreatment" choice="XOR">
+            <definition status="missing">Definition of property name SeparatedCloudTreatment required</definition>
+            <value name="yes (convective+stratiform+boundary layer)"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="CloudOverlap" choice="XOR">
+            <definition status="missing">Definition of property name CloudOverlap required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="Properties" choice="OR">
+            <definition status="missing">Definition of property name Properties required</definition>
+            <value name="cloud area fraction"/>
+            <value name="bulk cloud value"/>
+            <value name="entrainment"/>
+            <value name="detrainment"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="SubGridScaleWaterDistribution">
+          <parameter name="Type" choice="XOR">
+            <definition status="missing">Definition of property name Type required</definition>
+            <value name="prognostic"/>
+            <value name="diagnostic"/>
+          </parameter>
+          <parameter name="NameOfDistributionFunction" choice="keyboard">
+            <definition status="missing">Definition of property name NameOfDistributionFunction required</definition>
+            <value format="string" name=""/>
+          </parameter>
+          <parameter name="OrdersOfDistributionFunction" choice="keyboard">
+            <definition status="missing">Definition of property name OrdersOfDistributionFunction required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Properties" choice="XOR">
+            <definition status="missing">Definition of property name Properties required</definition>
+            <value name="coupled with deep convection"/>
+            <value name="coupled with shallow convection"/>
+            <value name="not coupled with convection"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <parametergroup name="LargeScalePrecipitation">
+        <parameter name="SchemeName" choice="keyboard">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value format="string" name="name of the large scale precipitation parametrization scheme"/>
+        </parameter>
+        <parameter name="PrecipitatingHydrometeors" choice="OR">
+          <definition status="missing">Definition of property name PrecipitatingHydrometeors required</definition>
+          <value name="liquid rain"/>
+          <value name="snow"/>
+          <value name="hail"/>
+          <value name="graupel"/>
+          <value name="cats &amp; dogs"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Microphysics">
+        <parameter name="SchemeName" choice="keyboard">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value format="string" name="name of the microphysics parametrization scheme"/>
+        </parameter>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
+          <value name="mixed phase"/>
+          <value name="cloud droplets"/>
+          <value name="cloud ice"/>
+          <value name="ice nucleation"/>
+          <value name="water vapour deposition"/>
+          <value name="raindrops"/>
+          <value name="snow"/>
+          <value name="graupel"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="OrographyAndWaves">
+      <definition status="missing">Definition of component type OrographyAndWaves required</definition>
+      <parametergroup name="OrographyAndWaves_Attributes">
+        <parameter name="SpongeLayer" choice="keyboard">
+          <definition status="missing">Definition of property name SpongeLayer required</definition>
+          <value format="string" name="characteristics of the sponge layer"/>
+        </parameter>
+        <parameter name="Background" choice="XOR">
+          <definition status="missing">Definition of property name Background required</definition>
+          <value name="none"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SubGridScaleOrography" choice="OR">
+          <definition status="missing">Definition of property name SubGridScaleOrography required</definition>
+          <value name="drag"/>
+          <value name="lifting"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="OrographicGravityWaves">
+        <parameter name="SourceMechanisms" choice="OR">
+          <definition status="missing">Definition of property name SourceMechanisms required</definition>
+          <value name="Linear mountain waves"/>
+          <value name="Hydraulic jump"/>
+          <value name="Envelope orography"/>
+          <value name="Statistical sub-grid scale variance"/>
+          <value name="Non-Linear calculation"/>
+          <value name="more than two cardinal directions"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="PropagationScheme" choice="XOR">
+          <definition status="missing">Definition of property name PropagationScheme required</definition>
+          <value name="Linear theory"/>
+          <value name="Non-Linear theory"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="DissipationScheme" choice="XOR">
+          <definition status="missing">Definition of property name DissipationScheme required</definition>
+          <value name="Total wave"/>
+          <value name="Single Wave"/>
+          <value name="Spectral"/>
+          <value name="Linear"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="ConvectiveGravityWaves">
+        <parameter name="PropagationScheme" choice="XOR">
+          <definition status="missing">Definition of property name PropagationScheme required</definition>
+          <value name="Linear theory"/>
+          <value name="Non-Linear theory"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="DissipationScheme" choice="XOR">
+          <definition status="missing">Definition of property name DissipationScheme required</definition>
+          <value name="Total Wave"/>
+          <value name="Single Wave"/>
+          <value name="Spectral"/>
+          <value name="Linear"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Non-OrographicGravityWaves">
+        <parameter name="SourceMechanisms" choice="OR">
+          <definition status="missing">Definition of property name SourceMechanisms required</definition>
+          <value name="Convection"/>
+          <value name="Precipitation"/>
+          <value name="Background spectrum"/>
+          <value name="Spatially dependent"/>
+          <value name="Temporally dependent"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="PropagationScheme" choice="XOR">
+          <definition status="missing">Definition of property name PropagationScheme required</definition>
+          <value name="Linear theory"/>
+          <value name="Non-Linear theory"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="DissipationScheme" choice="XOR">
+          <definition status="missing">Definition of property name DissipationScheme required</definition>
+          <value name="Total Wave"/>
+          <value name="Single Wave"/>
+          <value name="Spectral"/>
+          <value name="Linear"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+  </component>
+</vocab>
