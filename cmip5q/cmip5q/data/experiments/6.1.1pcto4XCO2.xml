@@ -88,5 +88,18 @@
     <documentID xsi:type="Identifier">
         6.1_1pctCo2
     </documentID> 
-    
+    <!-- 
+    <documentGenealogy type="Genealogy">
+        <relationship>
+            <DocumentRelationship type="DocumentRelationship">
+                <target>
+                    <documentID>CMIP3.09.1pct4Xco2</documentID>
+                    <description>CMIP3 Experiment_09: 1% per year increase in CO2 to quadrupling</description>
+                </target>
+                <DocumentRelationshipType>previousRealisation</DocumentRelationshipType>
+            </DocumentRelationship>
+        </relationship>
+        <description>Effectively the same as CMIP3 Experiment09_1pctCO2IncreaseToQuadrupling</description>
+    </documentGenealogy> 
+    -->    
 </numericalExperiment>
