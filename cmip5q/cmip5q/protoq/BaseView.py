@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from cmip5q.protoq.utilities import tabs
 from django.http import HttpResponse,HttpResponseRedirect
+from cmip5q.protoq.utilities import sublist
 import logging
 
 class BaseViewHandler:
@@ -79,13 +80,15 @@ class BaseViewHandler:
                 # monkey patch an edit URL into the object, saying come back here (list)
                 args=(self.cid,self.resource['type'],o.id,'list',)
                 o.editURL=reverse('cmip5q.protoq.views.edit',args=args)
-                o.delURL=reverse('cmip5q.protoq.views.delete',args=args)
-            
+                if o.centre==self.centre:
+                    o.delURL=reverse('cmip5q.protoq.views.delete',args=args)
+                else:
+                    o.delURL=None
         # we pass a form and formURL for a new instance to be created.
         # we're doing all this because we think we have too many entities to use a formset
         
         return render_to_response(self.listHTML,{
-                'objects':objects,
+                'objects':sublist(objects,3),
                 'tabs':tabs(request,self.cid,self.resource['tab']),
                 'form':self._constructForm('GET'),
                 'editURL':formURL,
@@ -154,9 +157,11 @@ class BaseViewHandler:
         if request.method=='POST':
             if self.resource['id']<>'0':
                 instance=self.resource['class'].objects.get(id=self.resource['id'])
-                instance.delete()
-                return HttpResponseRedirect(okURL)
-            
+                if instance.centre==self.centre: 
+                    instance.delete()
+                    return HttpResponseRedirect(okURL)
+                else:
+                    return HttpResponse("Invalid")
         #all other cases are invalid
         return HttpResponse('Invalid')
         

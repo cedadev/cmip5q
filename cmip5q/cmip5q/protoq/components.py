@@ -7,7 +7,7 @@ from django.forms.models import modelformset_factory
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import PropertyForm,tabs
+from cmip5q.protoq.utilities import PropertyForm,tabs,NewPropertyForm
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
@@ -21,6 +21,8 @@ import os
 from lxml import etree as ET
 
 import tempfile
+
+NEWMINDMAPS=1
 
 ComponentInputFormSet=modelformset_factory(ComponentInput,form=ComponentInputForm,exclude=('owner','realm'),can_delete=True)
             
@@ -98,6 +100,8 @@ class componentHandler(object):
         ''' Provides a form to edit a component, and handle the posting of a form
         containing edits for a component '''
         
+        if NEWMINDMAPS: PropertyForm=NewPropertyForm
+        
         c=self.component
         logging.debug('Starting editing component %s'%c.id)
         
@@ -123,6 +127,7 @@ class componentHandler(object):
         inps=ComponentInput.objects.filter(owner__id=c.id)
         
         pform=PropertyForm(c,prefix='props')
+        
         postOK=True
         if request.method=="POST":
             cform=ComponentForm(request.POST,prefix='gen',instance=c)
@@ -162,7 +167,14 @@ class componentHandler(object):
                              'nec':len(ExternalClosure.objects.filter(coupling=i)),
                              } for i in cs]
         else: cset=[]
-    
+        
+        if NEWMINDMAPS: 
+            for p in pform.pgset: 
+                print 'PARAMGROUP',p
+                for cg in p.cgset:
+                    print cg
+                    for r in cg.rows: print r
+        
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
                 {'c':c,'refs':refs,'inps':inps,
@@ -320,7 +332,8 @@ class componentHandler(object):
         ''' Make a copy for later editing. Currently restricted to model components only '''
         # Must be a post ...
         if request.method!='POST':
-            return HtpResponse('uknown request')
+            return HttpResponse('uknown request')
+        if not self.component.isModel: return HttpResponse("Not a model, wont copy")
         centre=Centre.objects.get(id=self.centre_id)
         new=self.component.makeNewCopy(centre)
         new.abbrev=self.component.abbrev+'cp'

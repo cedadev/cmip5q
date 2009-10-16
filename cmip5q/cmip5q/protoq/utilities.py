@@ -99,44 +99,36 @@ class NewPropertyForm:
         
         # filter chaining, see
         # http://docs.djangoproject.com/en/dev/topics/db/queries/#chaining-filters
-        
-        self.pg=ParamGroup.objects.filter(component=component)
-        
+        pgset=self.component.paramgroup_set.all()
         self.keys={}
-        
-        for pg in self.pg:
-            pg.constraintGroup=ConstraintGroup.objects.filter(parentGroup=pg)
-            for cg in pg.constraintGroup:
-                
-                params=NewParam.objects.filter(constraint=cg)
+        self.pgset=[]
+        for pg in pgset:
+            pg.cgset=[]            
+            for cg in pg.constraintgroup_set.all():
+                params=cg.newparam_set.all()
                 cg.orp=params.filter(ptype='OR')
                 cg.xorp=params.filter(ptype='XOR')
                 cg.other=params.exclude(ptype='XOR').exclude(ptype='OR')
                 cg.controlled=params.exclude(ptype='User')
-             
                 cg.rows=[]
-                cg.keys=[]
-        
                 for o in cg.orp:
                     o.form={'op':'+='}
                     o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
                     o.form['values'].insert(0,'------')
                     o.key=o.id
                     cg.rows.append(o)
-                    
                 for o in cg.xorp:
                     o.form={'op':'='}
                     o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
                     o.form['values'].insert(0,'------')
                     o.key=o.id
                     cg.rows.append(o)
-            
                 for o in cg.other:
                     o.form=None
                     o.key=o.id
                     cg.rows.append(o)
-            
-            
+                pg.cgset.append(cg)
+            self.pgset.append(pg)
             
     def update(self,request):
         ''' take an incoming form and load it into the database '''
@@ -151,41 +143,42 @@ class NewPropertyForm:
                 mykey=key[lenprefix+1:]
                 myids=mykey.split('/') 
                 # four cases, new params and values, deletions, and controlled values
-                if mykey == 'newparam':
+                if 'newparamval' in mykey:
+                    #ignore, handled below
+                    pass
+                elif 'newparam' in mykey:
+                    id=mykey[0:mykey.find('newparam')-1]
+                    name=qdict[key]
                     if qdict[key]<>'':
-                        nvalkey='%s-newparamval'%self.prefix
+                        nvalkey='%s-%s-newparamval'%(self.prefix,id)
                         if nvalkey not in qdict:
                             logging.info('New param value expected, nothing added(%s)'%qdict)
                         else:
-                            #  assumption is that the user constraint and parameter group is the last one.
-                            new=Param(name=qdict[key],value=qdict[nvalkey],ptype='User',
-                                constraint=self.pg[-1].cg[-1])
-                            new.save()
-                elif mykey == 'newparamval':
-                    #ignore, handled above
-                    pass
+                            try:
+                                cg=ConstraintGroup.objects.get(id=id)
+                                new=NewParam(name=name,value=qdict[nvalkey],ptype='User',constraint=cg)
+                                new.save()
+                            except:
+                                logging.info('Unable to load new parameter %s into %s'%(name,id))
                 elif mykey[0:3] == 'del':
                     # we can only delete user defined things ...
-                    pname=mykey[4:]
+                    id=mykey[4:]
                     try:
-                        p=Param.objects.get(id=pname)
+                        p=NewParam.objects.get(id=id)
                         p.delete()
-                        deleted.append(pname)
-                        logging.info('Deleted parameter %s from %s'%(pname,self.component))
+                        deleted.append(id)
+                        logging.info('Deleted parameter %s from %s'%(id,self.component))
                     except:
                         logging.info(
-                          'Attempt to delete parameter %s for component %s failed '%(
-                              pname,self.component))
+                          'Attempt to delete parameter %s for component %s failed '%(id,self.component))
                 else:
-                    if mykey not in self.keys:
-                        logging.info(
-                        'Unexpected key %s ignored in PropertyForm (%s)'%(
-                        mykey,self.keys))
-                    else:
-                        if mykey not in deleted:
-                            p=self.params.get(id=mykey)
-                            new.value=qdict[key]
-                            new.save()
+                    if mykey not in deleted:
+                        try:
+                            p=NewParam.objects.get(id=mykey)
+                            p.value=qdict[key]
+                            p.save()
+                        except:
+                            logging.info('Unable to load (new)parameter value for %s (val %s)'%(mykey,qdict[key]))
 
      
         

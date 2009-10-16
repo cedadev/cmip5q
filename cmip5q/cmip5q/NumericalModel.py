@@ -274,7 +274,7 @@ class ComponentParser:
                 cg=self.__handleNewParam(item,p,cg)
     def __handleConstraint(self,elem,pg):
         ''' Handle Constraints'''
-        c=ConstraintGroup(name=elem.attrib['name'],parentGroup=pg)
+        c=ConstraintGroup(constraint=elem.attrib['name'],parentGroup=pg)
         c.save()
         for item in elem:
             self.__handleNewParam(item,pg,c)
@@ -282,7 +282,7 @@ class ComponentParser:
     def __handleNewParam(self,elem,pg,cg):
         ''' Add new parameter to cg, if cg none, create one in pg '''
         if cg is None:
-            cg=ConstraintGroup(name='',parentGroup=pg)
+            cg=ConstraintGroup(constraint='',parentGroup=pg)
             cg.save()
         paramName=elem.attrib['name']
         choiceType=elem.attrib['choice']
@@ -432,9 +432,10 @@ class ComponentParser:
                     child=subComponentParser.add(True,realm=realm)
                     logging.debug("Adding sub-component %s to component %s (model %s, realm %s)"%(child.abbrev, component.abbrev,child.model,child.realm))
                     component.components.add(child)
-                elif subchild.tag == 'ParameterGroup': 
+                elif subchild.tag == 'parametergroup': 
                     self.__handleParamGrp(subchild)
                 elif subchild.tag == 'parameter':
+                    print logging.info('OOOOOOOPPPPPPs')
                     self.__handleParam(subchild)
                 else:
                     logging.debug('Ignoring tag %s for %s'%(subchild.tag,self.component))

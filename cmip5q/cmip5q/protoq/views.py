@@ -385,12 +385,16 @@ class ViewHandler(BaseViewHandler):
             constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
             objects=objects.filter(component__in=constraintSet)
         if self.resource['type']=='reference':
+            # show all the references, why not ...
             objects=objects.order_by('name')
         elif self.resource['type']=='initialcondition':
+            objects=objects.filter(centre=self.centre)
             objects=objects.order_by('date')
         elif self.resource['type']=='file':
+            objects=objects.filter(centre__in=[None,self.centre])
             objects=objects.order_by('name')
         elif self.resource['type']=='codemodification':
+            objects=objects.filter(centre=self.centre)
             objects=objects.order_by('mnemonic')
         return objects
         

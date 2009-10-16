@@ -8,10 +8,12 @@ from django.core.urlresolvers import reverse
 import uuid
 import logging
 
+NEWMINDMAPS=1
+
 class Doc(models.Model):
     ''' Abstract class for general properties '''
     title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.CharField(max_length=20)
+    abbrev=models.CharField(max_length=25)
     email=models.EmailField(blank=True)
     contact=models.CharField(max_length=128,blank=True,null=True)
     description=models.TextField(blank=True,null=True)
@@ -106,8 +108,12 @@ class Component(Doc):
             logging.debug('Added new component %s to component %s (in model %s with realm %s)'%(r,new,model,realm))
             
         #### Now we need to deal with the parameter settings too ..
-        pset=Param.objects.filter(component=self)
-        for p in pset: p.makeNewCopy(new)
+        if NEWMINDMAPS:
+            pset=ParamGroup.objects.filter(component=self)
+            for p in pset: p.copy(new)
+        else:
+            pset=Param.objects.filter(component=self)
+            for p in pset: p.makeNewCopy(new)
         
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
@@ -250,9 +256,10 @@ class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
     component=models.ForeignKey(Component)
-    def copy(self,component):
-        new=ParamGroup(name=self.name,component=component)
-        for constraint in self.constraint_set():constraint.new(new)
+    def copy(self,newComponent):
+        new=ParamGroup(name=self.name,component=newComponent)
+        new.save()
+        for constraint in self.constraintgroup_set.all():constraint.copy(new)
     def __unicode__(self):
         return self.name
 
@@ -265,7 +272,8 @@ class ConstraintGroup(models.Model):
         else: return '' 
     def copy(self,paramgrp):
         new=ConstraintGroup(constraint=self.constraint,parentGroup=paramgrp)
-        for param in self.newparam_set(): param.copy(constraint)
+        new.save()
+        for param in self.newparam_set.all(): param.copy(new)
     
 class NewParam(models.Model):
     ''' Holds an actual parameter '''
@@ -285,7 +293,7 @@ class NewParam(models.Model):
     def __unicode__(self):
         return self.name
     def copy(self,constraint):
-        new=Param(name=self.name,constraint=self.constraint,ptype=self.ptype,controlled=self.controlled,
+        new=NewParam(name=self.name,constraint=constraint,ptype=self.ptype,controlled=self.controlled,
                       vocab=self.vocab,value=self.value,definition=self.definition,units=self.units)
         new.save()
     
@@ -413,6 +421,7 @@ class InitialCondition(models.Model):
     #in the archive, so we don't need to ask for them. If we know their
     #CF name, then we know them.
     variables=models.TextField(blank=True,null=True)
+    centre=models.ForeignKey(Centre)
     def __unicode__(self):
         return 'IC%s-%s'%(self.id,self.date)
          
@@ -420,6 +429,7 @@ class CodeModification(models.Model):
     mnemonic=models.SlugField()
     component=models.ForeignKey(Component)
     description=models.TextField()
+    centre=models.ForeignKey(Centre)
     #we could try and get to the parameter values as well ...
     def __unicode__(self):
         return "%s (%s)"%(self.mnemonic,self.component)
@@ -480,12 +490,26 @@ class CodeModificationForm(forms.ModelForm):
         model=CodeModification
     def specialise(self,model):
         self.fields['component'].queryset=Component.objects.filter(model=model)
-    
+    def __init__(self,*args,**kwargs):  
+        forms.ModelForm.__init__(self)
+        self.hostCentre=None
+    def save(self):
+        o=forms.ModelForm.save(self,commit=False)
+        o.centre=self.hostCentre
+        o.save()
+        
 class InitialConditionForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
     variables=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
     class Meta:
         model=InitialCondition
+    def __init__(self,*args,**kwargs):  
+        forms.ModelForm.__init__(self)
+        self.hostCentre=None
+    def save(self):
+        o=forms.ModelForm.save(self,commit=False)
+        o.centre=self.hostCentre
+        o.save()
         
 class BoundaryConditionForm(forms.ModelForm):
     ''' Simulation boundary condition form '''
