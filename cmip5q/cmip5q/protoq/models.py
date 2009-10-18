@@ -79,6 +79,8 @@ class Component(Doc):
         for i in attrs: kwargs[i]=self.__getattribute__(i)
         if email:kwargs['email']=email
         if contact: kwargs['contact']=contact
+        kwargs['title']=kwargs['title']+'dup'
+        kwargs['abbrev']=kwargs['abbrev']+'dup'
         kwargs['uri']=str(uuid.uuid1())
         kwargs['centre']=centre
         
@@ -230,6 +232,25 @@ class Simulation(Doc):
         for m in modelCouplings:
             if m not in myOriginals: 
                 r=m.duplicate4sim(self)
+
+    def copy(self,experiment):
+        ''' Copy this simulation into a new experiment '''
+        s=Simulation(abbrev=self.abbrev+'_copy',title='copy', 
+                     email=self.email, contact=self.contact, description='COPY',
+                     uri=str(uuid.uuid1()),
+                     experiment=experiment,numericalModel=self.numericalModel,
+                     ensembleMembers=1, platform=self.platform, centre=self.centre,
+                     initialCondition=self.initialCondition)
+        s.save()
+        #now we need to get all the other stuff related to this simulation
+        #couplings:
+        myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
+        for m in myCouplings:
+            r=m.duplicate4sim(s)
+        # conformance:
+        # we can't duplicate that, since we don't know the conformance are the same unless we 
+        # have a mapping page somewhere ... 
+        return s
 
 class Centre(Doc):
     ''' A CMIP5 modelling centre '''
@@ -703,8 +724,6 @@ class ComponentInputForm(forms.ModelForm):
     class Meta:
         model=ComponentInput
     exclude=('owner','realm') # we know these
-    
-    
     
     
         

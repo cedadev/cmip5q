@@ -176,6 +176,10 @@ def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)
 
+def simulationCopy(request,centre_id):
+    s=simulationHandler(centre_id)
+    return s.copy(request)
+
 def conformanceMain(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simulation_id)
     return s.conformanceMain(request)

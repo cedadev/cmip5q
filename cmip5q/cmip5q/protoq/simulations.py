@@ -17,6 +17,7 @@ ConformanceFormSet=modelformset_factory(Conformance,
                                         form=ConformanceForm,
                                         exclude=('simulation','requirement','ctype'))
 
+
 class MyConformanceFormSet(ConformanceFormSet):
     ''' Mimics the function of a formset for the situation where we want to edit the
     known conformances '''
@@ -173,16 +174,17 @@ class simulationHandler(object):
                 self.id=id
                 self.new=reverse('cmip5q.protoq.views.simulationAdd',args=(c.id,id,))
                 
-        for e in Experiment.objects.all():
-            sims=[s for s in e.simulation_set.filter(centre=c.id)]
-            for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))
+        csims=Simulation.objects.filter(centre=c)
+        cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
+
+        eset=Experiment.objects.all()
+        for e in eset:
+            sims=e.simulation_set.filter(centre=c.id)
+            for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))    
             exp.append(etmp(e.longName,sims,e.id))
-            print 'loading experiment %s (%s)'%(e.id,e.docID)
-        
-        logging.info('Viewing simulation %s'%c.id)
-        
+
         return render_to_response('simulationList.html',
-            {'c':c,'experiments':exp,
+            {'c':c,'experiments':exp,'csims':csims,'cpurl':cpurl,
             'tabs':tabs(request,c.id,'Experiments'),'notAjax':not request.is_ajax()})
  
     def conformanceMain(self,request):
@@ -220,5 +222,22 @@ class simulationHandler(object):
         return render_to_response('conformance.html',{'s':s,'e':e,'cform':cformset,
                     'urls':urls,'tabs':tabs(request,self.centreid,'Conformance')})
   
+    def copy(self,request):
+        if request.method=='POST':
+                #try:
+                if request.POST['targetSim']=='---':
+                    return HttpResponse('Error, please choose a simulation to copy. You can use your browser back button')
+                targetExp=request.POST['targetExp']
+                exp=Experiment.objects.get(id=targetExp)
+                targetSim=request.POST['targetSim']
+                s=Simulation.objects.get(id=targetSim)
+                print targetSim,targetExp
+                ss=s.copy(exp)
+                url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
+                return HttpResponseRedirect(url)
+                #except Exception,e:
+                return HttpResponse('ERROR, %s, malformed POST to simulation copy'%e)
+        else:
+            return self.list(request)
     
                 

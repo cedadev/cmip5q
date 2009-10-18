@@ -49,7 +49,9 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/coupling/(?P<coupling_id>\d+)/(?P<ctype>\D+)/$',
                 'cmip5q.protoq.views.simulationCup'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/conformance/$',
-                'cmip5q.protoq.views.conformanceMain'),                 
+                'cmip5q.protoq.views.conformanceMain'),  
+    (r'^cmip5/(?P<centre_id>\d+)/simulation/copy/$',
+                'cmip5q.protoq.views.simulationCopy'),                     
     #           
     # platforms/add/centre_id
     # platforms/edit/platform_id

@@ -13,7 +13,7 @@
     <p class="cmip5q"> (NB: The experiments, and their descriptions will be entered via the CIM instances)<p>
         <div class="backgrey">
     <table width="100%">
-        <tr><th width="20%">name</th><th colspan="2"> simulations </th></tr>
+        <tr><th width="20%">Experiment Name</th><th> Edit Simulations </th><th> Add Simulations </th></tr>
         {% for e in experiments %}
         <tr><td><a href="/cmip5/experiment/view/{{e.id}}/">{{e.abbrev}}</a></td><td >
         {% for s in e.values %}
@@ -22,10 +22,23 @@
                 var oLinkSimEdButton{{s.id}} = new YAHOO.widget.Button("simEdButton{{s.id}}");
             </script>
         {% endfor %}
-        </td> <td width="10%"> 
-        <a id="simAddButton{{forloop.counter}}" href="{{e.new}}">Add New</a>
-        <script  type="text/javascript"> 
-            var oLinkButton{{forloop.counter}} = new YAHOO.widget.Button("simAddButton{{forloop.counter}}"); 
+        </td> <td width="40%"> 
+            <table><tr>
+            <td>Add</td><td><a id="simAddButton{{forloop.counter}}" href="{{e.new}}">New</a> 
+            </td><td>or, from existing:</td><td>
+            <form action="{{cpurl}}" method="POST">
+            <input type="hidden" name="targetExp" value="{{e.id}}">
+            <select name="targetSim" size="1">
+                <option value="---" selected="true">-------</option>
+                {% for cp in csims %} <option value="{{cp.id}}">{{cp}}</option> {% endfor %}
+            </select>, <input type="submit" id="cp4_{{e.id}}button" value="Copy"/>
+            </form>
+            </td></tr></table>
+        </td>    
+        <script type="text/javascript"> 
+            var oLinkButton{{forloop.counter}} = new YAHOO.widget.Button("simAddButton{{forloop.counter}}");
+            var oCopyButton{{forloop.counter}} = new YAHOO.widget.Button("cp4_{{e.id}}button",
+                  {value:"cp4_{{e.id}}button"});
         </script>
         </td></tr>
         {% endfor %}
