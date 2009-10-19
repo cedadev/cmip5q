@@ -3,9 +3,9 @@
   <component name="Atmosphere">
     <definition status="missing">Definition of component type Atmosphere required</definition>
     <parametergroup name="Atmosphere_Attributes"/>
-    <component name="KeyProperties">
-      <definition status="missing">Definition of component type KeyProperties required</definition>
-      <parametergroup name="KeyProperties_Attributes">
+    <component name="AtmosKeyProperties">
+      <definition status="missing">Definition of component type AtmosKeyProperties required</definition>
+      <parametergroup name="AtmosKeyProperties_Attributes">
         <parameter name="ModelFamily" choice="XOR">
           <definition status="missing">Definition of property name ModelFamily required</definition>
           <value name="AGCM"/>
@@ -33,20 +33,22 @@
           </parameter>
         </parametergroup>
         <parametergroup name="HorizontalDomain">
-          <parameter name="Grid configuration" choice="XOR">
-            <definition status="missing">Definition of property name Grid configuration required</definition>
+          <parameter name="GridConfiguration" choice="XOR">
+            <definition status="missing">Definition of property name GridConfiguration required</definition>
             <value name="latitude-longitude retangular"/>
             <value name="latitude-longitude"/>
             <value name="reduced gaussian"/>
             <value name="other"/>
           </parameter>
-          <parameter name="MeridionalExtent" choice="keyboard">
+          <parameter name="MeridionalExtent" choice="AND">
             <definition status="missing">Definition of property name MeridionalExtent required</definition>
-            <value format="numerical" name="lat_min, lat_max" units="degN"/>
+            <value format="numerical" name="lat_min" units="degN"/>
+            <value format="numerical" name="lat_max" units="degN"/>
           </parameter>
-          <parameter name="ZonalExtent" choice="keyboard">
+          <parameter name="ZonalExtent" choice="AND">
             <definition status="missing">Definition of property name ZonalExtent required</definition>
-            <value format="numerical" name="lon_min, lon_max" units="degE"/>
+            <value format="numerical" name="lon_min" units="degE"/>
+            <value format="numerical" name="lon_max" units="degE"/>
           </parameter>
           <parameter name="Resolution" choice="keyboard">
             <definition status="missing">Definition of property name Resolution required</definition>
@@ -72,37 +74,20 @@
             <value name="Sigma"/>
             <value name="other"/>
           </parameter>
+          <parameter name="TopModelLevel" choice="keyboard">
+            <definition status="missing">Definition of property name TopModelLevel required</definition>
+            <value format="numerical" name="level at top of the model" units="vertical coordinate units"/>
+          </parameter>
           <parameter name="NumberOfVerticalLevels" choice="keyboard">
             <definition status="missing">Definition of property name NumberOfVerticalLevels required</definition>
             <value format="numerical" name="number of vertical levels"/>
           </parameter>
-          <parameter name="TopModelLevel" choice="keyboard">
-            <definition status="missing">Definition of property name TopModelLevel required</definition>
-            <value format="numerical" name="level at top of the model"/>
-          </parameter>
         </parametergroup>
       </component>
     </component>
-    <component name="DynamicalCore">
-      <definition status="missing">Definition of component type DynamicalCore required</definition>
-      <parametergroup name="DynamicalCore_Attributes">
-        <parameter name="TimeSteppingFramework" choice="XOR">
-          <definition status="missing">Definition of property name TimeSteppingFramework required</definition>
-          <value name="Adam Bashford"/>
-          <value name="Explicit"/>
-          <value name="Implicit"/>
-          <value name="Semi-Implicit"/>
-          <value name="LeapFrog"/>
-          <value name="Multi-step"/>
-          <value name="Runge Kutta fifth order"/>
-          <value name="Runge Kutta second order"/>
-          <value name="Runge Kutta third order"/>
-          <value name="other"/>
-        </parameter>
-        <parameter name="TimeStep" choice="keyboard">
-          <definition status="missing">Definition of property name TimeStep required</definition>
-          <value format="numerical" name="time step" units="time units"/>
-        </parameter>
+    <component name="AtmosDynamicalCore">
+      <definition status="missing">Definition of component type AtmosDynamicalCore required</definition>
+      <parametergroup name="AtmosDynamicalCore_Attributes">
         <parameter name="ListOfPrognosticVariables" choice="OR">
           <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
           <value name="surface pressure"/>
@@ -111,7 +96,7 @@
           <value name="temperature"/>
           <value name="potential temperature"/>
           <value name="total water"/>
-          <value name="vapor/solid/liquid"/>
+          <value name="vapour/solid/liquid"/>
           <value name="total water moments"/>
           <value name="clouds"/>
           <value name="radiation"/>
@@ -129,6 +114,25 @@
           <value name="radiation boundary condition"/>
           <value name="none"/>
           <value name="other "/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="TimeSteppingFramework">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Adam Bashford"/>
+          <value name="Explicit"/>
+          <value name="Implicit"/>
+          <value name="Semi-Implicit"/>
+          <value name="LeapFrog"/>
+          <value name="Multi-step"/>
+          <value name="Runge Kutta fifth order"/>
+          <value name="Runge Kutta second order"/>
+          <value name="Runge Kutta third order"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="TimeStep" choice="keyboard">
+          <definition status="missing">Definition of property name TimeStep required</definition>
+          <value format="numerical" name="time step" units="time units"/>
         </parameter>
       </parametergroup>
       <parametergroup name="HorizontalDiscretization">
@@ -168,7 +172,7 @@
           </parameter>
         </constraint>
       </parametergroup>
-      <parametergroup name="AtmosHorizontalDiffusion">
+      <parametergroup name="HorizontalDiffusion">
         <parameter name="SchemeName" choice="XOR">
           <definition status="missing">Definition of property name SchemeName required</definition>
           <value name="Other"/>
@@ -192,7 +196,7 @@
             <definition status="missing">Definition of property name SchemeType required</definition>
             <value name="Eulerian"/>
             <value name="Lagrangian"/>
-            <value name="Semi-lagrangian"/>
+            <value name="Semi-Lagrangian"/>
             <value name="Mass-conserving"/>
             <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
             <value name="other"/>
@@ -216,7 +220,7 @@
             <definition status="missing">Definition of property name SchemeType required</definition>
             <value name="Eulerian"/>
             <value name="Lagrangian"/>
-            <value name="Semi-lagrangian"/>
+            <value name="Semi-Lagrangian"/>
             <value name="Mass-conserving"/>
             <value name="Mass-conserving / Finite volume (Lin-Rood)"/>
             <value name="other"/>
@@ -233,9 +237,9 @@
         </parametergroup>
       </component>
     </component>
-    <component name="Radiation">
-      <definition status="missing">Definition of component type Radiation required</definition>
-      <parametergroup name="Radiation_Attributes">
+    <component name="AtmosRadiation">
+      <definition status="missing">Definition of component type AtmosRadiation required</definition>
+      <parametergroup name="AtmosRadiation_Attributes">
         <parameter name="TimeStep " choice="keyboard">
           <definition status="missing">Definition of property name TimeStep  required</definition>
           <value format="numerical" name="time step" units="time units"/>
@@ -290,7 +294,7 @@
         <parameter name="SchemeType" choice="XOR">
           <definition status="missing">Definition of property name SchemeType required</definition>
           <value name="Wide-band model"/>
-          <value name="Wide-band model (Foucquart)"/>
+          <value name="Wide-band model (Fouquart)"/>
           <value name="other"/>
         </parameter>
         <parameter name="NumberOfSpectralIntervals" choice="keyboard">
@@ -309,9 +313,9 @@
         </parameter>
       </parametergroup>
     </component>
-    <component name="TurbulenceConvectionCloud">
-      <definition status="missing">Definition of component type TurbulenceConvectionCloud required</definition>
-      <parametergroup name="TurbulenceConvectionCloud_Attributes"/>
+    <component name="AtmosCloudConvectionTurb">
+      <definition status="missing">Definition of component type AtmosCloudConvectionTurb required</definition>
+      <parametergroup name="AtmosCloudConvectionTurb_Attributes"/>
       <parametergroup name="BoundaryLayerTurbulence">
         <parameter name="SchemeName" choice="XOR">
           <definition status="missing">Definition of property name SchemeName required</definition>
@@ -324,8 +328,8 @@
             <value format="numerical" name="N.x"/>
           </parameter>
         </constraint>
-        <parameter name="Method" choice="XOR">
-          <definition status="missing">Definition of property name Method required</definition>
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
           <value name="TKE prognostic"/>
           <value name="TKE diagnostic"/>
           <value name="TKE coupled with water"/>
@@ -356,8 +360,8 @@
             <value name="Bulk mass flux scheme"/>
           </parameter>
         </constraint>
-        <parameter name="Properties" choice="OR">
-          <definition status="missing">Definition of property name Properties required</definition>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
           <value name="vertical momentum transport"/>
           <value name="convective momentum transport (CMT)"/>
           <value name="penetrative convection effects included"/>
@@ -412,10 +416,8 @@
             <value name="yes"/>
             <value name="no"/>
           </parameter>
-          <parameter name="Properties" choice="OR">
-            <definition status="missing">Definition of property name Properties required</definition>
-            <value name="cloud area fraction"/>
-            <value name="bulk cloud value"/>
+          <parameter name="Processes" choice="OR">
+            <definition status="missing">Definition of property name Processes required</definition>
             <value name="entrainment"/>
             <value name="detrainment"/>
             <value name="other"/>
@@ -427,18 +429,18 @@
             <value name="prognostic"/>
             <value name="diagnostic"/>
           </parameter>
-          <parameter name="NameOfDistributionFunction" choice="keyboard">
-            <definition status="missing">Definition of property name NameOfDistributionFunction required</definition>
+          <parameter name="FunctionName" choice="keyboard">
+            <definition status="missing">Definition of property name FunctionName required</definition>
             <value format="string" name=""/>
           </parameter>
-          <parameter name="OrdersOfDistributionFunction" choice="keyboard">
-            <definition status="missing">Definition of property name OrdersOfDistributionFunction required</definition>
+          <parameter name="FunctionOrder" choice="keyboard">
+            <definition status="missing">Definition of property name FunctionOrder required</definition>
             <value format="numerical" name=""/>
           </parameter>
-          <parameter name="Properties" choice="XOR">
-            <definition status="missing">Definition of property name Properties required</definition>
-            <value name="coupled with deep convection"/>
-            <value name="coupled with shallow convection"/>
+          <parameter name="CouplingWithConvection" choice="XOR">
+            <definition status="missing">Definition of property name CouplingWithConvection required</definition>
+            <value name="coupled with deep"/>
+            <value name="coupled with shallow"/>
             <value name="not coupled with convection"/>
           </parameter>
         </parametergroup>
@@ -477,9 +479,9 @@
         </parameter>
       </parametergroup>
     </component>
-    <component name="OrographyAndWaves">
-      <definition status="missing">Definition of component type OrographyAndWaves required</definition>
-      <parametergroup name="OrographyAndWaves_Attributes">
+    <component name="AtmosOrographyAndWaves">
+      <definition status="missing">Definition of component type AtmosOrographyAndWaves required</definition>
+      <parametergroup name="AtmosOrographyAndWaves_Attributes">
         <parameter name="SpongeLayer" choice="keyboard">
           <definition status="missing">Definition of property name SpongeLayer required</definition>
           <value format="string" name="characteristics of the sponge layer"/>

@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r646 (mariepierre, 2009-07-06) of Ocean.mm" defnversion="">
+  <component name="Ocean">
+    <definition status="missing">Definition of component type Ocean required</definition>
+    <parametergroup name="Ocean_Attributes"/>
+    <component name="OceanKeyProperties">
+      <definition status="missing">Definition of component type OceanKeyProperties required</definition>
+      <parametergroup name="OceanKeyProperties_Attributes">
+        <parameter name="ModelFamily" choice="XOR">
+          <definition status="missing">Definition of property name ModelFamily required</definition>
+          <value name="OGCM"/>
+          <value name="1D (SCM)"/>
+          <value name="1D (Ocean Mixed Layer)"/>
+          <value name="ShallowWater"/>
+          <value name="1 layer"/>
+          <value name="Slab"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="BasicApproximations" choice="OR">
+          <definition status="missing">Definition of property name BasicApproximations required</definition>
+          <value name="Primitive Equations"/>
+          <value name="Non-Hydrostatic"/>
+          <value name="Boussinesq"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="ListOfPrognosticVariables" choice="OR">
+          <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
+          <value name="potential temperature"/>
+          <value name="conservative temperature"/>
+          <value name="salinity"/>
+          <value name="U-velocity"/>
+          <value name="V-velocity"/>
+          <value name="W-Velocity"/>
+          <value name="SSH"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SeaWater">
+        <parameter name="EquationOfState" choice="XOR">
+          <definition status="missing">Definition of property name EquationOfState required</definition>
+          <value name="linear"/>
+          <value name="McDougall et al."/>
+          <value name="Jackett et al. 2006"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="FreezingPoint" choice="keyboard">
+          <definition status="missing">Definition of property name FreezingPoint required</definition>
+          <value format="numerical" name="freezing temperature of sea water" units="degC"/>
+        </parameter>
+        <parameter name="SpecificHeat" choice="keyboard">
+          <definition status="missing">Definition of property name SpecificHeat required</definition>
+          <value format="numerical" name="specific heat" units="J/(kg.K"/>
+        </parameter>
+      </parametergroup>
+      <component name="GeographicalConfiguration">
+        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
+        <parametergroup name="GeographicalConfiguration_Attributes">
+          <parameter name="Bathymetry" choice="keyboard">
+            <definition status="missing">Definition of property name Bathymetry required</definition>
+            <value format="string" name="characteritics of the bathymetry"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="HorizontalDomain">
+          <parameter name="GridConfiguration" choice="XOR">
+            <definition status="missing">Definition of property name GridConfiguration required</definition>
+            <value name="latitude-longitude rectangular"/>
+            <value name="tripolar curvilinear"/>
+            <value name="cube sphere"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="HorizontalDiscretization" choice="XOR">
+            <definition status="missing">Definition of property name HorizontalDiscretization required</definition>
+            <value name="finite differences"/>
+            <value name="finite volumes"/>
+            <value name="finite elements"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if HorizontalDiscretization is &quot;finite differences&quot;">
+            <parameter name="GridType" choice="XOR">
+              <definition status="missing">Definition of property name GridType required</definition>
+              <value name="Arakawa B-grid"/>
+              <value name="Arakawa C-Grid"/>
+              <value name="Arakawa E-Grid"/>
+            </parameter>
+          </constraint>
+          <parameter name="MeridionalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name MeridionalExtent required</definition>
+            <value format="numerical" name="lat_min, lat_max" units="degN"/>
+          </parameter>
+          <parameter name="ZonalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name ZonalExtent required</definition>
+            <value format="numerical" name="lon_min, lon_max" units="degE"/>
+          </parameter>
+          <parameter name="Resolution" choice="keyboard">
+            <definition status="missing">Definition of property name Resolution required</definition>
+            <value format="string" name="horizontal resolution"/>
+          </parameter>
+          <parameter name="PoleSingularityTreatment" choice="XOR">
+            <definition status="missing">Definition of property name PoleSingularityTreatment required</definition>
+            <value name="filter"/>
+            <value name="pole rotation"/>
+            <value name="artificial island"/>
+            <value name="none"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="VerticalDomain">
+          <parameter name="VerticalCoordinateSystem" choice="XOR">
+            <definition status="missing">Definition of property name VerticalCoordinateSystem required</definition>
+            <value name="Z-coordinate"/>
+            <value name="Z*-coordinate"/>
+            <value name="S-coordinate"/>
+            <value name="isopycnic"/>
+            <value name="Hybrid (Z+S)"/>
+            <value name="Hybrid (Z+isopycnic)"/>
+            <value name="Pressure reference (P)"/>
+            <value name="P*"/>
+            <value name="Z**"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if VerticalCoordinateSystem is &quot;Z-coordinate&quot; or &quot;Z*-coordinate&quot;">
+            <parameter name="PartialSteps" choice="XOR">
+              <definition status="missing">Definition of property name PartialSteps required</definition>
+              <value name="yes"/>
+              <value name="no"/>
+            </parameter>
+          </constraint>
+          <constraint name="if VerticalCoordinateSystem is &quot;S-coordinate&quot;">
+            <parameter name="ReferencePressure" choice="XOR">
+              <definition status="missing">Definition of property name ReferencePressure required</definition>
+              <value name="Sigma0"/>
+              <value name="Sigma2"/>
+              <value name="Sigma4"/>
+              <value name="other"/>
+            </parameter>
+          </constraint>
+          <parameter name="VerticalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name VerticalExtent required</definition>
+            <value format="numerical" name="upper_level, lower_level" units="vertical coordinate units"/>
+          </parameter>
+          <parameter name="NumberOfVerticalLevels" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfVerticalLevels required</definition>
+            <value format="numerical" name="number of vertical levels"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <component name="Nudging">
+        <definition status="missing">Definition of component type Nudging required</definition>
+        <parametergroup name="Nudging_Attributes"/>
+        <parametergroup name="TracersDamping">
+          <parameter name="AppliedTo" choice="OR">
+            <definition status="missing">Definition of property name AppliedTo required</definition>
+            <value name="temperature"/>
+            <value name="salinity"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="VerticalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name VerticalExtent required</definition>
+            <value format="numerical" name="min, max values" units="meters"/>
+          </parameter>
+          <parameter name="MeridionalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name MeridionalExtent required</definition>
+            <value format="numerical" name="min, max values" units="degN"/>
+          </parameter>
+          <parameter name="ZonalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name ZonalExtent required</definition>
+            <value format="numerical" name="min, max values" units="degE"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="MomentumDamping">
+          <parameter name="VerticalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name VerticalExtent required</definition>
+            <value format="numerical" name="min, max values" units="meters"/>
+          </parameter>
+          <parameter name="MeridionalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name MeridionalExtent required</definition>
+            <value format="numerical" name="min, max values" units="degN"/>
+          </parameter>
+          <parameter name="ZonalExtent" choice="keyboard">
+            <definition status="missing">Definition of property name ZonalExtent required</definition>
+            <value format="numerical" name="min, max values" units="degE"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <parametergroup name="TimeSteppingFramework">
+        <parameter name="Tracer" choice="XOR">
+          <definition status="missing">Definition of property name Tracer required</definition>
+          <value name="Leap-frog + Asselin filter"/>
+          <value name="Leap-frog + Periodic Euler backward solver"/>
+          <value name="Predictor-corrector"/>
+          <value name="Forward-backward"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="BarotropicSolver" choice="XOR">
+          <definition status="missing">Definition of property name BarotropicSolver required</definition>
+          <value name="Leap-frog + Asselin filter"/>
+          <value name="Leap-frog + Periodic Euler backward solver"/>
+          <value name="Predictor-corrector"/>
+          <value name="AM3-LF (ROMS)"/>
+          <value name="Forward-backward"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="BaroclinicMomentum" choice="XOR">
+          <definition status="missing">Definition of property name BaroclinicMomentum required</definition>
+          <value name="Leap-frog + Asselin filter"/>
+          <value name="Leap-frog + Periodic Euler backward solver"/>
+          <value name="Predictor-corrector"/>
+          <value name="AM3-LF (ROMS)"/>
+          <value name="Forward-backward"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="TimeStep" choice="keyboard">
+          <definition status="missing">Definition of property name TimeStep required</definition>
+          <value format="numerical" name="time step" units="time units"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="OceanAdvection">
+      <definition status="missing">Definition of component type OceanAdvection required</definition>
+      <parametergroup name="OceanAdvection_Attributes"/>
+      <parametergroup name="Momentum">
+        <parameter name="SchemeName" choice="keyboard">
+          <definition status="missing">Definition of property name SchemeName required</definition>
+          <value format="string" name="usual scheme name"/>
+        </parameter>
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Flux form"/>
+          <value name="Vector form"/>
+        </parameter>
+      </parametergroup>
+      <component name="Tracers">
+        <definition status="missing">Definition of component type Tracers required</definition>
+        <parametergroup name="Tracers_Attributes"/>
+        <parametergroup name="Lateral">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="Centred 2nd order"/>
+            <value name="Centred 4th order"/>
+            <value name="Total Variance Dissipation (TVD)"/>
+            <value name="MUSCL"/>
+            <value name=" QUICKEST"/>
+            <value name=" Piecewise Parabolic method"/>
+            <value name="Sweby"/>
+            <value name="Prather 2nd moment (PSOM)"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="MonotonicFluxLimiter" choice="XOR">
+            <definition status="missing">Definition of property name MonotonicFluxLimiter required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Vertical">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="Centred 2nd order"/>
+            <value name="Centred 4th order"/>
+            <value name="TVD"/>
+            <value name="Sweby"/>
+            <value name="Prather 2nd moment (PSOM)"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="MonotonicFluxLimiter" choice="XOR">
+            <definition status="missing">Definition of property name MonotonicFluxLimiter required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="OceanLateralPhysics">
+      <definition status="missing">Definition of component type OceanLateralPhysics required</definition>
+      <parametergroup name="OceanLateralPhysics_Attributes"/>
+      <component name="Momentum">
+        <definition status="missing">Definition of component type Momentum required</definition>
+        <parametergroup name="Momentum_Attributes"/>
+        <parametergroup name="Operator">
+          <parameter name="Direction" choice="XOR">
+            <definition status="missing">Definition of property name Direction required</definition>
+            <value name="horizontal"/>
+            <value name="isopycnal"/>
+            <value name="isoneutral"/>
+            <value name="geopotential"/>
+            <value name="iso-level"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="Order" choice="XOR">
+            <definition status="missing">Definition of property name Order required</definition>
+            <value name="harmonic (second order)"/>
+            <value name="bi-harmonic (fourth order)"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="Discretization" choice="XOR">
+            <definition status="missing">Definition of property name Discretization required</definition>
+            <value name="second order"/>
+            <value name="higher order"/>
+            <value name="flux limited"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="EddyViscosityCoefficient">
+          <parameter name="CoefficientType" choice="XOR">
+            <definition status="missing">Definition of property name CoefficientType required</definition>
+            <value name="constant"/>
+            <value name="space varying"/>
+            <value name="time + space varying (Smagorinski)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if CoefficientType is &quot;constant&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="Eddy viscosity coefficient for momentum" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <constraint name="if CoefficientType is &quot;space varying&quot; or &quot;time + space varying&quot;">
+            <parameter name="SpatialVariation" choice="OR">
+              <definition status="missing">Definition of property name SpatialVariation required</definition>
+              <value name="with depth"/>
+              <value name="with latitude"/>
+              <value name="with longitude"/>
+            </parameter>
+          </constraint>
+          <parameter name="MinimalBackgroundValue" choice="keyboard">
+            <definition status="missing">Definition of property name MinimalBackgroundValue required</definition>
+            <value format="numerical" name="minimal background Eddy viscosity coefficient for momentum" units="m2/s"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <component name="Tracers">
+        <definition status="missing">Definition of component type Tracers required</definition>
+        <parametergroup name="Tracers_Attributes">
+          <parameter name="MesoscaleClosure" choice="XOR">
+            <definition status="missing">Definition of property name MesoscaleClosure required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Operator">
+          <parameter name="Direction" choice="XOR">
+            <definition status="missing">Definition of property name Direction required</definition>
+            <value name="horizontal"/>
+            <value name="isopycnal"/>
+            <value name="isoneutral"/>
+            <value name="geopotential"/>
+            <value name="iso-level"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="Order" choice="XOR">
+            <definition status="missing">Definition of property name Order required</definition>
+            <value name="harmonic (second order)"/>
+            <value name="bi-harmonic (fourth order)"/>
+            <value name="Other"/>
+          </parameter>
+          <parameter name="Discretization" choice="XOR">
+            <definition status="missing">Definition of property name Discretization required</definition>
+            <value name="second order"/>
+            <value name="higher order"/>
+            <value name="flux limited"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="EddyViscosityCoefficient">
+          <parameter name="CoefficientType" choice="XOR">
+            <definition status="missing">Definition of property name CoefficientType required</definition>
+            <value name="constant"/>
+            <value name="space varying"/>
+          </parameter>
+          <constraint name="if CoefficientType is &quot;constant&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="Eddy viscosity coefficient for tracers" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <constraint name="if CoefficientType is &quot;space varying&quot;">
+            <parameter name="SpatialVariation" choice="OR">
+              <definition status="missing">Definition of property name SpatialVariation required</definition>
+              <value name="with depth"/>
+              <value name="with latitude"/>
+              <value name="with longitude"/>
+            </parameter>
+          </constraint>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <definition status="missing">Definition of property name BackgroundValue required</definition>
+            <value format="numerical" name="background Eddy viscosity coefficient for tracers" units="m2/s"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Eddy-inducedVelocity">
+          <parameter name="CoefficientType" choice="XOR">
+            <definition status="missing">Definition of property name CoefficientType required</definition>
+            <value name="GM scheme"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if CoefficientType is &quot;GM scheme&quot;">
+            <parameter name="GMvalue" choice="keyboard">
+              <definition status="missing">Definition of property name GMvalue required</definition>
+              <value format="numerical" name="Eddy induced velocity coefficient" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <parameter name="TracersFlux" choice="XOR">
+            <definition status="missing">Definition of property name TracersFlux required</definition>
+            <value name="advective flux"/>
+            <value name="skew flux"/>
+          </parameter>
+          <parameter name="AddedDiffusivity" choice="XOR">
+            <definition status="missing">Definition of property name AddedDiffusivity required</definition>
+            <value name="constant"/>
+            <value name="flow dependent"/>
+            <value name="none"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="OceanVerticalPhysics">
+      <definition status="missing">Definition of component type OceanVerticalPhysics required</definition>
+      <parametergroup name="OceanVerticalPhysics_Attributes">
+        <parameter name="Convection" choice="XOR">
+          <definition status="missing">Definition of property name Convection required</definition>
+          <value name="non-penetrative convective adjustment"/>
+          <value name="enhanced vertical diffusion"/>
+          <value name="included in the turbulence closure scheme"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="Tide-inducedMixing" choice="OR">
+          <definition status="missing">Definition of property name Tide-inducedMixing required</definition>
+          <value name="baroclinic tides"/>
+          <value name="barotropic tides"/>
+        </parameter>
+      </parametergroup>
+      <component name="MixedLayer">
+        <definition status="missing">Definition of component type MixedLayer required</definition>
+        <parametergroup name="MixedLayer_Attributes"/>
+        <parametergroup name="Tracers">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="constant values"/>
+            <value name="turbulent closure (TKE)"/>
+            <value name="turbulent closure (KPP)"/>
+            <value name="turbulent closure (Mellor-Yamada)"/>
+            <value name="turbulent closure (Bulk Mixed Layer)"/>
+            <value name="Richardson number dependent (PP)"/>
+            <value name="Richardson number dependent (KT)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if SchemeType is &quot;turbulent closure&quot;">
+            <parameter name="ClosureOrder" choice="XOR">
+              <definition status="missing">Definition of property name ClosureOrder required</definition>
+              <value name="0"/>
+              <value name="1"/>
+              <value name="2.5"/>
+              <value name="3"/>
+            </parameter>
+          </constraint>
+          <constraint name="if SchemeType is &quot;constant values&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="mixing coefficient for tracers in the mixed layer" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <definition status="missing">Definition of property name BackgroundValue required</definition>
+            <value format="numerical" name="background mixing coefficient for tracers in the mixed layer" units="m2/s"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Momentum">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="constant values"/>
+            <value name="turbulent closure (TKE)"/>
+            <value name="turbulent closure (KPP)"/>
+            <value name="turbulent closure (Mellor-Yamada)"/>
+            <value name="turbulent closure (Bulk Mixed Layer)"/>
+            <value name="Richardson number dependent (PP)"/>
+            <value name="Richardson number dependent (KT)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if SchemeType is &quot;turbulent closure&quot;">
+            <parameter name="ClosureOrder" choice="XOR">
+              <definition status="missing">Definition of property name ClosureOrder required</definition>
+              <value name="0"/>
+              <value name="1"/>
+              <value name="2.5"/>
+              <value name="3"/>
+            </parameter>
+          </constraint>
+          <constraint name="if SchemeType is &quot;constant values&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="mixing coefficient for momentum in the mixed layer" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <parameter name="BackgroundValue" choice="keyboard">
+            <definition status="missing">Definition of property name BackgroundValue required</definition>
+            <value format="numerical" name="background mixing coefficient for momentum in the mixed layer" units="m2/s"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <component name="OceanInterior">
+        <definition status="missing">Definition of component type OceanInterior required</definition>
+        <parametergroup name="OceanInterior_Attributes"/>
+        <parametergroup name="Tracers">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="constant values"/>
+            <value name="Richardson number dependent (PP)"/>
+            <value name="Richardson number dependent (KT)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if SchemeType is &quot;constant values&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="mixing coefficient for tracers in the ocean interior" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <parameter name="BackgroundType" choice="XOR">
+            <definition status="missing">Definition of property name BackgroundType required</definition>
+            <value name="vertical profile"/>
+            <value name="constant value"/>
+          </parameter>
+          <constraint name="if BackgroundType is &quot;constant value&quot;">
+            <parameter name="BackgroundConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name BackgroundConstantValue required</definition>
+              <value format="numerical" name="background mixing coefficient for tracers in the ocean interior" units="m2/s"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+        <parametergroup name="Momentum">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="constant values"/>
+            <value name="Richardson number dependent (PP)"/>
+            <value name="Richardson number dependent (KT)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if SchemeType is &quot;constant values&quot;">
+            <parameter name="ConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name ConstantValue required</definition>
+              <value format="numerical" name="mixing coefficient for momentum in the ocean interior" units="m2/s"/>
+            </parameter>
+          </constraint>
+          <parameter name="BackgroundType" choice="XOR">
+            <definition status="missing">Definition of property name BackgroundType required</definition>
+            <value name="vertical profile"/>
+            <value name="constant value"/>
+          </parameter>
+          <constraint name="if BackgroundType is &quot;constant value&quot;">
+            <parameter name="BackgroundConstantValue" choice="keyboard">
+              <definition status="missing">Definition of property name BackgroundConstantValue required</definition>
+              <value format="numerical" name="background mixing coefficient for momentum in the ocean interior" units="m2/s"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="OceanUpperLowerBoundaries">
+      <definition status="missing">Definition of component type OceanUpperLowerBoundaries required</definition>
+      <parametergroup name="OceanUpperLowerBoundaries_Attributes"/>
+      <parametergroup name="OceanFreeSurface">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="linear implicit"/>
+          <value name="linear filtered"/>
+          <value name="linear split-explicit"/>
+          <value name="non-linear implicit"/>
+          <value name="non-linear filtered"/>
+          <value name="non-linear split-explicit"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="OceanBottomBoundaryLayer">
+        <parameter name="Type" choice="OR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="diffusive"/>
+          <value name="advective"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if Type is &quot;diffusive&quot;">
+          <parameter name="LateralMixingCoefficient" choice="keyboard">
+            <definition status="missing">Definition of property name LateralMixingCoefficient required</definition>
+            <value format="numerical" name="lateral mixing coefficient in the bottom boundary layer" units="m2/s"/>
+          </parameter>
+        </constraint>
+        <parameter name="SillOverflow " choice="XOR">
+          <definition status="missing">Definition of property name SillOverflow  required</definition>
+          <value name="specific treatment"/>
+          <value name="no specific treatment"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="OceanBoundaryForcing">
+      <definition status="missing">Definition of component type OceanBoundaryForcing required</definition>
+      <parametergroup name="OceanBoundaryForcing_Attributes"/>
+      <parametergroup name="Momentum">
+        <parameter name="BottomFriction" choice="XOR">
+          <definition status="missing">Definition of property name BottomFriction required</definition>
+          <value name="linear"/>
+          <value name="non-linear"/>
+          <value name="non-linear (drag function of speed of tides)"/>
+          <value name="constant drag coefficient"/>
+          <value name="none"/>
+        </parameter>
+        <parameter name="LateralFriction" choice="XOR">
+          <definition status="missing">Definition of property name LateralFriction required</definition>
+          <value name="none"/>
+          <value name="free-slip"/>
+          <value name="no-slip"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="SurfaceFluxCorrection" choice="XOR">
+          <definition status="missing">Definition of property name SurfaceFluxCorrection required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+      <component name="Tracers">
+        <definition status="missing">Definition of component type Tracers required</definition>
+        <parametergroup name="Tracers_Attributes">
+          <parameter name="GeothermalHeating" choice="XOR">
+            <definition status="missing">Definition of property name GeothermalHeating required</definition>
+            <value name="spatial varying"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="SurfaceFluxCorrections" choice="OR">
+            <definition status="missing">Definition of property name SurfaceFluxCorrections required</definition>
+            <value name="temperature"/>
+            <value name="salinity"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="SunlightPenetration">
+          <parameter name="SchemeType" choice="XOR">
+            <definition status="missing">Definition of property name SchemeType required</definition>
+            <value name="1 extinction depth"/>
+            <value name="2 extinction depths"/>
+            <value name="3 extinction depths"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="FirstDepth" choice="keyboard">
+            <definition status="missing">Definition of property name FirstDepth required</definition>
+            <value format="numerical" name="fisrt extinction depth" units="m"/>
+          </parameter>
+          <parameter name="SecondDepth" choice="keyboard">
+            <definition status="missing">Definition of property name SecondDepth required</definition>
+            <value format="numerical" name="second extinction depth" units="m"/>
+          </parameter>
+          <parameter name="ThirdDepth" choice="keyboard">
+            <definition status="missing">Definition of property name ThirdDepth required</definition>
+            <value format="numerical" name="third extinction depth" units="m"/>
+          </parameter>
+          <parameter name="OceanColorDependent" choice="XOR">
+            <definition status="missing">Definition of property name OceanColorDependent required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="SurfaceSalinity">
+          <parameter name="FluxType" choice="OR">
+            <definition status="missing">Definition of property name FluxType required</definition>
+            <value name="freshwater flux"/>
+            <value name="virtual salt flux"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+  </component>
+</vocab>

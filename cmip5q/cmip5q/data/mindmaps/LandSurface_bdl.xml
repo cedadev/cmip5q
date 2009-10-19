@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r813 (mariepierre, 2009-08-19) of LandSurface.mm" defnversion="">
+  <component name="LandSurface">
+    <definition status="missing">Definition of component type LandSurface required</definition>
+    <parametergroup name="LandSurface_Attributes"/>
+    <component name="LandSurfaceKeyProperties">
+      <definition status="missing">Definition of component type LandSurfaceKeyProperties required</definition>
+      <parametergroup name="LandSurfaceKeyProperties_Attributes">
+        <parameter name="ModelFamily" choice="XOR">
+          <definition status="missing">Definition of property name ModelFamily required</definition>
+          <value name="inherited from Atmosphere"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="BasicApproximations" choice="keyboard">
+          <definition status="missing">Definition of property name BasicApproximations required</definition>
+          <value format="string" name=""/>
+        </parameter>
+        <parameter name="Genealogy" choice="XOR">
+          <definition status="missing">Definition of property name Genealogy required</definition>
+          <value name="BATS"/>
+          <value name="Bucket"/>
+          <value name="Deardorff"/>
+          <value name="SiB"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="CouplingWithAtmosphere" choice="XOR">
+          <definition status="missing">Definition of property name CouplingWithAtmosphere required</definition>
+          <value name="implicit"/>
+          <value name="semi-implicit"/>
+          <value name="explicit"/>
+        </parameter>
+      </parametergroup>
+      <component name="GeographicalConfiguration">
+        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
+        <parametergroup name="GeographicalConfiguration_Attributes">
+          <parameter name="Orography" choice="XOR">
+            <definition status="missing">Definition of property name Orography required</definition>
+            <value name="inherited from Atmosphere"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="HorizontalDomain">
+          <parameter name="Grid" choice="XOR">
+            <definition status="missing">Definition of property name Grid required</definition>
+            <value name="inherited from Atmosphere"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="LandSurfaceTiling">
+          <parameter name="Tiling" choice="XOR">
+            <definition status="missing">Definition of property name Tiling required</definition>
+            <value name="common to all LS subcomponents"/>
+            <value name="specific to each LS subomponents"/>
+          </parameter>
+          <constraint name="if Tiling is &quot;common to all LS subcomponents&quot;">
+            <parameter name="TilingMethod" choice="XOR">
+              <definition status="missing">Definition of property name TilingMethod required</definition>
+              <value name="dynamic"/>
+              <value name="fixed number of types"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+      </component>
+      <parametergroup name="TimeSteppingFramework">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="inherited from Atmosphere"/>
+          <value name="sub-time stepping"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if SchemeType is &quot;sub-time stepping&quot;">
+          <parameter name="TimeStep" choice="keyboard">
+            <definition status="missing">Definition of property name TimeStep required</definition>
+            <value format="numerical" name="time step" units="time units"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceSoil">
+      <definition status="missing">Definition of component type LandSurfaceSoil required</definition>
+      <parametergroup name="LandSurfaceSoil_Attributes"/>
+      <parametergroup name="SoilMap">
+        <parameter name="Texture" choice="keyboard">
+          <definition status="missing">Definition of property name Texture required</definition>
+          <value format="string" name="characteristics of soil map texture"/>
+        </parameter>
+        <parameter name="Structure" choice="keyboard">
+          <definition status="missing">Definition of property name Structure required</definition>
+          <value format="string" name="characteristics of soil map structure"/>
+        </parameter>
+        <parameter name="Albedo" choice="keyboard">
+          <definition status="missing">Definition of property name Albedo required</definition>
+          <value format="string" name="characteristics of soil map albedo"/>
+        </parameter>
+        <parameter name="WaterTable" choice="keyboard">
+          <definition status="missing">Definition of property name WaterTable required</definition>
+          <value format="string" name="characteristics of soil map water table"/>
+        </parameter>
+        <parameter name="Other" choice="keyboard">
+          <definition status="missing">Definition of property name Other required</definition>
+          <value format="string" name=""/>
+        </parameter>
+      </parametergroup>
+      <component name="Hydrology">
+        <definition status="missing">Definition of component type Hydrology required</definition>
+        <parametergroup name="Hydrology_Attributes">
+          <parameter name="SpecificTiling" choice="XOR">
+            <definition status="missing">Definition of property name SpecificTiling required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="NumberOfGroundWaterLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfGroundWaterLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="WaterStorageMethod" choice="XOR">
+            <definition status="missing">Definition of property name WaterStorageMethod required</definition>
+            <value name="Bucket"/>
+            <value name="Force-Restore"/>
+            <value name="Choisnel"/>
+            <value name="Explicit diffusion"/>
+            <value name="Other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="SoilMoistureFreezing">
+          <parameter name="NumberOfGroundIceLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfGroundIceLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="IceStorageMethod" choice="keyboard">
+            <definition status="missing">Definition of property name IceStorageMethod required</definition>
+            <value format="string" name="description and reference"/>
+          </parameter>
+          <parameter name="Permafrost" choice="OR">
+            <definition status="missing">Definition of property name Permafrost required</definition>
+            <value name="specific treatment"/>
+            <value name="specific tiling"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Runoff-Drainage">
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="bulk (undifferentiated drainage and runoff)"/>
+            <value name="differentiated drainage and runoff"/>
+          </parameter>
+          <constraint name="if Method is &quot;differentiated drainage and runoff&quot;">
+            <parameter name="Processes" choice="OR">
+              <definition status="missing">Definition of property name Processes required</definition>
+              <value name="deep drainage"/>
+              <value name="saturated surface runoff"/>
+              <value name="subgrid drainage"/>
+              <value name="infiltration excess runoff"/>
+              <value name="water table recharge"/>
+              <value name="subgrid"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+      </component>
+      <component name="HeatTreatment">
+        <definition status="missing">Definition of component type HeatTreatment required</definition>
+        <parametergroup name="HeatTreatment_Attributes"/>
+        <parametergroup name="SoilHeatTreatment_Attributes">
+          <parameter name="SpecificTiling" choice="XOR">
+            <definition status="missing">Definition of property name SpecificTiling required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="NumberOfGroundHeatLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfGroundHeatLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Method">
+          <parameter name="HeatStorage" choice="XOR">
+            <definition status="missing">Definition of property name HeatStorage required</definition>
+            <value name="Force-Restore"/>
+            <value name="Explicit diffusion"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="Processes" choice="OR">
+            <definition status="missing">Definition of property name Processes required</definition>
+            <value name="soil moisture freeze-thaw"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="LandSurfaceSnow">
+      <definition status="missing">Definition of component type LandSurfaceSnow required</definition>
+      <parametergroup name="LandSurfaceSnow_Attributes">
+        <parameter name="SpecificTiling" choice="XOR">
+          <definition status="missing">Definition of property name SpecificTiling required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="NumberOfSnowLayers" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfSnowLayers required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SchemeMethod">
+        <parameter name="SnowAlbedo" choice="XOR">
+          <definition status="missing">Definition of property name SnowAlbedo required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+          <value name="constant"/>
+        </parameter>
+        <parameter name="SnowDensity" choice="XOR">
+          <definition status="missing">Definition of property name SnowDensity required</definition>
+          <value name="prognostic"/>
+          <value name="constant"/>
+        </parameter>
+        <parameter name="SnowWaterEquivalent" choice="XOR">
+          <definition status="missing">Definition of property name SnowWaterEquivalent required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="SnowHeatContent" choice="XOR">
+          <definition status="missing">Definition of property name SnowHeatContent required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="SnowTemperature" choice="XOR">
+          <definition status="missing">Definition of property name SnowTemperature required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="SnowLiquidWaterContent" choice="XOR">
+          <definition status="missing">Definition of property name SnowLiquidWaterContent required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="SnowCoverFractions" choice="OR">
+          <definition status="missing">Definition of property name SnowCoverFractions required</definition>
+          <value name="ground snow fraction"/>
+          <value name="vegetation snow fraction"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
+          <value name="snow interception"/>
+          <value name="snow melting"/>
+          <value name="snow refreezing"/>
+          <value name="blowing snow"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceVegetation">
+      <definition status="missing">Definition of component type LandSurfaceVegetation required</definition>
+      <parametergroup name="LandSurfaceVegetation_Attributes">
+        <parameter name="SpecificTiling" choice="XOR">
+          <definition status="missing">Definition of property name SpecificTiling required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="Interception" choice="XOR">
+          <definition status="missing">Definition of property name Interception required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="BiomeTypes" choice="OR">
+          <definition status="missing">Definition of property name BiomeTypes required</definition>
+          <value name="Evergreen needleleaf forest"/>
+          <value name="Evergreen broadleaf forest"/>
+          <value name="deciduous needleleaf forest"/>
+          <value name="deciduous  broadleaf forest"/>
+          <value name="Mixed forest"/>
+          <value name="Woodland"/>
+          <value name="Wooded grassland"/>
+          <value name="Closed shrubland"/>
+          <value name="Open shrubland"/>
+          <value name="Grassland"/>
+          <value name="Cropland"/>
+          <value name="Wetlands"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SchemeMethod">
+        <parameter name="Phenology" choice="XOR">
+          <definition status="missing">Definition of property name Phenology required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic (vegetation map)"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="LAI" choice="XOR">
+          <definition status="missing">Definition of property name LAI required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="Biomass" choice="XOR">
+          <definition status="missing">Definition of property name Biomass required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="BioGeography" choice="XOR">
+          <definition status="missing">Definition of property name BioGeography required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="StomatalResistanceFunctionOf" choice="OR">
+          <definition status="missing">Definition of property name StomatalResistanceFunctionOf required</definition>
+          <value name="light"/>
+          <value name="temperature"/>
+          <value name="water availability"/>
+          <value name="CO2"/>
+          <value name="O3"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceEnergyBalance">
+      <definition status="missing">Definition of component type LandSurfaceEnergyBalance required</definition>
+      <parametergroup name="LandSurfaceEnergyBalance_Attributes">
+        <parameter name="SpecificTiling" choice="XOR">
+          <definition status="missing">Definition of property name SpecificTiling required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <constraint name="if SpecificTiling is &quot;yes&quot;">
+          <parameter name="SubsurfaceTiling" choice="XOR">
+            <definition status="missing">Definition of property name SubsurfaceTiling required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </constraint>
+        <parameter name="NumberOfSurfaceTemperatures" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfSurfaceTemperatures required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SchemeMethod">
+        <parameter name="TypeOfEvaporationFormulation" choice="XOR">
+          <definition status="missing">Definition of property name TypeOfEvaporationFormulation required</definition>
+          <value name="alpha"/>
+          <value name="beta"/>
+          <value name="combined"/>
+          <value name="Monteith potential evaporation"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
+          <value name="transpiration"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceAlbedo">
+      <definition status="missing">Definition of component type LandSurfaceAlbedo required</definition>
+      <parametergroup name="LandSurfaceAlbedo_Attributes">
+        <parameter name="SpecificTiling" choice="XOR">
+          <definition status="missing">Definition of property name SpecificTiling required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SnowFreeAlbedo">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="prognostic"/>
+          <value name="prescribed"/>
+        </parameter>
+        <constraint name="if Type is &quot;prognostic&quot;">
+          <parameter name="FunctionOf" choice="OR">
+            <definition status="missing">Definition of property name FunctionOf required</definition>
+            <value name="vegetation type"/>
+            <value name="soil humidity"/>
+            <value name="vegetation state"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="Direct-Diffuse" choice="XOR">
+            <definition status="missing">Definition of property name Direct-Diffuse required</definition>
+            <value name="distinction between direct and diffuse albedo"/>
+            <value name="no distinction between direct and diffuse albedo"/>
+          </parameter>
+          <parameter name="NumberOfWavelenghBands" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfWavelenghBands required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="SnowAlbedo">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="prognostic"/>
+          <value name="prescribed"/>
+        </parameter>
+        <constraint name="if Type is &quot;prognostic&quot;">
+          <parameter name="FunctionOf" choice="OR">
+            <definition status="missing">Definition of property name FunctionOf required</definition>
+            <value name="vegetation type"/>
+            <value name="Snow age"/>
+            <value name="Snow density"/>
+            <value name="Snow grain type"/>
+            <value name="Other"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceCarbonCycle">
+      <definition status="missing">Definition of component type LandSurfaceCarbonCycle required</definition>
+      <parametergroup name="LandSurfaceCarbonCycle_Attributes"/>
+      <component name="Vegetation">
+        <definition status="missing">Definition of component type Vegetation required</definition>
+        <parametergroup name="Vegetation_Attributes">
+          <parameter name="NumberOfCarbonPools" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfCarbonPools required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="ListOfCarbonPools" choice="keyboard">
+            <definition status="missing">Definition of property name ListOfCarbonPools required</definition>
+            <value format="string" name="list of C-pools"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Photosynthesis">
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="biochemical approach"/>
+            <value name="light use efficiency approach (LUE)"/>
+            <value name="carbon assimilation approach"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="AutotrophicRespiration">
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="parametrized"/>
+            <value name="implicit"/>
+          </parameter>
+          <constraint name="if Method is &quot;parametrized&quot;">
+            <parameter name="MaintenanceRespiration" choice="XOR">
+              <definition status="missing">Definition of property name MaintenanceRespiration required</definition>
+              <value name="leaves + stems + roots"/>
+              <value name="leaves + stems and roots (leafy + woody)"/>
+              <value name="leaves + fine roots + stems and roots"/>
+              <value name="whole plant (no distinction)"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+        <parametergroup name="Allocation">
+          <parameter name="AllocationBins" choice="XOR">
+            <definition status="missing">Definition of property name AllocationBins required</definition>
+            <value name="leaves + stems + roots"/>
+            <value name="leaves + stems and roots (leafy + woody)"/>
+            <value name="leaves + fine roots + coarse roots + stems"/>
+            <value name="whole plant (no distinction)"/>
+          </parameter>
+          <parameter name="AllocationFractions" choice="XOR">
+            <definition status="missing">Definition of property name AllocationFractions required</definition>
+            <value name="fixed"/>
+            <value name="function of vegetation type"/>
+            <value name="function of plant allometry"/>
+            <value name="explicitly calculated"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Phenology">
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="implicit (seasonal evolution of LAI)"/>
+            <value name="implicit (spectral vegetation indices NDVI or SR)"/>
+            <value name="parametrized"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <parametergroup name="Soil">
+        <parameter name="Method" choice="OR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="heterotrophic respiration"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="NumberOfCarbonPools" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfCarbonPools required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="ListOfCarbonPools" choice="keyboard">
+          <definition status="missing">Definition of property name ListOfCarbonPools required</definition>
+          <value format="string" name="list of C-pools"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Permafrost">
+        <parameter name="ListOfGases" choice="keyboard">
+          <definition status="missing">Definition of property name ListOfGases required</definition>
+          <value format="string" name="list of gases"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceRiverRouting">
+      <definition status="missing">Definition of component type LandSurfaceRiverRouting required</definition>
+      <parametergroup name="LandSurfaceRiverRouting_Attributes"/>
+      <parametergroup name="RiverRouting_Attributes">
+        <parameter name="SpecificTiling" choice="XOR">
+          <definition status="provided">Tiling of basins.</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="Resolution" choice="XOR">
+          <definition status="missing">Definition of property name Resolution required</definition>
+          <value name="inherited from Land Surface"/>
+          <value name="independent"/>
+        </parameter>
+        <parameter name="NumberOfReservoirs" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfReservoirs required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+        <parameter name="ListOfPrognosticVariables" choice="OR">
+          <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
+          <value name="heat"/>
+          <value name="water"/>
+          <value name="tracers"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="WaterRe-evaporation" choice="OR">
+          <definition status="missing">Definition of property name WaterRe-evaporation required</definition>
+          <value name="flood plains"/>
+          <value name="irrigation"/>
+        </parameter>
+        <parameter name="CouplingWithAtmosphere" choice="XOR">
+          <definition status="missing">Definition of property name CouplingWithAtmosphere required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <constraint name="if CouplingWithAtmosphere is &quot;yes&quot;">
+          <parameter name="QuantitiesExchangedWithAtmosphere" choice="OR">
+            <definition status="missing">Definition of property name QuantitiesExchangedWithAtmosphere required</definition>
+            <value name="heat"/>
+            <value name="water"/>
+            <value name="tracers"/>
+            <value name="other"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="OceanicDischarge">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="direct (large rivers)"/>
+          <value name="diffuse"/>
+        </parameter>
+        <parameter name="QuantitiesTransported" choice="OR">
+          <definition status="missing">Definition of property name QuantitiesTransported required</definition>
+          <value name="heat"/>
+          <value name="water"/>
+          <value name="tracers"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="LandSurfaceLakes">
+      <definition status="missing">Definition of component type LandSurfaceLakes required</definition>
+      <parametergroup name="LandSurfaceLakes_Attributes">
+        <parameter name="CouplingWithRivers" choice="XOR">
+          <definition status="missing">Definition of property name CouplingWithRivers required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <constraint name="if CouplingWithRivers is &quot;yes&quot;">
+          <parameter name="QuantitiesExchangedWithRivers" choice="OR">
+            <definition status="missing">Definition of property name QuantitiesExchangedWithRivers required</definition>
+            <value name="heat"/>
+            <value name="water"/>
+            <value name="tracers"/>
+            <value name="other"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="SchemeMethod">
+        <parameter name="IceTreatment" choice="XOR">
+          <definition status="missing">Definition of property name IceTreatment required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="LakesAlbedo" choice="XOR">
+          <definition status="missing">Definition of property name LakesAlbedo required</definition>
+          <value name="prognostic"/>
+          <value name="diagnostic"/>
+        </parameter>
+        <parameter name="LakesDynamics" choice="XOR">
+          <definition status="missing">Definition of property name LakesDynamics required</definition>
+          <value name="vertical"/>
+          <value name="horizontal"/>
+          <value name="vertical + horizontal"/>
+          <value name="none"/>
+        </parameter>
+        <parameter name="DynamicLakesExtent" choice="XOR">
+          <definition status="missing">Definition of property name DynamicLakesExtent required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="EndorheicBasins" choice="XOR">
+          <definition status="provided"> basins not flowing to ocean. </definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+    </component>
+  </component>
+</vocab>
