@@ -91,7 +91,7 @@ def componentEdit(request,centre_id,component_id):
 def componentSub(request,centre_id,component_id):
     ''' Add a subcomponent onto a component '''
     c=componentHandler(centre_id,component_id)
-    return c.addsub()
+    return c.addsub(request)
     
 def componentRefs(request,centre_id,component_id):
     ''' Manage the references associated with a component '''

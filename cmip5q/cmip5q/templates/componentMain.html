@@ -2,13 +2,22 @@
 {% extends "base.html" %}
 {% block content %} 
 
-<div class="boxer"> <table>
+<div class="boxer"> 
 <!--
 <tr><td width="800px"><h1> Model Component {{c.abbrev }} </h1></td>
 <td width="20%"> {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
 <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
 </table>-->
-<h1> Model Component {{c.abbrev }} </h1>
+<table><tr>
+<td><h1> Model Component {{c.abbrev }} </h1> </td> {% if c.controlled %} {% else %}
+    <td>
+        <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
+            <input type="hidden" name="deleteMe" value="1"/>
+            <input id="deleteButton" type="submit" value="Delete"/>
+        </form>
+    </td>
+    {% endif %}
+    </tr></table>
  </div>
 
 <table class="navmain">
@@ -20,7 +29,8 @@
             <h4>Component {{c.abbrev}}</h4>
             <p class="guidance"> Please add details of any other relevant
             subcomponents of this component <p>
-            <p><a id="sublinkbut" href="{{urls.subcomp}}"> Add Subcomponent</a></p>
+            <p><form action="{{urls.subcomp}}" method="POST">
+                <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/></form></p>
         </div>
         <div class="boxer"> 
         <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
@@ -84,7 +94,8 @@
             <p>{{cform.description}}</p> 
             </center> 
         </div>
-    <center><input id="updateButton1" type="submit" value="Save"/></center>
+    <center><input id="updateButton1" type="submit" value="Save"/>
+    </center>
     </form>
     </div>
     
@@ -139,12 +150,14 @@
         var oLinkButton1 = new YAHOO.widget.Button("viewlinkbut"); 
         var oLinkButton2 = new YAHOO.widget.Button("vallinkbut"); 
         var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
-        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut"); 
+       
         var oLinkButton5 = new YAHOO.widget.Button("numlinkbut"); 
         var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
         //var olinkButton7 = new YAHOO.widget.Button("outlinkbut");//
         var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
+        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
         var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
+        var deleteButton1 = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
 </script>
 <!-- end of button javascript -->
 

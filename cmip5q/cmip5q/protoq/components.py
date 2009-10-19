@@ -81,29 +81,47 @@ class componentHandler(object):
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
             
-    def addsub(self):
+    def addsub(self,request):
         ''' Add a subcomponent to a parent, essentially, we create a subcomponent, and return
         it for editing  '''
         #we have instantiated self.component as the parent!
         #ok create a new component
-        u=str(uuid.uuid1())
-        c=Component(scienceType='sub',centre=self.component.centre,uri=u,abbrev='new',
-                    contact=self.component.contact,email=self.component.email,
-                    model=self.component.model,realm=self.component.realm)
-        c.save()
-        self.component.components.add(c)
-        url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
-        logging.info('Created subcomponent %s in component %s (type "new")'%(c.id,self.component.id))
-        return HttpResponseRedirect(url)
+        if request.method=='POST':
+            u=str(uuid.uuid1())
+            c=Component(scienceType='sub',centre=self.component.centre,uri=u,abbrev='new',
+                        contact=self.component.contact,email=self.component.email,
+                        model=self.component.model,realm=self.component.realm)
+            r=c.save()
+            #print 'Return Value',r
+            self.component.components.add(c)
+            url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))
+            logging.info('Created subcomponent %s in component %s (type "new")'%(c.id,self.component.id))
+            return HttpResponseRedirect(url)
+        else:
+            #would be better to post the create child to the parent url, not this artificial non restful way 
+            return HttpResponseBadRequest('Cannot use HTTP GET to this URL')
 
     def edit(self,request):
         ''' Provides a form to edit a component, and handle the posting of a form
-        containing edits for a component '''
-        
-        if NEWMINDMAPS: PropertyForm=NewPropertyForm
+        containing edits for a component, or a delete'''
         
         c=self.component
         logging.debug('Starting editing component %s'%c.id)
+        
+        if request.method=='POST':
+            if 'deleteMe' in request.POST:
+                if c.controlled:
+                    logging.debug('Invalid delete POST to controlled component')
+                    return HttpResponse('Invalid Request')
+                else:
+                    if len(c.components.all())<>0:
+                        return HttpResponse('You need to delete child components first')
+                    parent=Component.objects.filter(components=c)[0]
+                    url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,parent.id,))
+                    c.delete()
+                    return HttpResponseRedirect(url)
+        
+        if NEWMINDMAPS: PropertyForm=NewPropertyForm
         
         # find my own urls ...
         urls={}
