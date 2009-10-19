@@ -66,7 +66,10 @@ class simulationHandler(object):
                     args=(self.centreid,s.id,))
             urls['ens']=reverse('cmip5q.protoq.views.ensemble',
                     args=(self.centreid,s.id,))
-              
+            urls['validate']=reverse('cmip5q.protoq.views.simulationValidate',
+                    args=(self.centreid,s.id,))
+            urls['view']=reverse('cmip5q.protoq.views.simulationView',
+                    args=(self.centreid,s.id,))
         
         if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
