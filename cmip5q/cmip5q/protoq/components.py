@@ -71,10 +71,10 @@ class componentHandler(object):
             #nm.read()
             cmip5c=Centre.objects.get(abbrev='CMIP5')
             original=Component.objects.filter(abbrev='GCM Template').get(centre=cmip5c)
-            self.component=original.makeNewCopy(Centre.objects.get(id=centre_id))
+            self.component=original.copy(Centre.objects.get(id=centre_id))
         else:
             try:
-                self.component=Component.objects.get(pk=component_id)
+                self.component=Component.objects.get(id=component_id)
             except:
                 return HttpResponse('Unknown component %s'%component_id)
         
@@ -89,7 +89,8 @@ class componentHandler(object):
         if request.method=='POST':
             u=str(uuid.uuid1())
             c=Component(scienceType='sub',centre=self.component.centre,uri=u,abbrev='new',
-                        contact=self.component.contact,email=self.component.email,
+                        contact=self.component.contact,author=self.component.author,
+                        funder=self.component.funder,
                         model=self.component.model,realm=self.component.realm)
             r=c.save()
             #print 'Return Value',r
@@ -298,9 +299,6 @@ class componentHandler(object):
         os.remove(file.name)
 
         return linestring
-   
-    def numerics(self):
-        return HttpResponse('Not implemented')
         
     def coupling(self,request,ctype=None):
         ''' Handle the construction of component couplings '''
@@ -353,7 +351,7 @@ class componentHandler(object):
             return HttpResponse('uknown request')
         if not self.component.isModel: return HttpResponse("Not a model, wont copy")
         centre=Centre.objects.get(id=self.centre_id)
-        new=self.component.makeNewCopy(centre)
+        new=self.component.copy(centre)
         new.abbrev=self.component.abbrev+'cp'
         new.title=self.component.title+'cp'
         new.save()

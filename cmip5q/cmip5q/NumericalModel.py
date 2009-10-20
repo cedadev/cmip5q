@@ -47,6 +47,8 @@ class NumericalModel:
         if klass != Centre:
             raise ValueError('Need a valid django centre class for NumericalModel, got %s'%klass)
         self.centre=centre
+        self.joe=ResponsibleParty.objects.filter(centre=centre).get(name='Unknown')
+        
         if id==0: xml=True
         if xml and id<>0:
             raise ValueError('Incompatible arguments to numerical model')
@@ -58,6 +60,7 @@ class NumericalModel:
         else:
             raise ValueError('Nothing to do in NumericalModel')
         
+        
     def copy(self):
         
         new=self.top.makeNewCopy(self.centre)
@@ -66,17 +69,20 @@ class NumericalModel:
     
     def makeEmptyModel(self,
                       centre,
-                      authorName='Joe Bloggs',
-                      authorEmail='joe@foo.bar',
+                      author=None,
+                      contact=None,
+                      funder=None,
                       title='GCM Template',
                       abbrev='GCM Template'):
-   
-        u=str(uuid.uuid1())
-        component=Component(scienceType='model',centre=centre,abbrev='',uri=u)
+        
+        if author is None: author=self.joe
+        if funder is None: funder=self.joe
+        if contact is None: contact=self.joe
+        
+        component=Component(scienceType='model',centre=centre,abbrev='',uri=str(uuid.uuid1()),
+                            author=author,contact=contact,funder=funder)
         component.isModel=True
         component.isRealm=False
-        component.contact=authorName
-        component.email=authorEmail
         component.title=title
         component.abbrev=abbrev
         component.save()
@@ -406,7 +412,8 @@ class ComponentParser:
                 uri=u,
                 centre=self.model.centre,
                 contact=self.model.contact,
-                email=self.model.email)
+                author=self.model.author,
+                funder=self.model.funder)
         component.save() # we need a primary key value so we can add subcomponents later
         self.component=component # used to assign parameters ...
         
@@ -447,10 +454,10 @@ class TestFunctions(unittest.TestCase):
     ''' We can have real unittests for this, because it's independent of the webserver '''
     def setUp(self):
         try:
-            self.centre=Centre.objects.get(pk=1)
+            self.centre=Centre.objects.get(abbrev="CMIP5")
         except: 
             u=str(uuid.uuid1())
-            c=Centre(abbrev='CMIP5',title='Dummy testing version',
+            c=Centre(abbrev='CMIP5',name='Dummy testing version',
                      uri=u)
             logging.debug('Created dummy centre for testing')
             c.save()

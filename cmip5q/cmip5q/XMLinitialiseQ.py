@@ -54,6 +54,7 @@ conformanceTypes=('BoundaryCondition','InitialCondition', 'CodeModification')
 # would need to modify the numerical requiremnet class, and the conformance code.
 numrecTypes=('BoundaryCondition','InitialCondition')
 
+
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
     v=Vocab(uri=str(uuid.uuid1()),name=name)
@@ -68,9 +69,12 @@ def initialise():
     #start with initialising the centres:
     for centre in centres:
         u=str(uuid.uuid1())
-        c=Centre(abbrev=centre[0],title=centre[1],uri=u)
+        c=Centre(abbrev=centre[0],name=centre[1],uri=u)
         c.save()
-    
+        #and give each of them an unknown user to play with
+        rp=ResponsibleParty(name='Unknown',abbrev='Unknown',address='Erehwon',email='u@foo.bar',
+                            uri=str(uuid.uuid1()),centre=c)
+        rp.save()
     #add the realm vocabularies
     loadvocab('Realms',realms)
         
@@ -97,3 +101,5 @@ def initialise():
     
     #support for file formats
     loadvocab('FileFormats',FileFormats)
+    
+    

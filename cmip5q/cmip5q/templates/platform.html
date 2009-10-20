@@ -2,29 +2,41 @@
 {% block content %}
 <div class="inner">
     <div class="boxer">
-        <h2> Edit platform {{pname}} for {{c}}</h2>
+        <h1> Edit platform {{pname}} for {{c}}</h1>
     </div>
-    <div class="boxer">
+    <div class="boxer2">
     <form action='{{url}}' method='post'>
+        <div class="boxer">
         <table>
         <tr>
             <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
+           
+        </tr>
+        <tr>
+            <td>Contact:&nbsp;{{pform.contact.errors}}</td><td>{{pform.contact}}</td>
+            <td>Funder:&nbsp;{{pform.funder.errors}}</td><td>{{pform.funder}}</td></tr>
+        </tr>
+        </table>
+        </div>
+        <div class="boxer">
+        <table>
+        <tr> 
             <td>Vendor:{{pform.vendor.errors}}</td><td>{{pform.vendor}}</td>
-        </tr><tr>
             <td>Compiler:{{pform.compiler.errors}}</td><td>{{pform.compiler}}</td>
             <td>Compiler Version:{{pform.compilerVersion.errors}}</td><td>{{pform.compilerVersion}}</td>
         </tr><tr>
             <td>Operating System:{{pform.operatingSystem.errors}}</td><td>{{pform.operatingSystem}}</td>
-            <td colspan="2">Maximum Processors:{{pform.maxProcessors.errors}}{{pform.maxProcessors}}
-                Cores Per Processor:{{pform.coresPerProcessor.errors}}{{pform.coresPerProcessor}}</td>
+            <td colspan="2">Maximum Processors:{{pform.maxProcessors.errors}}&nbsp;{{pform.maxProcessors}}</td>
+            <td colspan="2">Cores Per Processor:{{pform.coresPerProcessor.errors}}&nbsp;{{pform.coresPerProcessor}}</td>
         </tr><tr>
-        <td colspan="4">Hardware:{{pform.hardware.errors}}{{pform.hardware}}
-                        Processor Type: {{pform.processor.errors}}{{pform.processor}}
-                        Interconnect Type: {{pform.interconnect.errors}}{{pform.interconnect}}</td>
+            <td>Hardware:{{pform.hardware.errors}}</td><td>{{pform.hardware}}</td>
+            <td>Processor Type: {{pform.processor.errors}}</td><td>{{pform.processor}}</td>
+            <td>Interconnect Type: {{pform.interconnect.errors}}</td><td>{{pform.interconnect}}</td>
         </tr><tr>
-        <td>Any extra information:{{pform.description.errors}}</td><td colspan="3">{{pform.description}}</td>
+        <td>Any extra information:{{pform.description.errors}}</td><td colspan="6">{{pform.description}}</td>
         </tr>.     
         </table>
+        </div>
         <center> <input type="submit" value="Save"/></center>
     </form>
     </div>

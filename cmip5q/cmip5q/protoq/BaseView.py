@@ -38,6 +38,7 @@ class BaseViewHandler:
         elif method == 'GET':
             # FIXME we'll need to do the specialisation based on the 
             # target information ... postpone this again for now.
+            print self.resource['form']
             form=self.resource['form'](*args,**kwargs)
             constraints=self.constraints()
             print 'constraints',constraints

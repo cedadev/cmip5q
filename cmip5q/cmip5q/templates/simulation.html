@@ -36,27 +36,36 @@
         </div>
         </td>
         <td valign="top" width="900px">
-            <div class="boxer">
-                <h4> General Characteristics of the Simulation </h4>
-                <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
+            <div class="boxer2">
                 <form action="{{urls.url}}" method="post">
-                <table>
-                <tr><td>Short Name:{{simform.abbrev.errors}} </td><td>{{simform.abbrev}}</td></tr>
-                <tr><td>Long Name:{{simform.title.errors}} </td><td>{{simform.title}}</td></tr>
-                <tr><td>Contact Email:{{simform.email.errors}} </td><td>{{simform.email}}</td></tr>
-                <tr><td>Contact Name:{{simform.contact.errors}} </td><td>{{simform.contact}}</td></tr>
-                <tr><td> Simulation used:  </td><td>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
-                on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
-                <tr><td>Ensemble Members: </td><td>{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
-                </td></tr>
-                <tr><td>Description (notes){{simform.description.errors}}</td><td>{{simform.description}}</td></tr>
-                <tr><td colspan="2">
-                <center><input id="simFormButton" type="submit" value="{{label}}"/>
-               
-                </center></td></tr>
-                </table>
+                    <div class="boxer">
+                    <h4> General Characteristics of the Simulation </h4>
+                    <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
+                    <table>
+                    <tr><td>Short Name:{{simform.abbrev.errors}} </td><td colspan="3">{{simform.abbrev}}</td></tr>
+                    <tr><td>Long Name:{{simform.title.errors}} </td><td colspan="3">{{simform.title}}</td></tr>
+                
+                    <tr><td> Simulation used:  </td><td colspan="3">Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
+                    on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
+                    <tr><td>Ensemble Members: </td><td colspan="3">{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
+                    </td></tr>
+                    <tr><td>Description (notes){{simform.description.errors}}</td><td colspan="3">{{simform.description}}</td></tr> 
+                    <tr><td colspan="4">Responsible Parties (use the parties tab to add more choices here): </td></tr>
+                    <tr><td></td><td>Contact:&nbsp;{{simform.contact.errors}}{{simform.contact}}</td>
+                                <td>Lead Author:&nbsp;{{simform.author.errors}}{{simform.author}}</td>
+                                <td>Funder:&nbsp;{{simform.funder.errors}}{{simform.funder}}</td></tr>
+                    </table>
+                    </div>
+                    <div class="boxer">
+                    <center>
+                    <p>Please enter the list of authors you wish to appear in a DOI for this simulation
+                    {{simform.authorList.errors}}:</p><p>{{simform.authorList}}</p>
+                    </center>
+                    </div>
+                    <center><input id="simFormButton" type="submit" value="{{label}}"/>
+                    </center>
                 </form>
-            </div> <!-- right boxer -->
+            </div> <!-- boxser2 -->
         </td>
     </tr>
 </table>

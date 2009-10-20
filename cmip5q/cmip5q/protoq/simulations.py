@@ -79,6 +79,7 @@ class simulationHandler(object):
             simform=SimulationForm(request.POST,instance=s)
             simform.specialise(self.centre)
             if simform.is_valid():
+                print 'SAVING SIMFORM'
                 s=simform.save()
                 return HttpResponseRedirect(afterURL)
             else:

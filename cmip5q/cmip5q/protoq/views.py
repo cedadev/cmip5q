@@ -35,7 +35,7 @@ def centres(request):
     if request.method=='POST':
         #yep we've selected something
         try:
-            selected_centre=p.get(pk=request.POST['choice'])
+            selected_centre=p.get(id=request.POST['choice'])
         except KeyError:
             #redisplay form
             return render_to_response('centres.html',
@@ -47,14 +47,14 @@ def centres(request):
     
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''
-    c=Centre.objects.get(pk=centre_id)
+    c=Centre.objects.get(id=centre_id)
     models=[]
-    models=[Component.objects.get(pk=m.id) for m in c.component_set.filter(scienceType='model')]
+    models=[Component.objects.get(id=m.id) for m in c.component_set.filter(scienceType='model')]
     #monkey patch the urls to edit these ...
     for m in models:
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
         m.cpURL=reverse('cmip5q.protoq.views.componentCopy',args=(c.id,m.id))
-    platforms=[Platform.objects.get(pk=p['id']) for p in c.platform_set.values()]
+    platforms=[Platform.objects.get(id=p['id']) for p in c.platform_set.values()]
     for p in platforms:
         p.url=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,p.id))
     sims=Simulation.objects.filter(centre=c.id)
@@ -67,11 +67,12 @@ def centre(request,centre_id):
     
     refs=Reference.objects.filter(centre=c)
     files=DataObject.objects.filter(centre=c)
+    parties=ResponsibleParty.objects.filter(centre=c)
     
     logging.info('Viewing %s'%c.id)
     return render_to_response('centre.html',
         {'centre':c,'models':models,'platforms':platforms,
-         'refs':refs,'files':files,
+         'refs':refs,'files':files,'parties':parties,
         'newmod':newmodURL,'newplat':newplatURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
         'tabs':tabs(request,c.id,'Summary'),'notAjax':not request.is_ajax()})
       
@@ -201,14 +202,17 @@ def conformanceEdit(request,cen_id,sim_id,req_id):
 ##### PLATFORM HANDLING ###########################################################
 
 class MyPlatformForm(PlatformForm):
-    def __init__(self,*args,**kwargs):
+    def __init__(self,centre,*args,**kwargs):
         PlatformForm.__init__(self,*args,**kwargs)
         self.vocabs={'hardware':Vocab.objects.get(name='hardwareType'),
                      'processor':Vocab.objects.get(name='processorType'),
                      'interconnect':Vocab.objects.get(name='interconnectType')}
         for key in self.vocabs:
             self.fields[key].queryset=Value.objects.filter(vocab=self.vocabs[key])
-
+        qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
+        self.fields['funder'].queryset=qs
+        self.fields['contact'].queryset=qs
+        
 def platformEdit(request,centre_id,platform_id=None):
     ''' Handle platform editing '''
     c=Centre.objects.get(id=centre_id)
@@ -216,20 +220,20 @@ def platformEdit(request,centre_id,platform_id=None):
     if platform_id is None:
         editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,))
         if request.method=='GET':
-            pform=MyPlatformForm()
+            pform=MyPlatformForm(c)
         elif request.method=='POST':
-            pform=MyPlatformForm(request.POST)
+            pform=MyPlatformForm(c,request.POST)
         pname=''
         puri=str(uuid.uuid1())
     else:
         editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))
-        p=Platform.objects.get(pk=platform_id)
+        p=Platform.objects.get(id=platform_id)
         puri=p.uri
         pname=p.abbrev
         if request.method=='GET':
-            pform=MyPlatformForm(instance=p)
+            pform=MyPlatformForm(c,instance=p)
         elif request.method=='POST':
-            pform=MyPlatformForm(request.POST,instance=p)
+            pform=MyPlatformForm(c,request.POST,instance=p)
     # now we've got a form, handle it        
     if request.method=='POST':
         if pform.is_valid():
@@ -247,7 +251,7 @@ def platformEdit(request,centre_id,platform_id=None):
 ########## EXPERIMENT VIEWS ##################
     
 def viewExperiment(request,experiment_id):
-    e=Experiment.objects.get(pk=experiment_id)
+    e=Experiment.objects.get(id=experiment_id)
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'notAjax':not request.is_ajax()})
 
@@ -323,6 +327,9 @@ class ViewHandler(BaseViewHandler):
                         'reference':{'attname':'references',
                             'title':'Reference','tab':'References',
                             'class':Reference,'form':ReferenceForm},
+                        'parties':{'attname':'responsibleParty',
+                                   'title':'Party','tab':'Parties',
+                                   'class':ResponsibleParty,'form':ResponsiblePartyForm},
                         }
                         
     # Some resources are associated with specific targets, so we need a mapping
@@ -350,8 +357,6 @@ class ViewHandler(BaseViewHandler):
     # references for a given component (assign to a component and list)
     # data objects in general (list)
     # initial conditions (assign to a simulation) and list
-    
-    
                         
     def __init__(self,cen_id,resourceType,resource_id,target_id,targetType):
         ''' We can have some combination of the above at initialiation time '''
@@ -400,6 +405,8 @@ class ViewHandler(BaseViewHandler):
         elif self.resource['type']=='codemodification':
             objects=objects.filter(centre=self.centre)
             objects=objects.order_by('mnemonic')
+        elif self.resource['type']=='parties':
+            objects=objects.filter(centre=self.centre).order_by('name')
         return objects
         
     def constraints(self):

@@ -63,6 +63,7 @@ class tabs(list):
                  ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],)),
                  ('Files','cmip5q.protoq.views.list',(centre_id,'file',)),
                  ('References','cmip5q.protoq.views.list',(centre_id,'reference',)),
+                 ('Parties','cmip5q.protoq.views.list',(centre_id,'parties',)),
                  ('Help','cmip5q.protoq.views.help',(centre_id,)),
                  ('About','cmip5q.protoq.views.about',(centre_id,)),
                  ]

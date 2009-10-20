@@ -10,13 +10,33 @@ import logging
 
 NEWMINDMAPS=1
 
+class ResponsibleParty(models.Model):
+    ''' So we have the flexibility to use this in future versions '''
+    name=models.CharField(max_length=128,blank=True)
+    abbrev=models.CharField(max_length=25)
+    email=models.EmailField(blank=True)
+    address=models.TextField(blank=True)
+    uri=models.CharField(max_length=64,unique=True)
+    centre=models.ForeignKey('Centre',blank=True,null=True) # for access control
+    def __unicode__(self):
+        return self.abbrev
+    
+class Centre(ResponsibleParty):
+    ''' A CMIP5 modelling centre '''
+    # It's such an important entity it gets it's own sub class ...
+    # I wanted to preserve the API, but title will need to change to name
+    party=models.OneToOneField(ResponsibleParty,parent_link=True,related_name='party')
+    def __init__(self,*args,**kwargs):
+        ResponsibleParty.__init__(self,*args,**kwargs)
+
 class Doc(models.Model):
     ''' Abstract class for general properties '''
     title=models.CharField(max_length=128,blank=True,null=True)
     abbrev=models.CharField(max_length=25)
-    email=models.EmailField(blank=True)
-    contact=models.CharField(max_length=128,blank=True,null=True)
-    description=models.TextField(blank=True,null=True)
+    author=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_author')
+    funder=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_funder')
+    contact=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_contact')
+    description=models.TextField(blank=True)
     uri=models.CharField(max_length=64,unique=True)
     def __unicode__(self):
         return self.abbrev
@@ -69,18 +89,19 @@ class Component(Doc):
         schematron = ET.Schematron(sct_doc)
         return schematron.validate(CIMFragment)
 
-    def makeNewCopy(self,centre,model=None,realm=None,email=None,contact=None):
+    def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''
+        if centre.__class__!=Centre:
+            raise ValueError('Invalid centre passed to component copy')
         
         attrs=['title','abbrev','description',
                'scienceType','controlled','isRealm','isModel',
-               'email','contact']
+               'author','contact','funder']
         kwargs={}
         for i in attrs: kwargs[i]=self.__getattribute__(i)
-        if email:kwargs['email']=email
-        if contact: kwargs['contact']=contact
-        kwargs['title']=kwargs['title']+'dup'
-        kwargs['abbrev']=kwargs['abbrev']+'dup'
+        if kwargs['isModel']: 
+            kwargs['title']=kwargs['title']+' dup'
+            kwargs['abbrev']=kwargs['abbrev']+' dup'
         kwargs['uri']=str(uuid.uuid1())
         kwargs['centre']=centre
         
@@ -105,9 +126,9 @@ class Component(Doc):
         new.realm=realm
        
         for c in self.components.all():
-            r=c.makeNewCopy(centre,model=model,realm=realm,email=kwargs['email'],contact=kwargs['contact'])
+            r=c.copy(centre,model=model,realm=realm)
             new.components.add(r)
-            logging.debug('Added new component %s to component %s (in model %s with realm %s)'%(r,new,model,realm))
+            logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))
             
         #### Now we need to deal with the parameter settings too ..
         if NEWMINDMAPS:
@@ -190,7 +211,7 @@ class Experiment(models.Model):
     def __unicode__(self):
         return self.shortName
     class Meta:
-        ordering=('shortName',)
+        ordering=('longName',)
     
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
@@ -220,6 +241,9 @@ class Simulation(Doc):
     # boundary conditions link to us, not the other way round
     # ensemble descriptions (if appropriate) link to us.
     
+    # following will be used to construct the DOI
+    authorList=models.TextField()
+    
     def save(self):
         Doc.save(self)
         
@@ -235,8 +259,9 @@ class Simulation(Doc):
 
     def copy(self,experiment):
         ''' Copy this simulation into a new experiment '''
-        s=Simulation(abbrev=self.abbrev+'_copy',title='copy', 
-                     email=self.email, contact=self.contact, description='COPY',
+        s=Simulation(abbrev=self.abbrev+' dup',title='copy', 
+                     contact=self.contact, author=self.author, funder=self.funder,
+                     description=self.description, authorList=self.authorList,
                      uri=str(uuid.uuid1()),
                      experiment=experiment,numericalModel=self.numericalModel,
                      ensembleMembers=1, platform=self.platform, centre=self.centre,
@@ -252,9 +277,6 @@ class Simulation(Doc):
         # have a mapping page somewhere ... 
         return s
 
-class Centre(Doc):
-    ''' A CMIP5 modelling centre '''
-   
 
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -606,8 +628,7 @@ class SimulationForm(forms.ModelForm):
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
-    email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
-    contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     class Meta:
         model=Simulation
         #these are enforced by the workflow leading to the form
@@ -616,6 +637,8 @@ class SimulationForm(forms.ModelForm):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
                             scienceType='model').filter(centre=centre)
+        qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
+        for i in ['author','funder','contact']: self.fields[i].queryset=qs                  
     def save(self):
         s=forms.ModelForm.save(self)
         try:
@@ -635,8 +658,6 @@ class ComponentForm(forms.ModelForm):
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
-    email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}))
-    contact=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
    
     implemented=forms.BooleanField(required=False)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
@@ -649,6 +670,9 @@ class ComponentForm(forms.ModelForm):
                  'references','components')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
+        #concatenate to allow the centre to be shown as well as the other parties tied to it.
+        qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
+        for i in ['author','contact','funder']: self.fields[i].queryset=qs
         if self.instance.controlled: 
             # We don't want this to be editable 
             self.fields['scienceType'].widget=forms.HiddenInput()
@@ -723,7 +747,21 @@ class ComponentInputForm(forms.ModelForm):
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
     class Meta:
         model=ComponentInput
-    exclude=('owner','realm') # we know these
+        exclude=('owner','realm') # we know these
     
+class ResponsiblePartyForm(forms.ModelForm):
+    email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
+    name=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
+    address=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
+    class Meta:
+        model=ResponsibleParty
+        exclude=('uri','centre')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        self.hostCentre=None
+    def save(self):
+        r=forms.ModelForm.save(self,commit=False)
+        r.centre=self.hostCentre
+        r.save()  
     
-        

@@ -53,15 +53,18 @@
             <!--<h4> General Characteristics </h4>-->
             <table>
                 <tr><td>Short Name:&nbsp;{{cform.abbrev.errors}}</td>
-                <td>{{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
+                <td colspan="3">
+                  {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
                 </td></tr>
                 {% if cform.showImplemented %}
                 <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
-                <td>{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr>
+                <td colspan="3">{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr>
                 {% endif %}
-                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td>{{cform.title}}</td></tr> 
-                <tr><td>Contact Email:&nbsp;{{cform.email.errors}}</td><td>{{cform.email}}</td></tr>
-                <tr><td>Contact Name:&nbsp;{{cform.contact.errors}}</td><td>{{cform.contact}}</td></tr>
+                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
+                <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
+                <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>
+                             <td>Lead Author:&nbsp;{{cform.author.errors}}{{cform.author}}</td>
+                             <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td></tr>
             </table>
             <!-- Following is hidden -->
             {{cform.controlled}} 
