@@ -66,7 +66,7 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.platformEdit'),
     #
     # experiment/view/experiment_id
-    (r'^cmip5/experiment/view/(?P<experiment_id>\d+)/$',
+    (r'^cmip5/(?P<cen_id>\d+)/experiment/(?P<experiment_id>\d+)/$',
             'cmip5q.protoq.views.viewExperiment'),   
                 
     # cmip5/conformance/centre_id/simulation_id/requirement_id/$

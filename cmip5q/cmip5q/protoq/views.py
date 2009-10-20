@@ -250,10 +250,10 @@ def platformEdit(request,centre_id,platform_id=None):
         
 ########## EXPERIMENT VIEWS ##################
     
-def viewExperiment(request,experiment_id):
+def viewExperiment(request,cen_id,experiment_id):
     e=Experiment.objects.get(id=experiment_id)
     r=e.requirements.all()
-    return render_to_response('experiment.html',{'e':e,'reqs':r,'notAjax':not request.is_ajax()})
+    return render_to_response('experiment.html',{'e':e,'reqs':r,'tabs':tabs(request,cen_id,'Experiment')})
 
 ######## HELP and ABOUT ###############
 

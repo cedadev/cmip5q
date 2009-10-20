@@ -15,7 +15,7 @@
     <table width="100%">
         <tr><th width="20%">Experiment Name</th><th> Edit Simulations </th><th> Add Simulations </th></tr>
         {% for e in experiments %}
-        <tr><td><a href="/cmip5/experiment/view/{{e.id}}/">{{e.abbrev}}</a></td><td >
+        <tr><td><a href="{{e.url}}">{{e.abbrev}}</a></td><td >
         {% for s in e.values %}
             <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
             <script type="text/javascript">

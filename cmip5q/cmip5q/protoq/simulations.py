@@ -176,6 +176,7 @@ class simulationHandler(object):
                 self.abbrev=abbrev
                 self.values=values
                 self.id=id
+                self.url=reverse('cmip5q.protoq.views.viewExperiment',args=(c.id,id,))
                 self.new=reverse('cmip5q.protoq.views.simulationAdd',args=(c.id,id,))
                 
         csims=Simulation.objects.filter(centre=c)
