@@ -5,6 +5,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
+from protoq.utilities import uniqueness
 import uuid
 import logging
 
@@ -526,6 +527,9 @@ class ModForm(forms.ModelForm):
         o=forms.ModelForm.save(self,commit=False)
         o.centre=self.hostCentre
         o.save()
+    def clean(self):
+        ''' Needed to ensure reference name uniqueness within a centre '''
+        return uniqueness(self,self.hostCentre,'mnemonic')
         
 class ModelModForm(ModForm):
     class Meta:
@@ -577,7 +581,6 @@ class CouplingForm(forms.ModelForm):
                  'simulation', # we hold these across ...
                  'original'
                 )
-
 class InternalClosureForm(forms.ModelForm):
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
@@ -612,22 +615,8 @@ class DataObjectForm(forms.ModelForm):
         o.save()
     def clean(self):
         ''' Needed to ensure reference name uniqueness within a centre '''
-        #http://docs.djangoproject.com/en/dev/ref/forms/validation/#cleaning-and-validating-fields-that-depend-on-each-other
-        cleaned_data=self.cleaned_data
-        name=cleaned_data.get('name')
-        existing=DataObject.objects.all()
-        if self.hostCentre is not None:
-            existing=existing.filter(centre=self.hostCentre)      
-        #Assume we don't want something with no centre clashing with anything
-        #since it might want to be copied in later.
-        result=existing.filter(name=name)
-        if len(result)>0:
-            #It's already there ... reject
-            msg=u'%s is aready in use, please choose a unique name/mnenonic'%name
-            self._errors["name"] = ErrorList([msg])
-            del cleaned_data["name"]
-        return cleaned_data
-
+        return uniqueness(self,self.hostCentre,'name')
+        
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
@@ -710,22 +699,7 @@ class ReferenceForm(forms.ModelForm):
         pass
     def clean(self):
         ''' Needed to ensure reference name uniqueness within a centre '''
-        #http://docs.djangoproject.com/en/dev/ref/forms/validation/#cleaning-and-validating-fields-that-depend-on-each-other
-        cleaned_data=self.cleaned_data
-        name=cleaned_data.get('name')
-        existing=Reference.objects.all()
-        if self.hostCentre is not None:
-            existing=existing.filter(centre=self.hostCentre)      
-        #Assume we don't want something with no centre clashing with anything
-        #since it might want to be copied in later.
-        result=existing.filter(name=name)
-        if len(result)>0:
-            #It's already there ... reject
-            msg=u'%s is aready in use, please choose a unique name/mnenonic'%name
-            self._errors["name"] = ErrorList([msg])
-            del cleaned_data["name"]
-            print msg
-        return cleaned_data
+        return uniqueness(self,self.hostCentre,'name')
     
 class PlatformForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
