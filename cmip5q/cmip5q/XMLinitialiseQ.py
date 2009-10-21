@@ -47,15 +47,21 @@ interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed'
 #geneology 
 relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf')
 
-#types of conformance, we'll allow more than one to be chosen
-conformanceTypes=('BoundaryCondition','InitialCondition', 'CodeModification')
+#types of conformance, just allow one.
+conformanceTypes=('Via Couplings','Via Model Mods', 'Via Combination')
 
-# types of numerical requirement (nb: at the moment we don't use these, it's hardwired)
-# would need to modify the numerical requiremnet class, and the conformance code.
-numrecTypes=('BoundaryCondition','InitialCondition')
-
+# types of modification
+modificationTypes=('ModelMod','InputMod')
 # input requirements
 inputTypes=('InitialCondition','BoundaryCondition','AncillaryFile')
+# model modification types
+modelModTypes=('ParameterChange','CodeChange')
+
+# types of numerical requirement 
+numrecTypes=('BoundaryCondition','InitialCondition')
+
+#ensembleTypes
+ensembleTypes=('Differing Start Date','Differing Initialisation','Perturbed Physics')
 
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
@@ -98,13 +104,18 @@ def initialise():
     loadvocab('relations',relations)
     
     #support for conformanceTypes and numericalRequirementTypes
-    loadvocab('conformanceTypes',conformanceTypes)
-    loadvocab('numericalRequirementTypes',numrecTypes)
+    loadvocab('ConformanceTypes',conformanceTypes)
+    loadvocab('ModifcationTypes',modificationTypes)
+    loadvocab('ModelModTypes',modelModTypes)
+    
+    loadvocab('NumericalRequirementTypes',numrecTypes)
     
     #support for file formats
     loadvocab('FileFormats',FileFormats)
     
     #input types
     loadvocab('InputTypes',inputTypes)
-    
+        
+    #ensemble types
+    loadvocab('EnsembleTypes',ensembleTypes)
     

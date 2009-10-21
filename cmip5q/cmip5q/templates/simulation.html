@@ -20,6 +20,8 @@
                 <!--<p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>-->
                 <p><a id="bclinkbut" href="{{urls.bc}}">Input Coupling</a></p>
                 <h4> Experiment Criteria</h4>
+                <p><a id="modlinkbut" href="{{urls.mod}}">Model Mods</a></p>
+                <!--<p><a id="icslinkbut" href="{{urls.ics}}">Input Mods</a></p>-->
                 <p><a id="conlinkbut" href="{{urls.con}}">Conformance</a></p>
                 <h4> Ensemble Characteristics </h4>
                 {% ifequal s.ensembleMembers 1 %}
@@ -72,23 +74,20 @@
                 var oLinkButton4 = new YAHOO.widget.Button("conlinkbut"); 
                 var oLinkButton5 = new YAHOO.widget.Button("viewlinkbut"); 
                 var oLinkButton6 = new YAHOO.widget.Button("vallinkbut"); 
+                var oLinkButton7 = new YAHOO.widget.Button("modlinkbut"); 
+                //var oLinkButton8 = new YAHOO.widget.Button("icslinkbut"); 
                 var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
             </script>
             
             {% if ensemble %}<div class="boxer">
                 <h4> Ensemble Characteristics </h4>
-                <p>{{ensemble.set.description}}</p>
+                <p>Description:{{ensemble.set.description}}</p>
                 <table>
                 {% for m in ensemble.members %}
-                <tr><td>Member {{m.memberNumber}} has </td>
-                {% if ensemble.set.perturbedPhysics %}
-                <td> Code Modification: {{m.codeModification}}</td>
-                {% else %}
-                <td> Initial Condition: {{m.initialCondition}}</td>
-                {% endif %}
-                </tr>
+                <tr class="{%cycle  'row2' 'row1'%}"><td>Member {{m.memberNumber}} has modification: {{m.mod}}</td></tr>
                 {% endfor %}
                 </table>
+                <p> (You can modify thse using the "Ensemble Characteristics" button on the left hand menu.)
             </div>{% endif %}
             
             <div class="boxer">

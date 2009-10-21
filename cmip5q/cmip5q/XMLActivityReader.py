@@ -28,7 +28,7 @@ class numericalRequirement:
         if typekey in elem.attrib.keys():
             ctype=elem.attrib[typekey]
         else: ctype=''
-        v=Vocab.objects.get(name='conformanceTypes')
+        v=Vocab.objects.get(name='NumericalRequirementTypes')
         ctypeVals=Value.objects.filter(vocab=v)
         try:
             self.ctype=ctypeVals.get(value=ctype)

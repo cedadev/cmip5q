@@ -280,23 +280,26 @@ def ensemble(request,cen_id,sim_id):
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
           'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
           'mods':reverse('cmip5q.protoq.views.list',
-                     args=(cen_id,'codemodification','ensemble',s.id,)),
+                     args=(cen_id,'modelmod','ensemble',s.id,)),
           'ics':reverse('cmip5q.protoq.views.list',
-                     args=(cen_id,'initialcondition','ensemble',s.id,))}
-                     
+                     args=(cen_id,'inputmod','ensemble',s.id,)),        
+                     }                 
     if request.method=='GET':
         eform=EnsembleForm(instance=e,prefix='set')
         eformset=EnsembleMemberFormset(queryset=members,prefix='members')
     elif request.method=='POST':
+        if e.etype is not None:
+            eformset=EnsembleMemberFormset(request.POST,queryset=members,prefix='members')
+        else: eformset=None
         eform=EnsembleForm(request.POST,instance=e,prefix='set')
-        eformset=EnsembleMemberFormset(request.POST,queryset=members,prefix='members')
         ok=True
         if eform.is_valid():
             eform.save()
         else: ok=False
-        if eformset.is_valid():
-            eformset.save()
-        else: ok=False
+        if eformset is not None:
+            if eformset.is_valid():
+                eformset.save()
+            else: ok=False
         logging.debug('POST to ensemble is ok - %s'%ok)
         if ok: return HttpResponseRedirect(urls['self'])
     return render_to_response('ensemble.html',
@@ -315,15 +318,15 @@ class ViewHandler(BaseViewHandler):
     # as it will appear in a URL, the name it is used when an attribute, 
     # the resource class and the resource class form
     # (so keys need to be lower case)
-    SupportedResources={'initialcondition':{'attname':'initialCondition',
-                            'title':'Initial Condition','tab':'IniCon',
-                            'class':InitialCondition,'form':InitialConditionForm},
+    SupportedResources={'modelmod':{'attname':'modelMod',
+                            'title':'Model Modification','tab':'ModelMods',
+                             'class':ModelMod,'form':ModelModForm},
+                        'inputmod':{'attname':'inputMod',
+                            'title':'Input Modifications','tab':'InputMods',
+                             'class':InputMod,'form':InputModForm}, 
                         'file':{'attname':'dataObject',
                             'title':'File','tab':'Files',
                             'class':DataObject,'form':DataObjectForm},
-                        'codemodification':{'attname':'codeModification',
-                            'title':'Code Modification','tab':'CodeMods',
-                            'class':CodeModification,'form':CodeModificationForm},
                         'reference':{'attname':'references',
                             'title':'Reference','tab':'References',
                             'class':Reference,'form':ReferenceForm},
@@ -389,20 +392,17 @@ class ViewHandler(BaseViewHandler):
     def objects(self):
         ''' Returns a list of objects to display, as a function of the resource and target types'''
         objects=self.resource['class'].objects.all()
-        if self.resource['type']=='codemodification' and self.target['type']=='simulation':
+        if self.resource['type']=='modelmod' and self.target['type']=='simulation':
             # for code modifications, we need to get those associated with a model for a simulation
             constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
             objects=objects.filter(component__in=constraintSet)
         if self.resource['type']=='reference':
             # show all the references, why not ...
             objects=objects.order_by('name')
-        elif self.resource['type']=='initialcondition':
-            objects=objects.filter(centre=self.centre)
-            objects=objects.order_by('date')
         elif self.resource['type']=='file':
             objects=objects.filter(centre__in=[None,self.centre])
             objects=objects.order_by('name')
-        elif self.resource['type']=='codemodification':
+        elif self.resource['type']=='modelmod':
             objects=objects.filter(centre=self.centre)
             objects=objects.order_by('mnemonic')
         elif self.resource['type']=='parties':
@@ -411,13 +411,18 @@ class ViewHandler(BaseViewHandler):
         
     def constraints(self):
         ''' Return constraints for form specialisation '''
-        if self.resource['type']=='codemodification':
+        if self.resource['type']=='modelmod':
             if self.target['type']=='simulation':
                 return self.target['instance'].numericalModel
             elif self.target['type']=='component':
                 return self.target['instance']
+            elif self.target['type']=='ensemble':
+                return self.target['instance'].numericalModel
         if self.resource['type']=='reference':
             return True
+        if self.resource['type']=='inputmod':
+            if self.target['type']=='ensemble':
+                return self.target['instance'] # which should be a simulation
                    
         return None
 

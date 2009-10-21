@@ -120,6 +120,7 @@ class BaseViewHandler:
             instance=self.resource['class'].objects.get(id=self.resource['id'])
                     
         if request.method=='POST':
+            logging.debug('Handling post with %s, %s '%(self.resource,request.POST))
             form=self._constructForm('POST',request.POST,instance=instance)
             form.hostCentre=self.centre
             if form.is_valid():
@@ -128,10 +129,10 @@ class BaseViewHandler:
                 form.save() ##################### WHY DID I JUST ADD THIS >>>> 23/9
                 return HttpResponseRedirect(okURL)
             else:
+                print 'ERRORS [%s]'%form.errors
                 constraints=self.constraints()
                 if constraints:form.specialise(constraints)
                 
-           
         if request.method=='GET':
             form=self._constructForm('GET',instance=instance)
         

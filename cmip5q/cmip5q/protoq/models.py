@@ -235,14 +235,14 @@ class Simulation(Doc):
     platform=models.ForeignKey(Platform)
     #each simulation run by one centre
     centre=models.ForeignKey('Centre')
-    #
-    # enforce the following as required via q'logical validation, not form validation.
-    initialCondition=models.ForeignKey('InitialCondition',blank=True,null=True)
-    # boundary conditions link to us, not the other way round
-    # ensemble descriptions (if appropriate) link to us.
-    
     # following will be used to construct the DOI
     authorList=models.TextField()
+    
+    # allow some minor mods to match the criteria, how else would it be described?
+    modelMod=models.ManyToManyField('ModelMod',blank=True,null=True)
+    
+    # this next is here in case we need it later, but I think we shouldn't
+    inputMod=models.ManyToManyField('InputMod',blank=True,null=True)
     
     def save(self):
         Doc.save(self)
@@ -265,7 +265,7 @@ class Simulation(Doc):
                      uri=str(uuid.uuid1()),
                      experiment=experiment,numericalModel=self.numericalModel,
                      ensembleMembers=1, platform=self.platform, centre=self.centre,
-                     initialCondition=self.initialCondition)
+                     inputMod=self.inputMod,modelMod=self.modelMod)
         s.save()
         #now we need to get all the other stuff related to this simulation
         #couplings:
@@ -455,31 +455,10 @@ class ExternalClosure(CouplingClosure):
     def __unicode__(self):
         return 'eClosure %s'%self.target    
         
-class InitialCondition(models.Model):
-    ''' Simulation initial condition '''
-    description=models.TextField(blank=True,null=True)
-    date=models.DateField() # watch out, model calendars ...
-    #actually we want to replace this with a choice into CF ... but need to
-    #work out how to handle this. The assumption is that the files will be
-    #in the archive, so we don't need to ask for them. If we know their
-    #CF name, then we know them.
-    variables=models.TextField(blank=True,null=True)
-    centre=models.ForeignKey(Centre)
-    def __unicode__(self):
-        return 'IC%s-%s'%(self.id,self.date)
-         
-class CodeModification(models.Model):
-    mnemonic=models.SlugField()
-    component=models.ForeignKey(Component)
-    description=models.TextField()
-    centre=models.ForeignKey(Centre)
-    #we could try and get to the parameter values as well ...
-    def __unicode__(self):
-        return "%s (%s)"%(self.mnemonic,self.component)
 
 class Ensemble(models.Model):
     description=models.TextField(blank=True,null=True)
-    perturbedPhysics=models.BooleanField(default=False)
+    etype=models.ForeignKey(Value,blank=True,null=True)
     simulation=models.ForeignKey(Simulation)
     def updateMembers(self):
         ''' Make sure we have enough members, this needs to be called if the
@@ -498,9 +477,7 @@ class Ensemble(models.Model):
 class EnsembleMember(models.Model):
     ensemble=models.ForeignKey(Ensemble,blank=True,null=True)
     memberNumber=models.IntegerField()
-    #  one of the following will be selected via the perturbedPhysics choice in Ensemble.
-    codeModification=models.ForeignKey(CodeModification,blank=True,null=True)
-    initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
+    mod=models.ForeignKey('Modification',blank=True,null=True)
     def __unicode__(self):
         return '%s ensemble member %s'%(self.ensemble.simulation,self.memberNumber)
     
@@ -511,58 +488,86 @@ class Conformance(models.Model):
     # simulation owning the requirement 
     simulation=models.ForeignKey(Simulation)
     # conformance type from the controlled vocabulary
-    ctype=models.ForeignKey(Value,blank=True,null=True)
-    # code modification 
-    codeModification=models.ManyToManyField(CodeModification,blank=True,null=True)
-    initialCondition=models.ForeignKey(InitialCondition,blank=True,null=True)
-    boundaryCondition=models.ForeignKey(Coupling,blank=True,null=True)
+    ctype=models.ForeignKey(Value)
+    #
+    mod=models.ManyToManyField('Modification',blank=True,null=True)
+    coupling=models.ManyToManyField(Coupling,blank=True,null=True)
     # notes
     description=models.TextField(blank=True,null=True)
     def __unicode__(self):
         return "%s for %s"%(self.ctype,self.requirement)
-
+    
+class Modification(models.Model):
+    mnemonic=models.SlugField()
+    mtype=models.ForeignKey(Value)
+    description=models.TextField()
+    centre=models.ForeignKey(Centre)
+    def __unicode__(self):
+        return '%s(%s)'%(self.mnemonic,self.mtype)
+    
+class InputMod(Modification):
+    ''' Simulation initial condition '''
+    # could need a date to override the date in the file for i.c. ensembles.
+    date=models.DateField(blank=True,null=True) # watch out, model calendars
+    # could be to multiple inputs ... otherwise it'd get untidy
+    inputs=models.ManyToManyField(Coupling,blank=True,null=True)
+         
+class ModelMod(Modification):
+    #we could try and get to the parameter values as well ...
+    component=models.ForeignKey(Component)
+        
+class ModForm(forms.ModelForm):
+    mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    def __init__(self,*args,**kwargs):  
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        self.hostCentre=None
+    def save(self):
+        o=forms.ModelForm.save(self,commit=False)
+        o.centre=self.hostCentre
+        o.save()
+        
+class ModelModForm(ModForm):
+    class Meta:
+        model=ModelMod
+        exclude=('centre')
+    def specialise(self,model):
+        self.fields['component'].queryset=Component.objects.filter(model=model)
+        ivocab=Vocab.objects.get(name='ModelModTypes')
+        self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)
+          
+class InputModForm(ModForm):
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    class Meta:
+        model=InputMod
+        exclude=('centre')
+    def specialise(self,simulation):
+        self.fields['inputs'].queryset=Coupling.objects.filter(simulation=simulation)
+        ivocab=Vocab.objects.get(name='InputTypes')
+        self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)
+        
+class ConformanceForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False)
+    class Meta:
+        model=Conformance
+        exclude=('simulation') # we know it
+    def specialise(self,simulation):
+        #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
+        relevant_components=Component.objects.filter(model=simulation.model)
+        self.fields['mod'].queryset=CodeModification.objects.filter(component__in=relevant_components)
+        self.fields['coupling'].queryset=Coupling.objects.filter(simulation=simulation)
+        v=Vocab.objects.get(name='ConformanceTypes')
+        self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+       
 class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
     class Meta:
         model=Ensemble
         exclude=('simulation')
-    
-class CodeModificationForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
-    class Meta:
-        model=CodeModification
-    def specialise(self,model):
-        self.fields['component'].queryset=Component.objects.filter(model=model)
-    def __init__(self,*args,**kwargs):  
-        forms.ModelForm.__init__(self)
-        self.hostCentre=None
-    def save(self):
-        o=forms.ModelForm.save(self,commit=False)
-        o.centre=self.hostCentre
-        o.save()
-        
-class InitialConditionForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
-    variables=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
-    class Meta:
-        model=InitialCondition
-    def __init__(self,*args,**kwargs):  
-        forms.ModelForm.__init__(self)
-        self.hostCentre=None
-    def save(self):
-        o=forms.ModelForm.save(self,commit=False)
-        o.centre=self.hostCentre
-        o.save()
-        
-class BoundaryConditionForm(forms.ModelForm):
-    ''' Simulation boundary condition form '''
-    inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
-    class Meta:
-        model=ExternalClosure
-    def specialise(self,model):
-        ''' Specialise as it's own method to avoid confusion with POST and GET '''
-        pass
-       
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        self.fields['etype'].queryset=Value.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
+
 class CouplingForm(forms.ModelForm):
     manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
     class Meta:
@@ -632,7 +637,7 @@ class SimulationForm(forms.ModelForm):
     class Meta:
         model=Simulation
         #these are enforced by the workflow leading to the form
-        exclude=('centre','experiment','uri','intialcondition')
+        exclude=('centre','experiment','uri')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
@@ -730,18 +735,6 @@ class PlatformForm(forms.ModelForm):
         model=Platform
         exclude=('centre','uri')
         
-class ConformanceForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False)
-    class Meta:
-        model=Conformance
-        exclude=('simulation') # we know it
-    def specialise(self,model,simulation):
-        #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
-        relevant_components=Component.objects.filter(model=model)
-        self.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=relevant_components)
-        #self.fields['initialCondition'].queryset
-        self.fields['boundaryCondition'].queryset=Coupling.objects.filter(simulation=simulation)
-        
 class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"2"}),required=False)
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
@@ -767,5 +760,23 @@ class ResponsiblePartyForm(forms.ModelForm):
     def save(self):
         r=forms.ModelForm.save(self,commit=False)
         r.centre=self.hostCentre
-        r.save()  
+        r.save()
+        
+class EnsembleMemberForm(forms.ModelForm):
+    class Meta:
+        model=EnsembleMember
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        if self.instance:
+            # find the set of modifications which are appropriate for the current centre
+            etype=self.instance.ensemble.etype
+            vet=Vocab.objects.get(name='EnsembleTypes')
+            # probably don't need the filter, but just to make sure ...
+            pp=Value.objects.filter(vocab=vet).get(name='PerturbedPhysics')
+            if etype==pp:
+                qs=ModelMods.filter(centre=self.instance.ensemble.simulation.centre)
+            else:
+                qs=InputMods.filter(centre=self.instance.ensemble.simulation.centre)
+            self.fields['mod'].queryset=qs
+    
     

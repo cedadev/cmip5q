@@ -15,7 +15,7 @@ import logging
 
 ConformanceFormSet=modelformset_factory(Conformance,
                                         form=ConformanceForm,
-                                        exclude=('simulation','requirement','ctype'))
+                                        exclude=('simulation','requirement'))
 
 
 class MyConformanceFormSet(ConformanceFormSet):
@@ -27,14 +27,14 @@ class MyConformanceFormSet(ConformanceFormSet):
         ConformanceFormSet.__init__(self,data,queryset=qset)
         self.s=simulation
     def specialise(self):
-        v=Vocab.objects.get(name='conformanceTypes')
+        v=Vocab.objects.get(name='ConformanceTypes')
         allowedComponents=Component.objects.filter(model=self.s.numericalModel)
+        cset=Value.objects.filter(vocab=v)
         for form in self.forms:
             #form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
-            form.fields['codeModification'].queryset=CodeModification.objects.filter(component__in=allowedComponents)
-            form.fields['boundaryCondition'].queryset=Coupling.objects.filter(simulation=self.s)
-            form.show=str(form.instance.ctype)
-    # we don't need a subclass save method, because we initialise from instances in the queryset
+            form.fields['mod'].queryset=ModelMod.objects.filter(component__in=allowedComponents)
+            form.fields['coupling'].queryset=Coupling.objects.filter(simulation=self.s)
+            form.fields['ctype'].queryset=cset
           
 class simulationHandler(object):
     
@@ -70,6 +70,11 @@ class simulationHandler(object):
                     args=(self.centreid,s.id,))
             urls['view']=reverse('cmip5q.protoq.views.simulationView',
                     args=(self.centreid,s.id,))
+            urls['mod']=reverse('cmip5q.protoq.views.assign',
+                     args=(self.centreid,'modelmod','simulation',s.id,))
+            # dont think we should be able to get to input mods from here ...
+            #urls['ics']=reverse('cmip5q.protoq.views.assign',
+            #         args=(self.centreid,'inputmod','simulation',s.id,))        
         
         if not fix and request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
@@ -97,7 +102,7 @@ class simulationHandler(object):
         cs=Conformance.objects.filter(simulation=s)
         coset=[]
         for i in cs:
-            new={'name':i.requirement,'method':'','detail':''}
+            '''new={'name':i.requirement,'method':'','detail':''}
             if i.ctype.value=='BoundaryCondition':
                 if i.boundaryCondition:
                     new['method']='conforms via boundary condition %s'%i.boundaryCondition
@@ -112,7 +117,7 @@ class simulationHandler(object):
                 if new['method']=='': new['method']+=' and '
                 new['method']+='code modification'
             new['detail']=i.description
-            coset.append(new)
+            coset.append(new)'''
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
@@ -198,16 +203,19 @@ class simulationHandler(object):
         urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,)),
               'mods':reverse('cmip5q.protoq.views.list',
-                    args=(self.centreid,'codemodification','component',s.numericalModel.id,)),
+                    args=(self.centreid,'modelmod','component',s.numericalModel.id,)),
               'sim':reverse('cmip5q.protoq.views.simulationEdit',
                     args=(self.centreid,s.id,))
                     }
         con=Conformance.objects.filter(simulation=s)
+        
         if len(con)==0:
             # we need to set up the conformances!
+             ctypes=Vocab.objects.get(name='ConformanceTypes')
+             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Input')
              reqs=e.requirements.all()
              for r in reqs:
-                 c=Conformance(requirement=r,simulation=s, ctype=r.ctype)
+                 c=Conformance(requirement=r,simulation=s, ctype=defaultConformance)
                  c.save()
                  
         if request.method=='POST':

@@ -9,36 +9,40 @@
 <center>
 <form action={{urls.self}} method="POST">
 <table>
-<tr><td width="20%">Is this a perturbed physics ensemble? 
-{{eform.perturbedPhysics.errors}}
+<tr><td width="20%">Ensemble Type:
+{{eform.etype.errors}}
 </td>
-<td>{{eform.perturbedPhysics}}&nbsp; The default, unticked, is an Initial Condition ensemble. If you change the ensemble type from initial condition to perturbed physics (or vice versa), you will need to save the form once before the rest of the form has the right attributes for the new ensemble type!</p></td></tr>
+<td>{{eform.etype}}&nbsp;</td></tr>
 <tr><td>General notes about the ensemble:{{eform.description.errors}}</td>
 <td>{{eform.description}}</td></tr>
 <tr><td>&nbsp;</td><td></td></tr>
 <tr><td colspan="2"> Now enter the details which explain how the ensemble members differ.
 </td></tr>
+{% if eform.instance.etype %}
 {{eformset.management_form}}
 {% for form in eformset.forms %}
-<tr><td>Member {{forloop.counter}}, {% if eform.instance.perturbedPhysics %} choose a code modification: {{form.codeModification.errors}}</td><td>{{ form.codeModification}} {% else %}
-choose an inital condition: {{form.initialCondition.errors}}</td><td>{{ form.initialCondition}} {% endif %} </td></tr>
+<tr><td>Member {{forloop.counter}} uses {{form.mod.errors}}</td><td>{{form.mod}} </td></tr>
 {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
 {% endfor %}
+{% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+{% else %}
+<tr><td colspan="2"> You need to save the form before you can assign details to
+initial ensemble members </td></tr>
+{% endif %}
+
 </table>
 <input id="subDatBut" type="submit" value="Save Description">
 </form>
 </center>
 </div>
 
+
 </div>
 <div>
 <center>
 <a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>
-{% if eform.instance.perturbedPhysics %}
 <a id="codebut" href="{{urls.mods}}">Manage Code Modifications</a>
-{% else %}
-<a id="icbut" href="{{urls.ics}}">Manage Initial Conditions</a>
-{% endif %}
+<a id="icbut" href="{{urls.ics}}">Manage Input Modifications</a>
 </center>
 </div>
 </div>

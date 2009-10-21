@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %} 
 <div class="boxer"><h1>{{title}}</h1></div>
+<div class="boxer2">
 <div class="boxer">
 {% if showChoices %}
 <form action='{{chooseURL}}' method='post'>
@@ -18,7 +19,7 @@
        {% include editTemplate %}
     </form>
 </div>
-
+</div>
 
 <script type="text/javascript">
     var oLinkButton1 = new YAHOO.widget.Button("morelinkbut"); 
