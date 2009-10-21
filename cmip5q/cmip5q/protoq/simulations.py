@@ -89,12 +89,9 @@ class simulationHandler(object):
             simform.specialise(self.centre)
         
         # work out what we want to say about couplings 
-        cs=Coupling.objects.filter(simulation=s)
-        cset=[{'name':str(i),'nic':len(InternalClosure.objects.filter(coupling=i)),
-                             'nec':len(ExternalClosure.objects.filter(coupling=i)),
-                             } for i in cs]
+        cset=Coupling.objects.filter(simulation=s)
         for i in cset:
-            i['valid']=i['nic']+i['nec'] > 0 # need at least one closure
+            i.valid=len(i.internalclosure_set.all())+len(i.externalclosure_set.all()) > 0 # need at least one closure
             
         # now work out what we want to say about conformances.
         cs=Conformance.objects.filter(simulation=s)

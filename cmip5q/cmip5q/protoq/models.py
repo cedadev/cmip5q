@@ -402,9 +402,9 @@ class Coupling(models.Model):
     manipulation=models.TextField(blank=True,null=True)
     def __unicode__(self):
         if self.simulation:
-            return 'I/O into %s ( for %s )'%(self.targetInput,self.simulation)
+            return 'I/O4for%s(in %s)'%(self.targetInput,self.simulation)
         else:
-            return 'I/O into %s'%self.targetInput
+            return 'I/Ofor%s'%self.targetInput
     def duplicate4sim(self,simulation):
         '''Make a copy of self, and associate with a simulation'''
         # first make a copy of self
