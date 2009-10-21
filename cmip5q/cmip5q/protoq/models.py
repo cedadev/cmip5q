@@ -150,7 +150,7 @@ class ComponentInput(models.Model):
     abbrev=models.CharField(max_length=24)
     description=models.TextField(blank=True,null=True)
     #mainly we're going to be interested in boundary condition inputs:
-    bc=models.BooleanField(default=True)
+    ctype=models.ForeignKey('Value')
     #the component which owns this input (might bubble up from below realm)
     owner=models.ForeignKey(Component,related_name="input_owner")
     #strictly we don't need this, we should be able to get it by parsing
@@ -161,7 +161,7 @@ class ComponentInput(models.Model):
     def __unicode__(self):
         return '%s:%s'%(self.owner,self.abbrev)
     def makeNewCopy(self,component):
-        new=ComponentInput(abbrev=self.abbrev,description=self.description,bc=self.bc,
+        new=ComponentInput(abbrev=self.abbrev,description=self.description,ctype=self.ctype,
                            owner=component,realm=component.realm)
         new.save()
         # if we've made a new input, we need a new coupling
@@ -395,7 +395,7 @@ class Coupling(models.Model):
     # may also be associated with a simulation, in which case there is an original
     simulation=models.ForeignKey(Simulation,blank=True,null=True)
     original=models.ForeignKey('Coupling',blank=True,null=True)
-    # coupling details
+    # coupling details for boundary conditions
     couplingType=models.ForeignKey('Value',related_name='%(class)s_couplingTypeVal',blank=True,null=True)
     couplingFreqUnits=models.ForeignKey('Value',related_name='%(class)s_couplingFreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
@@ -564,7 +564,7 @@ class BoundaryConditionForm(forms.ModelForm):
         pass
        
 class CouplingForm(forms.ModelForm):
-    manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}))
+    manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
     class Meta:
         model=Coupling
         exclude=('component',  # we should always know this
@@ -748,6 +748,10 @@ class ComponentInputForm(forms.ModelForm):
     class Meta:
         model=ComponentInput
         exclude=('owner','realm') # we know these
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        v=Vocab.objects.get(name='InputTypes')
+        self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
     
 class ResponsiblePartyForm(forms.ModelForm):
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}),required=False)

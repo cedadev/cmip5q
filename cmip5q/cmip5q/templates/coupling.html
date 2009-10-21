@@ -1,15 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Coupling to "{{c.abbrev}}" inputs  
+<h1> Coupling for {% if not s %} default {% endif %} inputs to "{{c.abbrev}}"
   {% if s %} for simulation "{{s}}" {% endif %}
 </h1>
 </div>
 <div class="boxer">
-    <p> On this page we want you to describe how the major components in your model are coupled to each other and to "boundary conditions" read from files as the model runs. </p>
+    <p> On this page we want you to describe how the inputs to the components within your model are coupled (bound) to files and/or the runtime output of other components.</p>
     <p> There is one "coupling" entry for each input requirement you declared in your model component description. It may be you need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, so you can describe them here. </p>
-    <p> Within each of those "coupling" entries, there are four subsections: <ol><li>A section describing the coupler used, and the coupling frequency for that particular input.</li><li> A section describing how (potentially multiple) inputs were gathered from other components to feed into the one you are describing.</li><li> A section describing how inputs were gathered from (potentially multiple) files to feed into the one you are describing,and </li><li> A section describing how the inputs were manipulated to produce the final input. It is likely that you'll only fill out section (2) or section (3) for any one coupling. </li></ol>
-    <p> We ask you this at least twice! Once during the description of a model {% if not s %} (ie now) {% endif %} and once during the description of each simulation {% if s %} (ie now){% endif %} using that model. When/if you first fill out section (1) and (4) in the model description, they will be automatically copied over to subsequent simulation descriptions, but you need to manually copy section 2 or 3 as necessary using the links below. </p>
+    <p> Recall there are three types of inputs, and the nature of the what we ask depends on what sort of
+    input is required.<p>
+    <p><ul><li> <b> Boundary Conditions</b> Within each such "coupling" entry, there are four subsections: <ol><li>A section describing the coupler used, and the coupling frequency for that particular input.</li><li> A section describing how (potentially multiple) inputs were gathered from other components to feed into the one you are describing.</li><li> A section describing how inputs were gathered from (potentially multiple) files (described using the file tab) to feed into the one you are describing,and </li><li> A section describing how the inputs were manipulated to produce the final input. It is likely that you'll only fill out section (2) or section (3) for any one coupling. </li></ol></li>
+    <li> <b> Initial conditions</b> Within each such coupling entry, we ask you simply to bind the input to between one and many variables from the file/variable combinations you have entered using the file tab.</li>
+    <li> <b> Ancillary Files</b> Within each such coupling entry, we ask you simply to bind the input to one file (and one file only, if you want multiple files, please use multiple input requirements to distinguish them.</li>
+    </ul>
+    </p>
+    
+    <p> We ask you this once during the description of a model {% if not s %} (ie now) {% endif %} to establish default inputs. {% if not s  %} <em> You do not need to enter couplings for all inputs at this time unless you wish to.</em> {% endif %}
+    
+    <p> We ask you again during the description of each simulation {% if s %} (ie now){% endif %}. Most of your default answers (if you have any) are copied over to each simulation so you don't have to reenter information if you have entered defaults. However, because in most cases different simulations have differing boundary conditions, we have not copied out sections 2 and 3 of your boundary conditions - to force you to think about them. However, you can still manually copy them by simply using the copy button which appears alongside each link for the simulation couplings.</p>
+    
     <p> The level of detail to input is up to you, but we will be asking you about how your simulation conformed to the experimental requirements. In many cases that will be asking you to link some response of yours to both a particular requirement and a particular input, so if you don't do it now, you might have to come back later :-) (and obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external (file-based) boundary conditions). Note also that the simulation description will not validate as complete unless all inputs are coupled somehow to boundary conditions.</p>
 </div>
     <div class="boxer">

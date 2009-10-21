@@ -54,6 +54,8 @@ conformanceTypes=('BoundaryCondition','InitialCondition', 'CodeModification')
 # would need to modify the numerical requiremnet class, and the conformance code.
 numrecTypes=('BoundaryCondition','InitialCondition')
 
+# input requirements
+inputTypes=('InitialCondition','BoundaryCondition','AncillaryFile')
 
 def loadvocab(name,values):
     ''' Used to load vocabularies '''
@@ -101,5 +103,8 @@ def initialise():
     
     #support for file formats
     loadvocab('FileFormats',FileFormats)
+    
+    #input types
+    loadvocab('InputTypes',inputTypes)
     
     

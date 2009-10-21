@@ -34,7 +34,7 @@
         </div>
         <div class="boxer"> 
         <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
-           {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
+           {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Input Requirements</a></p>{% endif %}
             <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
         </div>
         <div class="boxer">
@@ -102,25 +102,24 @@
     </form>
     </div>
     
+    {% if inps|length %}
     <div class="boxer">
-        {% if inps|length %}
         <h4> Inputs required by this component are: </h4>
         <table>
-        <tr><th> Short Name </th><th> Description </th></tr>
+        <tr><th> Type </th><th> Short Name </th><th>Description </th></tr>
         {% for i in inps %}
-        <tr><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
+        <tr class="{%cycle  'row2' 'row1'%}">
+        <td>{{i.ctype}}</td><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
         {% endfor %} 
         </table>
-        {% if isRealm %}
         <p class="guidance"> Update this list using the "Runtime Inputs" button </p>
-        {% endif %}
-        {% else %}
         {% if isRealm %}
-        <p class="red"> Please identify key inputs to this component using the "Runtime Inputs" button </p>
-        {% endif %}
-        {% endif %}
+        <p> You may find that the inputs don't match onto the components described below
+        this level in the heirarchy. If so, please identify relevant cross-component inputs at
+        the level of this "realm" component, using the "Runtime Requirements" button.</p>
+        {% endif %}   
     </div>
-    
+    {% endif %}
     
     <div class="boxer">
         <h4> References (associated with this component) </h4>
@@ -138,10 +137,10 @@
     </div>
     {% if isModel %}
     <div class="boxer">
-    <h4> Couplings </h4>
+    <h4> Required Inputs and Couplings </h4>
     <table>
     {% for bc in cset %}
-    <tr class="{%cycle  'row2' 'row1'%}"><td>Boundary Condition:&nbsp;</td><td>{{bc.name}} uses {{bc.nic}} internal link(s) and {{bc.nec}} file link(s) by default.</tr>
+    <tr class="{%cycle  'row2' 'row1'%}"><td>{{bc.targetInput.ctype}}</td><td>{{bc}} uses {{bc.internalclosure_set.all|length}} internal link(s) and {{bc.externalclosure_set.all|length}} file link(s) by default.</tr>
     {% endfor %}
     </table>
     </div>

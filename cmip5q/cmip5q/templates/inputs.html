@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Inputs for component: "{{c.abbrev}}"</h1>
-<p> This page is for entering requirements for spatially varying "initial conditions" and spatio-temporally or temporally varying "boundary conditions".</p>
-{% if c.isRealm %} <p>Note that these should include all inputs from components described
-beneath this one </p> {% endif %}
-<p> (Each time you add a new input, it will be saved, and a new entry form will appear for subsequent inputs.) </p>
+<h1> Input Requirements for component: "{{c.abbrev}}"</h1>
+<p> This page is for entering <b>requirements</b> for any of three different sorts of
+inputs:<ul><li>spatially varying <b>"initial conditions"</b> for prognostic variables,</li>
+<li> spatio-temporally or temporally varying <b>"boundary conditions"</b>, and</li>
+<li> static <b>"ancillary files"</b> (e.g. land/sea masks etc).</li></ul></p>
+
+<p> You can enter multiple inputs here, each time you add a new input, it will be saved, and a new entry form will appear for subsequent inputs. </p>
+
+<p> You can "bind" each of these input requirements to variable(s) in file(s) (or in the case of a boundary condition another component) in two different places: on the "coupling" pages at the top level components within your model (to establish default coupling), and on the "coupling" page of the simulation description, where you can establish new bindings or override the default behaviour.</p> 
 </div>
 
 <div class="boxer">
@@ -18,7 +22,7 @@ beneath this one </p> {% endif %}
                 <table>
                     <tr class="{% cycle 'row1' 'row2'%}">
                         <td>Name: {{f.abbrev.errors}} {{f.abbrev}} </td>
-                        <td>BoundaryCondition? {{f.bc.errors}} {{f.bc}} </td>
+                        <td>Input Type: {{f.ctype.errors}} {{f.ctype}} </td>
                         <td>{% if not forloop.last %} (delete: {{f.DELETE.errors}}{{f.DELETE}}){% endif %}</td>
                     </tr>
                     <tr class="{% cycle 'row1' 'row2'%}">

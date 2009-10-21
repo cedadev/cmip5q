@@ -181,11 +181,9 @@ class componentHandler(object):
         
         if c.isModel:
             #we'd better decide what we want to say about couplings. Same code in simulation!
-            cs=Coupling.objects.filter(component=c).filter(simulation=None)
-            cset=[{'name':str(i),'nic':len(InternalClosure.objects.filter(coupling=i)),
-                             'nec':len(ExternalClosure.objects.filter(coupling=i)),
-                             } for i in cs]
-        else: cset=[]
+            cset=Coupling.objects.filter(component=c).filter(simulation=None)
+            cset=cset.order_by('targetInput__ctype','component')
+        else: cset=None
         
         if NEWMINDMAPS: 
             for p in pform.pgset: 

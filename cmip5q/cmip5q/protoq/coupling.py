@@ -88,7 +88,16 @@ class MyCouplingFormSet:
         
         self.model=self.component.model
         
-        self.queryset=Coupling.objects.filter(component=self.component).filter(simulation=simulation)
+        # build up a queryset, chunked into the various types of component inputs
+        ctypes=Value.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
+        bcvalue=ctypes.get(value='BoundaryCondition')  #used for layout on coupling form
+        afvalue=ctypes.get(value='AncillaryFile') #used for layout on closure form
+        qs=Coupling.objects.filter(component=self.component).filter(simulation=simulation)
+        #bqs=qs.filter(targetInput__ctype=ctypes[0])
+        #for c in ctypes[1:]:
+        #    bqs|=qs.filter(targetInput__ctype=c)
+        #self.queryset=bqs
+        self.queryset=qs.order_by('targetInput__ctype','targetInput')
             
         # setup our vocabularies
         couplingType=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
@@ -121,7 +130,9 @@ class MyCouplingFormSet:
             ec=MyExternalClosures(q,data)
             #make sure we don't offer up the target input owner component:
             iqs=BaseInternalQueryset.exclude(id__exact=q.targetInput.owner.id)
-            self.forms.append(MyCouplingForm({'title':title,'cf':cf,'ic':ic,'ec':ec,'iqs':iqs}))
+            self.forms.append(MyCouplingForm({'title':title,
+                                              'cf':cf,'ic':ic,'ec':ec,'iqs':iqs,
+                                              'bcv':bcvalue,'afv':afvalue}))
             
             
     def is_valid(self):
@@ -202,7 +213,8 @@ class couplingHandler:
         labelstr='Coupling for %s'%model
         if simulation: labelstr+=' (in %s)'%simulation
         return render_to_response('coupling.html',{'c':model,'s':simulation,'urls':self.urls,
-        'Intform':Intform,'tabs':tabs(self.request,self.centre_id,labelstr)})
+        'Intform':Intform,
+        'tabs':tabs(self.request,self.centre_id,labelstr)})
         
     def resetClosures(self,simulation_id,coupling_id,ctype):
         coupling=Coupling.objects.get(id=coupling_id)

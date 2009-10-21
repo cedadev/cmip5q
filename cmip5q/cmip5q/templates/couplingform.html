@@ -1,6 +1,7 @@
 <div class="boxer">
-<h3>{{f.title}}</h3>
+<h3>{{f.title}}  ({{f.cf.instance.targetInput.ctype}})</h3>
 <hr>
+{% ifequal f.cf.instance.targetInput.ctype f.bcv %}
 <p> (1) This section describes the coupling method and how often the coupling occurred </p>
 <p>Coupling Type: {{f.cf.couplingType.errors}}{{f.cf.couplingType}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
@@ -18,11 +19,13 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {% endfor %}
 </table>
 <hr> 
-<p>(3) <b> External Boundary Conditions</b> This section describes coupling to files.</p>
+<p> (3) <b> External Boundary Conditions</b> This section describes coupling to files.</p>
+{% endifequal %}
+{{ f.ic.management_form}}
 {% if s %}
 <p>If you have set values for these in your model description, you can copy them using this link: <a id="eclink{{f.cf.ecreset.coupling.id}}" href="{{f.cf.ecreset.url}}">Copy</a></p>
 {% endif %}
-<p> Enter zero or more inputs from files: (a new blank form will appear after each save). Use the files tab if you don't see any files to choose in the "From" dropdown selector, and then navigate back here.</p>
+<p> Enter {% ifequal f.cf.instance.targetInput.ctype f.bcv %} zero or more {% endifequal %} inputs from files: (a new blank form will appear after each save). Use the files tab if you don't see any files to choose in the "From" dropdown selector, and then navigate back here.</p>
 {{f.ec.management_form}}
 <table>
 {% for ff in f.ec.forms %}
@@ -30,6 +33,8 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {% endfor %}
 </table>
 <hr>
+{% ifequal f.cf.instance.targetInput.ctype f.bcv %}
 <p> (4) Describe how these input(s) were manipulated when providing input into {{c.abbrev}}</p>
 {{f.cf.manipulation.errors}}{{f.cf.manipulation}}
+{% endifequal %}
 </div>
