@@ -5,7 +5,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
-from protoq.utilities import uniqueness
+from protoq.modelUtilities import uniqueness
 import uuid
 import logging
 
@@ -367,13 +367,24 @@ class Param(models.Model):
                       info=self.info,myconstraint=self.myconstraint,units=self.units)
         new.save()
     
-class DataObject(models.Model):
-    ''' Holds the data object information agreed in Paris '''
+class DataContainer(models.Model):
+    ''' This holds multiple data objects. Some might think of this as a file '''
     # a name for drop down file lists:
     name=models.CharField(max_length=64)
     # a link to the object if possible:
     link=models.URLField(blank=True)
-    # a free text description
+    # what's in the container
+    description=models.TextField()
+    # container format
+    format=models.ForeignKey('Value',blank=True,null=True) 
+    # centre that owns this data container
+    centre=models.ForeignKey('Centre')
+    def __unicode__(self):
+        return self.name
+    
+class DataObject(models.Model):
+    ''' Holds a variable within a data container '''
+    container=models.ForeignKey(DataContainer)
     description=models.TextField()
     # if the data object is a variable within a dataset at the target uri, give the variable
     variable=models.CharField(max_length=128,blank=True)
@@ -381,12 +392,13 @@ class DataObject(models.Model):
     cftype=models.CharField(max_length=512,blank=True)
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
-    #format
-    format=models.ForeignKey('Value',blank=True,null=True)
-    #centre that owns this data object
-    centre=models.ForeignKey('Centre')
+    # not using this at the moment, but keep for later: csml/science type
+    featureType=models.ForeignKey('Value',blank=True,null=True)
+    # not using this at the moment, but keep for later:
+    drsAddress=models.CharField(max_length=256,blank=True)
     def __unicode__(self):
-        return self.name
+        return '%s(%s)'%(self.variable,self.container)
+
         
 class Coupling(models.Model):
     # parent component, must be a model for CMIP5:
@@ -594,29 +606,7 @@ class ExternalClosureForm(InternalClosureForm):
          model=ExternalClosure
      def specialise(self):
          pass
-                
-class DataObjectForm(forms.ModelForm):
-    link=forms.URLField(widget=forms.TextInput(attrs={'size':'70'}))
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
-    variable=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
-    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'70'}),required=False)
-    class Meta:
-        model=DataObject
-        exclude=('centre',)
-    def __init__(self,*args,**kwargs):
-        forms.ModelForm.__init__(self,*args,**kwargs)
-        v=Vocab.objects.get(name='FileFormats')
-        self.fields['format'].queryset=Value.objects.filter(vocab=v)
-        self.hostCentre=None
-    def save(self):
-        ''' Need to add the centre '''
-        o=forms.ModelForm.save(self,commit=False)
-        o.centre=self.hostCentre
-        o.save()
-    def clean(self):
-        ''' Needed to ensure reference name uniqueness within a centre '''
-        return uniqueness(self,self.hostCentre,'name')
-        
+                        
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
@@ -752,5 +742,81 @@ class EnsembleMemberForm(forms.ModelForm):
             else:
                 qs=InputMods.filter(centre=self.instance.ensemble.simulation.centre)
             self.fields['mod'].queryset=qs
+    
+class DataContainerForm(forms.ModelForm):
+    ''' This is the form used to edit "files" ... '''
+    name=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
+    link=forms.URLField(widget=forms.TextInput(attrs={'size':'45'}))
+    description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
+    class Meta:
+        model=DataContainer
+        exclude=('centre','dataObject')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        v=Vocab.objects.get(name='FileFormats')
+        self.fields['format'].queryset=Value.objects.filter(vocab=v)
+        self.hostCentre=None
+    def save(self):
+        ''' Need to add the centre, and save the subform too '''
+        o=forms.ModelForm.save(self,commit=False)
+        o.centre=self.hostCentre
+        o.save()
+        return o
+    def clean(self):
+        ''' Needed to ensure name uniqueness within a centre, and handle the subform '''
+        return uniqueness(self,self.hostCentre,'name')
+
+class DataObjectForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
+    variable=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
+    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}),required=False)
+    class Meta:
+        model=DataObject
+        exclude=('featureType','drsAddress','container')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        self.hostCentre=None
+ 
+class DataHandlingForm(object):
+    ''' This is a fudge to allow baseview to think it's dealing with one form, 
+    when it's really dealing with two'''
+    # Base view will send datacontainer objects as the instance... we need to handle them,
+    # and the objects within them, and the request
+    DataObjectFormSet=modelformset_factory(DataObject,form=DataObjectForm,can_delete=True)
+    def __init__(self,postData=None,instance=None):
+        self.cform=DataContainerForm(postData,instance=instance,prefix='cform')
+        if instance:
+            qset=DataObject.objects.filter(container=instance)
+        else:
+            qset=DataObject.objects.filter(variable=None) # should get an empty set
+        self.oform=self.DataObjectFormSet(postData,queryset=qset,prefix='oform')
+        self.hostCentre=None
+    def is_valid(self):
+        return self.cform.is_valid() and self.oform.is_valid()
+        
+    def specialise(self,constraints):
+        self.cform.specialise(constraints)
+    
+    def save(self):
+        c=self.cform.save()
+        oset=self.oform.save(commit=False)
+        for o in oset: 
+            o.container=c
+            o.save()
+        return None
+    
+    def handleError(self):
+        return str(self.cform.errors)+str(self.oform.errors)
+    
+    def getCentre(self):
+        return self.cform.hostCentre
+    
+    def setCentre(self,val):
+        self.oform.hostCentre=val
+        self.cform.hostCentre=val
+    
+    errors=property(handleError,None)
+    hostCentre=property(getCentre,setCentre)
+    
     
     

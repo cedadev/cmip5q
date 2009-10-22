@@ -1,7 +1,7 @@
 # Create your views here.
 from django.template import Context, loader
 from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 
 from cmip5q.protoq.models import *
@@ -66,7 +66,7 @@ def centre(request,centre_id):
     viewsimURL=reverse('cmip5q.protoq.views.simulationList',args=(c.id,))
     
     refs=Reference.objects.filter(centre=c)
-    files=DataObject.objects.filter(centre=c)
+    files=DataContainer.objects.filter(centre=c)
     parties=ResponsibleParty.objects.filter(centre=c)
     
     logging.info('Viewing %s'%c.id)
@@ -324,9 +324,9 @@ class ViewHandler(BaseViewHandler):
                         'inputmod':{'attname':'inputMod',
                             'title':'Input Modifications','tab':'InputMods',
                              'class':InputMod,'form':InputModForm}, 
-                        'file':{'attname':'dataObject',
-                            'title':'File','tab':'Files',
-                            'class':DataObject,'form':DataObjectForm},
+                        'file':{'attname':'dataContainer',
+                            'title':'Files and Variables','tab':'Files & Vars',
+                            'class':DataContainer,'form':DataHandlingForm},
                         'reference':{'attname':'references',
                             'title':'Reference','tab':'References',
                             'class':Reference,'form':ReferenceForm},
@@ -334,6 +334,8 @@ class ViewHandler(BaseViewHandler):
                                    'title':'Party','tab':'Parties',
                                    'class':ResponsibleParty,'form':ResponsiblePartyForm},
                         }
+    # Note that we don't expect to be able to assign files, since we'll directly
+    # attach objects within files as appropriate.
                         
     # Some resources are associated with specific targets, so we need a mapping
     # between how they appear in URLs and the associated django classes
@@ -428,7 +430,6 @@ class ViewHandler(BaseViewHandler):
 
 def edit(request,cen_id,resourceType,resource_id,targetType=None,target_id=None,returnType=None):
     ''' This is the generic simple view editor '''
-    
     h=ViewHandler(cen_id,resourceType,resource_id,target_id,targetType)
     return h.edit(request,returnType)
 
@@ -446,6 +447,8 @@ def list(request,cen_id,resourceType,targetType=None,target_id=None):
 def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType
     to resource target_id of type targetType '''
+    if resourceType=='file':
+        return HttpResponseBadRequest('Cannot assign files to targets, assign objects from within them!')
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 

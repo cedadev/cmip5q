@@ -1,20 +1,39 @@
-<p class="guidance"> You should make one file link for each variable you need to access. (You may find that you need to have several file descriptions pointing to the same physical file object, but pointing at different variables within that physical file.)
 <table>
-<tr><td width="20%">Name:{{form.name.errors}}</td><td>{{form.name}}</td></tr>
-<tr><td>Link:&nbsp;(This should point either to a downloadable version of the file, or to a page from which the file can be obtained.){{form.link.errors}}</td><td>{{form.link}}</td></tr>
-<tr><td>File Format:&nbsp;(This is the ultimate file format not the format of the object returned if you dereference the link.){{form.format.errors}}</td><td>{{form.format}}</td></tr>
-<tr><td>Description:{{form.description.errors}}</td><td>{{form.description}}</td></tr>
-<tr><td>Reference:{{form.reference.errors}}</td><td>{{form.reference}}</td><tr>
-<tr><td>Standard Name:{{form.cftype.errors}}</td><td>{{form.cftype}}</td></tr>
-<tr><td>(If necessary) Actual variable name within the file: {{form.variable.errors}}</td>
-        <td>{{form.variable}}</td></tr>
-<tr><td colspan="2">
-    <center>
-    <input id="subDatBut" type="submit" value="Save File Description">
-    <script type="text/javascript">
-        var subDatBut = new YAHOO.widget.Button("subDatBut",
-                            {value:"subDatButvalue"});
-    </script>
-    </center>
-</td></tr>
+    <tr><th> File Description </th> <th> Variable Description </th></tr>
+        <td width="50%">
+            <table>
+            <tr><td width="20%">Name:{{form.cform.name.errors}}</td><td>{{form.cform.name}}</td></tr>
+            <tr><td>Link:&nbsp;{{form.cform.link.errors}}</td><td>{{form.cform.link}}</td></tr>
+            <tr><td></td><td>(This should point either to a downloadable version of the file, or to a page from which the file can be obtained.)</td></tr>
+            <tr><td>File Format:&nbsp;{{form.cform.format.errors}}</td><td>{{form.cform.format}}</td></tr>
+            <tr><td></td><td>(This is the ultimate file format not the format of the object returned if you dereference the link.)</td></tr>
+            <tr><td>Description:{{form.cform.description.errors}}</td><td>{{form.cform.description}}</td></tr>
+            </table>
+        </td><td>
+        <p> This column may not be necessary for files being used for ancillary files,
+        but it will be necessary to identify variables for binding to boundary and initial 
+        conditions </p>
+        <table>
+        {{ form.oform.management_form }}
+        {% for f in form.oform.forms %}
+            <tr class="{%cycle 'row1' 'row2'%}">
+                <td>Variable:{{f.variable.errors}}</td><td>{{f.variable}}</td>
+            <tr class="{%cycle 'row1' 'row2'%}">
+                <td>CF Std Name:{{f.cftype.errors}}</td><td>{{f.cftype}}</td>
+            </tr><tr class="{%cycle 'row1' 'row2'%}">
+                <td>Description:{{f.description.errors}}</td><td>{{f.description}}</td>
+            </tr><tr class="{%cycle 'row1' 'row2'%}">
+                <td>Reference:{{f.reference.errors}}</td><td>{{f.reference}}&nbsp;
+                Delete:{{f.DELETE.errors}}{{f.DELETE}}</td></tr>
+            {% for hid in f.hidden_fields %} {{hid}}{% endfor %}
+        {% endfor %}
+        </table>
+    </td></tr>
 </table>
+<center>
+<input id="subDatBut" type="submit" value="Save">
+<script type="text/javascript">
+    var subDatBut = new YAHOO.widget.Button("subDatBut",
+                        {value:"subDatButvalue"});
+</script>
+</center>

@@ -87,7 +87,7 @@ class BaseViewHandler:
                     o.delURL=None
         # we pass a form and formURL for a new instance to be created.
         # we're doing all this because we think we have too many entities to use a formset
-        
+       
         return render_to_response(self.listHTML,{
                 'objects':sublist(objects,3),
                 'tabs':tabs(request,self.cid,self.resource['tab']),
