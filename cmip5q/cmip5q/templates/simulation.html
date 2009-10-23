@@ -79,6 +79,21 @@
                 var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
             </script>
             
+            {% if s.modelMod.all|length %}
+            <div class="boxer">
+                <h4> Modifications to the base model</h4>
+                <p> These are parameter and code modifications with respect to the base model </p>
+                <table>
+                <tr><th> Name </th><th>Description</th></tr>
+                {% for m in s.modelMod.all %} 
+                <tr class="{%cycle 'row1' 'row2'%}"><td>{{m}}</td><td>{{m.description}}</td></tr>
+                {% endfor %}
+                </table>
+            </div>
+            {% endif %}
+            
+            
+            
             {% if ensemble %}<div class="boxer">
                 <h4> Ensemble Characteristics </h4>
                 <p>Description:{{ensemble.set.description}}</p>

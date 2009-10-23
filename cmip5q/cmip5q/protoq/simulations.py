@@ -203,7 +203,7 @@ class simulationHandler(object):
         urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,)),
               'mods':reverse('cmip5q.protoq.views.list',
-                    args=(self.centreid,'modelmod','component',s.numericalModel.id,)),
+                    args=(self.centreid,'modelmod','simulation',s.id,)),
               'sim':reverse('cmip5q.protoq.views.simulationEdit',
                     args=(self.centreid,s.id,))
                     }
@@ -212,7 +212,7 @@ class simulationHandler(object):
         if len(con)==0:
             # we need to set up the conformances!
              ctypes=Vocab.objects.get(name='ConformanceTypes')
-             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Input')
+             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Via Couplings')
              reqs=e.requirements.all()
              for r in reqs:
                  c=Conformance(requirement=r,simulation=s, ctype=defaultConformance)

@@ -177,9 +177,7 @@ class BaseViewHandler:
          
         title='Assign %s(s) to %s'%(self.resource['type'],self.target['instance'])
         objects=self.objects()
-        print objects
-        print [i.id for i in objects]
-        
+
         data=[(r.id,str(r)) for r in objects]
         
         # two possible forms could be used, multiple choice, or single choice.
@@ -218,7 +216,6 @@ class BaseViewHandler:
                 #now parse these up and assign to the resource
                 if not JustOne:manager.clear()
                 new=rform.cleaned_data['choose']
-                print 'new',new
                 if JustOne:
                     target.__setattr__(self.resource['attname'],objects.get(id=new))
                 else:
@@ -226,11 +223,9 @@ class BaseViewHandler:
                         r=objects.get(id=n)
                         manager.add(r)
                 target.save()
-                print target
                 return HttpResponseRedirect(self.target['url'])
         elif request.method=='GET':
             #need to ensure that if there are none already chosen, we don't bind the form ...
-            print 'initial',initial
             if initial==[]:
                 rform=ActualForm()
             else:rform=ActualForm({'choose':initial})
@@ -240,12 +235,15 @@ class BaseViewHandler:
         #editURL and form used to add a new instance.
         editURL=reverse('cmip5q.protoq.views.edit',
             args=(self.cid,self.resource['type'],0,self.target['type'],self.target['instance'].id,'assign'))
+        listURL=reverse('cmip5q.protoq.views.list',
+            args=(self.cid,self.resource['type'],self.target['type'],self.target['instance'].id))
+            
         return render_to_response(self.selectHTML,
             {'showChoices':showChoices,
                 'rform':rform,
                 'title':title,
                 'form':self._constructForm('GET'),
-                'editURL':editURL,
+                'editURL':editURL,'listURL':listURL,
                 'editTemplate':'%s_snippet.html'%self.resource['type'],
                 'tabs':tabs(request,self.cid,'Assign %s'%self.resource['type']),
                 'chooseURL':url})

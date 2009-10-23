@@ -4,10 +4,19 @@
 <div class="boxer2">
 <div class="boxer">
 {% if showChoices %}
+<table width="100%">
+<tr>
+<td width="75%">
 <form action='{{chooseURL}}' method='post'>
+<table>
   {{rform}}
-  <input type="submit" value="Save"/>
+<tr><td colspan="2"><input type="submit" value="Save"/></td></tr>
+</table>
 </form>
+</td><td><p> You can edit the choices shown on the left from the list page: <a href="{{listURL}}"> List and Edit </a></p>
+</td>
+</tr>
+</table>
 {% else %}
 <p> There are currently none to chose from <p>
 {% endif %}
