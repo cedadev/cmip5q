@@ -265,8 +265,9 @@ class Simulation(Doc):
                      description=self.description, authorList=self.authorList,
                      uri=str(uuid.uuid1()),
                      experiment=experiment,numericalModel=self.numericalModel,
-                     ensembleMembers=1, platform=self.platform, centre=self.centre,
-                     inputMod=self.inputMod,modelMod=self.modelMod)
+                     ensembleMembers=1, platform=self.platform, centre=self.centre)
+        for mm in self.inputMod.all():s.inputMod.add(m)
+        for mm in self.modelMod.all():s.modelMod.add(m)
         s.save()
         #now we need to get all the other stuff related to this simulation
         #couplings:

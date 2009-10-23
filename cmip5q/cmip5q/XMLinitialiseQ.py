@@ -39,14 +39,14 @@ VocabList={'Realms':
     'SpatialRegridding':('None','Non-Convervative','Conservative'),
     'SpatialRegriddingType':('2D-FirstOrder','2D-SecondOrder','2D-ThirdOrder',
                          '3D-FirstOrder','3D-SecondOrder','3d-ThirdOrder','Other'),
-    'TemporalRegridding':('None','TimeAverage','TimeAccumulation','lastAvailable','Linear'),
+    'TemporalRegridding':('None','TimeAverage','TimeAccumulation','lastAvailable','Linear','Other'),
     'FreqUnits':('seconds','minutes','hours','days','months','years','decades'),
 
     # and these will support platforms
     'hardwareType':('Vector','Parallel','Beowulf'),
 
     #following extended from top500 site:
-    'processorTyp':('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64',
+    'processorType':('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64',
                           'Other Intel','Other AMD','Other'),   
     'interconnectType':('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed',
                         'NUMAlink','SP Switch','Cray Interconnect','Fat Tree','Other'),
