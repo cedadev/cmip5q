@@ -67,8 +67,8 @@ urlpatterns = patterns('',
     #
     # experiment/view/experiment_id
     (r'^cmip5/(?P<cen_id>\d+)/experiment/(?P<experiment_id>\d+)/$',
-            'cmip5q.protoq.views.viewExperiment'),   
-                
+            'cmip5q.protoq.views.viewExperiment'),
+    
     # cmip5/conformance/centre_id/simulation_id/requirement_id/$
     (r'^cmip5/conformance/(?P<cen_id>\d+)/(?P<sim_id>\d+)/(?P<req_id>\d+)/$',
             'cmip5q.protoq.views.conformanceEdit'),  
@@ -109,7 +109,11 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<cen_id>\d+)/assign/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.assign'),       
 
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # New XML Handler
+    (r'^cmip5/(?P<documentType>\D+)/(?P<docID>\d+)/xmlview$',
+            'cmip5q.protoq.views.xmlview'),     
+            
+                # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

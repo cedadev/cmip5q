@@ -79,6 +79,7 @@
                 var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
             </script>
             
+            {% ifequal label "Update" %}
             {% if s.modelMod.all|length %}
             <div class="boxer">
                 <h4> Modifications to the base model</h4>
@@ -91,7 +92,7 @@
                 </table>
             </div>
             {% endif %}
-            
+            {% endifequal %}
             
             
             {% if ensemble %}<div class="boxer">

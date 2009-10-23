@@ -10,6 +10,7 @@ from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import PropertyForm, tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
+from cmip5q.protoq.XML import *
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
 from django import forms
@@ -452,3 +453,11 @@ def assign(request,cen_id,resourceType,targetType,target_id):
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 
+
+def xmlview(request,documentType,docID):
+    ''' Placeholder document handling'''
+    if documentType=='experiment':
+        r=XMLExperimentHandler(documentType,docID)
+    return r.xml(request)
+    
+    

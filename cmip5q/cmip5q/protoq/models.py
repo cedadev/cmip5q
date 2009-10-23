@@ -5,7 +5,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
-from protoq.modelUtilities import uniqueness
+from modelUtilities import uniqueness
 import uuid
 import logging
 
