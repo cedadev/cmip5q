@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r811 (mariepierre, 2009-08-19) of AtmosphericChemistry.mm" defnversion="">
+  <component name="AtmosChemAndAerosol">
+    <definition status="missing">Definition of component type AtmosChemAndAerosol required</definition>
+    <parametergroup name="AtmosChemAndAerosolAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
+        <parameter name="ChemSchemeScope" choice="OR">
+          <definition status="missing">Definition of property name ChemSchemeScope required</definition>
+          <value name="Troposphere"/>
+          <value name="Stratosphere"/>
+          <value name="Mesosphere"/>
+          <value name="WholeAtmosphere"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="BasicApproximations" choice="keyboard">
+          <definition status="missing">Definition of property name BasicApproximations required</definition>
+          <value format="string" name="decription of the basic approximations made in the AtmosphericChemistry and Aerosols  model"/>
+        </parameter>
+        <parameter name="ListOfPrognosticVariables" choice="OR">
+          <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
+          <value name="3D mixing ratio for gas"/>
+          <value name="3D size bins or modes for aerosol compounds"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="NumberOfTracers" choice="keyboard">
+          <definition status="missing">Definition of property name NumberOfTracers required</definition>
+          <value format="numerical" name=""/>
+        </parameter>
+      </parametergroup>
+      <component name="SpaceConfiguration">
+        <definition status="missing">Definition of component type SpaceConfiguration required</definition>
+        <parametergroup name="SpaceConfigurationAttributes"/>
+        <parametergroup name="HorizontalDomain">
+          <parameter name="GridConfig" choice="XOR">
+            <definition status="missing">Definition of property name GridConfig required</definition>
+            <value name="inherited from Atmosphere"/>
+            <value name="specific"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="VerticalDomain">
+          <parameter name="NumberOfVerticalLevels" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfVerticalLevels required</definition>
+            <value format="numerical" name="number of vertical levels"/>
+          </parameter>
+          <parameter name="VerticalCoordinateSystem" choice="XOR">
+            <definition status="missing">Definition of property name VerticalCoordinateSystem required</definition>
+            <value name="pressure"/>
+            <value name="sigma"/>
+            <value name="potential temperature"/>
+            <value name="hybrid sigma pressure"/>
+            <value name="altitude"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if VerticalCoordinateSystem is not &quot;hybrid sigma pressure&quot;">
+            <parameter name="LevelsValues" choice="keyboard">
+              <definition status="missing">Definition of property name LevelsValues required</definition>
+              <value format="string" name=""/>
+            </parameter>
+          </constraint>
+          <constraint name="if VerticalCoordinateSystem is &quot;hybrid sigma pressure&quot;">
+            <parameter name="LevelsA-Values" choice="keyboard">
+              <definition status="missing">Definition of property name LevelsA-Values required</definition>
+              <value format="string" name=""/>
+            </parameter>
+            <parameter name="LevelsB-Values" choice="keyboard">
+              <definition status="missing">Definition of property name LevelsB-Values required</definition>
+              <value format="string" name=""/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="AtmosChemAerTransport">
+      <definition status="missing">Definition of component type AtmosChemAerTransport required</definition>
+      <parametergroup name="AtmosChemAerTransportAttributes">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="Eulerian"/>
+          <value name="Semi-Lagrangian"/>
+          <value name="Eulerian and Semi-Lagrangian"/>
+          <value name="Lagrangian"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="MassConservation" choice="OR">
+          <definition status="missing">Definition of property name MassConservation required</definition>
+          <value name="mass adjustment"/>
+          <value name="concentrations positivity"/>
+          <value name="gradients monotony"/>
+        </parameter>
+        <parameter name="Convection" choice="OR">
+          <definition status="missing">Definition of property name Convection required</definition>
+          <value name="convective fluxes connected to tracers"/>
+          <value name="vertical velocities connected to tracers"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Turbulence">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="2D"/>
+          <value name="3D"/>
+        </parameter>
+        <parameter name="CouplingWithChemicalReactivity" choice="XOR">
+          <definition status="missing">Definition of property name CouplingWithChemicalReactivity required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="EmissionAndConcentration">
+      <definition status="missing">Definition of component type EmissionAndConcentration required</definition>
+      <parametergroup name="EmissionAndConcentrationAttributes"/>
+      <parametergroup name="2D-Sources">
+        <parameter name="SpeciesEmitted" choice="keyboard">
+          <definition status="missing">Definition of property name SpeciesEmitted required</definition>
+          <value format="string" name="list of 2D species emitted"/>
+        </parameter>
+        <parameter name="Method" choice="OR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="prescribed (climatology)"/>
+          <value name="prescribed (spatially uniform)"/>
+          <value name="interactive"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="ClimatologyType" choice="XOR">
+          <definition status="missing">Definition of property name ClimatologyType required</definition>
+          <value name="constant"/>
+          <value name="interannual"/>
+          <value name="annual"/>
+          <value name="monthly"/>
+          <value name="daily"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <component name="3D-Sources">
+        <definition status="missing">Definition of component type 3D-Sources required</definition>
+        <parametergroup name="3D-SourcesAttributes"/>
+        <parametergroup name="Aircraft">
+          <parameter name="SpeciesEmitted" choice="keyboard">
+            <definition status="missing">Definition of property name SpeciesEmitted required</definition>
+            <value format="string" name="list of 3D species emitted by aircrafts"/>
+          </parameter>
+          <parameter name="Method" choice="OR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="prescribed (climatology)"/>
+            <value name="prescribed (spatially uniform)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if Method is &quot;prescribed (climatology)&quot;">
+            <parameter name="ClimatologyType" choice="XOR">
+              <definition status="missing">Definition of property name ClimatologyType required</definition>
+              <value name="constant"/>
+              <value name="interannual"/>
+              <value name="annual"/>
+              <value name="monthly"/>
+              <value name="daily"/>
+              <value name="other"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+        <parametergroup name="BiomassBurning">
+          <parameter name="SpeciesEmitted" choice="keyboard">
+            <definition status="missing">Definition of property name SpeciesEmitted required</definition>
+            <value format="string" name="list of species emitted by biomass burning"/>
+          </parameter>
+          <parameter name="Method" choice="OR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="prescribed (climatology)"/>
+            <value name="prescribed (spatially uniform)"/>
+            <value name="interactive"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if Method is &quot;prescribed (climatology)&quot;">
+            <parameter name="ClimatologyType" choice="XOR">
+              <definition status="missing">Definition of property name ClimatologyType required</definition>
+              <value name="constant"/>
+              <value name="interannual"/>
+              <value name="annual"/>
+              <value name="monthly"/>
+              <value name="daily"/>
+              <value name="other"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+        <parametergroup name="Lightning">
+          <parameter name="SpeciesEmitted" choice="keyboard">
+            <definition status="missing">Definition of property name SpeciesEmitted required</definition>
+            <value format="string" name="list of 3D species emitted by lightnings"/>
+          </parameter>
+          <parameter name="Method" choice="OR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="prescribed (climatology)"/>
+            <value name="prescribed (spatially uniform)"/>
+            <value name="interactive"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if Method is &quot;prescribed (climatology)&quot;">
+            <parameter name="ClimatologyType" choice="XOR">
+              <definition status="missing">Definition of property name ClimatologyType required</definition>
+              <value name="constant"/>
+              <value name="interannual"/>
+              <value name="annual"/>
+              <value name="monthly"/>
+              <value name="daily"/>
+              <value name="oher"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+        <parametergroup name="Volcanic">
+          <parameter name="SpeciesEmitted" choice="keyboard">
+            <definition status="missing">Definition of property name SpeciesEmitted required</definition>
+            <value format="string" name="list of 3D species emitted by volcanoes"/>
+          </parameter>
+          <parameter name="Method" choice="OR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="prescribed (climatology)"/>
+            <value name="prescribed (spatially uniform)"/>
+            <value name="other"/>
+          </parameter>
+          <constraint name="if Method is &quot;prescribed (climatology)&quot;">
+            <parameter name="ClimatologyType" choice="XOR">
+              <definition status="missing">Definition of property name ClimatologyType required</definition>
+              <value name="constant"/>
+              <value name="interannual"/>
+              <value name="annual"/>
+              <value name="monthly"/>
+              <value name="daily"/>
+              <value name="other"/>
+            </parameter>
+          </constraint>
+        </parametergroup>
+      </component>
+      <parametergroup name="Concentrations">
+        <parameter name="PrescribedLowerBoundary" choice="keyboard">
+          <definition status="missing">Definition of property name PrescribedLowerBoundary required</definition>
+          <value format="string" name="list of species prescribed at the lower boundary"/>
+        </parameter>
+        <parameter name="PrescribedUpperBoundary" choice="keyboard">
+          <definition status="missing">Definition of property name PrescribedUpperBoundary required</definition>
+          <value format="string" name="list of species prescribed at the upper boundary"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="AtmosphericChemistry">
+      <definition status="missing">Definition of component type AtmosphericChemistry required</definition>
+      <parametergroup name="AtmosphericChemistryAttributes"/>
+      <component name="GasPhaseChemistry">
+        <definition status="missing">Definition of component type GasPhaseChemistry required</definition>
+        <parametergroup name="GasPhaseChemistryAttributes"/>
+        <parametergroup name="GasPhaseChemAttributes">
+          <parameter name="Species" choice="OR">
+            <definition status="missing">Definition of property name Species required</definition>
+            <value name="HOx"/>
+            <value name="NOy"/>
+            <value name="Ox"/>
+            <value name="Cly"/>
+            <value name="SOx"/>
+            <value name="Bry"/>
+            <value name="VOCs"/>
+            <value name="ISOPRENE"/>
+            <value name="H2O"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="NumOfReactionsAndSpecies">
+          <parameter name="NumberOfBimolecularReactions" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfBimolecularReactions required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="NumberOfTermolecularReactions" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfTermolecularReactions required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="NumberOfAdvectedSpecies" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfAdvectedSpecies required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="NumberOfSteadyStateSpecies" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfSteadyStateSpecies required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Processes">
+          <parameter name="DryDeposition" choice="XOR">
+            <definition status="missing">Definition of property name DryDeposition required</definition>
+            <value name="prescribed"/>
+            <value name="interactive"/>
+          </parameter>
+          <parameter name="WetDeposition" choice="XOR">
+            <definition status="missing">Definition of property name WetDeposition required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="Oxidation" choice="XOR">
+            <definition status="missing">Definition of property name Oxidation required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+          <parameter name="WashOut-RainOut" choice="OR">
+            <definition status="provided">Downward transport of soluble chemistry species in clouds.</definition>
+            <value name="in-cloud scavenging"/>
+            <value name="below-cloud scavenging"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <component name="HeterogeneousChemistry">
+        <definition status="missing">Definition of component type HeterogeneousChemistry required</definition>
+        <parametergroup name="HeterogeneousChemistryAttributes"/>
+        <component name="Stratospheric">
+          <definition status="missing">Definition of component type Stratospheric required</definition>
+          <parametergroup name="StratosphericAttributes"/>
+          <parametergroup name="NumOfReactionsAndSpecies">
+            <parameter name="NumberOfReactions" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfReactions required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+            <parameter name="NumberOfAdvectedSpecies" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfAdvectedSpecies required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+            <parameter name="NumberOfSteadyStateSpecies" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfSteadyStateSpecies required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+          </parametergroup>
+          <parametergroup name="Species">
+            <parameter name="GasPhase" choice="OR">
+              <definition status="missing">Definition of property name GasPhase required</definition>
+              <value name="Cly"/>
+              <value name="Bry"/>
+              <value name="NOy"/>
+              <value name="other"/>
+            </parameter>
+            <parameter name="Aerosol-PSC" choice="OR">
+              <definition status="missing">Definition of property name Aerosol-PSC required</definition>
+              <value name="Ice"/>
+              <value name="NAT"/>
+              <value name="STS"/>
+              <value name="Sulphate"/>
+              <value name="other"/>
+            </parameter>
+          </parametergroup>
+          <parametergroup name="Processes">
+            <parameter name="Sedimentation" choice="XOR">
+              <definition status="missing">Definition of property name Sedimentation required</definition>
+              <value name="yes"/>
+              <value name="no"/>
+            </parameter>
+            <parameter name="Coagulation" choice="XOR">
+              <definition status="missing">Definition of property name Coagulation required</definition>
+              <value name="yes"/>
+              <value name="no"/>
+            </parameter>
+          </parametergroup>
+        </component>
+        <component name="Tropospheric">
+          <definition status="missing">Definition of component type Tropospheric required</definition>
+          <parametergroup name="TroposphericAttributes"/>
+          <parametergroup name="NumOfReactionsAndSpecies">
+            <parameter name="NumberOfReactions" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfReactions required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+            <parameter name="NumberOfAdvectedSpecies" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfAdvectedSpecies required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+            <parameter name="NumberOfSteadyStateSpecies" choice="keyboard">
+              <definition status="missing">Definition of property name NumberOfSteadyStateSpecies required</definition>
+              <value format="numerical" name=""/>
+            </parameter>
+          </parametergroup>
+          <parametergroup name="Species">
+            <parameter name="GasPhase" choice="keyboard">
+              <definition status="missing">Definition of property name GasPhase required</definition>
+              <value format="string" name="list of gas phase species involved in heterogeneous chemistry processes"/>
+            </parameter>
+            <parameter name="Aerosols" choice="OR">
+              <definition status="missing">Definition of property name Aerosols required</definition>
+              <value name="Sulphate"/>
+              <value name="dust"/>
+              <value name="sea salt"/>
+              <value name="organic"/>
+              <value name="nitrate"/>
+              <value name="other"/>
+            </parameter>
+          </parametergroup>
+          <parametergroup name="Processes">
+            <parameter name="DryDeposition" choice="XOR">
+              <definition status="missing">Definition of property name DryDeposition required</definition>
+              <value name="Prescribed"/>
+              <value name="Interactive"/>
+            </parameter>
+            <parameter name="WetDeposition" choice="XOR">
+              <definition status="missing">Definition of property name WetDeposition required</definition>
+              <value name="yes"/>
+              <value name="no"/>
+            </parameter>
+            <parameter name="WashOut-RainOut" choice="OR">
+              <definition status="provided">Downward transport of soluble chemistry species in clouds.</definition>
+              <value name="in-cloud scavenging"/>
+              <value name="below-cloud scavenging"/>
+            </parameter>
+            <parameter name="coagulation" choice="XOR">
+              <definition status="missing">Definition of property name coagulation required</definition>
+              <value name="yes"/>
+              <value name="no"/>
+            </parameter>
+          </parametergroup>
+        </component>
+      </component>
+      <component name="PhotoChemistry">
+        <definition status="missing">Definition of component type PhotoChemistry required</definition>
+        <parametergroup name="PhotoChemistryAttributes"/>
+        <parametergroup name="NumOfReactionsAndSpecies">
+          <parameter name="NumberOfReactions" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfReactions required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="NumberOfSpecies" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfSpecies required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Photolysis">
+          <parameter name="Method" choice="XOR">
+            <definition status="missing">Definition of property name Method required</definition>
+            <value name="offline (clearsky)"/>
+            <value name="offline (with clouds)"/>
+            <value name="online"/>
+          </parameter>
+          <parameter name="ReactionsData" choice="OR">
+            <definition status="missing">Definition of property name ReactionsData required</definition>
+            <value name="updated reaction absorption cross sections"/>
+            <value name="updated reaction quantum yields"/>
+          </parameter>
+        </parametergroup>
+      </component>
+    </component>
+    <component name="Aerosols">
+      <definition status="missing">Definition of component type Aerosols required</definition>
+      <parametergroup name="AerosolsAttributes">
+        <parameter name="SizeRepresentation" choice="XOR">
+          <definition status="missing">Definition of property name SizeRepresentation required</definition>
+          <value name="Bin Scheme"/>
+          <value name="Bulk Scheme"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="ConcentrationOrEmission" choice="XOR">
+          <definition status="missing">Definition of property name ConcentrationOrEmission required</definition>
+          <value name="Concentrations"/>
+          <value name="Emissions"/>
+        </parameter>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
+          <value name="Dry Deposition"/>
+          <value name="Sedimentation"/>
+          <value name="Wet Deposition-ImpactionScavenging"/>
+          <value name="Wet Deposition-NucleationScavenging"/>
+          <value name="Coagulation"/>
+          <value name="Nucleation"/>
+          <value name="Oxidation-GasPhase"/>
+          <value name="Oxidation-InCloud"/>
+          <value name="Condensation"/>
+          <value name="Aging"/>
+          <value name="Advection-Horizontal"/>
+          <value name="Advection-Vertical"/>
+        </parameter>
+        <parameter name="Coupling" choice="OR">
+          <definition status="missing">Definition of property name Coupling required</definition>
+          <value name="Radiation"/>
+          <value name="LandSurface"/>
+          <value name="Clouds"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="AnthropogenicAerosols">
+        <parameter name="Species" choice="OR">
+          <definition status="missing">Definition of property name Species required</definition>
+          <value name="Sulphates"/>
+          <value name="Dust"/>
+          <value name="BlackCarbon"/>
+          <value name="Nitrates"/>
+          <value name="POM"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Precursors" choice="keyboard">
+          <definition status="missing">Definition of property name Precursors required</definition>
+          <value format="string" name="list of aerosol precursors"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="NaturalAerosols">
+        <parameter name="Species" choice="OR">
+          <definition status="missing">Definition of property name Species required</definition>
+          <value name="Sulphates"/>
+          <value name="Dust"/>
+          <value name="SOA"/>
+          <value name="SeaSalt"/>
+          <value name="Nitrates"/>
+          <value name="PSC"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Precursors" choice="keyboard">
+          <definition status="missing">Definition of property name Precursors required</definition>
+          <value format="string" name="list of aerosol precursors"/>
+        </parameter>
+      </parametergroup>
+    </component>
+  </component>
+</vocab>

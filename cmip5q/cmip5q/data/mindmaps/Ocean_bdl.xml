@@ -2,10 +2,10 @@
 <vocab mmversion="based on r646 (mariepierre, 2009-07-06) of Ocean.mm" defnversion="">
   <component name="Ocean">
     <definition status="missing">Definition of component type Ocean required</definition>
-    <parametergroup name="Ocean_Attributes"/>
-    <component name="OceanKeyProperties">
-      <definition status="missing">Definition of component type OceanKeyProperties required</definition>
-      <parametergroup name="OceanKeyProperties_Attributes">
+    <parametergroup name="OceanAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
         <parameter name="ModelFamily" choice="XOR">
           <definition status="missing">Definition of property name ModelFamily required</definition>
           <value name="OGCM"/>
@@ -49,20 +49,20 @@
         </parameter>
         <parameter name="SpecificHeat" choice="keyboard">
           <definition status="missing">Definition of property name SpecificHeat required</definition>
-          <value format="numerical" name="specific heat" units="J/(kg.K"/>
+          <value format="numerical" name="specific heat" units="J.kg-1.K-1"/>
         </parameter>
       </parametergroup>
-      <component name="GeographicalConfiguration">
-        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
-        <parametergroup name="GeographicalConfiguration_Attributes">
+      <component name="SpaceConfiguration">
+        <definition status="missing">Definition of component type SpaceConfiguration required</definition>
+        <parametergroup name="SpaceConfigurationAttributes">
           <parameter name="Bathymetry" choice="keyboard">
             <definition status="missing">Definition of property name Bathymetry required</definition>
             <value format="string" name="characteritics of the bathymetry"/>
           </parameter>
         </parametergroup>
         <parametergroup name="HorizontalDomain">
-          <parameter name="GridConfiguration" choice="XOR">
-            <definition status="missing">Definition of property name GridConfiguration required</definition>
+          <parameter name="GridType" choice="XOR">
+            <definition status="missing">Definition of property name GridType required</definition>
             <value name="latitude-longitude rectangular"/>
             <value name="tripolar curvilinear"/>
             <value name="cube sphere"/>
@@ -76,21 +76,13 @@
             <value name="other"/>
           </parameter>
           <constraint name="if HorizontalDiscretization is &quot;finite differences&quot;">
-            <parameter name="GridType" choice="XOR">
-              <definition status="missing">Definition of property name GridType required</definition>
+            <parameter name="GridName" choice="XOR">
+              <definition status="missing">Definition of property name GridName required</definition>
               <value name="Arakawa B-grid"/>
               <value name="Arakawa C-Grid"/>
               <value name="Arakawa E-Grid"/>
             </parameter>
           </constraint>
-          <parameter name="MeridionalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name MeridionalExtent required</definition>
-            <value format="numerical" name="lat_min, lat_max" units="degN"/>
-          </parameter>
-          <parameter name="ZonalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name ZonalExtent required</definition>
-            <value format="numerical" name="lon_min, lon_max" units="degE"/>
-          </parameter>
           <parameter name="Resolution" choice="keyboard">
             <definition status="missing">Definition of property name Resolution required</definition>
             <value format="string" name="horizontal resolution"/>
@@ -101,6 +93,22 @@
             <value name="pole rotation"/>
             <value name="artificial island"/>
             <value name="none"/>
+          </parameter>
+          <parameter name="LatMin" choice="keyboard">
+            <definition status="missing">Definition of property name LatMin required</definition>
+            <value format="numerical" name="lat_min" units="degN"/>
+          </parameter>
+          <parameter name="LatMax" choice="keyboard">
+            <definition status="missing">Definition of property name LatMax required</definition>
+            <value format="numerical" name="lat_max" units="degN"/>
+          </parameter>
+          <parameter name="LonMin" choice="keyboard">
+            <definition status="missing">Definition of property name LonMin required</definition>
+            <value format="numerical" name="lon_min" units="degE"/>
+          </parameter>
+          <parameter name="LonMax" choice="keyboard">
+            <definition status="missing">Definition of property name LonMax required</definition>
+            <value format="numerical" name="lon_max" units="degE"/>
           </parameter>
         </parametergroup>
         <parametergroup name="VerticalDomain">
@@ -133,19 +141,23 @@
               <value name="other"/>
             </parameter>
           </constraint>
-          <parameter name="VerticalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name VerticalExtent required</definition>
-            <value format="numerical" name="upper_level, lower_level" units="vertical coordinate units"/>
-          </parameter>
           <parameter name="NumberOfVerticalLevels" choice="keyboard">
             <definition status="missing">Definition of property name NumberOfVerticalLevels required</definition>
             <value format="numerical" name="number of vertical levels"/>
+          </parameter>
+          <parameter name="UpperLevel" choice="keyboard">
+            <definition status="missing">Definition of property name UpperLevel required</definition>
+            <value format="numerical" name="upper_level" units="user units"/>
+          </parameter>
+          <parameter name="LowerLevel" choice="keyboard">
+            <definition status="missing">Definition of property name LowerLevel required</definition>
+            <value format="numerical" name="lower_level" units="user units"/>
           </parameter>
         </parametergroup>
       </component>
       <component name="Nudging">
         <definition status="missing">Definition of component type Nudging required</definition>
-        <parametergroup name="Nudging_Attributes"/>
+        <parametergroup name="NudgingAttributes"/>
         <parametergroup name="TracersDamping">
           <parameter name="AppliedTo" choice="OR">
             <definition status="missing">Definition of property name AppliedTo required</definition>
@@ -153,37 +165,61 @@
             <value name="salinity"/>
             <value name="other"/>
           </parameter>
-          <parameter name="VerticalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name VerticalExtent required</definition>
-            <value format="numerical" name="min, max values" units="meters"/>
+          <parameter name="LatMin" choice="keyboard">
+            <definition status="missing">Definition of property name LatMin required</definition>
+            <value format="numerical" name="lat_min" units="degN"/>
           </parameter>
-          <parameter name="MeridionalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name MeridionalExtent required</definition>
-            <value format="numerical" name="min, max values" units="degN"/>
+          <parameter name="LatMax" choice="keyboard">
+            <definition status="missing">Definition of property name LatMax required</definition>
+            <value format="numerical" name="lat_max" units="degN"/>
           </parameter>
-          <parameter name="ZonalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name ZonalExtent required</definition>
-            <value format="numerical" name="min, max values" units="degE"/>
+          <parameter name="LonMin" choice="keyboard">
+            <definition status="missing">Definition of property name LonMin required</definition>
+            <value format="numerical" name="lon_min" units="degE"/>
+          </parameter>
+          <parameter name="LonMax" choice="keyboard">
+            <definition status="missing">Definition of property name LonMax required</definition>
+            <value format="numerical" name="lon_max" units="degE"/>
+          </parameter>
+          <parameter name="UpperLevel" choice="keyboard">
+            <definition status="missing">Definition of property name UpperLevel required</definition>
+            <value format="numerical" name="upper_level" units="user units"/>
+          </parameter>
+          <parameter name="LowerLevel" choice="keyboard">
+            <definition status="missing">Definition of property name LowerLevel required</definition>
+            <value format="numerical" name="lower_level" units="user units"/>
           </parameter>
         </parametergroup>
         <parametergroup name="MomentumDamping">
-          <parameter name="VerticalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name VerticalExtent required</definition>
-            <value format="numerical" name="min, max values" units="meters"/>
+          <parameter name="LatMin" choice="keyboard">
+            <definition status="missing">Definition of property name LatMin required</definition>
+            <value format="numerical" name="lat_min" units="degN"/>
           </parameter>
-          <parameter name="MeridionalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name MeridionalExtent required</definition>
-            <value format="numerical" name="min, max values" units="degN"/>
+          <parameter name="LatMax" choice="keyboard">
+            <definition status="missing">Definition of property name LatMax required</definition>
+            <value format="numerical" name="lat_max" units="degN"/>
           </parameter>
-          <parameter name="ZonalExtent" choice="keyboard">
-            <definition status="missing">Definition of property name ZonalExtent required</definition>
-            <value format="numerical" name="min, max values" units="degE"/>
+          <parameter name="LonMin" choice="keyboard">
+            <definition status="missing">Definition of property name LonMin required</definition>
+            <value format="numerical" name="lon_min" units="degE"/>
+          </parameter>
+          <parameter name="LonMax" choice="keyboard">
+            <definition status="missing">Definition of property name LonMax required</definition>
+            <value format="numerical" name="lon_max" units="degE"/>
+          </parameter>
+          <parameter name="UpperLevel" choice="keyboard">
+            <definition status="missing">Definition of property name UpperLevel required</definition>
+            <value format="numerical" name="upper_level" units="user units"/>
+          </parameter>
+          <parameter name="LowerLevel" choice="keyboard">
+            <definition status="missing">Definition of property name LowerLevel required</definition>
+            <value format="numerical" name="lower_level" units="user units"/>
           </parameter>
         </parametergroup>
       </component>
       <parametergroup name="TimeSteppingFramework">
-        <parameter name="Tracer" choice="XOR">
-          <definition status="missing">Definition of property name Tracer required</definition>
+        <parameter name="Tracers" choice="XOR">
+          <definition status="missing">Definition of property name Tracers required</definition>
           <value name="Leap-frog + Asselin filter"/>
           <value name="Leap-frog + Periodic Euler backward solver"/>
           <value name="Predictor-corrector"/>
@@ -216,7 +252,7 @@
     </component>
     <component name="OceanAdvection">
       <definition status="missing">Definition of component type OceanAdvection required</definition>
-      <parametergroup name="OceanAdvection_Attributes"/>
+      <parametergroup name="OceanAdvectionAttributes"/>
       <parametergroup name="Momentum">
         <parameter name="SchemeName" choice="keyboard">
           <definition status="missing">Definition of property name SchemeName required</definition>
@@ -230,7 +266,7 @@
       </parametergroup>
       <component name="Tracers">
         <definition status="missing">Definition of component type Tracers required</definition>
-        <parametergroup name="Tracers_Attributes"/>
+        <parametergroup name="TracersAttributes"/>
         <parametergroup name="Lateral">
           <parameter name="SchemeType" choice="XOR">
             <definition status="missing">Definition of property name SchemeType required</definition>
@@ -270,10 +306,10 @@
     </component>
     <component name="OceanLateralPhysics">
       <definition status="missing">Definition of component type OceanLateralPhysics required</definition>
-      <parametergroup name="OceanLateralPhysics_Attributes"/>
+      <parametergroup name="OceanLateralPhysicsAttributes"/>
       <component name="Momentum">
         <definition status="missing">Definition of component type Momentum required</definition>
-        <parametergroup name="Momentum_Attributes"/>
+        <parametergroup name="MomentumAttributes"/>
         <parametergroup name="Operator">
           <parameter name="Direction" choice="XOR">
             <definition status="missing">Definition of property name Direction required</definition>
@@ -327,7 +363,7 @@
       </component>
       <component name="Tracers">
         <definition status="missing">Definition of component type Tracers required</definition>
-        <parametergroup name="Tracers_Attributes">
+        <parametergroup name="TracersAttributes">
           <parameter name="MesoscaleClosure" choice="XOR">
             <definition status="missing">Definition of property name MesoscaleClosure required</definition>
             <value name="yes"/>
@@ -410,7 +446,7 @@
     </component>
     <component name="OceanVerticalPhysics">
       <definition status="missing">Definition of component type OceanVerticalPhysics required</definition>
-      <parametergroup name="OceanVerticalPhysics_Attributes">
+      <parametergroup name="OceanVerticalPhysicsAttributes">
         <parameter name="Convection" choice="XOR">
           <definition status="missing">Definition of property name Convection required</definition>
           <value name="non-penetrative convective adjustment"/>
@@ -426,7 +462,7 @@
       </parametergroup>
       <component name="MixedLayer">
         <definition status="missing">Definition of component type MixedLayer required</definition>
-        <parametergroup name="MixedLayer_Attributes"/>
+        <parametergroup name="MixedLayerAttributes"/>
         <parametergroup name="Tracers">
           <parameter name="SchemeType" choice="XOR">
             <definition status="missing">Definition of property name SchemeType required</definition>
@@ -494,7 +530,7 @@
       </component>
       <component name="OceanInterior">
         <definition status="missing">Definition of component type OceanInterior required</definition>
-        <parametergroup name="OceanInterior_Attributes"/>
+        <parametergroup name="OceanInteriorAttributes"/>
         <parametergroup name="Tracers">
           <parameter name="SchemeType" choice="XOR">
             <definition status="missing">Definition of property name SchemeType required</definition>
@@ -549,10 +585,10 @@
         </parametergroup>
       </component>
     </component>
-    <component name="OceanUpperLowerBoundaries">
-      <definition status="missing">Definition of component type OceanUpperLowerBoundaries required</definition>
-      <parametergroup name="OceanUpperLowerBoundaries_Attributes"/>
-      <parametergroup name="OceanFreeSurface">
+    <component name="UpAndLowBoundaries">
+      <definition status="missing">Definition of component type UpAndLowBoundaries required</definition>
+      <parametergroup name="UpAndLowBoundariesAttributes"/>
+      <parametergroup name="FreeSurface">
         <parameter name="Type" choice="XOR">
           <definition status="missing">Definition of property name Type required</definition>
           <value name="linear implicit"/>
@@ -563,7 +599,7 @@
           <value name="non-linear split-explicit"/>
         </parameter>
       </parametergroup>
-      <parametergroup name="OceanBottomBoundaryLayer">
+      <parametergroup name="BottomBoundaryLayer">
         <parameter name="Type" choice="OR">
           <definition status="missing">Definition of property name Type required</definition>
           <value name="diffusive"/>
@@ -576,8 +612,8 @@
             <value format="numerical" name="lateral mixing coefficient in the bottom boundary layer" units="m2/s"/>
           </parameter>
         </constraint>
-        <parameter name="SillOverflow " choice="XOR">
-          <definition status="missing">Definition of property name SillOverflow  required</definition>
+        <parameter name="SillOverflow" choice="XOR">
+          <definition status="missing">Definition of property name SillOverflow required</definition>
           <value name="specific treatment"/>
           <value name="no specific treatment"/>
         </parameter>
@@ -585,7 +621,7 @@
     </component>
     <component name="OceanBoundaryForcing">
       <definition status="missing">Definition of component type OceanBoundaryForcing required</definition>
-      <parametergroup name="OceanBoundaryForcing_Attributes"/>
+      <parametergroup name="OceanBoundaryForcingAttributes"/>
       <parametergroup name="Momentum">
         <parameter name="BottomFriction" choice="XOR">
           <definition status="missing">Definition of property name BottomFriction required</definition>
@@ -610,7 +646,7 @@
       </parametergroup>
       <component name="Tracers">
         <definition status="missing">Definition of component type Tracers required</definition>
-        <parametergroup name="Tracers_Attributes">
+        <parametergroup name="TracersAttributes">
           <parameter name="GeothermalHeating" choice="XOR">
             <definition status="missing">Definition of property name GeothermalHeating required</definition>
             <value name="spatial varying"/>
@@ -630,18 +666,20 @@
             <value name="3 extinction depths"/>
             <value name="other"/>
           </parameter>
-          <parameter name="FirstDepth" choice="keyboard">
-            <definition status="missing">Definition of property name FirstDepth required</definition>
-            <value format="numerical" name="fisrt extinction depth" units="m"/>
-          </parameter>
-          <parameter name="SecondDepth" choice="keyboard">
-            <definition status="missing">Definition of property name SecondDepth required</definition>
-            <value format="numerical" name="second extinction depth" units="m"/>
-          </parameter>
-          <parameter name="ThirdDepth" choice="keyboard">
-            <definition status="missing">Definition of property name ThirdDepth required</definition>
-            <value format="numerical" name="third extinction depth" units="m"/>
-          </parameter>
+          <constraint name="if SchemeType is &quot;extinction depth&quot;">
+            <parameter name="FirstDepth" choice="OR">
+              <definition status="missing">Definition of property name FirstDepth required</definition>
+              <value format="numerical" name="fisrt extinction depth" units="m"/>
+            </parameter>
+            <parameter name="SecondDepth" choice="OR">
+              <definition status="missing">Definition of property name SecondDepth required</definition>
+              <value format="numerical" name="second extinction depth" units="m"/>
+            </parameter>
+            <parameter name="ThirdDepth" choice="OR">
+              <definition status="missing">Definition of property name ThirdDepth required</definition>
+              <value format="numerical" name="third extinction depth" units="m"/>
+            </parameter>
+          </constraint>
           <parameter name="OceanColorDependent" choice="XOR">
             <definition status="missing">Definition of property name OceanColorDependent required</definition>
             <value name="yes"/>
@@ -649,8 +687,20 @@
           </parameter>
         </parametergroup>
         <parametergroup name="SurfaceSalinity">
-          <parameter name="FluxType" choice="OR">
-            <definition status="missing">Definition of property name FluxType required</definition>
+          <parameter name="FromAtmosphere" choice="XOR">
+            <definition status="missing">Definition of property name FromAtmosphere required</definition>
+            <value name="freshwater flux"/>
+            <value name="virtual salt flux"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="FromSeaIce" choice="XOR">
+            <definition status="missing">Definition of property name FromSeaIce required</definition>
+            <value name="freshwater flux"/>
+            <value name="virtual salt flux"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="FromRiver" choice="XOR">
+            <definition status="missing">Definition of property name FromRiver required</definition>
             <value name="freshwater flux"/>
             <value name="virtual salt flux"/>
             <value name="other"/>

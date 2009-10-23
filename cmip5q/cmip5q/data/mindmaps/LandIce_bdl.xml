@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r813 (mariepierre, 2009-08-19) of LandIce.mm" defnversion="">
+  <component name="LandIce">
+    <definition status="missing">Definition of component type LandIce required</definition>
+    <parametergroup name="LandIceAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
+        <parameter name="CouplingIceSheet-IceShelves" choice="XOR">
+          <definition status="missing">Definition of property name CouplingIceSheet-IceShelves required</definition>
+          <value name="grounding line interactive"/>
+          <value name="grounding line prescribed"/>
+        </parameter>
+        <constraint name="if CouplingIceSheet-IceShelves is &quot;grounding line interactive&quot;">
+          <parameter name="ModelNumerics" choice="XOR">
+            <definition status="missing">Definition of property name ModelNumerics required</definition>
+            <value name="flux prescribed (Schoof)"/>
+            <value name="fixed grid size"/>
+            <value name="moving grid"/>
+          </parameter>
+        </constraint>
+        <parameter name="LandIceAlbedo" choice="XOR">
+          <definition status="missing">Definition of property name LandIceAlbedo required</definition>
+          <value name="prognostic"/>
+          <value name="prescribed"/>
+        </parameter>
+        <constraint name="if LandIceAlbedo is &quot;prognostic&quot;">
+          <parameter name="AlbedoFunctionOf" choice="OR">
+            <definition status="missing">Definition of property name AlbedoFunctionOf required</definition>
+            <value name="ice age"/>
+            <value name="ice density"/>
+            <value name="other"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="LandGlaciers">
+      <definition status="missing">Definition of component type LandGlaciers required</definition>
+      <parametergroup name="LandGlaciersAttributes">
+        <parameter name="DynamicArealExtent" choice="XOR">
+          <definition status="missing">Definition of property name DynamicArealExtent required</definition>
+          <value name="yes"/>
+          <value name="no"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SnowTreatment">
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="same as Snow in LandSurface"/>
+          <value name="different from Snow in LandSurface"/>
+        </parameter>
+        <constraint name="if Method is &quot;different from Snow in LandSurface&quot;">
+          <parameter name="NumberOfSnowLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfSnowLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Properties" choice="OR">
+            <definition status="missing">Definition of property name Properties required</definition>
+            <value name="prognostic snow albedo"/>
+            <value name="prognostic snow density"/>
+            <value name="prognostic snow water equivalent"/>
+            <value name="prognostic snow heat content"/>
+            <value name="prognostic snow temperature"/>
+            <value name="prognostic snow liquid water content"/>
+            <value name="snow melting"/>
+            <value name="snow refreezing"/>
+            <value name="blowing snow"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="LandIceSheet">
+      <definition status="missing">Definition of component type LandIceSheet required</definition>
+      <component name="Dynamics">
+        <definition status="missing">Definition of component type Dynamics required</definition>
+        <parametergroup name="DynamicsAttributes">
+          <parameter name="CouplingWithAtmosphere" choice="1NODE">
+            <definition status="missing">Definition of property name CouplingWithAtmosphere required</definition>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Model-Numerics">
+          <parameter name="Approximation" choice="XOR">
+            <definition status="missing">Definition of property name Approximation required</definition>
+            <value name="shallow ice"/>
+            <value name="higher order"/>
+            <value name="full stokes"/>
+            <value name="other"/>
+          </parameter>
+          <parameter name="IceStreams" choice="XOR">
+            <definition status="missing">Definition of property name IceStreams required</definition>
+            <value name="yes"/>
+            <value name="no"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <parametergroup name="SnowTreatment">
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="same as Snow in LandSurface"/>
+          <value name="different from Snow in LandSurface"/>
+        </parameter>
+        <constraint name="if Method is &quot;different from Snow in LandSurface&quot;">
+          <parameter name="NumberOfSnowLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfSnowLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Properties" choice="OR">
+            <definition status="missing">Definition of property name Properties required</definition>
+            <value name="prognostic snow albedo"/>
+            <value name="prognostic snow density"/>
+            <value name="prognostic snow water equivalent"/>
+            <value name="prognostic snow heat content"/>
+            <value name="prognostic snow temperature"/>
+            <value name="prognostic snow liquid water content"/>
+            <value name="snow melting"/>
+            <value name="snow refreezing"/>
+            <value name="blowing snow"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="IceShelves">
+      <definition status="missing">Definition of component type IceShelves required</definition>
+      <parametergroup name="IceShelvesAttributes">
+        <parameter name="Bottom" choice="XOR">
+          <definition status="missing">Definition of property name Bottom required</definition>
+          <value name="basal melting"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <component name="Dynamics">
+        <definition status="missing">Definition of component type Dynamics required</definition>
+        <parametergroup name="DynamicsAttributes">
+          <parameter name="CouplingWithOcean" choice="1NODE">
+            <definition status="missing">Definition of property name CouplingWithOcean required</definition>
+          </parameter>
+        </parametergroup>
+        <parametergroup name="Model-Numerics">
+          <parameter name="Approximation" choice="XOR">
+            <definition status="missing">Definition of property name Approximation required</definition>
+            <value name="shallow shelf"/>
+            <value name="full stokes"/>
+            <value name="other"/>
+          </parameter>
+        </parametergroup>
+      </component>
+      <parametergroup name="SnowTreatment">
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="same as Snow in LandSurface"/>
+          <value name="different from Snow in LandSurface"/>
+        </parameter>
+        <constraint name="if Method is &quot;different from Snow in LandSurface&quot;">
+          <parameter name="NumberOfSnowLayers" choice="keyboard">
+            <definition status="missing">Definition of property name NumberOfSnowLayers required</definition>
+            <value format="numerical" name=""/>
+          </parameter>
+          <parameter name="Properties" choice="OR">
+            <definition status="missing">Definition of property name Properties required</definition>
+            <value name="prognostic snow albedo"/>
+            <value name="prognostic snow density"/>
+            <value name="prognostic snow water equivalent"/>
+            <value name="prognostic snow heat content"/>
+            <value name="prognostic snow temperature"/>
+            <value name="prognostic snow liquid water content"/>
+            <value name="snow melting"/>
+            <value name="snow refreezing"/>
+            <value name="blowing snow"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+  </component>
+</vocab>

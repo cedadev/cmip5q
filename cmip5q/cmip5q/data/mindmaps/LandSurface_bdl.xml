@@ -2,18 +2,13 @@
 <vocab mmversion="based on r813 (mariepierre, 2009-08-19) of LandSurface.mm" defnversion="">
   <component name="LandSurface">
     <definition status="missing">Definition of component type LandSurface required</definition>
-    <parametergroup name="LandSurface_Attributes"/>
-    <component name="LandSurfaceKeyProperties">
-      <definition status="missing">Definition of component type LandSurfaceKeyProperties required</definition>
-      <parametergroup name="LandSurfaceKeyProperties_Attributes">
-        <parameter name="ModelFamily" choice="XOR">
-          <definition status="missing">Definition of property name ModelFamily required</definition>
-          <value name="inherited from Atmosphere"/>
-          <value name="other"/>
-        </parameter>
+    <parametergroup name="LandSurfaceAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
         <parameter name="BasicApproximations" choice="keyboard">
           <definition status="missing">Definition of property name BasicApproximations required</definition>
-          <value format="string" name=""/>
+          <value format="string" name="decription of the basic approximations made in the LandSurface model"/>
         </parameter>
         <parameter name="Genealogy" choice="XOR">
           <definition status="missing">Definition of property name Genealogy required</definition>
@@ -30,23 +25,10 @@
           <value name="explicit"/>
         </parameter>
       </parametergroup>
-      <component name="GeographicalConfiguration">
-        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
-        <parametergroup name="GeographicalConfiguration_Attributes">
-          <parameter name="Orography" choice="XOR">
-            <definition status="missing">Definition of property name Orography required</definition>
-            <value name="inherited from Atmosphere"/>
-            <value name="other"/>
-          </parameter>
-        </parametergroup>
+      <component name="SpaceConfiguration">
+        <definition status="missing">Definition of component type SpaceConfiguration required</definition>
+        <parametergroup name="SpaceConfigurationAttributes"/>
         <parametergroup name="HorizontalDomain">
-          <parameter name="Grid" choice="XOR">
-            <definition status="missing">Definition of property name Grid required</definition>
-            <value name="inherited from Atmosphere"/>
-            <value name="other"/>
-          </parameter>
-        </parametergroup>
-        <parametergroup name="LandSurfaceTiling">
           <parameter name="Tiling" choice="XOR">
             <definition status="missing">Definition of property name Tiling required</definition>
             <value name="common to all LS subcomponents"/>
@@ -59,16 +41,21 @@
               <value name="fixed number of types"/>
             </parameter>
           </constraint>
+          <parameter name="GridConfig" choice="XOR">
+            <definition status="missing">Definition of property name GridConfig required</definition>
+            <value name="inherited from Atmosphere"/>
+            <value name="specific"/>
+          </parameter>
         </parametergroup>
       </component>
       <parametergroup name="TimeSteppingFramework">
-        <parameter name="SchemeType" choice="XOR">
-          <definition status="missing">Definition of property name SchemeType required</definition>
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
           <value name="inherited from Atmosphere"/>
           <value name="sub-time stepping"/>
           <value name="other"/>
         </parameter>
-        <constraint name="if SchemeType is &quot;sub-time stepping&quot;">
+        <constraint name="if Method is &quot;sub-time stepping&quot;">
           <parameter name="TimeStep" choice="keyboard">
             <definition status="missing">Definition of property name TimeStep required</definition>
             <value format="numerical" name="time step" units="time units"/>
@@ -78,7 +65,7 @@
     </component>
     <component name="LandSurfaceSoil">
       <definition status="missing">Definition of component type LandSurfaceSoil required</definition>
-      <parametergroup name="LandSurfaceSoil_Attributes"/>
+      <parametergroup name="LandSurfaceSoilAttributes"/>
       <parametergroup name="SoilMap">
         <parameter name="Texture" choice="keyboard">
           <definition status="missing">Definition of property name Texture required</definition>
@@ -101,9 +88,9 @@
           <value format="string" name=""/>
         </parameter>
       </parametergroup>
-      <component name="Hydrology">
-        <definition status="missing">Definition of component type Hydrology required</definition>
-        <parametergroup name="Hydrology_Attributes">
+      <component name="SoilHydrology">
+        <definition status="missing">Definition of component type SoilHydrology required</definition>
+        <parametergroup name="SoilHydrologyAttributes">
           <parameter name="SpecificTiling" choice="XOR">
             <definition status="missing">Definition of property name SpecificTiling required</definition>
             <value name="yes"/>
@@ -156,10 +143,9 @@
           </constraint>
         </parametergroup>
       </component>
-      <component name="HeatTreatment">
-        <definition status="missing">Definition of component type HeatTreatment required</definition>
-        <parametergroup name="HeatTreatment_Attributes"/>
-        <parametergroup name="SoilHeatTreatment_Attributes">
+      <component name="SoilHeatTreatment">
+        <definition status="missing">Definition of component type SoilHeatTreatment required</definition>
+        <parametergroup name="SoilHeatTreatmentAttributes">
           <parameter name="SpecificTiling" choice="XOR">
             <definition status="missing">Definition of property name SpecificTiling required</definition>
             <value name="yes"/>
@@ -187,7 +173,7 @@
     </component>
     <component name="LandSurfaceSnow">
       <definition status="missing">Definition of component type LandSurfaceSnow required</definition>
-      <parametergroup name="LandSurfaceSnow_Attributes">
+      <parametergroup name="LandSurfaceSnowAttributes">
         <parameter name="SpecificTiling" choice="XOR">
           <definition status="missing">Definition of property name SpecificTiling required</definition>
           <value name="yes"/>
@@ -248,7 +234,7 @@
     </component>
     <component name="LandSurfaceVegetation">
       <definition status="missing">Definition of component type LandSurfaceVegetation required</definition>
-      <parametergroup name="LandSurfaceVegetation_Attributes">
+      <parametergroup name="LandSurfaceVegetationAttributes">
         <parameter name="SpecificTiling" choice="XOR">
           <definition status="missing">Definition of property name SpecificTiling required</definition>
           <value name="yes"/>
@@ -311,7 +297,7 @@
     </component>
     <component name="LandSurfaceEnergyBalance">
       <definition status="missing">Definition of component type LandSurfaceEnergyBalance required</definition>
-      <parametergroup name="LandSurfaceEnergyBalance_Attributes">
+      <parametergroup name="LandSurfaceEnergyBalanceAttributes">
         <parameter name="SpecificTiling" choice="XOR">
           <definition status="missing">Definition of property name SpecificTiling required</definition>
           <value name="yes"/>
@@ -347,7 +333,7 @@
     </component>
     <component name="LandSurfaceAlbedo">
       <definition status="missing">Definition of component type LandSurfaceAlbedo required</definition>
-      <parametergroup name="LandSurfaceAlbedo_Attributes">
+      <parametergroup name="LandSurfaceAlbedoAttributes">
         <parameter name="SpecificTiling" choice="XOR">
           <definition status="missing">Definition of property name SpecificTiling required</definition>
           <value name="yes"/>
@@ -399,10 +385,10 @@
     </component>
     <component name="LandSurfaceCarbonCycle">
       <definition status="missing">Definition of component type LandSurfaceCarbonCycle required</definition>
-      <parametergroup name="LandSurfaceCarbonCycle_Attributes"/>
+      <parametergroup name="LandSurfaceCarbonCycleAttributes"/>
       <component name="Vegetation">
         <definition status="missing">Definition of component type Vegetation required</definition>
-        <parametergroup name="Vegetation_Attributes">
+        <parametergroup name="VegetationAttributes">
           <parameter name="NumberOfCarbonPools" choice="keyboard">
             <definition status="missing">Definition of property name NumberOfCarbonPools required</definition>
             <value format="numerical" name=""/>
@@ -483,10 +469,9 @@
         </parameter>
       </parametergroup>
     </component>
-    <component name="LandSurfaceRiverRouting">
-      <definition status="missing">Definition of component type LandSurfaceRiverRouting required</definition>
-      <parametergroup name="LandSurfaceRiverRouting_Attributes"/>
-      <parametergroup name="RiverRouting_Attributes">
+    <component name="RiverRouting">
+      <definition status="missing">Definition of component type RiverRouting required</definition>
+      <parametergroup name="RiverRoutingAttributes">
         <parameter name="SpecificTiling" choice="XOR">
           <definition status="provided">Tiling of basins.</definition>
           <value name="yes"/>
@@ -545,7 +530,7 @@
     </component>
     <component name="LandSurfaceLakes">
       <definition status="missing">Definition of component type LandSurfaceLakes required</definition>
-      <parametergroup name="LandSurfaceLakes_Attributes">
+      <parametergroup name="LandSurfaceLakesAttributes">
         <parameter name="CouplingWithRivers" choice="XOR">
           <definition status="missing">Definition of property name CouplingWithRivers required</definition>
           <value name="yes"/>

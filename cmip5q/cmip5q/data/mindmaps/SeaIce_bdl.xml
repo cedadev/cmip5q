@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vocab mmversion="based on r524 (mariepierre, 2009-05-29) of SeaIce.mm" defnversion="">
+  <component name="SeaIce">
+    <definition status="missing">Definition of component type SeaIce required</definition>
+    <parametergroup name="SeaIceAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
+        <parameter name="BasicApproximations" choice="keyboard">
+          <definition status="missing">Definition of property name BasicApproximations required</definition>
+          <value format="string" name="description of the basic approximations made in the SeaIce model"/>
+        </parameter>
+        <parameter name="ListOfPrognosticVariables" choice="keyboard">
+          <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
+          <value format="string" name="list of sea ice prognostic variables"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="SeaIceRepresentation">
+        <parameter name="SchemeType" choice="XOR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="2-levels"/>
+          <value name="multi-levels"/>
+          <value name="ice types"/>
+        </parameter>
+        <constraint name="if SchemeType is &quot;multi-levels&quot;">
+          <parameter name="Multi-LevelsScheme" choice="keyboard">
+            <definition status="missing">Definition of property name Multi-LevelsScheme required</definition>
+            <value format="string" name="details of the multi-levels scheme used for sea-ice representation"/>
+          </parameter>
+        </constraint>
+        <constraint name="if SchemeType is &quot;ice types&quot;">
+          <parameter name="IceTypesScheme" choice="keyboard">
+            <definition status="missing">Definition of property name IceTypesScheme required</definition>
+            <value format="string" name="details of the ice types scheme used for sea-ice representation"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+      <parametergroup name="TimeSteppingFramework">
+        <parameter name="Method" choice="XOR">
+          <definition status="missing">Definition of property name Method required</definition>
+          <value name="inherited from Ocean"/>
+          <value name="sub-time stepping"/>
+          <value name="other"/>
+        </parameter>
+        <constraint name="if Method is &quot;sub-time stepping&quot;">
+          <parameter name="TimeStep" choice="keyboard">
+            <definition status="missing">Definition of property name TimeStep required</definition>
+            <value format="numerical" name="time step" units="time units"/>
+          </parameter>
+        </constraint>
+      </parametergroup>
+    </component>
+    <component name="SeaIceThermodynamics">
+      <definition status="missing">Definition of component type SeaIceThermodynamics required</definition>
+      <parametergroup name="SeaIceThermodynamicsAttributes">
+        <parameter name="WaterPonds" choice="XOR">
+          <definition status="missing">Definition of property name WaterPonds required</definition>
+          <value name="yes "/>
+          <value name="no"/>
+        </parameter>
+        <parameter name="SurfaceAlbedo" choice="keyboard">
+          <definition status="missing">Definition of property name SurfaceAlbedo required</definition>
+          <value format="string" name="details for surface albedo formulation"/>
+        </parameter>
+        <parameter name="NewIceFormation" choice="keyboard">
+          <definition status="missing">Definition of property name NewIceFormation required</definition>
+          <value format="string" name="details for the parametrization of new ice formation"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Snow">
+        <parameter name="HeatDiffusion" choice="XOR">
+          <definition status="missing">Definition of property name HeatDiffusion required</definition>
+          <value name="multi-layer"/>
+          <value name="one layer"/>
+        </parameter>
+        <parameter name="SchemeType" choice="OR">
+          <definition status="missing">Definition of property name SchemeType required</definition>
+          <value name="snow-aging"/>
+          <value name="snow-ice"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Ice">
+        <parameter name="VerticalHeatDiffusion" choice="XOR">
+          <definition status="missing">Definition of property name VerticalHeatDiffusion required</definition>
+          <value name="multi-layer on an irregular vertical grid"/>
+          <value name="multi-layer on a regular vertical grid"/>
+          <value name="one layer"/>
+        </parameter>
+        <constraint name="if VerticalHeatDiffusion is &quot;multi-layer&quot;">
+          <parameter name="NumberOfLayers" choice="XOR">
+            <definition status="missing">Definition of property name NumberOfLayers required</definition>
+            <value name="2 layers (Semtner '76 type)"/>
+            <value name="N&gt;2 layers"/>
+          </parameter>
+        </constraint>
+        <parameter name="OceanToIceBasalHeatFlux" choice="XOR">
+          <definition status="missing">Definition of property name OceanToIceBasalHeatFlux required</definition>
+          <value name="prescribed"/>
+          <value name="parametrized (calculated in Ocean)"/>
+          <value name="parametrized (calculated in SeaIce)"/>
+        </parameter>
+        <parameter name="BrineInclusions" choice="XOR">
+          <definition status="missing">Definition of property name BrineInclusions required</definition>
+          <value name="none"/>
+          <value name="heat reservoir"/>
+          <value name="thermal properties depending on S-T (fixed salinity)"/>
+          <value name="thermal properties depending on S-T (varying salinity)"/>
+        </parameter>
+        <parameter name="Processes" choice="OR">
+          <definition status="missing">Definition of property name Processes required</definition>
+          <value name="Sea ice lateral melting"/>
+          <value name="Surface sublimation"/>
+          <value name="Solar radiation transmission"/>
+        </parameter>
+        <parameter name="TransportInThicknessSpace" choice="XOR">
+          <definition status="missing">Definition of property name TransportInThicknessSpace required</definition>
+          <value name="eulerian"/>
+          <value name="linear remapping"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+    </component>
+    <component name="SeaIceDynamics">
+      <definition status="missing">Definition of component type SeaIceDynamics required</definition>
+      <parametergroup name="SeaIceDynamicsAttributes">
+        <parameter name="Rheology" choice="XOR">
+          <definition status="missing">Definition of property name Rheology required</definition>
+          <value name="free-drift"/>
+          <value name="Mohr-Coulomb"/>
+          <value name="visco-plastic"/>
+          <value name="EVP"/>
+          <value name="granular"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="Advection" choice="XOR">
+          <definition status="missing">Definition of property name Advection required</definition>
+          <value name="incremental remapping (semi-lagrangian)"/>
+          <value name="prather"/>
+          <value name="other"/>
+        </parameter>
+        <parameter name="HorizontalDiscretizationGrid" choice="XOR">
+          <definition status="missing">Definition of property name HorizontalDiscretizationGrid required</definition>
+          <value name="Ocean grid"/>
+          <value name="Atmospheric grid"/>
+          <value name="other"/>
+        </parameter>
+      </parametergroup>
+      <parametergroup name="Redistribution">
+        <parameter name="Type" choice="XOR">
+          <definition status="missing">Definition of property name Type required</definition>
+          <value name="rafting"/>
+          <value name="ridging"/>
+          <value name="Other"/>
+        </parameter>
+        <parameter name="IceStrengthFormulation" choice="keyboard">
+          <definition status="missing">Definition of property name IceStrengthFormulation required</definition>
+          <value format="string" name="details for the ice strength formulation"/>
+        </parameter>
+      </parametergroup>
+    </component>
+  </component>
+</vocab>

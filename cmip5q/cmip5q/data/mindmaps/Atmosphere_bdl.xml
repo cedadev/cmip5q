@@ -2,10 +2,10 @@
 <vocab mmversion="based on r557 (mariepierre, 2009-06-09) of Atmosphere.mm" defnversion="">
   <component name="Atmosphere">
     <definition status="missing">Definition of component type Atmosphere required</definition>
-    <parametergroup name="Atmosphere_Attributes"/>
-    <component name="AtmosKeyProperties">
-      <definition status="missing">Definition of component type AtmosKeyProperties required</definition>
-      <parametergroup name="AtmosKeyProperties_Attributes">
+    <parametergroup name="AtmosphereAttributes"/>
+    <component name="KeyProperties">
+      <definition status="missing">Definition of component type KeyProperties required</definition>
+      <parametergroup name="KeyPropertiesAttributes">
         <parameter name="ModelFamily" choice="XOR">
           <definition status="missing">Definition of property name ModelFamily required</definition>
           <value name="AGCM"/>
@@ -24,31 +24,21 @@
           <value name="other"/>
         </parameter>
       </parametergroup>
-      <component name="GeographicalConfiguration">
-        <definition status="missing">Definition of component type GeographicalConfiguration required</definition>
-        <parametergroup name="GeographicalConfiguration_Attributes">
+      <component name="SpaceConfiguration">
+        <definition status="missing">Definition of component type SpaceConfiguration required</definition>
+        <parametergroup name="SpaceConfigurationAttributes">
           <parameter name="Orography" choice="keyboard">
             <definition status="missing">Definition of property name Orography required</definition>
             <value format="string" name="characteritics of the orography"/>
           </parameter>
         </parametergroup>
         <parametergroup name="HorizontalDomain">
-          <parameter name="GridConfiguration" choice="XOR">
-            <definition status="missing">Definition of property name GridConfiguration required</definition>
+          <parameter name="GridType" choice="XOR">
+            <definition status="missing">Definition of property name GridType required</definition>
             <value name="latitude-longitude retangular"/>
             <value name="latitude-longitude"/>
             <value name="reduced gaussian"/>
             <value name="other"/>
-          </parameter>
-          <parameter name="MeridionalExtent" choice="AND">
-            <definition status="missing">Definition of property name MeridionalExtent required</definition>
-            <value format="numerical" name="lat_min" units="degN"/>
-            <value format="numerical" name="lat_max" units="degN"/>
-          </parameter>
-          <parameter name="ZonalExtent" choice="AND">
-            <definition status="missing">Definition of property name ZonalExtent required</definition>
-            <value format="numerical" name="lon_min" units="degE"/>
-            <value format="numerical" name="lon_max" units="degE"/>
           </parameter>
           <parameter name="Resolution" choice="keyboard">
             <definition status="missing">Definition of property name Resolution required</definition>
@@ -60,6 +50,22 @@
             <value name="pole rotation"/>
             <value name="artificial island"/>
             <value name="none"/>
+          </parameter>
+          <parameter name="LatMin" choice="keyboard">
+            <definition status="missing">Definition of property name LatMin required</definition>
+            <value format="numerical" name="lat_min" units="degN"/>
+          </parameter>
+          <parameter name="LatMax" choice="keyboard">
+            <definition status="missing">Definition of property name LatMax required</definition>
+            <value format="numerical" name="lat_max" units="degN"/>
+          </parameter>
+          <parameter name="LonMin" choice="keyboard">
+            <definition status="missing">Definition of property name LonMin required</definition>
+            <value format="numerical" name="lon_min" units="degE"/>
+          </parameter>
+          <parameter name="LonMax" choice="keyboard">
+            <definition status="missing">Definition of property name LonMax required</definition>
+            <value format="numerical" name="lon_max" units="degE"/>
           </parameter>
         </parametergroup>
         <parametergroup name="VerticalDomain">
@@ -85,9 +91,9 @@
         </parametergroup>
       </component>
     </component>
-    <component name="AtmosDynamicalCore">
-      <definition status="missing">Definition of component type AtmosDynamicalCore required</definition>
-      <parametergroup name="AtmosDynamicalCore_Attributes">
+    <component name="DynamicalCore">
+      <definition status="missing">Definition of component type DynamicalCore required</definition>
+      <parametergroup name="DynamicalCoreAttributes">
         <parameter name="ListOfPrognosticVariables" choice="OR">
           <definition status="missing">Definition of property name ListOfPrognosticVariables required</definition>
           <value name="surface pressure"/>
@@ -185,7 +191,7 @@
       </parametergroup>
       <component name="Advection">
         <definition status="missing">Definition of component type Advection required</definition>
-        <parametergroup name="Advection_Attributes"/>
+        <parametergroup name="AdvectionAttributes"/>
         <parametergroup name="Tracers">
           <parameter name="SchemeName" choice="XOR">
             <definition status="missing">Definition of property name SchemeName required</definition>
@@ -237,11 +243,11 @@
         </parametergroup>
       </component>
     </component>
-    <component name="AtmosRadiation">
-      <definition status="missing">Definition of component type AtmosRadiation required</definition>
-      <parametergroup name="AtmosRadiation_Attributes">
-        <parameter name="TimeStep " choice="keyboard">
-          <definition status="missing">Definition of property name TimeStep  required</definition>
+    <component name="Radiation">
+      <definition status="missing">Definition of component type Radiation required</definition>
+      <parametergroup name="RadiationAttributes">
+        <parameter name="TimeStep" choice="keyboard">
+          <definition status="missing">Definition of property name TimeStep required</definition>
           <value format="numerical" name="time step" units="time units"/>
         </parameter>
         <parameter name="AerosolTypes" choice="OR">
@@ -313,9 +319,9 @@
         </parameter>
       </parametergroup>
     </component>
-    <component name="AtmosCloudConvectionTurb">
-      <definition status="missing">Definition of component type AtmosCloudConvectionTurb required</definition>
-      <parametergroup name="AtmosCloudConvectionTurb_Attributes"/>
+    <component name="ConvectionTurbulenceCloud">
+      <definition status="missing">Definition of component type ConvectionTurbulenceCloud required</definition>
+      <parametergroup name="ConvectionTurbulenceCloudAttributes"/>
       <parametergroup name="BoundaryLayerTurbulence">
         <parameter name="SchemeName" choice="XOR">
           <definition status="missing">Definition of property name SchemeName required</definition>
@@ -405,7 +411,7 @@
       </parametergroup>
       <component name="CloudScheme">
         <definition status="missing">Definition of component type CloudScheme required</definition>
-        <parametergroup name="CloudScheme_Attributes">
+        <parametergroup name="CloudSchemeAttributes">
           <parameter name="SeparatedCloudTreatment" choice="XOR">
             <definition status="missing">Definition of property name SeparatedCloudTreatment required</definition>
             <value name="yes (convective+stratiform+boundary layer)"/>
@@ -479,9 +485,9 @@
         </parameter>
       </parametergroup>
     </component>
-    <component name="AtmosOrographyAndWaves">
-      <definition status="missing">Definition of component type AtmosOrographyAndWaves required</definition>
-      <parametergroup name="AtmosOrographyAndWaves_Attributes">
+    <component name="OrographyAndWaves">
+      <definition status="missing">Definition of component type OrographyAndWaves required</definition>
+      <parametergroup name="OrographyAndWavesAttributes">
         <parameter name="SpongeLayer" choice="keyboard">
           <definition status="missing">Definition of property name SpongeLayer required</definition>
           <value format="string" name="characteristics of the sponge layer"/>
@@ -505,8 +511,6 @@
           <value name="Hydraulic jump"/>
           <value name="Envelope orography"/>
           <value name="Statistical sub-grid scale variance"/>
-          <value name="Non-Linear calculation"/>
-          <value name="more than two cardinal directions"/>
           <value name="Other"/>
         </parameter>
         <parameter name="PropagationScheme" choice="XOR">
@@ -546,8 +550,6 @@
           <value name="Convection"/>
           <value name="Precipitation"/>
           <value name="Background spectrum"/>
-          <value name="Spatially dependent"/>
-          <value name="Temporally dependent"/>
           <value name="other"/>
         </parameter>
         <parameter name="PropagationScheme" choice="XOR">
