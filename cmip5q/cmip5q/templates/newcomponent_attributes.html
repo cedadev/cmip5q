@@ -12,7 +12,7 @@
         {% for r in cg.rows %}
             <tr class="{% cycle 'row1' 'row2'%}">
             <td>
-                <b>{{r.name}}</b>:&nbsp;
+                <b id="tt{{r.id}}">{{r.name}}</b>:&nbsp;
                 {% ifequal r.ptype 'User' %}<br/>
                 (&nbsp;Delete <input type="checkbox" name="{{pform.prefix}}-del-{{r.id}}" id="delid_{{r.id}}"/>&nbsp;) 
                     {%endifequal %}
@@ -40,8 +40,16 @@
                     <input name="{{pform.prefix}}-{{r.id}}" id="id_{{r.id}}" size="50" value="{{r.value}}">
             </td>
             </tr>
+           
         {% endfor %}
-    </table></td></table>
+    </table>
+    <script type="text/javascript">
+        YAHOO.namespace("e{{pg.id}}{{cg.id}}.container");
+	{% for r in cg.rows %}
+            YAHOO.e{{pg.id}}{{cg.id}}.container.ytt{{r.id}} = new YAHOO.widget.Tooltip("ytt{{r.id}}", { context:"tt{{r.id}}", text:"{{r.name}}:&nbsp;{{r.definition}}" });
+        {% endfor %}
+    </script>
+    </td></table>
     <p>Enter {% ifnotequal pform.rows|length 0 %} an additional {% else %} a {% endifnotequal %} component attribute or parameter if you wish (you can enter multiple parameters by entering one at a time):</p>
     <table>
     <tr><th> Name </th><th> Value </th></tr>
