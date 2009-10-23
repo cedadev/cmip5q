@@ -566,7 +566,10 @@ class InputModForm(ModForm):
         self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)
         
 class ConformanceForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False)
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
+    # We need the queryset, we get away with a list, because we override it in the specialisation.
+    mod=forms.ModelMultipleChoiceField(required=True,queryset=[],widget=forms.SelectMultiple(attrs={'size':'3'}))
+    coupling=forms.ModelMultipleChoiceField(required=True,queryset=[],widget=forms.SelectMultiple(attrs={'size':'3'}))
     class Meta:
         model=Conformance
         exclude=('simulation') # we know it
