@@ -4,7 +4,7 @@
 # and to produce xml instances of the django storage.
 
 from protoq.models import *
-from XMLinitialiseQ import realms
+from XMLinitialiseQ import VocabList
 
 # move from ElementTree to lxml.etree
 #from xml.etree import ElementTree as ET
@@ -14,6 +14,8 @@ import logging
 import unittest
 import os
 import datetime
+
+Realms=VocabList['Realms']
 
 def initialiseModel():
     ''' Setup a template for model copying in the dummy CMIP5 centre '''
@@ -418,7 +420,7 @@ class ComponentParser:
         self.component=component # used to assign parameters ...
         
         logging.debug('Handling Component %s (%s)'%(component.abbrev,component.scienceType))
-        if component.scienceType in realms:
+        if component.scienceType in Realms:
             realm=component
             component.model=self.model
             component.isRealm=True
@@ -473,7 +475,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(False,c.isRealm)
         
         for c in nm.top.components.all():
-            self.assertEqual(True,c.scienceType in realms)
+            self.assertEqual(True,c.scienceType in Realms)
             self.assertEqual(True,c.isRealm)
             self.assertEqual(False,c.isModel)
         

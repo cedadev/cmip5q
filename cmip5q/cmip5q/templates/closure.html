@@ -1,7 +1,8 @@
 <tr class="{% cycle 'row1' 'row2' %}"><td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
 <td colspan="2">
 {% ifnotequal f.cf.instance.targetInput.ctype f.afv %}
-Spatial Regridding: {{ff.spatialRegridding.errors}} {{ff.spatialRegridding}} &nbsp;
+Spatial Regridding: {{ff.spatialRegridding.errors}} {{ff.spatialRegridding}} &nbsp;Type:
+{{ff.spatialType.errors}}{{ff.spatialType}}&nbsp;
 Temporal Regridding: {{ff.temporalRegridding.errors}} {{ff.temporalRegridding}} &nbsp; </td>
 {% endifnotequal %}
 </tr>

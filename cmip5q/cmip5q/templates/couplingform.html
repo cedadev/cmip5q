@@ -3,9 +3,9 @@
 <hr>
 {% ifequal f.cf.instance.targetInput.ctype f.bcv %}
 <p> (1) This section describes the coupling method and how often the coupling occurred </p>
-<p>Coupling Type: {{f.cf.couplingType.errors}}{{f.cf.couplingType}}&nbsp;
+<p>Coupling Type: {{f.cf.ctype.errors}}{{f.cf.ctype}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
-{{f.cf.couplingFreqUnits.errors}}{{f.cf.couplingFreqUnits}}</p>
+{{f.cf.FreqUnits.errors}}{{f.cf.FreqUnits}}</p>
 <hr>
 <p>(2) <b> Internal Boundary Conditions</b> This section describes how other components provide input </p> 
 {% if s %} 

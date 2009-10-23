@@ -408,9 +408,9 @@ class Coupling(models.Model):
     # may also be associated with a simulation, in which case there is an original
     simulation=models.ForeignKey(Simulation,blank=True,null=True)
     original=models.ForeignKey('Coupling',blank=True,null=True)
-    # coupling details for boundary conditions
-    couplingType=models.ForeignKey('Value',related_name='%(class)s_couplingTypeVal',blank=True,null=True)
-    couplingFreqUnits=models.ForeignKey('Value',related_name='%(class)s_couplingFreqUnits',blank=True,null=True)
+    # coupling details for boundary conditions'%(class)s_couplingTypeVal',blank=True,null=True)
+    ctype=models.ForeignKey('Value',related_name='%(class)s_corder',blank=True,null=True)
+    FreqUnits=models.ForeignKey('Value',related_name='%(class)s_FreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
     def __unicode__(self):
@@ -422,7 +422,7 @@ class Coupling(models.Model):
         '''Make a copy of self, and associate with a simulation'''
         # first make a copy of self
         args=['component','targetInput',
-          'couplingType','couplingFreq','couplingFreqUnits',
+          'ctype','couplingFreq','FreqUnits',
           'manipulation']
         kw={'original':self,'simulation':simulation}
         for a in args:kw[a]=self.__getattribute__(a)
@@ -443,14 +443,16 @@ class CouplingClosure(models.Model):
     # we don't need a closed attribute, since the absence of a target means it's open.
     coupling=models.ForeignKey(Coupling,blank=True,null=True)
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
-    spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridder')
+    spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridding')
+    spatialType=models.ForeignKey('Value',related_name='%(class)s_SpatialType')
     temporalRegridding=models.ForeignKey('Value',related_name='%(class)s_TemporalRegridder')
     inputDescription=models.TextField(blank=True,null=True)
    
     def makeNewCopy(self,coupling):
         ''' Copy closure to a new coupling '''
         kw={'coupling':coupling}
-        for key in ['spatialRegridding','temporalRegridding','inputDescription','target']:
+        for key in ['spatialRegridding','spatialType',
+                    'temporalRegridding','inputDescription','target']:
             kw[key]=self.__getattribute__(key)
         new=self.__class__(**kw)
         new.save()
@@ -677,7 +679,7 @@ class ReferenceForm(forms.ModelForm):
         exclude=('centre',)
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
-        v=Vocab.objects.get(name='Reference Types Vocab')
+        v=Vocab.objects.get(name='ReferenceTypes')
         self.fields['refType'].queryset=Value.objects.filter(vocab=v)
         self.hostCentre=None
     def save(self):

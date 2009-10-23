@@ -16,57 +16,75 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
          ('IPSL','FR Institute Simone Pierre Laplace'),
          ('MPIM','DE Max Planck Institute for Meteorology'), 
          ('CMIP5','Dummy Centre used to hold model template'),
+         ('Example','Dummy Centre used to hold examples'),
      )
      
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
-realms = ('LandIce','Ocean','SeaIce','Atmosphere','OceanBiogeoChemistry','AtmosChemAndAerosols','Aerosol','LandSurface')
-             
-# controlled vocabulary for file formats
-FileFormats=('NetCDF','Grib','PP','Excel','Text','HDF','Other')
-             
-# this tuple should provide a controlled vocabulary for referenceTypes
-referenceTypes=('Webpage','Online Refereed',
-                'Offline Refereed','Online Other',
-                'Offline Other')
 
-# these support couplings 
-couplingTypes=('ESMF','OASIS3','OASIS4','Other')
-spatialRegridding=('None','Weighted Nearest Neighbour','Weights and Addresses File',
-                   'Bilinear','Bicubic','Conservative','Other')
-temporalRegridding=('lastAvailable','linearBetween','averaged')
-frequencies=('seconds','minutes','hours','days','months','years','decades')
+VocabList={'Realms':
+     ('LandIce','Ocean','SeaIce','Atmosphere','OceanBiogeoChemistry',
+     'AtmosChemAndAerosols','Aerosol','LandSurface'),
+     
+     # controlled vocabulary for file formats
+     'FileFormats':('NetCDF','Grib','PP','Excel','Text','HDF','Other'),
+             
+    # this tuple should provide a controlled vocabulary for referenceTypes
+    'ReferenceTypes':('Webpage','Online Refereed','Offline Refereed',
+                      'Online Other','Offline Other'),
 
-# and these will support platforms
-hardware=('Vector','Parallel','Beowulf')
-#following extended from top500 site:
-processorFamily=('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64','Other Intel','Other AMD','Other')
-interconnectFamily=('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed','NUMAlink','SP Switch',
-    'Cray Interconnect','Fat Tree','Other')
+    # these support couplings 
+    'couplingType':('OASIS3','OASIS4','FMS','ESMF','CCSM Flux coupler','MCT',
+                    'Shared Memory','Files','Other'),
+    'SpatialRegridding':('None','Non-Convervative','Conservative'),
+    'SpatialRegriddingType':('2D-FirstOrder','2D-SecondOrder','2D-ThirdOrder',
+                         '3D-FirstOrder','3D-SecondOrder','3d-ThirdOrder','Other'),
+    'TemporalRegridding':('None','TimeAverage','TimeAccumulation','lastAvailable','Linear'),
+    'FreqUnits':('seconds','minutes','hours','days','months','years','decades'),
+
+    # and these will support platforms
+    'hardwareType':('Vector','Parallel','Beowulf'),
+
+    #following extended from top500 site:
+    'processorTyp':('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64',
+                          'Other Intel','Other AMD','Other'),   
+    'interconnectType':('Myrinet','Quadrics','Gigabit Ethernet','Infiniband','Mixed',
+                        'NUMAlink','SP Switch','Cray Interconnect','Fat Tree','Other'),
     
-#geneology 
-relations=('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf')
+    #geneology 
+    'relations':('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf'),
 
-#types of conformance, just allow one.
-conformanceTypes=('Via Couplings','Via Model Mods', 'Via Combination')
+    #types of conformance, just allow one.
+    'ConformanceTypes':('Via Couplings','Via Model Mods', 'Via Combination'),
 
-# types of modification
-modificationTypes=('ModelMod','InputMod')
-# input requirements
-inputTypes=('InitialCondition','BoundaryCondition','AncillaryFile')
-# model modification types
-modelModTypes=('ParameterChange','CodeChange')
+    # types of modification
+    'ModificationTypes':('ModelMod','InputMod'),
+    # input requirements
+    'InputTypes':('InitialCondition','BoundaryCondition','AncillaryFile'),
+    # model modification types
+    'ModelModTypes':('ParameterChange','CodeChange'),
 
-# types of numerical requirement 
-numrecTypes=('BoundaryCondition','InitialCondition')
+    # types of numerical requirement 
+    'NumReqTypes':('BoundaryCondition','InitialCondition'),
 
-#ensembleTypes
-ensembleTypes=('Differing Start Date','Differing Initialisation','Perturbed Physics')
+    #ensembleTypes
+    'EnsembleTypes':('Differing Start Date','Differing Initialisation','Perturbed Physics'),
+    }
 
-def loadvocab(name,values):
+def reloadVocab(key):
+    ''' Used to reset vocabulariews '''
+    vocab=Vocab.objects.get(name=key)
+    for v in Value.objects.filter(vocab=vocab):
+        v.delete()
+    vocab.delete()
+    loadvocab(key)
+
+def loadvocab(key):
     ''' Used to load vocabularies '''
-    v=Vocab(uri=str(uuid.uuid1()),name=name)
+    
+    v=Vocab(uri=str(uuid.uuid1()),name=key)
     v.save()
+    values=VocabList[key]
     for r in values:
         rv=Value(vocab=v,value=r)
         rv.save()
@@ -83,39 +101,5 @@ def initialise():
         rp=ResponsibleParty(name='Unknown',abbrev='Unknown',address='Erehwon',email='u@foo.bar',
                             uri=str(uuid.uuid1()),centre=c)
         rp.save()
-    #add the realm vocabularies
-    loadvocab('Realms',realms)
-        
-    #now add reference type vocabulary
-    loadvocab('Reference Types Vocab',referenceTypes)
-    
-    #now add couplings vocabularies
-    loadvocab('couplingType',couplingTypes)
-    loadvocab('FreqUnits',frequencies)
-    loadvocab('SpatialRegridding',spatialRegridding)
-    loadvocab('TemporalRegridding',temporalRegridding)
-    
-    #support for platforms
-    loadvocab('hardwareType',hardware)
-    loadvocab('processorType',processorFamily)
-    loadvocab('interconnectType',interconnectFamily)
-    
-    #support for geneologies
-    loadvocab('relations',relations)
-    
-    #support for conformanceTypes and numericalRequirementTypes
-    loadvocab('ConformanceTypes',conformanceTypes)
-    loadvocab('ModifcationTypes',modificationTypes)
-    loadvocab('ModelModTypes',modelModTypes)
-    
-    loadvocab('NumericalRequirementTypes',numrecTypes)
-    
-    #support for file formats
-    loadvocab('FileFormats',FileFormats)
-    
-    #input types
-    loadvocab('InputTypes',inputTypes)
-        
-    #ensemble types
-    loadvocab('EnsembleTypes',ensembleTypes)
-    
+            
+    for k in VocabList: loadvocab(k)

@@ -100,15 +100,17 @@ class MyCouplingFormSet:
         self.queryset=qs.order_by('targetInput__ctype','targetInput')
             
         # setup our vocabularies
-        couplingType=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
-        couplingFreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
+        ctype=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
+        FreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
         spatialRegridding=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegridding'))
+        spatialType=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegriddingType'))
         temporalRegridding=Value.objects.filter(vocab=Vocab.objects.get(name='TemporalRegridding'))
         
-        self.couplingVocabs={'couplingType':couplingType,
-                'couplingFreqUnits':couplingFreqUnits}
+        self.couplingVocabs={'ctype':ctype,
+                'FreqUnits':FreqUnits}
         self.closureVocabs={'spatialRegridding':spatialRegridding,
-                'temporalRegridding':temporalRegridding}
+                'temporalRegridding':temporalRegridding,
+                'spatialType':spatialType}
                 
         # rather than use a django formset for the couplings, we'll do them by
         # hand, but do the closures using a formset ...
