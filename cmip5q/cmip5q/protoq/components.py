@@ -271,7 +271,8 @@ class componentHandler(object):
     def view(self):
         ''' HTML view of self '''
         ''' Return a CIM XML view for the moment'''
-        return self.XML(mimetype="doc/cim/xml")
+        #return self.XML(mimetype="doc/cim/xml")
+        return self.XML()
     
     def XML(self,mimetype="application/xml"):
         ''' XML view of self'''

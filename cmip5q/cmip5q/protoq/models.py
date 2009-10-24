@@ -127,6 +127,7 @@ class Component(Doc):
         new.realm=realm
        
         for c in self.components.all():
+            logging.debug('About to add a sub-component to component %s (in centre %s, model %s with realm %s)'%(new,centre, model,realm))
             r=c.copy(centre,model=model,realm=realm)
             new.components.add(r)
             logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))

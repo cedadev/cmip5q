@@ -158,20 +158,32 @@ class NumericalModel:
         '''license'''
         '''componentProperties'''
         componentProperties=ET.SubElement(comp,'componentProperties')
-        pset=Param.objects.filter(component=c)
-        for p in pset:
+        pgset=ParamGroup.objects.filter(component=c)
+        for pg in pgset:
             componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'false'}) # [TBD3]
             '''shortName'''
-            ET.SubElement(componentProperty,'shortName').text=p.name
+            ET.SubElement(componentProperty,'shortName').text=pg.name
             '''longName'''
-            ET.SubElement(componentProperty,'longName').text=p.name
-            '''description'''
-            '''type'''
-            ET.SubElement(componentProperty,'type',{"value":"other"}) # TBD4
-            '''value'''
-            ET.SubElement(componentProperty,'value').text=p.value
-            #ET.SubElement(componentProperty,'ptype').text=p.ptype
-            #ET.SubElement(componentProperty,'vocab').text=p.vocab
+            ET.SubElement(componentProperty,'longName').text=pg.name
+
+            # the internal questionnaire representation is that all parameters
+            # are contained in a constraint group
+            constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+            for con in constraintSet:
+                pset=NewParam.objects.filter(constraint=con)
+                for p in pset:
+                    property=ET.SubElement(componentProperty,'componentProperty')
+                    '''shortName'''
+                    ET.SubElement(property,'shortName').text=p.name
+                    '''longName'''
+                    ET.SubElement(property,'longName').text=p.name
+                    '''description'''
+                    '''type'''
+                    ET.SubElement(property,'type',{"value":"other"}) # TBD4
+                    '''value'''
+                    ET.SubElement(property,'value').text=p.value
+                    #ET.SubElement(property,'ptype').text=p.ptype
+                    #ET.SubElement(property,'vocab').text=p.vocab
         '''numericalProperties'''
         ET.SubElement(comp,'numericalProperties')
         '''scientificProperties'''
@@ -186,7 +198,7 @@ class NumericalModel:
         #name=ET.SubElement(resp,'gmd:individualName')
         #ET.SubElement(name,'gco:CharacterString').text=c.contact
         name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
-        ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.contact
+        ###ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.contact
         # </gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
@@ -208,7 +220,7 @@ class NumericalModel:
         #email=ET.SubElement(ciaddress,'gmd:electronicMailAddress')
         #ET.SubElement(email,'gco:CharacterString').text=c.email
         email=ET.SubElement(ciaddress,self.GMD_NAMESPACE_BRACKETS+'electronicMailAddress')
-        ET.SubElement(email,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.email
+        ###ET.SubElement(email,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.email
         #         </gmd:electronicMailAddress>
         #     </gmd:address>
         #     <gmd:onlineResource/>

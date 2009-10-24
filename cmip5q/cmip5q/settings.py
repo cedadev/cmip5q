@@ -12,8 +12,8 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-#DATABASE_NAME = os.path.join(thisDir, 'sqlite.db') # Or path to database file if using sqlite3.
-DATABASE_NAME = '/home/bnl/meta4q/cmip5q/sqlite.db'
+DATABASE_NAME = os.path.join(thisDir, 'sqlite.db') # Or path to database file if using sqlite3.
+#DATABASE_NAME = '/home/bnl/meta4q/cmip5q/sqlite.db'
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -75,10 +75,12 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/bnl/meta4q/cmip5q/templates"
+    # "/home/bnl/meta4q/cmip5q/templates"
+    "/home/rupert/proj/metafor/venv/cmip5q/templates"
 )
 TEMPLATE_STRING_IF_INVALID = 'what happened here?'
-STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+# STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+STATIC_DOC_ROOT = "/home/rupert/proj/metafor/venv/cmip5q/templates/css"
 
 #TEMPLATE_DIRS = (
 #    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -102,3 +104,4 @@ logging.basicConfig(
     level = logging.DEBUG,
     format = '%(asctime)s %(levelname)s %(message)s',
 )
+

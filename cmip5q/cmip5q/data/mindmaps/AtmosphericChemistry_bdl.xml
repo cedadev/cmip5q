@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vocab mmversion="based on r811 (mariepierre, 2009-08-19) of AtmosphericChemistry.mm" defnversion="">
-  <component name="AtmosChemAndAerosol">
-    <definition status="missing">Definition of component type AtmosChemAndAerosol required</definition>
-    <parametergroup name="AtmosChemAndAerosolAttributes"/>
+  <component name="AtmosChemAndAerosols">
+    <definition status="missing">Definition of component type AtmosChemAndAerosols required</definition>
+    <parametergroup name="AtmosChemAndAerosolsAttributes"/>
     <component name="KeyProperties">
       <definition status="missing">Definition of component type KeyProperties required</definition>
       <parametergroup name="KeyPropertiesAttributes">
