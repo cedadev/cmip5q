@@ -568,19 +568,22 @@ class InputModForm(ModForm):
         
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
-    # We need the queryset, we get away with a list, because we override it in the specialisation.
-    mod=forms.ModelMultipleChoiceField(required=True,queryset=[],widget=forms.SelectMultiple(attrs={'size':'3'}))
-    coupling=forms.ModelMultipleChoiceField(required=True,queryset=[],widget=forms.SelectMultiple(attrs={'size':'3'}))
+    # We need the queryset, note that the queryset is limited in the specialisation
+    q1,q2=ModelMod.objects.all(),Coupling.objects.all()
+    mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=forms.SelectMultiple(attrs={'size':'3'}))
+    coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=forms.SelectMultiple(attrs={'size':'3'}))
     class Meta:
         model=Conformance
         exclude=('simulation') # we know it
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
-        relevant_components=Component.objects.filter(model=simulation.model)
-        self.fields['mod'].queryset=CodeModification.objects.filter(component__in=relevant_components)
+        #relevant_components=Component.objects.filter(model=simulation.model)
+        self.fields['mod'].queryset=simulation.modelMod.all()
         self.fields['coupling'].queryset=Coupling.objects.filter(simulation=simulation)
         v=Vocab.objects.get(name='ConformanceTypes')
         self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+        self.showMod=len(self.fields['mod'].queryset)
+        self.showCoupling=len(self.fields['coupling'].queryset)
        
 class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))

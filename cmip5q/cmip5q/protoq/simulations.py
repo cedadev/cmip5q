@@ -27,15 +27,9 @@ class MyConformanceFormSet(ConformanceFormSet):
         ConformanceFormSet.__init__(self,data,queryset=qset)
         self.s=simulation
     def specialise(self):
-        v=Vocab.objects.get(name='ConformanceTypes')
-        allowedComponents=Component.objects.filter(model=self.s.numericalModel)
-        cset=Value.objects.filter(vocab=v)
         for form in self.forms:
-            #form.fields['ctype'].queryset=Value.objects.filter(vocab=v)
-            form.fields['mod'].queryset=ModelMod.objects.filter(component__in=allowedComponents)
-            form.fields['coupling'].queryset=Coupling.objects.filter(simulation=self.s)
-            form.fields['ctype'].queryset=cset
-          
+            form.specialise(self.s)
+            
 class simulationHandler(object):
     
     def __init__(self,centre_id,simid=None,expid=None):
