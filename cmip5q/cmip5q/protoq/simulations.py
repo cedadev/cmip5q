@@ -182,7 +182,7 @@ class simulationHandler(object):
         for e in eset:
             sims=e.simulation_set.filter(centre=c.id)
             for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))    
-            exp.append(etmp(e.longName,sims,e.id))
+            exp.append(etmp(e.shortName,sims,e.id))
 
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,'csims':csims,'cpurl':cpurl,

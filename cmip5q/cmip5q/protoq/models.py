@@ -213,7 +213,7 @@ class Experiment(models.Model):
     def __unicode__(self):
         return self.shortName
     class Meta:
-        ordering=('longName',)
+        ordering=('shortName',)
     
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
