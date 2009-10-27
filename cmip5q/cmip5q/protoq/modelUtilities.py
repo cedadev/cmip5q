@@ -1,4 +1,6 @@
 from django.forms.util import ErrorList
+from django.forms.fields import URLField
+
 def uniqueness(form,centre,field='name'):
     '''  This utility function is to be called within a model clean method to ensure uniqueness
     of a field within a model in a given centre (as opposed to within all instances of the model
@@ -25,3 +27,15 @@ def uniqueness(form,centre,field='name'):
         form._errors[field] = ErrorList([msg])
         del cleaned_data[field]
     return cleaned_data
+
+class refLinkField(URLField):
+    ''' Used to override the check to check DOIs as valid URLs ...'''
+    def clean(self, value):
+        # first sort out whether it's a doi
+        parsed=value.split(':')
+        if parsed[0] in ['DOI','doi']:
+            #value='http://dx.doi.org/'+parsed[1]
+            # we can't use URLfield because doi.org doens't return a 404 .
+            return value
+        else:
+            return URLField.clean(self,value)

@@ -5,7 +5,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
-from modelUtilities import uniqueness
+from modelUtilities import uniqueness, refLinkField
 import uuid
 import logging
 
@@ -681,7 +681,8 @@ class ComponentForm(forms.ModelForm):
 
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))
-    link=forms.URLField(widget=forms.TextInput(attrs={'size':'55'}))
+    #link=forms.URLField(widget=forms.TextInput(attrs={'size':'55'}))
+    link=refLinkField(widget=forms.TextInput(attrs={'size':'55'}))
     class Meta:
         model=Reference
         exclude=('centre',)
