@@ -162,7 +162,7 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.1E_decadal
+		1.1E Decadal
 	</shortName>
     <longName> 
     	10-year prediction - O(10) ensemble 
