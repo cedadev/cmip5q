@@ -298,7 +298,23 @@ class ComponentParser:
         c.save()
         for item in elem:
             self.__handleNewParam(item,pg,c)
-            
+    
+    def __handleKeyboardValue(self,elem):
+        ''' Parse for and handle values from the keyboard, e.g.
+        <value format="string" name="list of 2D species emitted"/>
+        <value format="numerical" name="lat_min" units="degN"/>'''
+        # currently ignoring the value names ...
+        velem=elem.find('value')
+        if velem is None:
+            logging.info('ERROR: Unable to parse %s(%s)'%(elem.tag,elem.text))
+            return False,None
+        keys=velem.attrib.keys()
+        numeric,units=False,None
+        if 'format' in keys: 
+            if velem.attrib['format']=='numerical': numeric=True
+        if 'units' in keys: units=velem.attrib['units']
+        return numeric,units
+    
     def __handleNewParam(self,elem,pg,cg):
         ''' Add new parameter to cg, if cg none, create one in pg '''
         if cg is None:
@@ -327,9 +343,12 @@ class ComponentParser:
         elif choiceType in ['keyboard']:
             defn,units='',''
             delem=elem.find('definition')
-            if delem: defn=delem.text
-            if 'units' in elem.attrib.keys(): units=elem.attrib['units']
-            p=NewParam(name=paramName,constraint=cg,ptype=choiceType,definition=defn,units=units)
+            velem=elem.find('units')
+            if delem is not None: defn=delem.text
+            numeric,units=self.__handleKeyboardValue(elem)
+            print paramName,defn,numeric,units
+            p=NewParam(name=paramName,constraint=cg,ptype=choiceType,definition=defn,units=units,
+                       numeric=numeric)
             p.save()
         elif choiceType in ['couple']:
             # we create an input requirement here and now ...

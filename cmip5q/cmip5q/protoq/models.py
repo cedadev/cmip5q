@@ -336,11 +336,13 @@ class NewParam(models.Model):
     value=models.CharField(max_length=512,blank=True)
     # but it might be a numeric parameter, in which case we have more attributes
     units=models.CharField(max_length=128,null=True,blank=True)
+    numeric=models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
     def copy(self,constraint):
         new=NewParam(name=self.name,constraint=constraint,ptype=self.ptype,controlled=self.controlled,
-                      vocab=self.vocab,value=self.value,definition=self.definition,units=self.units)
+                      vocab=self.vocab,value=self.value,definition=self.definition,units=self.units,
+                      numeric=self.numeric)
         new.save()
     
 class Param(models.Model):
