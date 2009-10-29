@@ -132,13 +132,8 @@ class Component(Doc):
             new.components.add(r)
             logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))
             
-        #### Now we need to deal with the parameter settings too ..
-        if NEWMINDMAPS:
-            pset=ParamGroup.objects.filter(component=self)
-            for p in pset: p.copy(new)
-        else:
-            pset=Param.objects.filter(component=self)
-            for p in pset: p.makeNewCopy(new)
+        pset=ParamGroup.objects.filter(component=self)
+        for p in pset: p.copy(new)
         
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
@@ -159,7 +154,7 @@ class ComponentInput(models.Model):
     #the owners for their parent realms, but it's stored when we create
     #it to improve performance:
     realm=models.ForeignKey(Component,related_name="input_realm")
-    constraint=models.ForeignKey('Constraint',null=True,blank=True)
+    #constraint=models.ForeignKey('Constraint',null=True,blank=True)
     def __unicode__(self):
         return '%s:%s'%(self.owner,self.abbrev)
     def makeNewCopy(self,component):
@@ -170,22 +165,6 @@ class ComponentInput(models.Model):
         ci=Coupling(component=component.model,targetInput=new)
         ci.save()
 
-class Constraint(models.Model):
-    ''' Used to ensure that something is only used if needed '''
-    # This is the constraint as it appeared on input
-    note=models.CharField(max_length=256)
-    # this is the parameter holding the constraint target
-    key=models.ForeignKey('Param',blank=True,null=True)
-    # and this is the value it must hold to be a valid constraint (ie TRUE)
-    value=models.CharField(max_length=256)
-    def __unicode__(self):
-        return note
-    def isValid(self):
-        try:
-            return str(self.key.value)==self.value
-        except:
-            #FIXME: need to make sure we have a value ...
-            return False
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
     centre=models.ForeignKey('Centre')
@@ -279,8 +258,7 @@ class Simulation(Doc):
         # we can't duplicate that, since we don't know the conformance are the same unless we 
         # have a mapping page somewhere ... 
         return s
-
-
+        
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
     # this is the "name" of the vocab, called a uri because in the 
@@ -288,6 +266,7 @@ class Vocab(models.Model):
     name=models.CharField(max_length=64)
     uri=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
+    version=models.CharField(max_length=64,blank=True)
     def __unicode__(self):
         return self.name
     
@@ -295,6 +274,8 @@ class Value(models.Model):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
     value=models.CharField(max_length=64)
     vocab=models.ForeignKey(Vocab)
+    definition=models.TextField(blank=True)
+    version=models.CharField(max_length=64,blank=True)
     def __unicode__(self):  
         return self.value
     
@@ -343,32 +324,6 @@ class NewParam(models.Model):
         new=NewParam(name=self.name,constraint=constraint,ptype=self.ptype,controlled=self.controlled,
                       vocab=self.vocab,value=self.value,definition=self.definition,units=self.units,
                       numeric=self.numeric)
-        new.save()
-    
-class Param(models.Model):
-    ''' This is the abstract parameter class'''
-    name=models.CharField(max_length=64,blank=False)
-    controlled=models.BooleanField(default=True)
-    ptype=models.SlugField(max_length=12,blank=True)
-    # applies to
-    component=models.ForeignKey(Component,null=True,blank=True)
-    #following used to inform users about choices:
-    info=models.CharField(max_length=256,null=True,blank=True)
-    # constraint note
-    myconstraint=models.CharField(max_length=256,null=True,blank=True)
-    # Following used to point to vocabs and their values ...
-    # If a vocab is linked, then the value must be from it!
-    vocab=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.CharField(max_length=512,blank=True)
-    # but it might be a numeric parameter, in which case we have more attributes
-    definition=models.CharField(max_length=128,null=True,blank=True)
-    units=models.CharField(max_length=128,null=True,blank=True)
-    def __unicode__(self):
-        return self.name
-    def makeNewCopy(self,component):
-        new=Param(name=self.name,component=component,ptype=self.ptype,controlled=self.controlled,
-                      vocab=self.vocab,value=self.value,definition=self.definition,
-                      info=self.info,myconstraint=self.myconstraint,units=self.units)
         new.save()
     
 class DataContainer(models.Model):
