@@ -93,9 +93,11 @@ class NumericalModel:
         component.save()
         self.top=component
         logging.debug('Created empty top level model %s'%component)
-        # now get a placeholder paramgroup
+        # now get a placeholder paramgroup and constraint group
         p=ParamGroup(component=component)
-        p.save()
+        p.save() 
+        cg=ConstraintGroup(constraint='',parentGroup=p)
+        cg.save()
         
     def read(self):
        
@@ -287,11 +289,18 @@ class ComponentParser:
         p=ParamGroup(name=elem.attrib['name'],component=self.component)
         p.save()
         cg=None
+        empty=True
         for item in elem:
+            empty=False
             if item.tag=='constraint':
                 self.__handleConstraint(item,p)
             elif item.tag=='parameter':
                 cg=self.__handleNewParam(item,p,cg)
+        if empty:
+            #create an empty constraint group so new parameters can be added.
+            cg=ConstraintGroup(constraint='',parentGroup=p)
+            cg.save()
+            
     def __handleConstraint(self,elem,pg):
         ''' Handle Constraints'''
         c=ConstraintGroup(constraint=elem.attrib['name'],parentGroup=pg)

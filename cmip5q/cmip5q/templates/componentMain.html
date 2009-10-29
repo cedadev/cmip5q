@@ -83,7 +83,9 @@
         {% endif %}
         <div class="boxer">
         <h4> Component Attributes </h4>
-            <p> In this section enter parameters and attributes associated with this component.</p>
+            <p> In this section enter parameters and attributes associated with this 
+            {% if c.isModel %} model {% endif %}{% if c.isRealm %} realm {% endif %}
+            {% if not c.isModel %} component {% endif %}.</p>
             <!--include 'component_attributes.html' -->
             {% include 'newcomponent_attributes.html' %}
         </div>
