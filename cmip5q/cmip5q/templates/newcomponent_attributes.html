@@ -23,9 +23,9 @@
                 {% endifequal %}
                 {% ifequal r.ptype 'keyboard' %}
                         {% if r.units %}
-                        Enter numeric value in <em>{{r.units}}</em>:&nbsp;
+                        Enter {% if r.numeric %}numeric{% endif %} value in <em>{{r.units}}</em>:&nbsp;
                         {% else %}
-                        Enter freetext or numeric value::&nbsp;
+                        Enter {% if r.numeric %}numeric{% else%}string{%endif%} value::&nbsp;
                         {% endif %}
                 {% endifequal %}   
                 {% ifnotequal r.form None %}

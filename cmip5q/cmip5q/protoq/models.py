@@ -728,12 +728,18 @@ class ResponsiblePartyForm(forms.ModelForm):
     name=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
     address=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
+    uri=forms.CharField(widget=forms.HiddenInput(),required=False)
     class Meta:
         model=ResponsibleParty
-        exclude=('uri','centre')
+        exclude=('centre')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.hostCentre=None
+    def clean_uri(self):
+        ''' On creating a responsible party we need a uri, once we have one, it should stay the same '''
+        data=self.cleaned_data['uri']
+        if data == u'': data=str(uuid.uuid1())
+        return data
     def save(self):
         r=forms.ModelForm.save(self,commit=False)
         r.centre=self.hostCentre

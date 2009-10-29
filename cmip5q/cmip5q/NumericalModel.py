@@ -343,10 +343,8 @@ class ComponentParser:
         elif choiceType in ['keyboard']:
             defn,units='',''
             delem=elem.find('definition')
-            velem=elem.find('units')
             if delem is not None: defn=delem.text
             numeric,units=self.__handleKeyboardValue(elem)
-            print paramName,defn,numeric,units
             p=NewParam(name=paramName,constraint=cg,ptype=choiceType,definition=defn,units=units,
                        numeric=numeric)
             p.save()
