@@ -116,6 +116,11 @@ urlpatterns = patterns('',
                 # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+        
+    # Vocabs
+    (r'^cmip5/vocab/$','cmip5q.protoq.vocab.list'),
+    (r'^cmip5/vocab/(?P<vocabID>\d+)/$','cmip5q.protoq.vocab.show'),
+    #(r'^cmip5/vocab/(?P<docID>\d+)/(?P<valID>\d+)/$','cmip5q.protoq.vocab.list'),
 
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),

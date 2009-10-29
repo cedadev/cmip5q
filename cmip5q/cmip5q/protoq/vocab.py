@@ -1,13 +1,23 @@
-def vocab(listv,term,relationship):
-    ''' For a given term in a list, find relationships - dummy example'''
-    lists={'components':(
-        ('gcm','component','atmosphere'),
-        ('atmosphere','component','radiation'),
-        ('atmosphere','component','advection'),
-        ('radiation','component','lw'),
-        ('radiation','component','sw'))}
-    if listv not in lists: return None
-    r=[]
-    for i in lists['listv']:
-        if i[0]==term:r.append(i[1])
-    return r
+from django.template import Context, loader
+from django.shortcuts import get_object_or_404, render_to_response
+from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
+from django.core.urlresolvers import reverse
+from django import forms
+from cmip5q.protoq.models import *
+import uuid
+import logging
+
+def list(request):
+    ''' Returns a list of internal vocabularies '''
+    vocabs=Vocab.objects.all()
+    for v in vocabs:
+        v.url=reverse('cmip5q.protoq.vocab.show',args=(v.id,))
+    return render_to_response('vocab.html',{'v':vocabs})
+
+def show (request,vocabID):
+    ''' Returns members of a specific vocabulary '''
+    vocab=Vocab.objects.get(id=vocabID)
+    values=Value.objects.filter(vocab=vocab)
+    return render_to_response('vocabvalues.html',{'v':values,'vocab':vocab})
+
+
