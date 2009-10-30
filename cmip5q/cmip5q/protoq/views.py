@@ -403,7 +403,8 @@ class ViewHandler(BaseViewHandler):
             # show all the references, why not ...
             objects=objects.order_by('name')
         elif self.resource['type']=='file':
-            objects=objects.filter(centre__in=[None,self.centre])
+            #objects=objects.filter(centre__in=[None,self.centre]) doesn't work
+            objects=objects.filter(centre=None)|objects.filter(centre=self.centre)
             objects=objects.order_by('name')
         elif self.resource['type']=='modelmod':
             objects=objects.filter(centre=self.centre)
