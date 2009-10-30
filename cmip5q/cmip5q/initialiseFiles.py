@@ -9,16 +9,16 @@ def initialiseFiles():
     v=Vocab.objects.get(name='FileFormats')
     # loop over all rerences in spreadsheet
     for row in FilesCSVinfo:
-        print row
-        logging.debug(', '.join(row))
         # format is being read into the tuple only for convenience at the moment but is overwritten
+        # print row
         name,link,format,description=tuple(row)
+        logging.debug(name+format)
         # find out what file type
         filetype='Other'
         try:
             format=Value.objects.filter(vocab=v).get(value=filetype)
         except:
-            logging.info('Ignoring file %s'%', '.join(row))
+            logging.info('Ignoring file %s'%name)
             break  # leave the loop
         # find the other things: name, description, link    
         f=DataContainer(name=name,
@@ -26,12 +26,9 @@ def initialiseFiles():
                     description=description,
                     format=format)
         try:
-            f.save()
+            r=f.save()
         except:
-            logging.info('Unable to save file %s'%name)
-        # temporary 2 lines
-        def __unicode__(self):
-            return
+            logging.info('Unable to save file %s (%s)'%(name,r))
     
 if __name__=="__main__":
     

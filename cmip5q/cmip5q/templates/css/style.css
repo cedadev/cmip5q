@@ -1,9 +1,10 @@
 /* CSS numbers reminder 0,0,0,0 corresponds to top right bottom left */
-
 /* Generic css */
 
-* {margin:0;padding:0;font-family:Verdana, Arial, Helvetica, sans-serif;
-   line-height:1.4;color:#333;}
+* {margin:0;padding:0;font-family:"Times New Roman", Arial, Helvetica, sans-serif;
+   line-height:1.4;color:#333;font-size:12px;}
+
+h1 {font-size:16px;}
 
 body {
     background-color:#aaa;
@@ -15,36 +16,27 @@ p {padding: 2px; }
 ol {padding-left:20px;}
 ul {padding-left:20px;}
 
-
-/*Curly corners follow */
-/* Note that these need to appear in this order at the top of a curly bit, and reversed for the bottom */
-/* Note also that b0 provides the margin, and that the thing below (or above) wants borders only the
- appropriate sides */
-.hb0, .hb1, .hb2, .hb3, .hb4 {font-size:1px; overflow:hidden; display:block;}
-.hb0 {height:0px; background:#aaa; background-image:url(icons/hilbert.gif);padding:5px} 
-.hb1 {height:1px; background:#3c78b5; margin:0 10px; }
-.hb2 {height:1px; background:#fff; border-right:2px solid #3c78b5; border-left:2px solid #3c78b5; margin:0 8px;}
-.hb3 {height:1px; background:#fff; border-right:1px solid #3c78b5; border-left:1px solid #3c78b5; margin:0 7px;}
-.hb4 {height:2px; background:#fff; border-right:1px solid #3c78b5; border-left:1px solid #3c78b5; margin:0 6px;}
     
 /* metafor page layout follows, ie. header and footer */
 /* 5 px margin needed in header if we don't have the nifty corners, otherwise 0 (first one on the margin list */
-#header {font-size:large; text-align:center; padding: 0px 0px 5px 0px;
+#header {text-align:center; padding: 0px 0px 5px 0px;
 margin: 5px 5px 5px 5px;  border-left: 1px solid  #3c78b5; border-right:1px solid  #3c78b5 ; border-bottom:1px solid  #3c78b5;clear:both; background-color:#fff;
 }
+#subtitle {font-size:14px}
 
-#banner {font-size:large; text-align:center; border:1px; padding:2px;margin:5px;
+#banner {text-align:center; border:1px; padding:2px;margin:5px;
 background-color:#FFFFFF;}
-#footer {font-size:0.8em; text-align:center; padding: 0px 0px 0px 0px;
+#banner p {font-size:14px}
+    
+#footer {text-align:center; padding: 0px 0px 0px 0px;
 margin: 5px 5px 0px 5px; clear:both; background-color:#fff;
 /*border-left: 1px solid #3c78b5; border-right: 1px solid #3c78b5; border-top: 1px solid #3c78b5; */
 font-weight:italic;
 }
-#header.hdricon {float:center;}
-
-#footer td {font-size:0.8em;font-weight:bold;padding: 5px;}
+#footer td {font-weight:bold;padding: 5px;}
 
 /* Application Specific */
+#header.hdricon {float:center;}
 
 .main {
 background-color:#FFFFFF;
@@ -61,8 +53,6 @@ margin:5px;
 padding:5px 5px 5px 15px;
 }
 
-
-
 .twocol{background-color:#FFFFFF;padding:0px;margin:0px;}
 /* Two equal column options */
 .tableft{float:left;width:520px; background-color:#FFFFFF;margin:5px;}
@@ -76,48 +66,6 @@ td.space {background-color:#FFFFFF;}
 .tab300 {float:left;width:275px; background-color:#FFFFFF;margin:5px;}
 .tab500{float:right; width:540px; background-color:#FFFFFF;margin:5px;}
     
-/* 3 column stuff follows */
-/* from http://matthewjamestaylor.com/blog/perfect-3-column.htm */
-.colmask3 {
-	position:relative;	/* This fixes the IE7 overflow hidden bug */
-	clear:both;
-	float:left;
-	width:100%;			/* width of whole page */
-	overflow:hidden;		/* This chops off any overhanging divs */
-	}
-/* common 3 column settings */
-.colright, .colmid, .colleft { float:left; width:100%;			/* width of page */
-	position:relative; }
-.col1, .col2, .col3 {
-		float:left;
-		position:relative;
-		padding:0 0 1em 0;	/* no left and right padding on columns, we just make them narrower instead 
-						only padding top and bottom is included here, make it whatever value you need */
-		overflow:hidden;
-	}
-/* 3 Column settings */
-.threecol {background:#FFFFFF;		/* right column background colour */ }
-.threecol .colmid {
-		right:33%;			/* width of the right column */
-		background:#fff;		/* center column background colour */
-	}
-.threecol .colleft {
-		right:33%;			/* width of the middle column */
-		background:#FFFFFF;	/* left column background colour */
-	}
-.threecol .col1 {
-		width:30%;			/* width of center column content (column width minus padding on either side) */
-		left:102%;			/* 100% plus left padding of center column */
-	}
-.threecol .col2 {
-		width:29%;			/* Width of left column content (column width minus padding on either side) */
-		left:39%;			/* width of (right column) plus (center column left and right padding) plus (left column left padding) */	}
-.threecol .col3 {
-		width:29%;			/* Width of right column content (column width minus padding on either side) */
-		left:77%;			/* Please make note of the brackets here:
-						(100% - left column width) plus (center column left and right padding) plus (left column left and right padding) plus (right column left padding) */
-	}
-
 .boxer {margin:5px;padding:5px;background-color:#FFFFFF; border: 1px solid black;}
 .boxer h1, h4 {margin-left:2px; padding:2px;}
 .boxer2  {margin:5px;padding:5px;background-color:#CDC9A5; border: 1px solid black;} /* lemonchiffon3 */
@@ -140,16 +88,17 @@ a.button {text-decoration:None;padding:1px 3px 1px 3px;border:1px solid black; b
 .tabnav ul {                                 /* basic tab set */
 text-align: centre;                            /* left, right or center */
 margin: 0 0 0 0;                                   /* margin */
-font: bold 12px verdana, arial, sans-serif;  /* font type */
+ /* font type */
 list-style: none;                            /* IMPORTANT */
-padding: 8px 0 0 10px;                                  /* padding */
+padding: 8px 0 3px 10px;                                  /* padding */
 }
 .tabnav li { 
+font-size: 14px; font-weight: bold; 
 display: inline;                              /* IMPORTANT */
 border: solid;
 border-width: 1px 1px 0 1px;                  /* BOTTOM HAS TO BE ZERO */
 margin: 0 0.5em 0 0 ;                           /* Second one is spacing */
-padding: 2px 0 0 0;                           /* nb can't pad down */
+padding: 2px 0 3px 0;                           /* nb can't pad down any different from the ul down padding */
 }
 
 .tabnav a {
@@ -171,7 +120,7 @@ padding: 5px;
 .tabnav .subdue li a:hover {background:white;}
 .tabnav .subdue li {border-color: gray; border:dotted;}
 .tabnav .selected {
-padding-bottom: 1px; 
+padding-bottom: 4px;   /* needs to be one more than the ul down padding */
 background: #FFFACD;  /* needs to be the same as tabcontent */
 }
 
@@ -180,3 +129,9 @@ background: #FFFACD;  /* needs to be the same as tabcontent */
 
 /* for component highlighting in yui tree */
 .highlight { background-color:#CDC9A5;} /* colour same as boxer2 */
+
+/* Notes from yui docs:# The style of the text label/href when using TextNode
+    . ygtvlabel[link,visited,hover]
+    Due to a bug in the font smoothing algorithm in Internet Explorer, these styles define a white background 
+    for the labels thus, TreeViews have to be drawn over a white background or the background-color 
+    definition of these styles adjusted to match your background. */

@@ -320,7 +320,7 @@ class ViewHandler(BaseViewHandler):
     # the resource class and the resource class form
     # (so keys need to be lower case)
     SupportedResources={'modelmod':{'attname':'modelMod',
-                            'title':'Model Modification','tab':'ModelMods',
+                            'title':'Model Modifications','tab':'ModelMods',
                              'class':ModelMod,'form':ModelModForm},
                         'inputmod':{'attname':'inputMod',
                             'title':'Input Modifications','tab':'InputMods',
@@ -329,10 +329,10 @@ class ViewHandler(BaseViewHandler):
                             'title':'Files and Variables','tab':'Files & Vars',
                             'class':DataContainer,'form':DataHandlingForm},
                         'reference':{'attname':'references',
-                            'title':'Reference','tab':'References',
+                            'title':'References','tab':'References',
                             'class':Reference,'form':ReferenceForm},
                         'parties':{'attname':'responsibleParty',
-                                   'title':'Party','tab':'Parties',
+                                   'title':'Parties','tab':'Parties',
                                    'class':ResponsibleParty,'form':ResponsiblePartyForm},
                         }
     # Note that we don't expect to be able to assign files, since we'll directly
@@ -399,10 +399,7 @@ class ViewHandler(BaseViewHandler):
             # for code modifications, we need to get those associated with a model for a simulation
             constraintSet=Component.objects.filter(model=self.target['instance'].numericalModel)
             objects=objects.filter(component__in=constraintSet)
-        if self.resource['type']=='reference':
-            # show all the references, why not ...
-            objects=objects.order_by('name')
-        elif self.resource['type']=='file':
+        if self.resource['type'] in ['reference','file']:
             #objects=objects.filter(centre__in=[None,self.centre]) doesn't work
             objects=objects.filter(centre=None)|objects.filter(centre=self.centre)
             objects=objects.order_by('name')
@@ -422,8 +419,8 @@ class ViewHandler(BaseViewHandler):
                 return self.target['instance']
             elif self.target['type']=='ensemble':
                 return self.target['instance'].numericalModel
-        if self.resource['type']=='reference':
-            return True
+        if self.resource['type'] in ['reference','file']:
+            return self.centre 
         if self.resource['type']=='inputmod':
             if self.target['type']=='ensemble':
                 return self.target['instance'] # which should be a simulation

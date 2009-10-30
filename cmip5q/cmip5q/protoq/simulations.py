@@ -206,7 +206,7 @@ class simulationHandler(object):
         if len(con)==0:
             # we need to set up the conformances!
              ctypes=Vocab.objects.get(name='ConformanceTypes')
-             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Via Couplings')
+             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
              reqs=e.requirements.all()
              for r in reqs:
                  c=Conformance(requirement=r,simulation=s, ctype=defaultConformance)

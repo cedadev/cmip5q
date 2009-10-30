@@ -118,28 +118,31 @@ class BaseViewHandler:
         if self.resource['id']<>'0':
             instance=self.resource['class'].objects.get(id=self.resource['id'])
                     
+        # Now construct a useful submission URL
+        args=[self.cid,self.resource['type'],self.resource['id']]
+        if self.target:args+=[self.target['type'],self.target['instance'].id]
+        if returnType: args.append(returnType)
+                    
         if request.method=='POST':
             logging.debug('Handling post with %s, %s '%(self.resource,request.POST))
             form=self._constructForm('POST',request.POST,instance=instance)
             form.hostCentre=self.centre
             if form.is_valid():
                 if returnType=='ajax': return HttpResponse('not implemented')
-                logging.debug('Successful edit post, redirecting to %s'%okURL)
-                form.save() ##################### WHY DID I JUST ADD THIS >>>> 23/9
-                return HttpResponseRedirect(okURL)
+                f=form.save()
+                args[2]=f.id
+                editURL=reverse('cmip5q.protoq.views.edit',args=args)   
+                logging.debug('Successful edit post, redirecting to %s'%editURL)
+                return HttpResponseRedirect(editURL)#(okURL)
             else:
                 print 'ERRORS [%s]'%form.errors
-                constraints=self.constraints()
-                if constraints:form.specialise(constraints)
-                
-        if request.method=='GET':
+        elif request.method=='GET':
             form=self._constructForm('GET',instance=instance)
         
-        # Now construct a useful submission URL
-        args=[self.cid,self.resource['type'],self.resource['id']]
-        if self.target:args+=[self.target['type'],self.target['instance'].id]
-        if returnType: args.append(returnType)
-        editURL=reverse('cmip5q.protoq.views.edit',args=args)
+        constraints=self.constraints()
+        if constraints:form.specialise(constraints)
+                
+        editURL=reverse('cmip5q.protoq.views.edit',args=args) 
                           
         return render_to_response(self.editHTML,{'form':form,'editURL':editURL,'okURL':okURL,
                                                  'tabs':tabs(request,self.cid,'Edit %s'%instance),

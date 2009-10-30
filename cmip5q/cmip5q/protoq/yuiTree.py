@@ -58,6 +58,7 @@ class yuiTree2:
     def __walk(self,component):
         ''' Show me and my children'''
         children=component.components.all()
+        # we don't .order_by('abbrev') because we want the order we loaded them in ...
         classes=[]
         if component.id in self.expanders: classes.append('expanded')
         if component.id == self.family.me: classes.append('highlight') 

@@ -37,13 +37,13 @@
                 
             </div>
             <div id="banner">
-                <center> DRAFT CMIP5 QuestionNaire (alpha 8)  </center>
+                <center> <p> DRAFT CMIP5 QuestionNaire (alpha 8)</p>  </center>
             </div>
             <div class="main">
                 <div class="tabnav">
                     <ul>
                     {% for tab in tabs %}
-                    <li{% ifequal tab.active 1 %} class="selected"{%endifequal%}{% ifequal tab.active -1 %} class="subdue"{%endifequal%}>
+                    <li {% ifequal tab.active 1 %} class="selected"{% endifequal %}{% ifequal tab.active -1 %} class="subdue"{% endifequal %}>
                     <a href="{{tab.url}}">{{tab.name}}</a></li>
                     {% endfor %}
                     </ul>

@@ -110,6 +110,7 @@ class NumericalModel:
         logging.debug('Looking for mindmaps in %s'%mindMapDir)
         mindmaps=[os.path.join(mindMapDir, f) for f in os.listdir(mindMapDir)
                     if f.endswith('.xml')]
+        mindmaps.sort()  # at least go in alphabetical order.
                     
         for m in mindmaps:
             x=XMLVocabReader(m, self.top)

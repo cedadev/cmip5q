@@ -171,12 +171,12 @@ class Platform(Doc):
     compiler=models.CharField(max_length=128)
     vendor=models.CharField(max_length=128)
     compilerVersion=models.CharField(max_length=32)
-    maxProcessors=models.IntegerField()
-    coresPerProcessor=models.IntegerField()
-    operatingSystem=models.CharField(max_length=128)
-    hardware=models.ForeignKey('Value',related_name='hardwareVal')
-    processor=models.ForeignKey('Value',related_name='processorVal')
-    interconnect=models.ForeignKey('Value',related_name='interconnectVal')
+    maxProcessors=models.IntegerField(null=True,blank=True)
+    coresPerProcessor=models.IntegerField(null=True,blank=True)
+    operatingSystem=models.CharField(max_length=128,blank=True)
+    hardware=models.ForeignKey('Value',related_name='hardwareVal',null=True,blank=True)
+    processor=models.ForeignKey('Value',related_name='processorVal',null=True,blank=True)
+    interconnect=models.ForeignKey('Value',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
     
 class Experiment(models.Model):
@@ -304,6 +304,7 @@ class ConstraintGroup(models.Model):
     
 class NewParam(models.Model):
     ''' Holds an actual parameter '''
+    # We can't the name of this is a value in vocab, because it might be user generated '''
     name=models.CharField(max_length=64,blank=False)
     controlled=models.BooleanField(default=True)
     ptype=models.SlugField(max_length=12,blank=True)
@@ -337,7 +338,9 @@ class DataContainer(models.Model):
     # container format
     format=models.ForeignKey('Value',blank=True,null=True) 
     # centre that owns this data container
-    centre=models.ForeignKey('Centre')
+    centre=models.ForeignKey('Centre',blank=True,null=True)
+    # references (including web pages)
+    reference=models.ForeignKey(Reference,blank=True,null=True)
     def __unicode__(self):
         return self.name
     
@@ -500,6 +503,7 @@ class ModForm(forms.ModelForm):
         o=forms.ModelForm.save(self,commit=False)
         o.centre=self.hostCentre
         o.save()
+        return o
     def clean(self):
         ''' Needed to ensure reference name uniqueness within a centre '''
         return uniqueness(self,self.hostCentre,'mnemonic')
@@ -652,8 +656,8 @@ class ReferenceForm(forms.ModelForm):
         r=forms.ModelForm.save(self,commit=False)
         r.centre=self.hostCentre
         r.save()
-    def specialise(self,arg):
-        ''' Arg is dummy argument, we had specialisation at initialisation '''       
+        return r
+    def specialise(self,centre):
         pass
     def clean(self):
         ''' Needed to ensure reference name uniqueness within a centre '''
@@ -661,8 +665,8 @@ class ReferenceForm(forms.ModelForm):
     
 class PlatformForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}))
-    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}))
+    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
+    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
     class Meta:
         model=Platform
         exclude=('centre','uri')
@@ -720,8 +724,8 @@ class EnsembleMemberForm(forms.ModelForm):
 class DataContainerForm(forms.ModelForm):
     ''' This is the form used to edit "files" ... '''
     name=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
-    link=forms.URLField(widget=forms.TextInput(attrs={'size':'45'}))
-    description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
+    link=forms.URLField(widget=forms.TextInput(attrs={'size':'45'}),required=False)
+    description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'4'}),required=False)
     class Meta:
         model=DataContainer
         exclude=('centre','dataObject')
@@ -730,6 +734,8 @@ class DataContainerForm(forms.ModelForm):
         v=Vocab.objects.get(name='FileFormats')
         self.fields['format'].queryset=Value.objects.filter(vocab=v)
         self.hostCentre=None
+    def specialise(self,centre):
+        self.fields['reference'].queryset=Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
     def save(self):
         ''' Need to add the centre, and save the subform too '''
         o=forms.ModelForm.save(self,commit=False)
@@ -750,6 +756,8 @@ class DataObjectForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.hostCentre=None
+    def specialise(self,centre):
+        self.fields['reference'].queryset=Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
  
 class DataHandlingForm(object):
     ''' This is a fudge to allow baseview to think it's dealing with one form, 
@@ -770,14 +778,15 @@ class DataHandlingForm(object):
         
     def specialise(self,constraints):
         self.cform.specialise(constraints)
-    
+        for f in self.oform.forms:
+            f.specialise(constraints)
     def save(self):
         c=self.cform.save()
         oset=self.oform.save(commit=False)
         for o in oset: 
             o.container=c
             o.save()
-        return None
+        return c
     
     def handleError(self):
         return str(self.cform.errors)+str(self.oform.errors)
