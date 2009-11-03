@@ -14,6 +14,7 @@ NEWMINDMAPS=1
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)
+    webpage=models.CharField(max_length=128,blank=True)
     abbrev=models.CharField(max_length=25)
     email=models.EmailField(blank=True)
     address=models.TextField(blank=True)
@@ -246,10 +247,11 @@ class Simulation(Doc):
                      uri=str(uuid.uuid1()),
                      experiment=experiment,numericalModel=self.numericalModel,
                      ensembleMembers=1, platform=self.platform, centre=self.centre)
-        for mm in self.inputMod.all():s.inputMod.add(m)
-        for mm in self.modelMod.all():s.modelMod.add(m)
         s.save()
         #now we need to get all the other stuff related to this simulation
+        for mm in self.inputMod.all():s.inputMod.add(m)
+        for mm in self.modelMod.all():s.modelMod.add(m)
+        s.save() # I don't think I need to do this ... but to be sure ...
         #couplings:
         myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
         for m in myCouplings:
@@ -684,6 +686,7 @@ class ComponentInputForm(forms.ModelForm):
     
 class ResponsiblePartyForm(forms.ModelForm):
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
+    webpage=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     name=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
     address=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
@@ -703,6 +706,7 @@ class ResponsiblePartyForm(forms.ModelForm):
         r=forms.ModelForm.save(self,commit=False)
         r.centre=self.hostCentre
         r.save()
+        return r
         
 class EnsembleMemberForm(forms.ModelForm):
     class Meta:
