@@ -196,7 +196,7 @@ class simulationHandler(object):
         
         urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
                     args=(self.centreid,s.id,)),
-              'mods':reverse('cmip5q.protoq.views.list',
+              'mods':reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'modelmod','simulation',s.id,)),
               'sim':reverse('cmip5q.protoq.views.simulationEdit',
                     args=(self.centreid,s.id,))
