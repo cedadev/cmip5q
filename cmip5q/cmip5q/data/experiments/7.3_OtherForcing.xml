@@ -87,16 +87,13 @@
 	</longName>
      
    <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+       <realCalendar/>
 	</calendar>
     <requiredDuration xsi:type="ClosedDateRange">
 		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 2006-01-01T00:00:00Z</endDate>
+        <lengthYears>156</lengthYears>
 	</requiredDuration>
     <author>
 		<gmd:CI_ResponsibleParty>

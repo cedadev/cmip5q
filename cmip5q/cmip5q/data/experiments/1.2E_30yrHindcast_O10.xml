@@ -168,16 +168,13 @@
 		30-year prediction - O(10) ensemble
 	</longName>
      
-   <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+   	<calendar>
+   		<realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1965-09-01T00:00:00Z</startDate>
 		<endDate> 2036-01-01T00:00:00Z </endDate>
+		<lengthYears>70.25</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>

@@ -9,8 +9,7 @@
 
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+    <rationale>Aqua-planet : cloud response to an imposed uniform change in SST.</rationale>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -106,16 +105,13 @@
 	</longName>
      
    <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+       <perpetualPeriod/>
 	</calendar>
     <requiredDuration xsi:type="ClosedDateRange">
 		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1856-01-01T00:00:00Z</endDate>
+        <lengthYears>5</lengthYears>
 	</requiredDuration>
     <author>
 		<gmd:CI_ResponsibleParty>

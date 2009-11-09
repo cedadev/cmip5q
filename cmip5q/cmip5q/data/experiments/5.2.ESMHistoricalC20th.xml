@@ -85,11 +85,9 @@
 		ESM historical
 	</longName>
     
-    <CalendarType>
-        <realCalendar>
-            <range>1850-2005</range>
-        </realCalendar>
-    </CalendarType>
+    <Calendar>
+        <realCalendar/>
+    </Calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>2006-01-01T00:00:00Z</endDate>

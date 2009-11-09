@@ -32,16 +32,12 @@
 	</longName>
 	
     <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+    	<realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
-		<!--Dates to reflect 100 yrs of simulation 6k yrs ago - to be updated -->
 		<startDate> 0850-01-01T00:00:00Z</startDate>
 		<endDate> 1851-01-01T00:00:00Z </endDate>
+		<lengthYears>1000</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>

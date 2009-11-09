@@ -9,7 +9,7 @@
 
 	-->
 
-	<rationale/>
+	<rationale>Pescribed SST experiment to diagnose the "fast" responses to sulfate aerosols (ca. 2000).</rationale>
 	<why/>
 	
     
@@ -59,17 +59,13 @@
 		aerosol forcing
 	</longName>
      
-   <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+    <calendar>
+   		<perpetualPeriod/>
 	</calendar>
     <requiredDuration xsi:type="ClosedDateRange">
-		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
-		<endDate> 1881-01-01T00:00:00Z</endDate>
+		<endDate> 1850-12-30T00:00:00Z</endDate>
+    	<lengthYears>30</lengthYears>
 	</requiredDuration>
     <author>
 		<gmd:CI_ResponsibleParty>

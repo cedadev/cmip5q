@@ -29,15 +29,12 @@
     <longName> Chemistry-focused runs</longName>
      
     <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+		<daily-360/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 2000-01-01T00:00:00Z</startDate>
 		<endDate> 2000-01-01T00:00:00Z </endDate>
+		<lengthYears>0</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>

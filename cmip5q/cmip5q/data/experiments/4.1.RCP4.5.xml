@@ -87,11 +87,9 @@
 		RCP4.5
 	</longName>
     
-    <CalendarType>
-        <realCalendar>
-            <range>2006-2100</range>
-        </realCalendar>
-    </CalendarType>
+    <Calendar>
+        <realCalendar/>
+    </Calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>2006-01-01T00:00:00Z</startDate>
         <endDate>2100-01-01T00:00:00Z</endDate>

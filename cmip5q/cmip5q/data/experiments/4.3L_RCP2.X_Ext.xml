@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
+	<rationale>Extension of RCP2.X through to the year 2300.</rationale>
 	<why>Provide estimate of future anthropogenic climate change</why>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
-        <id xsi:type="Identifier">ic.004</id>
+        <id xsi:type="Identifier">ic.004c</id>
         <name>4.3L.ic</name>
-        <description> Initial conditions are from the end of experiment 3.2_historical </description>
+        <description> Initial conditions are from the end of experiment 4.3 RCP2.X.</description>
     </numericalRequirement>
     
     <!-- Boundary/Forcing Conditions -->
@@ -86,15 +86,12 @@
 	</longName>
     
     <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+        <realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
-		<startDate>2006-01-01T00:00:00Z</startDate>
+		<startDate>2100-01-01T00:00:00Z</startDate>
         <endDate>2300-01-01T00:00:00Z</endDate>
+	    <lengthYears>200</lengthYears>
 	</requiredDuration>
 	
 	<author>

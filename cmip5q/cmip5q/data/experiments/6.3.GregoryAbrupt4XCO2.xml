@@ -45,11 +45,9 @@
 		Abrupt 4XCO2
 	</longName>
     
-    <CalendarType>
-        <PerpetualPeriod>
-            <range>1850</range>
-        </PerpetualPeriod>
-    </CalendarType>
+    <Calendar>
+        <PerpetualPeriod/>
+    </Calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-30-12T00:00:00Z</endDate>

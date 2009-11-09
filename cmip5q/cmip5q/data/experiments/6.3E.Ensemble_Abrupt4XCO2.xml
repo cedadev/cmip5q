@@ -38,17 +38,13 @@ expt. 6.3 will serve as the 12th member of this ensemble.]
 		Abrupt 4XCO2 - Ensemble
 	</longName>
      
-   <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+    <calendar>
+   		<perpetualPeriod/>
 	</calendar>
     <requiredDuration xsi:type="ClosedDateRange">
-		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
-		<endDate> 1855-11-01T00:00:00Z</endDate>
+		<endDate> 1850-12-30T00:00:00Z</endDate>
+    	<lengthYears>5</lengthYears>
 	</requiredDuration>
     <author>
 		<gmd:CI_ResponsibleParty>

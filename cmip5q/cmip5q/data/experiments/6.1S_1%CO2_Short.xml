@@ -11,8 +11,8 @@
 
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale> Idealized 1% per year increase in CO2 (a shortened version of expt. 6.1).</rationale>
+	<why>Allow an evaluation of model drift, transient climate response, and ocean heat uptake.</why>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -36,15 +36,12 @@
 	</longName>
 	     
 	<calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+		<realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1930-01-01T00:00:00Z </endDate>
+		<lengthYears>80</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>

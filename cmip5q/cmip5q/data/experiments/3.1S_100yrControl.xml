@@ -81,15 +81,11 @@
 	</longName>
 	
     <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
+    	<perpetualPeriod/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
-		<endDate> 1950-01-01T00:00:00Z </endDate>
+		<endDate> 1850-01-01T00:00:00Z </endDate>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>
