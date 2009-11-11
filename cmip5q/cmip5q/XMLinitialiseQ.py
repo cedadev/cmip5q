@@ -34,10 +34,10 @@ VocabList={'Realms':
                       'Online Other','Offline Other'),
 
     # these support couplings 
-    'couplingType':('OASIS3','OASIS4','FMS','ESMF','CCSM Flux coupler','MCT',
-                    'Shared Memory','Files','Other'),
+    'couplingType':('Files','OASIS3','OASIS4','FMS','ESMF','CCSM Flux coupler','MCT',
+                    'Shared Memory','Other'),
     'SpatialRegridding':('None','Non-Convervative','Conservative'),
-    'SpatialRegriddingType':('2D-FirstOrder','2D-SecondOrder','2D-ThirdOrder',
+    'SpatialRegriddingType':('N/A','2D-FirstOrder','2D-SecondOrder','2D-ThirdOrder',
                          '3D-FirstOrder','3D-SecondOrder','3d-ThirdOrder','Other'),
     'TemporalRegridding':('None','TimeAverage','TimeAccumulation','lastAvailable','Linear','Other'),
     'FreqUnits':('seconds','minutes','hours','days','months','years','decades'),

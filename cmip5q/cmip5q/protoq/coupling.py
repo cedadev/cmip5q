@@ -92,6 +92,7 @@ class MyCouplingFormSet:
         ctypes=Value.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
         bcvalue=ctypes.get(value='BoundaryCondition')  #used for layout on coupling form
         afvalue=ctypes.get(value='AncillaryFile') #used for layout on closure form
+        icvalue=ctypes.get(value='InitialCondition') # used for layout on closure form
         qs=Coupling.objects.filter(component=self.component).filter(simulation=simulation)
         #bqs=qs.filter(targetInput__ctype=ctypes[0])
         #for c in ctypes[1:]:
@@ -134,18 +135,20 @@ class MyCouplingFormSet:
             iqs=BaseInternalQueryset.exclude(id__exact=q.targetInput.owner.id)
             self.forms.append(MyCouplingForm({'title':title,
                                               'cf':cf,'ic':ic,'ec':ec,'iqs':iqs,
-                                              'bcv':bcvalue,'afv':afvalue}))
+                                              'bcv':bcvalue,'afv':afvalue,'icv':icvalue}))
             
             
     def is_valid(self):
         ok=True
         for f in self.forms:
-            r=f.cf.is_valid()
-            if not r: ok=False
-            r=f.ec.is_valid()
-            if not r: ok=False
-            r=f.ic.is_valid()
-            if not r: ok=False
+            r1=f.cf.is_valid()
+            if not r1: ok=False
+            r2=f.ec.is_valid()
+            if not r2: ok=False
+            r3=f.ic.is_valid()
+            if not r3: ok=False
+            print '[#',f.cf.errors,'##',f.ec.errors,'##',f.ic.errors,'#]'
+        self.FormError=not ok   # used in coupling.html
         return ok
             
     def specialise(self):

@@ -9,6 +9,7 @@ ADMINS = (
     ('Bryan Lawrence', 'bryan.lawrence@stfc.ac.uk'),
     # ('Your Name', 'your_email@domain.com'),
 )
+SERVER_EMAIL = 'meta4q@neptune.badc.rl.ac.uk'
 
 MANAGERS = ADMINS
 

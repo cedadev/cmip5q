@@ -25,6 +25,7 @@
     <div class="boxer">
     <h4> Couplings </h4>
     {% if Intform.forms|length %}
+    {% if Intform.FormError %} <p class="red"> You form has not been saved. An error has occurred. Please correct error below. </p> {% endif %}
     <div class="boxer2">
     <form action="{{urls.ok}}" method="POST">
     {% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}

@@ -25,7 +25,12 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {% if s %}
 <p>If you have set values for these in your model description, you can copy them using this link: <a id="eclink{{f.cf.ecreset.coupling.id}}" href="{{f.cf.ecreset.url}}">Copy</a></p>
 {% endif %}
-<p> Enter {% ifequal f.cf.instance.targetInput.ctype f.bcv %} zero or more {% endifequal %} inputs from files: (a new blank form will appear after each save). Use the files tab if you don't see any files to choose in the "From" dropdown selector, and then navigate back here.</p>
+<p> Enter {% ifequal f.cf.instance.targetInput.ctype f.bcv %} zero or more inputs {% else %} input {% endifequal %} from files: 
+    {% ifnotequal f.cf.instance.targetInput.ctype f.bcv %} (Ignore subsequent blank forms in this case).
+    {% else %}
+    (a new blank form will appear after each save).
+    {% endifnotequal %} Use the files tab if you don't see any files to choose in the "From" dropdown selector, and then navigate back here.
+</p>
 {{f.ec.management_form}}
 <table>
 {% for ff in f.ec.forms %}
