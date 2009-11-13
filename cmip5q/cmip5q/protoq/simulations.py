@@ -87,8 +87,9 @@ class simulationHandler(object):
             simform=SimulationForm(instance=s)
             simform.specialise(self.centre)
         
-        # work out what we want to say about couplings 
-        cset=Coupling.objects.filter(simulation=s)
+        # work out what we want to say about couplings
+        cset=[]
+        if label !='Add': cset=s.numericalModel.couplings(s)
         for i in cset:
             i.valid=len(i.internalclosure_set.all())+len(i.externalclosure_set.all()) > 0 # need at least one closure
             

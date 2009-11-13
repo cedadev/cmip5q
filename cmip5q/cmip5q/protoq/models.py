@@ -9,8 +9,6 @@ from modelUtilities import uniqueness, refLinkField
 import uuid
 import logging
 
-NEWMINDMAPS=1
-
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)
@@ -38,12 +36,25 @@ class Doc(models.Model):
     author=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_author')
     funder=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_funder')
     contact=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_contact')
+    metadataMaintainer=models.ForeignKey(ResponsibleParty,blank=True,null=True,
+                       related_name='%(class)s_metadataMaintainer')
+    metadataVersion=models.CharField(max_length=128,editable=False)
+    documentVersion=models.IntegerField(default=1,editable=False)
     description=models.TextField(blank=True)
-    uri=models.CharField(max_length=64,unique=True)
+    uri=models.CharField(max_length=64,unique=True,editable=False)
+    created=models.DateField(auto_now_add=True,editable=False)
+    updated=models.DateField(auto_now=True,editable=False)
+    isValid=models.BooleanField(default=False,editable=False)
+    isComplete=models.BooleanField(default=False)
     def __unicode__(self):
         return self.abbrev
     class Meta:
         abstract=True
+    def save(self,*args,**kwargs):
+        ''' Used to decide what to do about versions. We only increment the document version
+        number with changes once the document is considered to be complete and valid '''
+        if self.isValid and self.isComplete:  self.documentVersion+=1
+        return models.Model.save(self,*args,**kwargs)
   
 class Reference(models.Model):
     ''' An academic Reference '''
@@ -61,7 +72,7 @@ class Component(Doc):
     # this is the vocabulary NAME of this component:
     scienceType=models.SlugField(max_length=64,blank=True,null=True)
     
-    # these next three are to support the questionnaire function
+    # these next four are to support the questionnaire function
     implemented=models.BooleanField(default=1)
     visited=models.BooleanField(default=0)
     controlled=models.BooleanField(default=0)
@@ -142,6 +153,15 @@ class Component(Doc):
                 
         new.save()
         return new
+    def couplings(self,simulation=None):
+        ''' Return a coupling set for me, in a simulation or not '''
+        if not self.isModel:
+            raise ValueError('No couplings for non "Model" components')
+        mygroups=self.couplinggroup_set.all()
+        if len(mygroups):
+            cg=mygroups.get(simulation=simulation)
+            return Coupling.objects.filter(parent=cg)
+        else: return []
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
@@ -163,7 +183,8 @@ class ComponentInput(models.Model):
                            owner=component,realm=component.realm)
         new.save()
         # if we've made a new input, we need a new coupling
-        ci=Coupling(component=component.model,targetInput=new)
+        cg=CouplingGroup.objects.filter(simulation=None).get(component=component.model)
+        ci=Coupling(parent=cg,targetInput=new)
         ci.save()
 
 class Platform(Doc):
@@ -230,14 +251,28 @@ class Simulation(Doc):
         Doc.save(self)
         
     def updateCoupling(self):
-        ''' Update my couplings, in case the user has made some changes in the model '''
-        #each one of these should appear in one of my boundary conditions.
-        modelCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=None)
-        myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
-        myOriginals=[i.original for i in myCouplings]
-        for m in modelCouplings:
-            if m not in myOriginals: 
-                r=m.duplicate4sim(self)
+        ''' Update my couplings, in case the user has added some inputs (and hence couplings)
+        in the numerical model, but note that updates to existing input couplings in
+        numerical models are not propagated to the simuations already made with them. '''
+        # first, do we have our own coupling group yet?
+        cgs=self.couplinggroup_set.all()
+        if len(cgs): 
+            # we've already got a coupling group, let's update it
+            assert(len(cgs)==1,'Simulation %s should only have one coupling group'%self) 
+            modelCouplings=self.numericalModel.couplings()
+            myCouplings=self.numericalModel.couplings(self)
+            myOriginals=[i.original for i in myCouplings]
+            for m in modelCouplings:
+                if m not in myOriginals: 
+                    r=m.copy(cgs[0])
+        else:
+            # get the model coupling group ... and copy it.
+            cgs=self.numericalModel.couplinggroup_set.all().get(simulation=None)
+            assert(len(cgs)==1,
+                   'Numerical model %s for simulation %s should only have coupling group'%(
+                   self.numericalModel,self)) 
+            cgs[0].duplicate4sim(self)
+            
 
     def copy(self,experiment):
         ''' Copy this simulation into a new experiment '''
@@ -249,11 +284,11 @@ class Simulation(Doc):
                      ensembleMembers=1, platform=self.platform, centre=self.centre)
         s.save()
         #now we need to get all the other stuff related to this simulation
-        for mm in self.inputMod.all():s.inputMod.add(m)
-        for mm in self.modelMod.all():s.modelMod.add(m)
+        for mm in self.inputMod.all():s.inputMod.add(mm)
+        for mm in self.modelMod.all():s.modelMod.add(mm)
         s.save() # I don't think I need to do this ... but to be sure ...
         #couplings:
-        myCouplings=Coupling.objects.filter(component=self.numericalModel).filter(simulation=self)
+        myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self)
         for m in myCouplings:
             r=m.duplicate4sim(s)
         # conformance:
@@ -362,45 +397,84 @@ class DataObject(models.Model):
     drsAddress=models.CharField(max_length=256,blank=True)
     def __unicode__(self):
         return '%s(%s)'%(self.variable,self.container)
-
-        
-class Coupling(models.Model):
+    
+class CouplingGroup(models.Model):
+    ''' This class is used to help manage the couplings in terms of presentation and
+    their copying between simulations '''
     # parent component, must be a model for CMIP5:
     component=models.ForeignKey(Component)
-    # coupling for:
-    targetInput=models.ForeignKey(ComponentInput)
     # may also be associated with a simulation, in which case there is an original
     simulation=models.ForeignKey(Simulation,blank=True,null=True)
-    original=models.ForeignKey('Coupling',blank=True,null=True)
-    # coupling details for boundary conditions'%(class)s_couplingTypeVal',blank=True,null=True)
+    original=models.ForeignKey('CouplingGroup',blank=True,null=True)
+    # to limit the size of drop down lists, we have a list of associated files
+    associatedFiles=models.ManyToManyField(DataContainer,blank=True,null=True)
+    def duplicate4sim(self,simulation):
+        '''Make a copy of self, and associate with a simulation'''
+        # first make a copy of self
+        args=['component',]
+        kw={'original':self,'simulation':simulation}
+        for a in args:kw[a]=self.__getattribute__(a)
+        new=CouplingGroup(**kw)
+        new.save()
+        #can't do the many to manager above, need to do them one by one
+        for af in self.associatedFiles.all():new.associatedFiles.add(af)
+        # now copy all the individual couplings associated with this group
+        cset=self.coupling_set.all()
+        for c in cset: c.copy(new)
+        return new
+    def propagateClosures(self):
+        ''' This is a one stop shop to update all the closures from an original source
+        model coupling group to a simulation coupling group '''
+        if self.original is None:raise ValueError('No original coupling group available')
+        #start by finding all the couplings in this coupling set.
+        myset=self.coupling_set.all()
+        for coupling in myset:
+            # find all the relevant closures and copy them
+            coupling.progagateClosures()          
+        return '%s couplings updated (with %s closures)'%(len(myset),nc)
+    class Meta:
+        ordering=['component']
+    def __unicode__(self):
+        return 'Coupling Group for %s (simulation %s)'%(self.component,self.simulation)
+
+class Coupling(models.Model):
+    # parent coupling group
+    parent=models.ForeignKey(CouplingGroup)
+    # coupling for:
+    targetInput=models.ForeignKey(ComponentInput)
+    # coupling details (common to all closures)
     ctype=models.ForeignKey('Value',related_name='%(class)s_corder',blank=True,null=True)
     FreqUnits=models.ForeignKey('Value',related_name='%(class)s_FreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
+    # original if I'm a copy.
+    original=models.ForeignKey('Coupling',blank=True,null=True)
     def __unicode__(self):
-        if self.simulation:
-            return 'I/O4for%s(in %s)'%(self.targetInput,self.simulation)
+        if self.parent.simulation:
+            return 'Coupling4:%s(in %s)'%(self.targetInput,self.parent.simulation)
         else:
-            return 'I/Ofor%s'%self.targetInput
-    def duplicate4sim(self,simulation):
-        '''Make a copy of self, and associate with a simulation'''
+            return 'Coupling4:%s'%self.targetInput
+    def copy(self,group):
+        '''Make a copy of self, and associate with a new group'''
         # first make a copy of self
-        args=['component','targetInput',
-          'ctype','couplingFreq','FreqUnits',
-          'manipulation']
-        kw={'original':self,'simulation':simulation}
+        args=['ctype','couplingFreq','FreqUnits','manipulation','targetInput']
+        kw={'original':self,'parent':group}
         for a in args:kw[a]=self.__getattribute__(a)
         new=Coupling(**kw)
         new.save()
-        # and now copy all the original closures
-        # icset=InternalClosure.objects.filter(coupling=self)
-        # ecset=ExternalClosure.objects.filter(coupling=self)
-        # for i in icset:
-        #    i.makeNewCopy(self)
-        # for i in ecset:
-        #    i.makeNewCopy(self)
-        # Actually, we'll let the user decide to do this in the form ...
+        # We don't copy all the individual closures by default. Currently we
+        # imagine that can happen in two ways but both are under user control.
+        # Either they to it individually, or they do it one by one.
         return new
+    def propagateClosures(self):
+        ''' Update my closures from an original if it exists '''
+        if self.original is None:raise ValueError('No original coupling available')
+        for cmodel in [InternalClosure,ExternalClosure]:
+            set=cmodel.objects.filter(coupling=self.original)
+            for i in set: i.makeNewCopy(self)
+        return '%s updated from %s'(self,self.original)
+    class Meta:
+        ordering=['targetInput']
     
 class CouplingClosure(models.Model):
     ''' Handles a specific closure to a component '''
@@ -494,7 +568,12 @@ class InputMod(Modification):
 class ModelMod(Modification):
     #we could try and get to the parameter values as well ...
     component=models.ForeignKey(Component)
+    
+#
+# =========================================================================================
+#
         
+
 class ModForm(forms.ModelForm):
     mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
@@ -525,7 +604,8 @@ class InputModForm(ModForm):
         model=InputMod
         exclude=('centre')
     def specialise(self,simulation):
-        self.fields['inputs'].queryset=Coupling.objects.filter(simulation=simulation)
+        group=CouplingGroup.objects.get(simulation=simulation)
+        self.fields['inputs'].queryset=Coupling.objects.filter(parent=group)
         ivocab=Vocab.objects.get(name='InputTypes')
         self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)
         
@@ -541,8 +621,9 @@ class ConformanceForm(forms.ModelForm):
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
+        group=CouplingGroup.objects.get(simulation=simulation)
         self.fields['mod'].queryset=simulation.modelMod.all()
-        self.fields['coupling'].queryset=Coupling.objects.filter(simulation=simulation)
+        self.fields['coupling'].queryset=Coupling.objects.filter(parent=group)
         v=Vocab.objects.get(name='ConformanceTypes')
         self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
         self.showMod=len(self.fields['mod'].queryset)
@@ -559,13 +640,13 @@ class EnsembleForm(forms.ModelForm):
 
 class CouplingForm(forms.ModelForm):
     manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        for k in ('parent', 'targetInput','original'):
+            self.fields[k].widget=forms.HiddenInput()
     class Meta:
         model=Coupling
-        exclude=('component',  # we should always know this
-                 'targetInput', # we generate couplings from these 
-                 'simulation', # we hold these across ...
-                 'original'
-                )
+        #exclude=('parent', 'targetInput','original')
 class InternalClosureForm(forms.ModelForm):
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
@@ -573,7 +654,7 @@ class InternalClosureForm(forms.ModelForm):
      def specialise(self):
          pass
 
-class ExternalClosureForm(InternalClosureForm):
+class ExternalClosureForm(forms.ModelForm):#InternalClosureForm): not sure why this was here 11/11/09
      inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=ExternalClosure
@@ -665,13 +746,15 @@ class ReferenceForm(forms.ModelForm):
         ''' Needed to ensure reference name uniqueness within a centre '''
         return uniqueness(self,self.hostCentre,'name')
     
+
+
 class PlatformForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
     coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
     class Meta:
         model=Platform
-        exclude=('centre','uri')
+        exclude=('centre','uri','metadataMaintainer')
         
 class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"2"}),required=False)

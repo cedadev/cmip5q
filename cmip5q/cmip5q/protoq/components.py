@@ -37,6 +37,17 @@ class MyComponentInputFormSet(ComponentInputFormSet):
     def specialise(self):
         ''' No local specialisation, yet '''
         pass
+    def __getCouplingGroup(self):
+        ''' Local method to get the appropriate coupling group, or if necessary
+        create it '''
+        cgroupset=self.component.model.couplinggroup_set.all()
+        if len(cgroupset):
+            cg=cgroupset.get(simulation=None)
+            return cg
+        else:
+            cg=CouplingGroup(component=self.component.model)
+            cg.save()
+            return cg
     def save(self):
         ''' Loop over form instances, add extra material, and couplings as necessary'''
         instances=ComponentInputFormSet.save(self,commit=False)
@@ -53,8 +64,7 @@ class MyComponentInputFormSet(ComponentInputFormSet):
                 newCoupling=1
             i.save()
             if newCoupling:
-                c=Coupling(component=self.component.model,
-                           targetInput=i)
+                c=Coupling(parent=self.__getCouplingGroup(),targetInput=i)
                 c.save()
     
 class componentHandler(object):
@@ -181,16 +191,8 @@ class componentHandler(object):
         
         if c.isModel:
             #we'd better decide what we want to say about couplings. Same code in simulation!
-            cset=Coupling.objects.filter(component=c).filter(simulation=None)
-            cset=cset.order_by('targetInput__ctype','component')
+            cset=c.couplings(None)
         else: cset=None
-        
-        if NEWMINDMAPS: 
-            for p in pform.pgset: 
-                print 'PARAMGROUP',p
-                for cg in p.cgset:
-                    print cg
-                    for r in cg.rows: print r
         
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
@@ -307,16 +309,16 @@ class componentHandler(object):
         urls={'self':reverse('cmip5q.protoq.views.componentCup',
                 args=(self.centre_id,self.id,))
               }
-                
+        cg=CouplingGroup.objects.filter(component=model).get(simulation=None)
         if request.method=='POST':
-            Intform=MyCouplingFormSet(model,request.POST)
+            Intform=MyCouplingFormSet(cg,request.POST)
             if Intform.is_valid():
                 Intform.save()
                 return HttpResponseRedirect(okURL)
             else:
                 Intform.specialise()
         elif request.method=='GET':
-            Intform=MyCouplingFormSet(model)
+            Intform=MyCouplingFormSet(cg)
             Intform.specialise()
         return render_to_response('coupling.html',{'c':model,'urls':urls,
         'Intform':Intform,'tabs':tabs(request,self.centre_id,'Coupling for %s'%c)})

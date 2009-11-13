@@ -48,7 +48,7 @@ class MyInternalClosures(InternalClosureFormSet):
         InternalClosureFormSet.__init__(self,data,queryset=qset,prefix=prefix)    
     def save(self):
         instances=InternalClosureFormSet.save(self,commit=False)
-        print 'saving internal closures for %s'%self.coupling
+        logging.debug('saving internal closures for %s'%self.coupling)
         for i in instances:
             i.coupling=self.coupling
             i.save()
@@ -61,7 +61,7 @@ class MyExternalClosures(ExternalClosureFormSet):
         ExternalClosureFormSet.__init__(self,data,queryset=qset,prefix=prefix)
     def save(self):
         instances=ExternalClosureFormSet.save(self,commit=False)
-        print 'saving external closures for %s'%self.coupling
+        logging.debug('saving external closures for %s'%self.coupling)
         for i in instances:
             i.coupling=self.coupling
             i.save()
@@ -80,26 +80,18 @@ class MyCouplingFormSet:
     coupling instance, and we can do that using formsets, but not the couplings themselves '''
      #http://docs.djangoproject.com/en/dev/topics/forms/modelforms/#id1
     
-    def __init__(self,component,data=None,simulation=None):
-        ''' Initialise the forms needed to interact for a (model) component '''
+    def __init__(self,model,simulation,queryset,data=None):
+        ''' Initialise the forms needed to interact for a (model) component (indicated by the coupling group).'''
         
-        self.component=component
+        self.model=model
         self.simulation=simulation
-        
-        self.model=self.component.model
-        
+         
         # build up a queryset, chunked into the various types of component inputs
         ctypes=Value.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
         bcvalue=ctypes.get(value='BoundaryCondition')  #used for layout on coupling form
         afvalue=ctypes.get(value='AncillaryFile') #used for layout on closure form
         icvalue=ctypes.get(value='InitialCondition') # used for layout on closure form
-        qs=Coupling.objects.filter(component=self.component).filter(simulation=simulation)
-        #bqs=qs.filter(targetInput__ctype=ctypes[0])
-        #for c in ctypes[1:]:
-        #    bqs|=qs.filter(targetInput__ctype=c)
-        #self.queryset=bqs
-        self.queryset=qs.order_by('targetInput__ctype','targetInput')
-            
+
         # setup our vocabularies
         ctype=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
         FreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
@@ -119,10 +111,10 @@ class MyCouplingFormSet:
         self.forms=[]
         # this is the list of relevant realm level components:
         BaseInternalQueryset=Component.objects.filter(model=self.model).filter(isRealm=True)
-        for q in self.queryset:
+        for q in queryset:
             cf=CouplingForm(data,instance=q,prefix=q)
-            if simulation:
-                centre_id=component.centre.id
+            if self.simulation:
+                centre_id=self.model.centre.id
                 cf.icreset=ClosureReset(centre_id,simulation.id,q,'ic')
                 cf.ecreset=ClosureReset(centre_id,simulation.id,q,'ec')
             title='Coupling into: %s'%q.targetInput
@@ -154,7 +146,7 @@ class MyCouplingFormSet:
     def specialise(self):
         for f in self.forms:
             for i in f.ic.forms+f.ec.forms:
-                print i.fields.keys()
+                #print i.fields.keys()
                 #i.fields['inputDescription']=self.widgets['inputDescription']
                 for key in self.closureVocabs:
                     i.fields[key].queryset=self.closureVocabs[key]
@@ -164,8 +156,8 @@ class MyCouplingFormSet:
         for f in self.forms:
             # first the coupling form
             cf=f.cf.save(commit=False)
-            cf.component=self.component
-            cf.targetInput=self.queryset.get(id=cf.id).targetInput
+            #cf.parent=self.parent
+            #cf.targetInput=self.queryset.get(id=cf.id).targetInput
             cf.save()
             # now the external closures formset ...
             instances=f.ec.save()
@@ -196,24 +188,20 @@ class couplingHandler:
         return self.__handle(simulation)
     def __handle(self,simulation=None):
         model=self.component.model
-        if model is None:
-            # This shouldn't happen, but it did at least once in testing.
-            # I assume the model creation process was somehow interrupted.
-            # This should catch this error, and allow vaguely sensible completion. 
-            logging.debug('Error: Component %s has no model'%self.component)
-            self.component.model=self.component           
+        assert (model != None,'Component %s has no model'%self.component)
+        queryset=model.couplings(simulation)
         self.urls['model']=reverse('cmip5q.protoq.views.componentEdit',
                     args=(self.centre_id,model.id,))
         logging.debug('Handling %s coupling request for %s (simulation %s)'%(self.method,model,simulation))
         if self.method=='POST':
-            Intform=MyCouplingFormSet(model,self.request.POST,simulation=simulation)
+            Intform=MyCouplingFormSet(model,simulation,queryset,self.request.POST)
             if Intform.is_valid():
                 Intform.save()
                 return HttpResponseRedirect(self.urls['ok'])
             else:
                 Intform.specialise()
         elif self.method=='GET':
-            Intform=MyCouplingFormSet(model,simulation=simulation)
+            Intform=MyCouplingFormSet(model,simulation,queryset)
             Intform.specialise()
         labelstr='Coupling for %s'%model
         if simulation: labelstr+=' (in %s)'%simulation
