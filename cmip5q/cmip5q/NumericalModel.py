@@ -384,13 +384,16 @@ class XMLVocabReader:
         self.etree=ET.parse(filename)
         self.root=self.etree.getroot() # should be the "vocab" element
         self.model=model
-            
+     
     def doParse(self):
         first = self.root.findall('component')[0]
         logging.info("New component: %s for model %s"%(first.attrib['name'],self.model))
         # Initiate new top-level component in django:
         modelParser = ComponentParser(first, self.model)
         self.component=modelParser.add(True)
+        self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s)'%(
+        self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
+        self.root.attrib['mmlcrevision'])
 		
 class ComponentParser:
     ''' class for handling all elements '''

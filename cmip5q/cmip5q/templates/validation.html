@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<div class="boxer">
+<h2> Validation Output <h2>
+<p class="red">Validation not yet fully implemented</p>
+</div>
+<div>
+<h2>Schematron results</h2>
+{{sHTML|safe}}
+</div>
+<div class="boxer"><h2> Content </h2>
+{{cimHTML|safe}}
+</div>
+</div>
+{% endblock %}

@@ -7,7 +7,7 @@ from django.forms.models import modelformset_factory
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import PropertyForm,tabs,NewPropertyForm
+from cmip5q.protoq.utilities import PropertyForm,tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
@@ -22,9 +22,8 @@ from lxml import etree as ET
 
 import tempfile
 
-NEWMINDMAPS=1
-
 ComponentInputFormSet=modelformset_factory(ComponentInput,form=ComponentInputForm,exclude=('owner','realm'),can_delete=True)
+            
             
 class MyComponentInputFormSet(ComponentInputFormSet):
     def __init__(self,component,realm=False,data=None):
@@ -132,7 +131,7 @@ class componentHandler(object):
                     c.delete()
                     return HttpResponseRedirect(url)
         
-        if NEWMINDMAPS: PropertyForm=NewPropertyForm
+        PropertyForm=NewPropertyForm
         
         # find my own urls ...
         urls={}
@@ -162,6 +161,7 @@ class componentHandler(object):
             cform=ComponentForm(request.POST,prefix='gen',instance=c)
             if cform.is_valid():
                 c=cform.save()
+                c=RemoteUser(request,c)
                 logging.debug('Saving component %s details (e.g. uri %s)'%(c.id,c.uri))
             else:
                 logging.debug('Unable to save characteristics for component %s'%c.id)

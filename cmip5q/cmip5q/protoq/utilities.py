@@ -2,6 +2,14 @@ import logging
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 
+def RemoteUser(request,document):
+    ''' Assign a metadata maintainer if we have one '''
+    key='REMOTE_USER'
+    if key in request.META:
+        document.metadataMaintainer=request.META(key)
+        document.save()
+    return document
+
 class RingBuffer:
     def __init__(self, size):
         self.data = [None for i in xrange(size)]

@@ -94,7 +94,6 @@ class NumericalExperiment:
         # FIXME, assume that they're all independent and no xlinks.
         
         for r in self.numericalRequirements:
-            print r.id,r.description
             rid=r.load()
             E.requirements.add(rid)
         
