@@ -267,8 +267,9 @@ class componentHandler(object):
         transform = ET.XSLT(xslt_doc)
         cimhtml = transform(formattedCIMDoc)
 
-        response=HttpResponse('<html><head><title>CIM Validation page</title></head><body><h2>Validate not yet fully implemented</h2><h2>Schematron results</h2><p/>'+str(schematronhtml)+'<h2>CIM XML</h2><p/>'+str(cimhtml)+'</body></html>')
-        return response
+        return render_to_response('validation.html',
+        {'sHTML':schematronhtml,'cimHTML':cimhtml})
+      
     
     def view(self):
         ''' HTML view of self '''

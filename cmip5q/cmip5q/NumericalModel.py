@@ -202,13 +202,14 @@ class NumericalModel:
 
 
     def composition(self,c,comp):
-        couplings=Coupling.objects.filter(component=c)
+        couplings=[]
+        if c.isModel:couplings=c.couplings()
         if len(couplings)>0:
             composition=ET.SubElement(comp,'composition')
             for coupling in couplings:
                 connection=ET.SubElement(composition,'coupling')
                 ET.SubElement(connection,'Q_sourceComponent').text=c.abbrev
-                ET.SubElement(connection,'Q_sourceComponent').text=coupling.component.abbrev
+                ET.SubElement(connection,'Q_sourceComponent').text=coupling.parent.component.abbrev
                 ET.SubElement(connection,'Q_inputType').text=coupling.targetInput.ctype.value
                 ET.SubElement(connection,'Q_inputAbbrev').text=coupling.targetInput.abbrev
                 ET.SubElement(connection,'Q_inputDescrip').text=coupling.targetInput.description
