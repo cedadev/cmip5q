@@ -391,7 +391,7 @@ class XMLVocabReader:
         # Initiate new top-level component in django:
         modelParser = ComponentParser(first, self.model)
         self.component=modelParser.add(True)
-        self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s)'%(
+        self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s). CMIP5 Questionnaire Version alpha10.'%(
         self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
         self.root.attrib['mmlcrevision'])
 		

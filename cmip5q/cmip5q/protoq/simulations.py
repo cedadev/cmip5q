@@ -44,10 +44,11 @@ class simulationHandler(object):
         ''' This method handles the form itself for both the add and edit methods '''
         logging.debug('entering simulation handle routine')
         
-        if s.ensembleMembers>1: 
-            set=s.ensemble_set.all()[0] # only one for any given simulation
-            members=set.ensemblemember_set.all()
-            ensemble={'set':set,'members':members}
+        if s.ensembleMembers>1:
+            eset=s.ensemble_set.all()
+            assert(len(eset)==1,'There can only be one ensemble set for %s'%s)
+            members=eset[0].ensemblemember_set.all()
+            ensemble={'set':eset[0],'members':members}
         else: ensemble=None
         
         urls={'url':url}
@@ -78,11 +79,10 @@ class simulationHandler(object):
             simform=SimulationForm(request.POST,instance=s)
             simform.specialise(self.centre)
             if simform.is_valid():
-                print 'SAVING SIMFORM'
                 s=simform.save()
                 return HttpResponseRedirect(afterURL)
             else:
-                print 'SIMFORM not valid [%s]'%simform.errors
+                logging.debug('SIMFORM not valid [%s]'%simform.errors)
         else:
             simform=SimulationForm(instance=s)
             simform.specialise(self.centre)
@@ -96,23 +96,6 @@ class simulationHandler(object):
         # now work out what we want to say about conformances.
         cs=Conformance.objects.filter(simulation=s)
         coset=[]
-        for i in cs:
-            '''new={'name':i.requirement,'method':'','detail':''}
-            if i.ctype.value=='BoundaryCondition':
-                if i.boundaryCondition:
-                    new['method']='conforms via boundary condition %s'%i.boundaryCondition
-            elif i.ctype.value=='InitialCondition':
-                if i.initialCondition:
-                    new['method']='conforms via initial condition %s'%i.initialCondition
-            else:
-                new['method']='Contact Programmer'
-            # are there any code modifications?
-            cm=i.codeModification.values()
-            if len(cm): 
-                if new['method']=='': new['method']+=' and '
-                new['method']+='code modification'
-            new['detail']=i.description
-            coset.append(new)'''
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,

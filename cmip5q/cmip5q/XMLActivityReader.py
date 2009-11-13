@@ -74,8 +74,7 @@ class NumericalExperiment:
         self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
         self.shortName=getText(self.root,'shortName')
         self.longName=getText(self.root,'longName')
-        logging.debug(
-           'Experiment %s has %s requirements'%(self.shortName,len(self.numericalRequirements)))
+        logging.debug('Experiment %s has %s requirements'%(self.shortName,len(self.numericalRequirements)))
    
     def load(self):
         ''' Loads information into the django database '''

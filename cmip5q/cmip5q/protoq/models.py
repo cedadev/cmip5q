@@ -44,7 +44,7 @@ class Doc(models.Model):
     uri=models.CharField(max_length=64,unique=True,editable=False)
     created=models.DateField(auto_now_add=True,editable=False)
     updated=models.DateField(auto_now=True,editable=False)
-    isValid=models.BooleanField(default=False,editable=False)
+    validErrors=models.IntegerField(default=-1,editable=False)
     isComplete=models.BooleanField(default=False)
     def __unicode__(self):
         return self.abbrev
@@ -53,8 +53,14 @@ class Doc(models.Model):
     def save(self,*args,**kwargs):
         ''' Used to decide what to do about versions. We only increment the document version
         number with changes once the document is considered to be complete and valid '''
-        if self.isValid and self.isComplete:  self.documentVersion+=1
+        if self.validErrors==0 and self.isComplete:  self.documentVersion+=1
         return models.Model.save(self,*args,**kwargs)
+    def __myclass(self):
+        ''' Presumably there is a hidden method on models.Model to do this '''
+        return str(self.__class__).split('.')[-1][0:-2]
+    #@models.permalink
+    #def get_absolute_url(self):
+    #    return  ('/display/%s/%s'%[self.__myclass(),self.uri])
   
 class Reference(models.Model):
     ''' An academic Reference '''
@@ -267,11 +273,16 @@ class Simulation(Doc):
                     r=m.copy(cgs[0])
         else:
             # get the model coupling group ... and copy it.
-            cgs=self.numericalModel.couplinggroup_set.all().get(simulation=None)
-            assert(len(cgs)==1,
-                   'Numerical model %s for simulation %s should only have coupling group'%(
-                   self.numericalModel,self)) 
-            cgs[0].duplicate4sim(self)
+            # it's possible we might be doing this before there is a modelling group
+            mcgs=self.numericalModel.couplinggroup_set.all()
+            if len(mcgs)==0: 
+                pass # nothing to do
+            else:
+                cgs=mcgs.get(simulation=None)
+                assert(len(cgs)==1,
+                    'Numerical model %s for simulation %s should only have coupling group'%(
+                    self.numericalModel,self)) 
+                cgs[0].duplicate4sim(self)
             
 
     def copy(self,experiment):
@@ -522,7 +533,7 @@ class Ensemble(models.Model):
         ndif=n-nShouldBe
         for i in range(abs(ndif)): 
             if ndif >0:
-                objects[-1].delete()
+                objects[n-1-i].delete()
             elif ndif < 0:
                 e=EnsembleMember(ensemble=self,memberNumber=n+i+1)
                 e.save()
