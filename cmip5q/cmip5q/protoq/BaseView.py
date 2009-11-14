@@ -1,8 +1,9 @@
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.loader import render_to_string
 from cmip5q.protoq.utilities import tabs
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden
 from cmip5q.protoq.utilities import sublist
 import logging
 
@@ -117,7 +118,7 @@ class BaseViewHandler:
         instance=None
         if self.resource['id']<>'0':
             instance=self.resource['class'].objects.get(id=self.resource['id'])
-                    
+            
         # Now construct a useful submission URL
         args=[self.cid,self.resource['type'],self.resource['id']]
         if self.target:args+=[self.target['type'],self.target['instance'].id]
@@ -125,6 +126,12 @@ class BaseViewHandler:
                     
         if request.method=='POST':
             logging.debug('Handling post with %s, %s '%(self.resource,request.POST))
+            if instance:
+                if instance.centre!=self.centre:
+                    logging.info('Attempt to edit resource not owned')
+                    return HttpResponseForbidden(render_to_string('error.html',
+                       {'message':"Attempt to edit a resource you don't own",
+                        'url':okURL}))
             form=self._constructForm('POST',request.POST,instance=instance)
             form.hostCentre=self.centre
             if form.is_valid():
