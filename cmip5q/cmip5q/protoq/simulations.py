@@ -79,7 +79,12 @@ class simulationHandler(object):
             simform=SimulationForm(request.POST,instance=s)
             simform.specialise(self.centre)
             if simform.is_valid():
-                s=simform.save()
+                if label=='Add':
+                    oldmodel=None
+                else: oldmodel=s.numericalModel
+                news=simform.save()
+                logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))
+                if news.numericalModel!=oldmodel:news.resetConformances()
                 return HttpResponseRedirect(afterURL)
             else:
                 logging.debug('SIMFORM not valid [%s]'%simform.errors)
@@ -95,11 +100,10 @@ class simulationHandler(object):
             
         # now work out what we want to say about conformances.
         cs=Conformance.objects.filter(simulation=s)
-        coset=[]
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
-             'cset':cset,'coset':coset,'ensemble':ensemble,
+             'cset':cset,'coset':cs,'ensemble':ensemble,
              'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
         
     def edit(self,request,fix=False):
@@ -185,17 +189,7 @@ class simulationHandler(object):
               'sim':reverse('cmip5q.protoq.views.simulationEdit',
                     args=(self.centreid,s.id,))
                     }
-        con=Conformance.objects.filter(simulation=s)
-        
-        if len(con)==0:
-            # we need to set up the conformances!
-             ctypes=Vocab.objects.get(name='ConformanceTypes')
-             defaultConformance=Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
-             reqs=e.requirements.all()
-             for r in reqs:
-                 c=Conformance(requirement=r,simulation=s, ctype=defaultConformance)
-                 c.save()
-                 
+        #con=Conformance.objects.filter(simulation=s)
         if request.method=='POST':
             cformset=MyConformanceFormSet(s,request.POST)
             if cformset.is_valid():
@@ -219,7 +213,6 @@ class simulationHandler(object):
                 exp=Experiment.objects.get(id=targetExp)
                 targetSim=request.POST['targetSim']
                 s=Simulation.objects.get(id=targetSim)
-                print targetSim,targetExp
                 ss=s.copy(exp)
                 url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
                 return HttpResponseRedirect(url)

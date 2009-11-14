@@ -279,11 +279,7 @@ class Simulation(Doc):
                 pass # nothing to do
             else:
                 cgs=mcgs.get(simulation=None)
-                assert(len(cgs)==1,
-                    'Numerical model %s for simulation %s should only have coupling group'%(
-                    self.numericalModel,self)) 
-                cgs[0].duplicate4sim(self)
-            
+                cgs.duplicate4sim(self)
 
     def copy(self,experiment):
         ''' Copy this simulation into a new experiment '''
@@ -306,6 +302,17 @@ class Simulation(Doc):
         # we can't duplicate that, since we don't know the conformance are the same unless we 
         # have a mapping page somewhere ... 
         return s
+        
+    def resetConformances(self):
+        # we need to set up the conformances or reset them.
+        existingConformances=Conformance.objects.filter(simulation=self)
+        for c in existingConformances:c.delete()
+        ctypes=Vocab.objects.get(name='ConformanceTypes')
+        defaultConformance=None#Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
+        reqs=self.experiment.requirements.all()
+        for r in reqs:
+            c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
+            c.save()
         
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -552,7 +559,7 @@ class Conformance(models.Model):
     # simulation owning the requirement 
     simulation=models.ForeignKey(Simulation)
     # conformance type from the controlled vocabulary
-    ctype=models.ForeignKey(Value)
+    ctype=models.ForeignKey(Value,blank=True,null=True)
     #
     mod=models.ManyToManyField('Modification',blank=True,null=True)
     coupling=models.ManyToManyField(Coupling,blank=True,null=True)
@@ -697,6 +704,7 @@ class SimulationForm(forms.ModelForm):
             e=Ensemble(simulation=s)
             e.save()
         e.updateMembers()
+        return s
 
 class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
