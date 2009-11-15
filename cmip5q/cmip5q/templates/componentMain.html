@@ -9,7 +9,7 @@
 <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
 </table>-->
 <table><tr>
-<td><h1> Model Component {{c.abbrev }} </h1> </td> {% if c.controlled %} {% else %}
+<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> {% if c.controlled %} {% else %}
     <td>
         <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
             <input type="hidden" name="deleteMe" value="1"/>
@@ -34,12 +34,12 @@
         </div>
         <div class="boxer"> 
         <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
-           {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Input Requirements</a></p>{% endif %}
+           {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Inputs Needed</a></p>{% endif %}
             <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
         </div>
         <div class="boxer">
           <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
-          <p><a id="cuplinkbut" href="{{urls.coupling}}"> Input Coupling</a></p> 
+          <p><a id="cuplinkbut" href="{{urls.coupling}}"> Resolve Inputs</a></p> 
           <!--<p><a id="outlinkbut" href="{{urls.outputs}}"> Outputs</a></p>-->
           <p><a id="viewlinkbut" href="{{urls.view}}">View</a></p>
           <p><a id="vallinkbut" href="{{urls.validate}}">Validate</a></p>
