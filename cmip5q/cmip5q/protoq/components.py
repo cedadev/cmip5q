@@ -7,7 +7,7 @@ from django.forms.models import modelformset_factory
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import PropertyForm,tabs,NewPropertyForm,RemoteUser
+from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
@@ -131,8 +131,6 @@ class componentHandler(object):
                     c.delete()
                     return HttpResponseRedirect(url)
         
-        PropertyForm=NewPropertyForm
-        
         # find my own urls ...
         urls={}
         urls['form']=self.url
@@ -154,7 +152,7 @@ class componentHandler(object):
         refs=Reference.objects.filter(component__id=c.id)
         inps=ComponentInput.objects.filter(owner__id=c.id)
         
-        pform=PropertyForm(c,prefix='props')
+        pform=NewPropertyForm(c,prefix='props')
         
         postOK=True
         if request.method=="POST":

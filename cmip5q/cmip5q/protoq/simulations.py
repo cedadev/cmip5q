@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import PropertyForm,tabs
+from cmip5q.protoq.utilities import tabs
 
 from django import forms
 import uuid

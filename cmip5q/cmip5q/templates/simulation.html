@@ -131,7 +131,7 @@
                 <p>(You can modify these using the button on the left hand menu.)</p>
                 <table>
                 {% for c in coset %}
-                <tr class="{% cycle 'row1' 'row2'%}"><td>{{c.name}}</td><td>{% if c.method %} {{c.method}} {% else %} <span class="red">Not conformant?</span>{% endif %}</tr>
+                <tr class="{% cycle 'row1' 'row2'%}"><td>{{c.requirement}}</td><td>{% if c.ctype %} {{c.ctype}} {% else %} <span class="red">Not conformant?</span>{% endif %}</tr>
                 {% endfor %}
                 </table>
                 {% endifnotequal %}

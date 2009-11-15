@@ -50,6 +50,7 @@
         {% endfor %}
     </script>
     </td></table>
+    {% if forloop.last %}
     <p>Enter {% ifnotequal pform.rows|length 0 %} an additional {% else %} a {% endifnotequal %} component attribute or parameter if you wish (you can enter multiple parameters by entering one at a time):</p>
     <table>
     <tr><th> Name </th><th> Value </th></tr>
@@ -58,6 +59,7 @@
         <td><input name="{{pform.prefix}}-{{cg.id}}-newparamval" id="{{pform.prefix}}-newparamval" size="40"></td>
     </tr>
     </table>
+    {% endif %}
 {% endfor %}
 </div>
 {% endfor %}

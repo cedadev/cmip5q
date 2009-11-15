@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.utilities import PropertyForm, tabs, sublist
+from cmip5q.protoq.utilities import  tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.XML import *
