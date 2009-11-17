@@ -125,7 +125,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),
 )
-if settings.DEBUG:
+if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
         (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
     )

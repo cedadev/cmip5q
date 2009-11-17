@@ -24,7 +24,7 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
 
 VocabList={'Realms':
      ('LandIce','Ocean','SeaIce','Atmosphere','OceanBiogeoChemistry',
-     'AtmosChemAndAerosols','Aerosol','LandSurface'),
+     'AtmosphericChemistry','Aerosols','LandSurface'),
      
      # controlled vocabulary for file formats
      'FileFormats':('NetCDF','Grib','PP','Excel','Text','HDF','Other'),
