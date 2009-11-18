@@ -7,7 +7,7 @@
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {{f.cf.FreqUnits.errors}}{{f.cf.FreqUnits}}</p>
 <hr>
-<p>(2) <b> Internal Boundary Conditions</b> This section describes how other components provide input </p> 
+<p>(2) <b> Couplings</b> This section describes how other components are coupled to inputs. </p> 
 {% if s %} 
 <p>If you have set values for these in your model description, you can copy them using this link: <a id="iclink{{f.cf.icreset.coupling.id}}" href="{{f.cf.icreset.url}}">Copy</a></p>
 {% endif %}
@@ -19,7 +19,7 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {% endfor %}
 </table>
 <hr> 
-<p> (3) <b> External Boundary Conditions</b> This section describes coupling to files.</p>
+<p> (3) <b> Forcings </b> This section describes how files are coupled to inputs.</p>
 {% endifequal %}
 {{ f.ic.management_form}}
 {% if s %}
