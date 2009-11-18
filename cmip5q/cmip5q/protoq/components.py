@@ -10,6 +10,7 @@ from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
+from cmip5q.protoq.cimHandling import *
 
 from django import forms
 import uuid
@@ -224,50 +225,9 @@ class componentHandler(object):
 
     def validate(self):
         ''' Validate model '''
-
-        # create CIM instance
-        my_component=self.component.model # use component for current component
-        component_id=my_component.id
-        nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
-        CIMDoc=nm.export() # add recurse=False to limit to this component only
-
-        #validate against schema
-        #CIM currently fails the schema parsing
-        #xmlschema_doc = ET.parse("xsd/cim.xsd")
-        #xmlschema = ET.XMLSchema(xmlschema_doc)
-        #if xmlschema.validate(CIMDoc):
-        #  logging.debug("CIM Document validates against the cim schema")
-        #else:
-        #  logging.debug("CIM Document fails to validate against the cim schema")
-        #log = xmlschema.error_log
-        #logging.debug("CIM Document schema errors are "+log)
-
-        #validate against schematron checks
-        sct_doc = ET.parse("xsl/BasicChecks.sch")
-        schematron = ET.Schematron(sct_doc)
-        if schematron.validate(CIMDoc):
-          logging.debug("CIM Document passes the schematron tests")
-        else:
-          logging.debug("CIM Document fails the schematron tests")
-
-        #obtain schematron report in html
-        xslt_doc = ET.parse("xsl/schematron-report.xsl")
-        transform = ET.XSLT(xslt_doc)
-        xslt_doc = transform(sct_doc)
-        transform = ET.XSLT(xslt_doc)
-        schematronhtml = transform(CIMDoc)
-
-        #also generate the cim as html
-        xslt_doc = ET.parse("xsl/xmlformat.xsl")
-        transform = ET.XSLT(xslt_doc)
-        formattedCIMDoc = transform(CIMDoc)
-        xslt_doc = ET.parse("xsl/verbid.xsl")
-        transform = ET.XSLT(xslt_doc)
-        cimhtml = transform(formattedCIMDoc)
-
-        return render_to_response('validation.html',
-        {'sHTML':schematronhtml,'cimHTML':cimhtml})
-      
+        validator=Validator()
+        schematronhtml,cimhtml=validator.validate(self.XML())
+        return render_to_response('validation.html',{'sHTML':schematronhtml,'cimHTML':cimhtml})
     
     def view(self):
         ''' HTML view of self '''
@@ -275,30 +235,23 @@ class componentHandler(object):
         #return self.XML(mimetype="doc/cim/xml")
         return self.XML()
     
-    def XML(self,mimetype="application/xml"):
+    def XML(self,allModel=True):
         ''' XML view of self'''
+        assert(allModel,True,'Support for not processing the entire model is not yet included')
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
-        CIMDoc=nm.export()
+        return nm.export()
+    
+    def XMLasHTML(self,allModel=True):
+        assert(allModel,True,'Support for not processing the entire model is not yet included')
+        CIMDoc=self.XML(allModel)
         #docStr=ET.tostring(CIMDoc,"UTF-8")
+        mimetype='application/xml'
         docStr=ET.tostring(CIMDoc,pretty_print=True)
         return HttpResponse(docStr,mimetype)
 
-    def XMLasHTML(self,XMLFileName):
-        ''' XML view of self supplied in a file and returned as HTML'''
-        # prettify the xml file with an xsl stylesheet
-        os.system("xsltproc xsl/xmlformat.xsl "+XMLFileName+" > "+XMLFileName+".pretty")
-        os.system("mv "+XMLFileName+".pretty "+XMLFileName)
-
-        # create and return html rendered xml using an xsl stylesheet
-        error=os.system("xsltproc xsl/xmlverbatim.xsl "+XMLFileName+" > "+XMLFileName+".html")
-
-        # read html file
-        file=open(XMLFileName+".html", 'r')
-        linestring=file.read()
-        file.close()
-        os.remove(file.name)
-
-        return linestring
+    def HTML(self,allModel=True):
+        ''' Rupert's nice XML view of self'''
+        return viewer(self.XML(allModel))
         
     def coupling(self,request,ctype=None):
         ''' Handle the construction of component couplings '''
