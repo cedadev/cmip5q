@@ -144,6 +144,7 @@ class componentHandler(object):
         urls['inputs']=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,c.id))
         urls['view']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
         urls['validate']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
+        urls['export']=reverse('cmip5q.protoq.views.componentXML',args=(self.centre_id,c.id))
         
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
@@ -233,10 +234,10 @@ class componentHandler(object):
         ''' HTML view of self '''
         ''' Return a CIM XML view for the moment'''
         #return self.XML(mimetype="doc/cim/xml")
-        return self.XML()
+        return self.HTML()
     
     def XML(self,allModel=True):
-        ''' XML view of self'''
+        ''' XML view of self as an element tree instance'''
         assert(allModel,True,'Support for not processing the entire model is not yet included')
         nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
         return nm.export()
@@ -251,7 +252,8 @@ class componentHandler(object):
 
     def HTML(self,allModel=True):
         ''' Rupert's nice XML view of self'''
-        return viewer(self.XML(allModel))
+        html=viewer(self.XML(allModel))
+        return HttpResponse(html)
         
     def coupling(self,request,ctype=None):
         ''' Handle the construction of component couplings '''

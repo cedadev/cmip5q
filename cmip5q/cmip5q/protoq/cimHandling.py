@@ -1,33 +1,42 @@
-import os
+import os,tempfile
 from lxml import etree as ET
 import logging
+import pkg_resources
 
-XSLDIR="xsl"  # TODO: we'll make this egg safe later
-XSDDIR="xsd"  # TODO: We'll make this egg safe later
+#http://peak.telecommunity.com/DevCenter/PkgResources#resourcemanager-api
+XSLDIR=pkg_resources.resource_filename("cmip5q","xsl")  # TODO: do we need to worry about cleanup?
+XSDDIR=pkg_resources.resource_filename("cmip5q","xsd")  # TODO: do we need to worry about cleanup?
+
+def shellcommand(command):
+    ''' lightweight wrapper to os.system that logs the return and handles errors '''
+    logging.debug('Executing '+command)
+    r=os.system(command)
+    logging.debug(r)
+    return r
 
 def viewer(xml,allModel=True):
-    ''' Rupert's xslt view '''
+    ''' Rupert's xslt view, xml is an element tree instance '''
     assert(allModel,True,'Support for not processing the entire model is not yet included')
     # we need the xml in a temporary file
-    tmpfname=os.mktemp('.xml')
+    tmpfname=tempfile.mktemp('.xml')
     tmpf=open(tmpfname,'w')
-    tmpf.write(xml)
+    tmpf.write(ET.tostring(xml))
+    tmpf.close()
     # prettify the xml file with an xsl stylesheet
-    outf=os.mktemp('.tmp')
+    outfname=tempfile.mktemp('.tmp')
     formatter=os.path.join(XSLDIR,'xmlformat.xsl')
-    os.system('xsltproc %s %s > %s'%(formatter,tmpf,outf))
-    os.system("mv %s %s"%(outf,tmpf))
+    r=shellcommand('xsltproc %s %s > %s'%(formatter,tmpfname,outfname))
+    r=shellcommand("mv %s %s"%(outfname,tmpfname))
 
     # create and return html rendered xml using an xsl stylesheet
     formatter=os.path.join(XSLDIR,'xmlverbatim.xsl')
-    os.system('xsltproc %s %s > %s'%(formatter,tmpf,outf))
+    shellcommand('xsltproc %s %s > %s'%(formatter,tmpfname,outfname))
 
     # read html file
-    file=open(outf, 'r')
-    linestring=file.read()
-    file.close()
-    os.remove(outf)
-
+    outf=open(outfname, 'r')
+    linestring=outf.read()
+    outf.close()
+    os.remove(outfname)
     return linestring
 
 class Validator:

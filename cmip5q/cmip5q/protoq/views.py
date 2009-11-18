@@ -111,9 +111,9 @@ def componentView(request,centre_id,component_id):
     return c.view()
     
 def componentXML(request,centre_id,component_id):
-    ''' Return an xml version of the component '''
+    ''' Return an xml version of the component, slightly pretty printed '''
     c=componentHandler(centre_id,component_id)
-    return c.xml()
+    return c.XMLasHTML()
   
 def componentCup(request,centre_id,component_id):
     ''' Return couplings for a component '''
