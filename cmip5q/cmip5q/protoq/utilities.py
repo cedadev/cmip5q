@@ -5,9 +5,10 @@ from django.core.urlresolvers import reverse
 def RemoteUser(request,document):
     ''' Assign a metadata maintainer if we have one '''
     key='REMOTE_USER'
-    if key in request.META:
-        document.metadataMaintainer=request.META(key)
-        document.save()
+    #if key in request.META:
+        #user=request.META[key]
+        #document.metadataMaintainer=ResponsibleParty( ...)
+        #document.save()
     return document
 
 class RingBuffer:

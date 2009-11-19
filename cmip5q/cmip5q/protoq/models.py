@@ -38,13 +38,20 @@ class Doc(models.Model):
     contact=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_contact')
     metadataMaintainer=models.ForeignKey(ResponsibleParty,blank=True,null=True,
                        related_name='%(class)s_metadataMaintainer')
-    metadataVersion=models.CharField(max_length=128,editable=False)
-    documentVersion=models.IntegerField(default=1,editable=False)
     description=models.TextField(blank=True)
-    uri=models.CharField(max_length=64,unique=True,editable=False)
+    # the following two are (or should be) set at document construction time:
+    uri=models.CharField(max_length=64,unique=True,editable=False)                  
+    metadataVersion=models.CharField(max_length=128,editable=False)
+    # following is updated by the save if the document is valid. NB: this version applies to 
+    # each individual component ... not the overall component.
+    documentVersion=models.IntegerField(default=1,editable=False)
+    # next two are automagically populated, and are used for the atom feed as well as being of general use.
     created=models.DateField(auto_now_add=True,editable=False)
     updated=models.DateField(auto_now=True,editable=False)
+    # next two are used to calculate the status bar, and are filled in by the validation software
     validErrors=models.IntegerField(default=-1,editable=False)
+    numberOfValidationChecks=models.IntegerField(default=0,editable=False)
+    # following is used by the user to declare the document is "ready"
     isComplete=models.BooleanField(default=False)
     def __unicode__(self):
         return self.abbrev

@@ -85,8 +85,9 @@ class componentHandler(object):
         else:
             try:
                 self.component=Component.objects.get(id=component_id)
-            except:
-                return HttpResponse('Unknown component %s'%component_id)
+            except Exception,e:
+                logging.debug('Attempt to open an unknown component %s'%component_id)
+                raise Exception,e
         
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
