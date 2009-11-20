@@ -33,7 +33,7 @@ class NumericalModel:
     ''' Handles the creation of a model instance in the database, either from XML storage
     or from a pre-existing instance '''
     
-    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.1"
+    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.3"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = "cim.xsd"
@@ -185,22 +185,6 @@ class NumericalModel:
         # <gmd:roll/>
         #role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')#empty
 
-    def getTimeStepParam(self,c):
-        # c/child/TimeSteppingFramework/TimeStep
-        for child in c.components.all():
-            if child.implemented:
-                pgset=ParamGroup.objects.filter(component=child)
-                for pg in pgset:
-                    if pg.name=='TimeSteppingFramework':
-                        constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
-                        for con in constraintSet:
-                            pset=NewParam.objects.filter(constraint=con)
-                            for p in pset:
-                                if p.name=='TimeStep':
-                                    return p
-        return 0
-
-
     def composition(self,c,comp):
         couplings=[]
         if c.isModel:couplings=c.couplings()
@@ -214,8 +198,14 @@ class NumericalModel:
                 ET.SubElement(connection,'Q_inputAbbrev').text=coupling.targetInput.abbrev
                 ET.SubElement(connection,'Q_inputDescrip').text=coupling.targetInput.description
                 if coupling.targetInput.ctype.value=='BoundaryCondition':
-                    ET.SubElement(connection,'Q_type').text=coupling.ctype.value
-                    ET.SubElement(connection,'Q_freqUnits').text=coupling.FreqUnits.value
+                    if (coupling.ctype):
+                        ET.SubElement(connection,'Q_type').text=coupling.ctype.value
+                    else:
+                        ET.SubElement(connection,'Q_type')
+                    if (coupling.FreqUnits):
+                        ET.SubElement(connection,'Q_freqUnits').text=coupling.FreqUnits.value
+                    else:
+                        ET.SubElement(connection,'Q_freqUnits')
                     ET.SubElement(connection,'Q_frequency').text=str(coupling.couplingFreq)
                     ET.SubElement(connection,'Q_manipulation').text=coupling.manipulation
                 iClosures=InternalClosure.objects.filter(coupling=coupling)
@@ -347,15 +337,10 @@ class NumericalModel:
         #comp.append(ET.Comment("value attribute in element type should have value "+c.scienceType+" but this fails the cim validation at the moment"))
         #ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
         ET.SubElement(comp,'type').text=c.scienceType
-        if nest==2:
-            '''timestep info only supplied for realm components'''
-            tsParam=self.getTimeStepParam(c)
-            if tsParam:
-                timing=ET.SubElement(comp,'timing',{'units':tsParam.units})
-                ET.SubElement(timing,'rate').text=str(tsParam.value)
-            else:
-                timing=ET.SubElement(comp,'timing',{'units':'not found'})
-                ET.SubElement(timing,'rate').text='not found'
+        '''component timestep info not explicitely supplied in questionnaire'''
+        #if nest==2:
+                #timing=ET.SubElement(comp,'timing',{'units':'units'})
+                #ET.SubElement(timing,'rate').text='rate'
         if nest==1:
             '''documentID'''
             ET.SubElement(comp,'documentID').text=c.uri
