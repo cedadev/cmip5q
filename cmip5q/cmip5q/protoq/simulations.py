@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs
+from cmip5q.protoq.cimHandling import *
 
 from django import forms
 import uuid
@@ -142,12 +143,43 @@ class simulationHandler(object):
         
     def validate(self):
         ''' Is this simulation complete? '''
-        return HttpResponse('Not implemented')
+        validator=Validator()
+        schematronhtml,cimhtml=validator.validate(self.XML())
+        return render_to_response('validation.html',{'sHTML':schematronhtml,'cimHTML':cimhtml})
     
     def view(self):
         ''' Return a "pretty" version of self '''
-        return HttpResponse('Not implemented')
+        return self.HTML()
       
+    def HTML(self):
+        html=viewer(self.XML())
+        return HttpResponse(html)
+    
+    def XML(self):
+        ''' XML view of self as an element tree instance'''
+        CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.3"
+        SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
+        SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
+        CIM_URL = "cim.xsd"
+        GMD_NAMESPACE = "http://www.isotc211.org/2005/gmd"
+        GMD_NAMESPACE_BRACKETS="{"+GMD_NAMESPACE+"}"
+        GCO_NAMESPACE = "http://www.isotc211.org/2005/gco"
+        GCO_NAMESPACE_BRACKETS="{"+GCO_NAMESPACE+"}"
+        logging.debug('SimulationHandler:XML returning an xml document')
+        NSMAP = {None  : CIM_NAMESPACE,             \
+                 "xsi" : SCHEMA_INSTANCE_NAMESPACE, \
+                 "gmd" : GMD_NAMESPACE,             \
+                 "gco" : GCO_NAMESPACE}
+        root=ET.Element('CIMRecord', \
+                        attrib={SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": CIM_URL}, \
+                        nsmap=NSMAP)
+        ET.SubElement(root,'id').text='[TBD1]'
+        sim=ET.SubElement(root,'simulationRun')
+        #self.exportAddComponent(root,self.top,1,recurse)
+        #nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
+        #return nm.export()
+        return root
+
     def list(self,request):
         ''' Return a listing of simulations for a given centre '''
         
