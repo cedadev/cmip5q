@@ -48,22 +48,45 @@ class Validator:
         self.CIMschema=os.path.join(self.XSDdir,'cim.xsd')
         self.schemaValidate=schemaValidate
         self.contentValidate=contentValidate
-       
+        self.nInvalid=0
+        self.nChecks=0
+        self.valid=True
+        self.percentComplete=100.0
+        self.cimHtml={}
+        self.report={}
+
+    def errorsAsHtml(self) :
+        return self.report
+    
+    def xmlAsHtml(self) :
+        return self.cimHtml
+    
     def __validateComponent(self,CIMdoc):
         ''' Validate a Component '''
         sct_doc = ET.parse(os.path.join(self.XSLdir,"BasicChecks.sch"))
-        schematron = ET.Schematron(sct_doc)
-        if schematron.validate(CIMdoc):
-          logging.debug("CIM Document passes the schematron tests")
-        else:
-          logging.debug("CIM Document fails the schematron tests")
+        #schematron = ET.Schematron(sct_doc)
+        #if schematron.validate(CIMdoc):
+        #  logging.debug("CIM Document passes the schematron tests")
+        #else:
+        #  logging.debug("CIM Document fails the schematron tests")
 
         #obtain schematron report in html
         xslt_doc = ET.parse(os.path.join(self.XSLdir,"schematron-report.xsl"))
         transform = ET.XSLT(xslt_doc)
         xslt_doc = transform(sct_doc)
         transform = ET.XSLT(xslt_doc)
-        schematronhtml = transform(CIMdoc)
+        self.report = transform(CIMdoc)
+        # find out how many errors and checks there were and set my state appropriately
+        self.nChecks=len(self.report.xpath('//check'))
+        self.nInvalid=len(self.report.xpath('//invalid'))
+        if self.nChecks>0:
+            self.percentComplete=str(((self.nChecks-self.Invalid)*100.0)/self.nChecks)
+        else:
+            self.percentComplete=100.0
+        if self.nInvalid>0:
+            self.valid=False
+        else:
+            self.valid=True
 
         #also generate the cim as html
         xslt_doc = ET.parse(os.path.join(self.XSLdir,"xmlformat.xsl"))
@@ -71,11 +94,14 @@ class Validator:
         formattedCIMdoc = transform(CIMdoc)
         xslt_doc = ET.parse(os.path.join(self.XSLdir,"verbid.xsl"))
         transform = ET.XSLT(xslt_doc)
-        cimhtml = transform(formattedCIMdoc)
-        return schematronhtml,cimhtml
+        self.cimHtml = transform(formattedCIMdoc)
     
-    
-    def validate(self,CIMdoc,cimtype='component'):
+
+    def validateFile(self,fileName):
+        tmpDoc=ET.parse(file)
+        self.validateDoc(tmpDoc)
+
+    def validateDoc(self,CIMdoc,cimtype='component'):
         ''' This method validates a CIM document '''
         #validate against schema
         if self.schemaValidate:
@@ -93,6 +119,6 @@ class Validator:
         if self.contentValidate:
             #validate against schematron checks
             if cimtype=='component':
-                return self.__validateComponent(CIMdoc)
+                self.__validateComponent(CIMdoc)
       
        

@@ -9,6 +9,8 @@ from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs
 from cmip5q.protoq.cimHandling import *
 
+from cmip5q.Translator import Translator
+
 from django import forms
 import uuid
 import logging
@@ -144,8 +146,13 @@ class simulationHandler(object):
     def validate(self):
         ''' Is this simulation complete? '''
         validator=Validator()
-        schematronhtml,cimhtml=validator.validate(self.XML())
-        return render_to_response('validation.html',{'sHTML':schematronhtml,'cimHTML':cimhtml})
+        validator.validateDoc(self.XML())
+        errorsHtml=validator.errorsAsHtml()
+        cimHtml=validator.xmlAsHtml()
+        s=Simulation.objects.get(pk=self.simid)
+        s.validErrors=validator.nInvalid
+        s.numberOfValidationChecks=validator.nChecks
+        return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
     
     def view(self):
         ''' Return a "pretty" version of self '''
@@ -156,29 +163,11 @@ class simulationHandler(object):
         return HttpResponse(html)
     
     def XML(self):
-        ''' XML view of self as an element tree instance'''
-        CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.3"
-        SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
-        SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
-        CIM_URL = "cim.xsd"
-        GMD_NAMESPACE = "http://www.isotc211.org/2005/gmd"
-        GMD_NAMESPACE_BRACKETS="{"+GMD_NAMESPACE+"}"
-        GCO_NAMESPACE = "http://www.isotc211.org/2005/gco"
-        GCO_NAMESPACE_BRACKETS="{"+GCO_NAMESPACE+"}"
-        logging.debug('SimulationHandler:XML returning an xml document')
-        NSMAP = {None  : CIM_NAMESPACE,             \
-                 "xsi" : SCHEMA_INSTANCE_NAMESPACE, \
-                 "gmd" : GMD_NAMESPACE,             \
-                 "gco" : GCO_NAMESPACE}
-        root=ET.Element('CIMRecord', \
-                        attrib={SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": CIM_URL}, \
-                        nsmap=NSMAP)
-        ET.SubElement(root,'id').text='[TBD1]'
-        sim=ET.SubElement(root,'simulationRun')
-        #self.exportAddComponent(root,self.top,1,recurse)
-        #nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
-        #return nm.export()
-        return root
+        ''' XML view of self as an lxml element tree instance'''
+        translator=Translator()
+        s=Simulation.objects.get(pk=self.simid)
+        xmlDoc=translator.q2cim(s,docType='simulation')
+        return xmlDoc
 
     def list(self,request):
         ''' Return a listing of simulations for a given centre '''

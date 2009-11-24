@@ -12,6 +12,8 @@ from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 from cmip5q.protoq.cimHandling import *
 
+from cmip5q.Translator import Translator
+
 from django import forms
 import uuid
 import logging
@@ -228,8 +230,12 @@ class componentHandler(object):
     def validate(self):
         ''' Validate model '''
         validator=Validator()
-        schematronhtml,cimhtml=validator.validate(self.XML())
-        return render_to_response('validation.html',{'sHTML':schematronhtml,'cimHTML':cimhtml})
+        validator.validateDoc(self.XML())
+        errorsHtml=validator.errorsAsHtml()
+        cimHtml=validator.xmlAsHtml()
+        self.component.validErrors=validator.nInvalid
+        self.component.numberOfValidationChecks=validator.nChecks
+        return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
     
     def view(self):
         ''' HTML view of self '''
@@ -239,9 +245,13 @@ class componentHandler(object):
     
     def XML(self,allModel=True):
         ''' XML view of self as an element tree instance'''
-        assert(allModel,True,'Support for not processing the entire model is not yet included')
-        nm=NumericalModel(Centre.objects.get(id=self.centre_id),self.component.model.id)
-        return nm.export()
+        translator=Translator()
+        if (allModel) :
+            c=self.component.model
+        else:
+            c=self.component
+        xmlDoc=translator.q2cim(c,docType='component')
+        return xmlDoc
     
     def XMLasHTML(self,allModel=True):
         assert(allModel,True,'Support for not processing the entire model is not yet included')
