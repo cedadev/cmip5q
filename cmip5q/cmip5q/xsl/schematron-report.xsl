@@ -44,6 +44,7 @@
 <xsl:param name="diagnose">yes</xsl:param>     
 
 <xsl:template name="process-prolog">
+         <!-- <HELLO type="process-prolog"/> -->
    <axsl:output method="html" />
 </xsl:template>
 
@@ -100,7 +101,6 @@
 <p><xsl:if test="$icon"><img src="{$icon}" /> </xsl:if
 ><xsl:apply-templates mode="text"/></p>
 </xsl:template>
-
 <xsl:template name="process-pattern">
    <xsl:param name="icon" />
    <xsl:param name="name" />
@@ -128,6 +128,7 @@
    <xsl:param name="pattern" />
    <xsl:param name="role" />
    <xsl:param name="diagnostics" />
+   <invalid/>
    <li>
    <xsl:if test="$icon"><img src="{$icon}" /> </xsl:if>
 <!--
@@ -154,6 +155,7 @@
    <xsl:param name="icon" />
    <xsl:param name="role" />
    <xsl:param name="diagnostics" />
+   <invalid/>
    <li>
    <xsl:if test="$icon"><img src="{$icon}" /> </xsl:if>
 <!--
@@ -173,5 +175,8 @@
    </li>
 </xsl:template>
 
+        <xsl:template name="process-rule">
+            <check/>
+        </xsl:template>
 
 </xsl:stylesheet>

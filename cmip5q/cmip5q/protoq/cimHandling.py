@@ -14,9 +14,8 @@ def shellcommand(command):
     logging.debug(r)
     return r
 
-def viewer(xml,allModel=True):
+def viewer(xml):
     ''' Rupert's xslt view, xml is an element tree instance '''
-    assert(allModel,True,'Support for not processing the entire model is not yet included')
     # we need the xml in a temporary file
     tmpfname=tempfile.mktemp('.xml')
     tmpf=open(tmpfname,'w')
@@ -80,7 +79,7 @@ class Validator:
         self.nChecks=len(self.report.xpath('//check'))
         self.nInvalid=len(self.report.xpath('//invalid'))
         if self.nChecks>0:
-            self.percentComplete=str(((self.nChecks-self.Invalid)*100.0)/self.nChecks)
+            self.percentComplete=str(((self.nChecks-self.nInvalid)*100.0)/self.nChecks)
         else:
             self.percentComplete=100.0
         if self.nInvalid>0:

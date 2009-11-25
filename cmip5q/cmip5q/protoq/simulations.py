@@ -152,6 +152,9 @@ class simulationHandler(object):
         s=Simulation.objects.get(pk=self.simid)
         s.validErrors=validator.nInvalid
         s.numberOfValidationChecks=validator.nChecks
+        logging.debug("simulation validate checks="+str(s.numberOfValidationChecks))
+        logging.debug("simulation validate errors="+str(s.validErrors))
+        logging.debug("simulation percent complete="+str(validator.percentComplete))
         return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
     
     def view(self):

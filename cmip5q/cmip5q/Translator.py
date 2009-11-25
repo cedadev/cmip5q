@@ -25,7 +25,9 @@ class Translator:
              "gco" : GCO_NAMESPACE}
 
     def __init__(self):
-        ''' I don't appear to have anything to do! '''
+        ''' Set any intial state '''
+        self.recurse=True
+        self.outputComposition=True
 
     def cimRoot(self):
         ''' return the top level cim document invarient structure '''
@@ -44,16 +46,38 @@ class Translator:
         return cimDoc
         
     def q2cim_simulation(self,ref,root):
-
+        
         logging.debug('Translator:q2cim_simulation: returning an xml document')
-        sim=ET.SubElement(root,'SIMULATION')
+        sim=ET.SubElement(root,'Q_Simulation')
+        experiment=ET.SubElement(sim,'Q_Experiment')
+        self.addExperiment(experiment,ref.experiment)
+        ET.SubElement(sim,'Q_EnsembleCount').text=str(ref.ensembleMembers)
+        ET.SubElement(sim,'Q_AuthorList').text=ref.authorList
+        model=ET.SubElement(sim,'Q_NumericalModel')
+        self.addComponent(model,ref.numericalModel,1)
         return root
 
+    def addExperiment(self,root,exp):
+        
+        ET.SubElement(root,'Q_Rationale').text=exp.rationale
+        ET.SubElement(root,'Q_Why').text=exp.why
+        # add numerical requirements here
+        ET.SubElement(root,'Q_DocID').text=exp.docID
+        ET.SubElement(root,'Q_ShortName').text=exp.shortName
+        ET.SubElement(root,'Q_LongName').text=exp.longName
+        ET.SubElement(root,'Q_StartDate').text=exp.startDate
+        ET.SubElement(root,'Q_EndDate').text=exp.endDate
+        
+
+    def setComponentOptions(self,recurse,composition):
+
+        self.recurse=recurse
+        self.outputComposition=composition
+    
     def q2cim_component(self,ref,root):
 
         logging.debug('Translator:q2cim_component: returning an xml document')
-        recurse=True
-        self.addComponent(root,ref,1,recurse)
+        self.addComponent(root,ref,1,self.recurse)
         return root
 
     def q2cim_platform(self,ref,root):
@@ -70,8 +94,9 @@ class Translator:
           comp=ET.SubElement(root,'modelComponent',{'documentVersion': '-1', 'CIMVersion': '1.3'})
         else:
           comp=ET.SubElement(root,'modelComponent')
-        '''composition'''
-        self.composition(c,comp)
+        if self.outputComposition:
+            '''composition'''
+            self.composition(c,comp)
         if recurse:
             '''childComponent'''
             for child in c.components.all():

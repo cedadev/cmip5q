@@ -230,11 +230,14 @@ class componentHandler(object):
     def validate(self):
         ''' Validate model '''
         validator=Validator()
-        validator.validateDoc(self.XML())
+        validator.validateDoc(self.XML(allModel=True,recurse=True,composition=True))
         errorsHtml=validator.errorsAsHtml()
         cimHtml=validator.xmlAsHtml()
         self.component.validErrors=validator.nInvalid
         self.component.numberOfValidationChecks=validator.nChecks
+        logging.debug("component validate checks="+str(validator.nChecks))
+        logging.debug("component validate errors="+str(validator.nInvalid))
+        logging.debug("component percent complete="+str(validator.percentComplete))
         return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
     
     def view(self):
@@ -243,19 +246,20 @@ class componentHandler(object):
         #return self.XML(mimetype="doc/cim/xml")
         return self.HTML()
     
-    def XML(self,allModel=True):
+    def XML(self,allModel=True,recurse=True,composition=True):
         ''' XML view of self as an element tree instance'''
         translator=Translator()
         if (allModel) :
             c=self.component.model
         else:
             c=self.component
+        translator.setComponentOptions(recurse,composition)
         xmlDoc=translator.q2cim(c,docType='component')
         return xmlDoc
     
     def XMLasHTML(self,allModel=True):
         assert(allModel,True,'Support for not processing the entire model is not yet included')
-        CIMDoc=self.XML(allModel)
+        CIMDoc=self.XML(allModel,recurse=True,composition=True)
         #docStr=ET.tostring(CIMDoc,"UTF-8")
         mimetype='application/xml'
         docStr=ET.tostring(CIMDoc,pretty_print=True)
@@ -263,7 +267,7 @@ class componentHandler(object):
 
     def HTML(self,allModel=True):
         ''' Rupert's nice XML view of self'''
-        html=viewer(self.XML(allModel))
+        html=viewer(self.XML(allModel=True,recurse=True,composition=True))
         return HttpResponse(html)
         
     def coupling(self,request,ctype=None):
