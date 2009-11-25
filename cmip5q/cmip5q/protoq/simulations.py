@@ -169,7 +169,7 @@ class simulationHandler(object):
         ''' XML view of self as an lxml element tree instance'''
         translator=Translator()
         s=Simulation.objects.get(pk=self.simid)
-        xmlDoc=translator.q2cim(s,docType='simulation')
+        xmlDoc=translator.q2cim(s,docType='Simulation')
         return xmlDoc
 
     def list(self,request):

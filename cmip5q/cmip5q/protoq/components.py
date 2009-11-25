@@ -254,7 +254,7 @@ class componentHandler(object):
         else:
             c=self.component
         translator.setComponentOptions(recurse,composition)
-        xmlDoc=translator.q2cim(c,docType='component')
+        xmlDoc=translator.q2cim(c,docType='Component')
         return xmlDoc
     
     def XMLasHTML(self,allModel=True):

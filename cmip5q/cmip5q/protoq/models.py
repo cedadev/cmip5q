@@ -533,7 +533,6 @@ class ExternalClosure(CouplingClosure):
     def __unicode__(self):
         return 'eClosure %s'%self.target    
         
-
 class Ensemble(models.Model):
     description=models.TextField(blank=True,null=True)
     etype=models.ForeignKey(Value,blank=True,null=True)

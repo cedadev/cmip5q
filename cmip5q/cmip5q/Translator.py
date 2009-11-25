@@ -9,7 +9,7 @@ import datetime
 
 class Translator:
 
-    ''' Translates a questionnaire Doc class (simulation, component or platform) into a CIM document (as an lxml etree instance) '''
+    ''' Translates a questionnaire Doc class (Simulation, Component or Platform) into a CIM document (as an lxml etree instance) '''
 
     CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.3"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
@@ -25,7 +25,7 @@ class Translator:
              "gco" : GCO_NAMESPACE}
 
     def __init__(self):
-        ''' Set any intial state '''
+        ''' Set any initial state '''
         self.recurse=True
         self.outputComposition=True
 
@@ -39,34 +39,119 @@ class Translator:
 
     def q2cim(self,ref,docType):
 
-        method_name = 'q2cim_' + str(docType)
+        method_name = 'add' + str(docType)
+        logging.debug("q2cim calling "+method_name)
         method = getattr(self, method_name)
         root=self.cimRoot()
         cimDoc=method(ref,root)
         return cimDoc
         
-    def q2cim_simulation(self,ref,root):
-        
-        logging.debug('Translator:q2cim_simulation: returning an xml document')
-        sim=ET.SubElement(root,'Q_Simulation')
-        experiment=ET.SubElement(sim,'Q_Experiment')
-        self.addExperiment(experiment,ref.experiment)
-        ET.SubElement(sim,'Q_EnsembleCount').text=str(ref.ensembleMembers)
-        ET.SubElement(sim,'Q_AuthorList').text=ref.authorList
-        model=ET.SubElement(sim,'Q_NumericalModel')
-        self.addComponent(model,ref.numericalModel,1)
-        return root
+    def addEnsemble(self,ensembleClass,rootElement):
 
-    def addExperiment(self,root,exp):
+        if ensembleClass :
+            ensembleElement=ET.SubElement(rootElement,'Q_Ensemble')
+            ET.SubElement(ensembleElement,'Q_Description').text=ensembleClass.description
+            etypeValueElement=ET.SubElement(ensembleElement,'Q_EtypeValue')
+            self.addValue(ensembleClass.etype,etypeValueElement)
+
+    def addSimulation(self,simClass,rootElement):
         
-        ET.SubElement(root,'Q_Rationale').text=exp.rationale
-        ET.SubElement(root,'Q_Why').text=exp.why
-        # add numerical requirements here
-        ET.SubElement(root,'Q_DocID').text=exp.docID
-        ET.SubElement(root,'Q_ShortName').text=exp.shortName
-        ET.SubElement(root,'Q_LongName').text=exp.longName
-        ET.SubElement(root,'Q_StartDate').text=exp.startDate
-        ET.SubElement(root,'Q_EndDate').text=exp.endDate
+        simElement=ET.SubElement(rootElement,'Q_Simulation')
+        #Simulation isa Doc
+        self.addDoc(simClass,simElement)
+        modelElement=ET.SubElement(simElement,'Q_NumericalModel')
+        self.addComponent(simClass.numericalModel,modelElement)
+        ET.SubElement(simElement,'Q_EnsembleCount').text=str(simClass.ensembleMembers)
+        # add ensemble information from Ensemble class
+        ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
+        ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+        for ensembleClass in ensembleClassSet :
+            self.addEnsemble(ensembleClass,ensemblesElement)
+        self.addExperiment(simClass.experiment,simElement)
+        self.addPlatform(simClass.platform,simElement)
+        self.addCentre(simClass.centre,simElement)
+        ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
+        modelModsElement=ET.SubElement(simElement,'Q_ModelMods')
+        for modelModClass in simClass.modelMod.all():
+            self.addModelMod(modelModClass,modelModsElement)
+        inputModsElement=ET.SubElement(simElement,'Q_InputMods')
+        for inputModClass in simClass.inputMod.all():
+            self.addInputMod(inputModClass,inputModsElement)
+        return rootElement
+
+    def addModification(self,modClass,rootElement) :
+        if modClass :
+            modElement=ET.SubElement(rootElement,'Q_Modification')
+            mtypeValueElement=ET.SubElement(modElement,'Q_MtypeValue')
+            self.addValue(modClass.mtype,mtypeValueElement)
+            ET.SubElement(modElement,'Q_Description').text=modClass.description
+
+    def addModelMod(self,modelModClass,rootElement) :
+        if modelModClass :
+            modelModElement=ET.SubElement(rootElement,'Q_ModelMod')
+            # ModelMod isa Modification
+            self.addModification(modelModClass,modelModElement)
+            if modelModClass.component :
+                compElement=ET.SubElement(modelModElement,'Q_ComponentRef')
+                ET.SubElement(compElement,'Q_ComponentName').text=modelModClass.component.abbrev
+
+    def addInputMod(self,inputModClass,rootElement) :
+        if inputModClass :
+            inputModElement=ET.SubElement(rootElement,'Q_InputMod')
+            # InputMod isa Modification
+            self.addModification(inputModClass,inputModElement)
+            ET.SubElement(inputModElement,'Q_Date').text=str(inputModClass.date)
+            couplingsElement=ET.SubElement(inputModElement,'Q_Couplings')
+            for couplingClass in inputModClass.inputs.all():
+                self.addCouplingRef(couplingClass,couplingsElement)
+
+    def addCouplingRef(self,couplingClass,rootElement):
+        if couplingClass :
+            couplingElement=ET.SubElement(rootElement,'Q_CouplingRef')
+            couplingElement=ET.SubElement(couplingElement,'Q_InputAbbreviation').text=couplingClass.targetInput.abbrev
+            couplingElement=ET.SubElement(couplingElement,'Q_InputDescription').text=couplingClass.targetInput.description
+
+    def addCentre(self,centreClass,rootElement):
+        if centreClass :
+            centreElement=ET.SubElement(rootElement,'Q_Centre')
+            #centreClass is a ResponsibleParty
+            self.addResp(centreClass.party,centreElement,'centre')
+
+    def addVocab(self,vocabClass,rootElement):
+        if vocabClass :
+            vocabElement=ET.SubElement(rootElement,'Q_Vocab')
+            ET.SubElement(vocabElement,'Q_Name').text=vocabClass.name
+            ET.SubElement(vocabElement,'Q_URI').text=vocabClass.uri
+            ET.SubElement(vocabElement,'Q_Note').text=vocabClass.note
+            ET.SubElement(vocabElement,'Q_Version').text=vocabClass.version
+
+    def addValue(self,valueClass,valueElement):
+        if valueClass :
+            ET.SubElement(valueElement,'Q_Value').text=valueClass.value
+            self.addVocab(valueClass.vocab,valueElement)
+            ET.SubElement(valueElement,'Q_Definition').text=valueClass.definition
+            ET.SubElement(valueElement,'Q_Version').text=valueClass.version
+
+    def addRequirement(self,reqClass,rootElement):
+        if reqClass :
+            reqElement=ET.SubElement(rootElement,'Q_NumericalRequirement')
+            ET.SubElement(reqElement,'Q_Description').text=reqClass.description
+            ET.SubElement(reqElement,'Q_Name').text=reqClass.name
+            valueElement=ET.SubElement(reqElement,'Q_CtypeValue')
+            self.addValue(reqClass.ctype,valueElement)
+
+    def addExperiment(self,expClass,rootElement):
+        expElement=ET.SubElement(rootElement,'Q_Experiment')
+        ET.SubElement(expElement,'Q_Rationale').text=expClass.rationale
+        ET.SubElement(expElement,'Q_Why').text=expClass.why
+        reqsElement=ET.SubElement(expElement,'Q_NumericalRequirements')
+        for reqClass in expClass.requirements.all():
+            self.addRequirement(reqClass,reqsElement)
+        ET.SubElement(expElement,'Q_DocID').text=expClass.docID
+        ET.SubElement(expElement,'Q_ShortName').text=expClass.shortName
+        ET.SubElement(expElement,'Q_LongName').text=expClass.longName
+        ET.SubElement(expElement,'Q_StartDate').text=expClass.startDate
+        ET.SubElement(expElement,'Q_EndDate').text=expClass.endDate
         
 
     def setComponentOptions(self,recurse,composition):
@@ -74,19 +159,52 @@ class Translator:
         self.recurse=recurse
         self.outputComposition=composition
     
-    def q2cim_component(self,ref,root):
+    def addComponent(self,compClass,rootElement):
 
-        logging.debug('Translator:q2cim_component: returning an xml document')
-        self.addComponent(root,ref,1,self.recurse)
-        return root
+        if compClass :
+            self.addChildComponent(compClass,rootElement,1,self.recurse)
+        return rootElement
 
-    def q2cim_platform(self,ref,root):
+    def addDoc(self,docClass,rootElement):
 
-        logging.debug('Translator:q2cim_platform: returning an xml document')
-        plat=ET.SubElement(root,'PLATFORM')
-        return root
+        if docClass :
+            docElement=ET.SubElement(rootElement,'Q_Doc')
+            ET.SubElement(docElement,'Q_Title').text=docClass.title
+            ET.SubElement(docElement,'Q_Abbrev').text=docClass.abbrev
+            self.addResp(docClass.author,docElement,'author')
+            self.addResp(docClass.funder,docElement,'funder')
+            self.addResp(docClass.contact,docElement,'contact')
+            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
+            ET.SubElement(docElement,'Q_Description').text=docClass.description
+            ET.SubElement(docElement,'Q_URI').text=docClass.uri
+            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
+            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
+            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
+            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
+        
 
-    def addComponent(self,root,c,nest,recurse=True):
+    def addPlatform(self,platClass,rootElement):
+
+        if platClass :
+            platElement=ET.SubElement(rootElement,'Q_Platform')
+            #Platform isa Doc
+            self.addDoc(platClass,platElement)
+            # add centre info ???
+            ET.SubElement(platElement,'Q_Compiler').text=platClass.compiler
+            ET.SubElement(platElement,'Q_Vendor').text=platClass.vendor
+            ET.SubElement(platElement,'Q_CompilerVersion').text=platClass.compilerVersion
+            ET.SubElement(platElement,'Q_MaxProcessors').text=platClass.maxProcessors
+            ET.SubElement(platElement,'Q_CoresPerProcessor').text=platClass.coresPerProcessor
+            ET.SubElement(platElement,'Q_OperatingSystem').text=platClass.operatingSystem
+            hardwareElement=ET.SubElement(platElement,'Q_HardwareVal')
+            self.addValue(platClass.hardware,hardwareElement)
+            processorElement=ET.SubElement(platElement,'Q_ProcessorVal')
+            self.addValue(platClass.processor,processorElement)
+            interconnectElement=ET.SubElement(platElement,'Q_InterconnectVal')
+            self.addValue(platClass.interconnect,interconnectElement)
+        return rootElement
+
+    def addChildComponent(self,c,root,nest,recurse=True):
 
       if c.implemented:
         if nest==1:
@@ -94,6 +212,8 @@ class Translator:
           comp=ET.SubElement(root,'modelComponent',{'documentVersion': '-1', 'CIMVersion': '1.3'})
         else:
           comp=ET.SubElement(root,'modelComponent')
+        #Component isa Doc
+        self.addDoc(c,comp)
         if self.outputComposition:
             '''composition'''
             self.composition(c,comp)
@@ -102,7 +222,7 @@ class Translator:
             for child in c.components.all():
               if child.implemented:
                 comp2=ET.SubElement(comp,'childComponent')
-                self.addComponent(comp2,child,nest+1)
+                self.addChildComponent(child,comp2,nest+1)
         '''parentComponent'''
         '''deployment'''
         '''shortName'''
@@ -157,9 +277,9 @@ class Translator:
         comp.append(ET.Comment("format for responsible party's is not yet determined"))
         resps=ET.SubElement(comp,"Q_responsibleParties")
 
-        self.addResp(resps,'author',c.author)
-        self.addResp(resps,'funder',c.funder)
-        self.addResp(resps,'contact',c.contact)
+        self.addResp(c.author,resps,'author')
+        self.addResp(c.funder,resps,'funder')
+        self.addResp(c.contact,resps,'contact')
         '''fundingSource'''
         '''citation'''
         references=ET.SubElement(comp,'Q_references')
@@ -205,15 +325,15 @@ class Translator:
         logging.debug("component "+c.abbrev+" has implemented set to false")
       return
 
-    def addResp(self,parent,respType,p):
-        if (p) :
-            resp=ET.SubElement(parent,"Q_responsibleParty",{'type':respType})
-            ET.SubElement(resp,"Q_name").text=p.name
-            ET.SubElement(resp,"Q_webpage").text=p.webpage
-            ET.SubElement(resp,"Q_abbrev").text=p.abbrev
-            ET.SubElement(resp,"Q_email").text=p.email
-            ET.SubElement(resp,"Q_address").text=p.address
-            ET.SubElement(resp,"Q_uri").text=p.uri
+    def addResp(self,respClass,rootElement,respType):
+        if (respClass) :
+            respElement=ET.SubElement(rootElement,"Q_responsibleParty",{'type':respType})
+            ET.SubElement(respElement,"Q_name").text=respClass.name
+            ET.SubElement(respElement,"Q_webpage").text=respClass.webpage
+            ET.SubElement(respElement,"Q_abbrev").text=respClass.abbrev
+            ET.SubElement(respElement,"Q_email").text=respClass.email
+            ET.SubElement(respElement,"Q_address").text=respClass.address
+            ET.SubElement(respElement,"Q_uri").text=respClass.uri
         #resp=ET.SubElement(comp,'responsibleParty') #type gmd:xxxx
         #ciresp=ET.SubElement(resp,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
         #http://www.isotc211.org/2005/gmd
@@ -256,6 +376,7 @@ class Translator:
 
     def composition(self,c,comp):
         couplings=[]
+        # couplings are all at the esm (root component) level
         if c.isModel:couplings=c.couplings()
         if len(couplings)>0:
             composition=ET.SubElement(comp,'composition')
