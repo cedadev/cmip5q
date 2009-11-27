@@ -174,6 +174,10 @@ def simulationView(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simid=simulation_id)
     return s.view()
 
+def simulationExport(request,centre_id,simulation_id):
+    s=simulationHandler(centre_id,simid=simulation_id)
+    return s.XMLasHTML()
+
 def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)

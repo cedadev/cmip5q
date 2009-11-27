@@ -66,6 +66,8 @@ class simulationHandler(object):
                     args=(self.centreid,s.id,))
             urls['validate']=reverse('cmip5q.protoq.views.simulationValidate',
                     args=(self.centreid,s.id,))
+            urls['export']=reverse('cmip5q.protoq.views.simulationExport',
+                    args=(self.centreid,s.id,))
             urls['view']=reverse('cmip5q.protoq.views.simulationView',
                     args=(self.centreid,s.id,))
             urls['mod']=reverse('cmip5q.protoq.views.assign',
@@ -171,6 +173,13 @@ class simulationHandler(object):
         s=Simulation.objects.get(pk=self.simid)
         xmlDoc=translator.q2cim(s,docType='Simulation')
         return xmlDoc
+
+    def XMLasHTML(self):
+        CIMDoc=self.XML()
+        #docStr=ET.tostring(CIMDoc,"UTF-8")
+        mimetype='application/xml'
+        docStr=ET.tostring(CIMDoc,pretty_print=True)
+        return HttpResponse(docStr,mimetype)
 
     def list(self,request):
         ''' Return a listing of simulations for a given centre '''

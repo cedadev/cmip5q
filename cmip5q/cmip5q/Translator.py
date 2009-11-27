@@ -27,7 +27,8 @@ class Translator:
     def __init__(self):
         ''' Set any initial state '''
         self.recurse=True
-        self.outputComposition=True
+        self.outputComposition=True # aka coupling information
+        self.simClass=None
 
     def cimRoot(self):
         ''' return the top level cim document invarient structure '''
@@ -53,9 +54,23 @@ class Translator:
             ET.SubElement(ensembleElement,'Q_Description').text=ensembleClass.description
             etypeValueElement=ET.SubElement(ensembleElement,'Q_EtypeValue')
             self.addValue(ensembleClass.etype,etypeValueElement)
+            ensMembersElement=ET.SubElement(ensembleElement,'Q_EnsembleMembers')
+            ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
+            for ensMemberClass in ensMemberClassSet :
+                self.addEnsMember(ensMemberClass,ensMembersElement)
+
+    def addEnsMember(self,ensMemberClass,rootElement):
+
+        if ensMemberClass :
+            ensMemberElement=ET.SubElement(rootElement,'Q_EnsembleMember')
+            ET.SubElement(ensMemberElement,'Q_Number').text=str(ensMemberClass.memberNumber)
+            # reference the modification here to avoid replication as it is stored as part of the simulation
+            self.addModificationRef(ensMemberClass.mod,ensMemberElement)
 
     def addSimulation(self,simClass,rootElement):
-        
+
+        #set simClass so that we know to pick up any simulation couplings
+        self.simClass=simClass
         simElement=ET.SubElement(rootElement,'Q_Simulation')
         #Simulation isa Doc
         self.addDoc(simClass,simElement)
@@ -63,8 +78,10 @@ class Translator:
         self.addComponent(simClass.numericalModel,modelElement)
         ET.SubElement(simElement,'Q_EnsembleCount').text=str(simClass.ensembleMembers)
         # add ensemble information from Ensemble class
+        # There should be a one to one mapping but we can not be sure here
         ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
         ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+        assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
         for ensembleClass in ensembleClassSet :
             self.addEnsemble(ensembleClass,ensemblesElement)
         self.addExperiment(simClass.experiment,simElement)
@@ -79,9 +96,19 @@ class Translator:
             self.addInputMod(inputModClass,inputModsElement)
         return rootElement
 
+
+    def addModificationRef(self,modClass,rootElement) :
+        if modClass :
+            modRefElement=ET.SubElement(rootElement,'Q_ModificationRef')
+            modRefElement.append(ET.Comment("I can not find a simple way to determine whether the modification is of type ModelMod or InputMod so I just store the modification name and type here as a reference. We can look up the details of the actual modification as they are stored with the simulation."))
+            ET.SubElement(modRefElement,'Q_Name').text=modClass.mnemonic
+            if modClass.mtype:
+                ET.SubElement(modRefElement,'Q_Type').text=modClass.mtype.value
+
     def addModification(self,modClass,rootElement) :
         if modClass :
             modElement=ET.SubElement(rootElement,'Q_Modification')
+            ET.SubElement(modElement,'Q_Mnemonic').text=modClass.mnemonic
             mtypeValueElement=ET.SubElement(modElement,'Q_MtypeValue')
             self.addValue(modClass.mtype,mtypeValueElement)
             ET.SubElement(modElement,'Q_Description').text=modClass.description
@@ -108,8 +135,14 @@ class Translator:
     def addCouplingRef(self,couplingClass,rootElement):
         if couplingClass :
             couplingElement=ET.SubElement(rootElement,'Q_CouplingRef')
-            couplingElement=ET.SubElement(couplingElement,'Q_InputAbbreviation').text=couplingClass.targetInput.abbrev
-            couplingElement=ET.SubElement(couplingElement,'Q_InputDescription').text=couplingClass.targetInput.description
+            if couplingClass.targetInput:
+                if couplingClass.targetInput.owner:
+                    ET.SubElement(couplingElement,'Q_ComponentName').text=couplingClass.targetInput.owner.abbrev
+                if couplingClass.targetInput.realm:
+                    ET.SubElement(couplingElement,'Q_RealmName').text=couplingClass.targetInput.realm.abbrev
+                ET.SubElement(couplingElement,'Q_AttrName').text=couplingClass.targetInput.abbrev
+                if couplingClass.targetInput.ctype:
+                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.value
 
     def addCentre(self,centreClass,rootElement):
         if centreClass :
@@ -139,6 +172,25 @@ class Translator:
             ET.SubElement(reqElement,'Q_Name').text=reqClass.name
             valueElement=ET.SubElement(reqElement,'Q_CtypeValue')
             self.addValue(reqClass.ctype,valueElement)
+            confElement=ET.SubElement(reqElement,'Q_Conformances')
+
+            confClassSet=Conformance.objects.filter(requirement=reqClass)
+            for confClass in confClassSet:
+                self.addConformance(confClass,confElement)
+        
+    def addConformance(self,confClass,rootElement):
+        if confClass :
+            confElement=ET.SubElement(rootElement,'Q_Conformance')
+            valueElement=ET.SubElement(confElement,'Q_CtypeValue')
+            self.addValue(confClass.ctype,valueElement)
+            modsElement=ET.SubElement(confElement,'Q_ModelModifications')
+            for modClass in confClass.mod.all():
+                # reference the code modification here to avoid replication as it is stored as part of the simulation
+                self.addModificationRef(modClass,modsElement)
+            coupElement=ET.SubElement(confElement,'Q_InputBindings')
+            for coupClass in confClass.coupling.all():
+                self.addCouplingRef(coupClass,coupElement)
+            ET.SubElement(confElement,'Q_Description').text=confClass.description
 
     def addExperiment(self,expClass,rootElement):
         expElement=ET.SubElement(rootElement,'Q_Experiment')
@@ -193,8 +245,8 @@ class Translator:
             ET.SubElement(platElement,'Q_Compiler').text=platClass.compiler
             ET.SubElement(platElement,'Q_Vendor').text=platClass.vendor
             ET.SubElement(platElement,'Q_CompilerVersion').text=platClass.compilerVersion
-            ET.SubElement(platElement,'Q_MaxProcessors').text=platClass.maxProcessors
-            ET.SubElement(platElement,'Q_CoresPerProcessor').text=platClass.coresPerProcessor
+            ET.SubElement(platElement,'Q_MaxProcessors').text=str(platClass.maxProcessors)
+            ET.SubElement(platElement,'Q_CoresPerProcessor').text=str(platClass.coresPerProcessor)
             ET.SubElement(platElement,'Q_OperatingSystem').text=platClass.operatingSystem
             hardwareElement=ET.SubElement(platElement,'Q_HardwareVal')
             self.addValue(platClass.hardware,hardwareElement)
@@ -377,47 +429,58 @@ class Translator:
     def composition(self,c,comp):
         couplings=[]
         # couplings are all at the esm (root component) level
-        if c.isModel:couplings=c.couplings()
+        if c.isModel:couplings=c.couplings(simulation=self.simClass)
         if len(couplings)>0:
-            composition=ET.SubElement(comp,'composition')
+            composeElement=ET.SubElement(comp,'composition')
             for coupling in couplings:
-                connection=ET.SubElement(composition,'coupling')
-                ET.SubElement(connection,'Q_sourceComponent').text=c.abbrev
-                ET.SubElement(connection,'Q_sourceComponent').text=coupling.parent.component.abbrev
-                ET.SubElement(connection,'Q_inputType').text=coupling.targetInput.ctype.value
-                ET.SubElement(connection,'Q_inputAbbrev').text=coupling.targetInput.abbrev
-                ET.SubElement(connection,'Q_inputDescrip').text=coupling.targetInput.description
-                if coupling.targetInput.ctype.value=='BoundaryCondition':
+                CompInpClass=coupling.targetInput
+                assert(CompInpClass,'A Coupling instance must have an associated ComponentInput instance')
+                assert(CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner')
+                assert(CompInpClass.realm,'A Coupling instance must have an associated ComponentInput instance with a valid realm')
+                assert(CompInpClass.ctype,'A Coupling instance must have an associated ComponentInput instance with a valid ctype')
+                couplingElement=ET.SubElement(composeElement,'coupling')
+                ET.SubElement(couplingElement,'Q_sourceComponent').text=CompInpClass.owner.abbrev
+                ET.SubElement(couplingElement,'Q_realmComponent').text=CompInpClass.realm.abbrev
+                ET.SubElement(couplingElement,'Q_inputType').text=CompInpClass.ctype.value
+                ET.SubElement(couplingElement,'Q_inputAbbrev').text=CompInpClass.abbrev
+                ET.SubElement(couplingElement,'Q_inputDescrip').text=CompInpClass.description
+                if CompInpClass.ctype.value=='BoundaryCondition':
                     if (coupling.ctype):
-                        ET.SubElement(connection,'Q_type').text=coupling.ctype.value
+                        ET.SubElement(couplingElement,'Q_type').text=coupling.ctype.value
                     else:
-                        ET.SubElement(connection,'Q_type')
+                        ET.SubElement(couplingElement,'Q_type')
                     if (coupling.FreqUnits):
-                        ET.SubElement(connection,'Q_freqUnits').text=coupling.FreqUnits.value
+                        ET.SubElement(couplingElement,'Q_freqUnits').text=coupling.FreqUnits.value
                     else:
-                        ET.SubElement(connection,'Q_freqUnits')
-                    ET.SubElement(connection,'Q_frequency').text=str(coupling.couplingFreq)
-                    ET.SubElement(connection,'Q_manipulation').text=coupling.manipulation
+                        ET.SubElement(couplingElement,'Q_freqUnits')
+                    ET.SubElement(couplingElement,'Q_frequency').text=str(coupling.couplingFreq)
+                    ET.SubElement(couplingElement,'Q_manipulation').text=coupling.manipulation
                 iClosures=InternalClosure.objects.filter(coupling=coupling)
                 if len(iClosures)>0:
-                    closures=ET.SubElement(connection,'Q_internalClosures')
+                    closures=ET.SubElement(couplingElement,'Q_internalClosures')
                     for iclos in iClosures:
                         closure=ET.SubElement(closures,'Q_closure')
-                        ET.SubElement(closure,'Q_spatialRegridding').text=iclos.spatialRegridding.value
-                        ET.SubElement(closure,'Q_spatialType').text=iclos.spatialType.value
-                        ET.SubElement(closure,'Q_temporalRegridding').text=iclos.temporalRegridding.value
+                        if iclos.spatialRegridding:
+                            ET.SubElement(closure,'Q_spatialRegridding').text=iclos.spatialRegridding.value
+                        if iclos.spatialType:
+                            ET.SubElement(closure,'Q_spatialType').text=iclos.spatialType.value
+                        if iclos.temporalRegridding:
+                            ET.SubElement(closure,'Q_temporalRegridding').text=iclos.temporalRegridding.value
                         ET.SubElement(closure,'Q_inputDescription').text=iclos.inputDescription
-                        ET.SubElement(closure,'Q_target').text=iclos.target.abbrev
+                        if iclos.target:
+                            ET.SubElement(closure,'Q_target').text=iclos.target.abbrev
                 eClosures=ExternalClosure.objects.filter(coupling=coupling)
                 if len(eClosures)>0:
-                    closures=ET.SubElement(connection,'Q_externalClosures')
-                    for eclos in eClosures:
+                    closures=ET.SubElement(couplingElement,'Q_externalClosures')
+                    for ExtClosClass in eClosures:
                         closure=ET.SubElement(closures,'Q_closure')
-                        ET.SubElement(closure,'Q_spatialRegridding').text=eclos.spatialRegridding.value
-                        ET.SubElement(closure,'Q_spatialType').text=eclos.spatialType.value
-                        ET.SubElement(closure,'Q_temporalRegridding').text=eclos.temporalRegridding.value
-                        ET.SubElement(closure,'Q_inputDescription').text=eclos.inputDescription
-                        ET.SubElement(closure,'Q_target').text=eclos.target.variable
+                        ET.SubElement(closure,'Q_spatialRegridding').text=ExtClosClass.spatialRegridding.value
+                        ET.SubElement(closure,'Q_spatialType').text=ExtClosClass.spatialType.value
+                        ET.SubElement(closure,'Q_temporalRegridding').text=ExtClosClass.temporalRegridding.value
+                        ET.SubElement(closure,'Q_inputDescription').text=ExtClosClass.inputDescription
+                        #Data is output separately so reference it at this point
+                        self.addDataRef(ExtClosClass.target,closure)
+                        
                 #coupling=ET.SubElement(composition,'coupling')
                 #ET.SubElement(composition,'description').text='Composition information associated with component '+c.abbrev
                 '''connection'''
@@ -431,4 +494,36 @@ class Translator:
                 #sourceRef=ET.SubElement(source,'reference',{'xlinkXXXhref':'AddLocationHere'})
                 '''couplingTarget'''
                 '''priming'''
+
+    def addDataRef(self,dataObjectClass,rootElement):
+        assert(dataObjectClass,'dataObject should not be null')
+        assert(dataObjectClass.container,'dataContainer should not be null')
+        dataRefElement=ET.SubElement(rootElement,"Q_DataRef")
+        ET.SubElement(dataRefElement,"Q_VariableName").text=dataObjectClass.variable
+        ET.SubElement(dataRefElement,"Q_FileName").text=dataObjectClass.container.name
+
+    def addDataContainer(self,dataContainerClass,rootElement):
+        if dataContainerClass :
+            dataContainerElement=ET.SubElement(rootElement,"Q_dataContainer")
+            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.name
+            ET.SubElement(dataContainerElement,"Q_URL").text=dataContainerClass.link
+            ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
+            formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
+            self.addValue(dataContainerClass.format,formatElement)
+            self.addReferences(dataContainerClass.reference,dataContainerElement)
+            # add any associated data ****************
+            dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
+            dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
+            for dataObjectInstance in dataObjectInstanceSet:
+                self.addDataObject(dataObjectInstance,dataObjectsElement)
+
+    def addDataObject(self,dataObjectClass,rootElement):
+        assert(dataObjectClass,'dataObject should not be null')
+        dataElement=ET.SubElement(rootElement,"Q_DataObject")
+        ET.SubElement(dataElement,"Q_description").text=dataObjectClass.description
+        ET.SubElement(dataElement,"Q_variable").text=dataObjectClass.variable
+        ET.SubElement(dataElement,"Q_cfname").text=dataObjectClass.cftype
+        self.addReferences(dataObjectClass.reference,dataElement)
+        # dataClass.featureType is unused at the moment
+        # dataClass.drsAddress is unused at the moment
 
