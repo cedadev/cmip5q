@@ -40,6 +40,7 @@ class Translator:
 
     def q2cim(self,ref,docType):
 
+        ''' public entry point. I should make all other methods private '''
         method_name = 'add' + str(docType)
         logging.debug("q2cim calling "+method_name)
         method = getattr(self, method_name)
@@ -94,6 +95,14 @@ class Translator:
         inputModsElement=ET.SubElement(simElement,'Q_InputMods')
         for inputModClass in simClass.inputMod.all():
             self.addInputMod(inputModClass,inputModsElement)
+        # add any associated files here for the moment
+        filesElement=ET.SubElement(simElement,'Q_Files')
+        # CouplingGroup does not appear to hold a component or simulations files.
+        # returning all datacontainers (files) associated with this centre
+        filesElement.append(ET.Comment("CouplingGroup does not appear to contain files associated with a component or simulation. Returning all datacontainers (files) associated with this centre as a fallback."))
+        dataContainerInstanceSet=DataContainer.objects.filter(centre=simClass.centre)
+        for dataContainerInstance in dataContainerInstanceSet:
+            self.addDataContainer(dataContainerInstance,filesElement)
         return rootElement
 
 
@@ -334,13 +343,7 @@ class Translator:
         self.addResp(c.contact,resps,'contact')
         '''fundingSource'''
         '''citation'''
-        references=ET.SubElement(comp,'Q_references')
-        for ref in c.references.all():
-            reference=ET.SubElement(references,'Q_reference')
-            ET.SubElement(reference,'Q_name').text=ref.name
-            ET.SubElement(reference,'Q_citation').text=ref.citation
-            ET.SubElement(reference,'Q_link').text=ref.link
-
+        self.addReferences(c.references,comp)
         ''' RF associating genealogy with the component rather than the document '''
         if (nest<=2):
             genealogy=ET.SubElement(comp,'Q_genealogy')
@@ -376,6 +379,17 @@ class Translator:
       else:
         logging.debug("component "+c.abbrev+" has implemented set to false")
       return
+
+    def addReferences(self,references,rootElement):
+        refsElement=ET.SubElement(rootElement,'Q_references')
+        for ref in references.all():
+            self.addReference(ref,refsElement)
+
+    def addReference(self,refInstance,rootElement):
+        refElement=ET.SubElement(rootElement,'Q_reference')
+        ET.SubElement(refElement,'Q_name').text=refInstance.name
+        ET.SubElement(refElement,'Q_citation').text=refInstance.citation
+        ET.SubElement(refElement,'Q_link').text=refInstance.link
 
     def addResp(self,respClass,rootElement,respType):
         if (respClass) :
@@ -510,8 +524,8 @@ class Translator:
             ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
             formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
             self.addValue(dataContainerClass.format,formatElement)
-            self.addReferences(dataContainerClass.reference,dataContainerElement)
-            # add any associated data ****************
+            self.addReference(dataContainerClass.reference,dataContainerElement)
+            # add any associated data
             dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
             dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
             for dataObjectInstance in dataObjectInstanceSet:
@@ -523,7 +537,7 @@ class Translator:
         ET.SubElement(dataElement,"Q_description").text=dataObjectClass.description
         ET.SubElement(dataElement,"Q_variable").text=dataObjectClass.variable
         ET.SubElement(dataElement,"Q_cfname").text=dataObjectClass.cftype
-        self.addReferences(dataObjectClass.reference,dataElement)
+        self.addReference(dataObjectClass.reference,dataElement)
         # dataClass.featureType is unused at the moment
         # dataClass.drsAddress is unused at the moment
 
