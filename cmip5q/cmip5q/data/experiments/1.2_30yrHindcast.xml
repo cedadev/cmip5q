@@ -5,7 +5,7 @@
 	Extend to 30 years the expt. 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. A minimum ensemble size of 3 should be produced for each start date.
 	-->
 	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<description>Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. A minimum ensemble size of 3 should be produced for each start date.</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

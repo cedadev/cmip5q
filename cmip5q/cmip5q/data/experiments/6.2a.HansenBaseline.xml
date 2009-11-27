@@ -6,14 +6,15 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" 
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
-    <rationale> 
-        AMIP-style experiment with control run climatological SSTs and sea ice.
-    </rationale>
-    <Why>
+    
+    <rationale>
         Diagnostic experiment for understanding the long-term simulations.
         Hansen experiment with prescribed SST to diagnose the super fast response to [CO2]. 
-        This is the baseline control for experiment 6.2b_sstClim4xco2 and 6.3_abrupt4xco2 
-    </Why>
+        This is the baseline control for experiment 6.2b and 6.3. 
+    </rationale>
+    <description> 
+        AMIP-style experiment with control run climatological SSTs and sea ice.
+    </description>
     <!--* results for all months including initial transient period
         * for at least 1 year in the first 25 years the following 
         diagnostics must be made:

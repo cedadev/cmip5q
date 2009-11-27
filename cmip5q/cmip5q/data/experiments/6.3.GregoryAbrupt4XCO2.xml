@@ -8,12 +8,14 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     <rationale>
-        Impose an instantaneous quadrupling of CO2, then hold fixed.</rationale>
-    <Why>
         Diagnostic experiment for understanding the long-term simulations.
         Gregory experiment to diagnose slow climate system response to 4X[CO2]
         Perturbation to experiments 6.2a and 6.2b with climate system allowed to respond 
-    </Why>
+    </rationale>
+    <description>
+        Impose an instantaneous quadrupling of CO2, then hold fixed.
+    </description>
+
     <!-- Diagnose "slow" climate rsystem responses to an instantaneous quadrupling of [CO2] in a coupled model. [CO2] is held fixed at 4X.
         * Begin simulation in January
         * Initialise from 3.1.Control

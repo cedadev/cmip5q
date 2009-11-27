@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 
-	<!-- Notes from document:
 
-	Aqua-planet : cloud response to an imposed uniform change in SST.
-
-	Consistent with CFMIP requirements, add a uniform +4K to the zonally uniform SSTs of expt. 6.7a (which is the control for this run).
-
-	-->
 
     <rationale>Aqua-planet : cloud response to an imposed uniform change in SST.</rationale>
+    <description>Consistent with CFMIP requirements, add a uniform +4K to the zonally uniform SSTs of expt. 6.7a (which is the control for this run).</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

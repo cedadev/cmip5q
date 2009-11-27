@@ -11,8 +11,10 @@
 
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+    <rationale>For models that do not have 20th century (experiment 3.2) and other standard runs, a 100 year control integration is required. 
+        Evaluate model drift, transient climate response and ocean heat uptake. Give some idea of the 
+        natural coupled modes of variability in the model. </rationale>
+    <description>Shortened version of the pre-industrial control run (experiment 3.1). </description>
 	
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">

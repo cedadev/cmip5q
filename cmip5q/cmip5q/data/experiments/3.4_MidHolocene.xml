@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <numericalExperiment documentVersion="1" control="true" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 
-<rationale/>
-<why>Compare the paleodata the model response to known orbital forcing changes in greenhouse gas concentrations</why>
+	<rationale>Compare paleodata with the model response to known orbital forcing changes in greenhouse gas concentrations. </rationale>
+	<description>Consistent with PMIP (Paleo Model Intercomparison Project) specifications. 
+		Impose Mid-Holocene (6 kyrs ago) conditions including Orbital parameters and Atmospheric concentrations of well-mixed greenhouse gasses. </description>
 
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">

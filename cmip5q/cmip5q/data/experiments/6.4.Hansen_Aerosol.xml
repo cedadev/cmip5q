@@ -9,8 +9,8 @@
 
 	-->
 
-	<rationale>Pescribed SST experiment to diagnose the "fast" responses to sulfate aerosols (ca. 2000).</rationale>
-	<why/>
+	<rationale>Pescribed SST experiment for Hansen-style diagnosis of the "fast" responses to sulfate aerosols (ca. 2000).</rationale>
+	<description>AMIP-style experiment with control run climatological SSTs and sea ice (as in expt. 6.2a) but with aerosols consistent with conditions in year 2000 of the historical run (expt. 3.2)</description>
 	
     
    <!-- Initial Conditions -->

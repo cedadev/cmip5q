@@ -11,8 +11,8 @@
 
 	-->
 
-	<rationale> Idealized 1% per year increase in CO2 (a shortened version of expt. 6.1).</rationale>
-	<why>Allow an evaluation of model drift, transient climate response, and ocean heat uptake.</why>
+	<rationale>Evaluate model drift, transient climate response, and ocean heat uptake.</rationale>
+	<description> Idealized 1% per year increase in CO2 (a shortened version of expt. 6.1). initialized at year 20 of the control run (3.1-S).</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

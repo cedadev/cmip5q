@@ -7,13 +7,14 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" 
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
+    
     <rationale>
-        Idealized 1% per year increase in CO2 to quadrupling.
-    </rationale>
-    <Why>
         Diagnostic experiment for understanding the long-term simulations.
         Evaluate model response without complications of aerosols, land-use change etc.
-    </Why>
+    </rationale>
+    <description>
+        Idealized 1% per year increase in atmospheric CO2 to quadrupling.
+    </description>
     <!-- Idealized 1%/yr run to 4XCO2
         Evaluate model response without complications of aerosols, land-use change etc.
         * Initialise form 3.1::Control

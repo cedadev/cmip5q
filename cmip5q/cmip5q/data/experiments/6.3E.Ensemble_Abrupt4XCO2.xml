@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 
-	<!-- Notes from document:
-
-	Generate an ensemble of runs as in expt. 6.3, but terminated after year 5. Each ensemble member must be initialized in a different month of the year. [The initial segment of
-expt. 6.3 will serve as the 12th member of this ensemble.]
-
-	-->
 
 	<rationale>Ensemble of runs to improve the estimate of the “fast” climate response diagnosed with the Gregory method.</rationale>
-	<why/>
+	<description>Generate an ensemble of runs as in expt. 6.3, but terminated after year 5. Each ensemble member must be initialized in a different month of the year. [The initial segment of
+		expt. 6.3 will serve as the 12th member of this ensemble.]</description>
 	
     
     <!-- Initial Conditions -->

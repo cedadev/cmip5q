@@ -7,10 +7,10 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     
-    <rationale> Historical simulation (1850 to 2005) as in experiment 3.2_historical 
-        but emissions-forced (with atmospheric CO2 determined by the model itself)</rationale>
-    <Why> Exploring the impact of climate-carbon cycle coupling in 
-        quantifying the carbon cycle feedback during the 20th century. </Why>
+    <rationale> Exploring the impact of climate-carbon cycle coupling in 
+        quantifying the carbon cycle feedback during the 20th century. </rationale>
+    <description> Historical simulation (1850 to 2005) as in experiment 3.2_historical 
+        but emissions-forced (with atmospheric CO2 determined by the model itself)</description>
     <!-- Historical (1850-2005).
         Impose changing conditions (consistent with observations), which may include:
         * atmospheric composition - including [CO2]

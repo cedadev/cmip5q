@@ -6,14 +6,15 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" 
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
+    
     <rationale>
-        As in expt. 6.2a but with quadrupled 4XCO2 imposed.
-    </rationale>
-    <Why>
         Diagnostic experiment for understanding the long-term simulations.
         Hansen experiment to diagnose fast climate system responses to quadrupled CO2.  
         Perturbed run for comparison to experiment 6.2a_sstClim.
-    </Why>
+    </rationale>
+    <description>
+        AMIP-style experiment with control run climatological SSTs and sea ice (as in 6.2a) but with quadrupled 4XCO2 imposed.
+    </description>
     <!-- * Similar to 6.2a.HansenBaseline  
         * But [CO2] is quadrupled  -->    
     

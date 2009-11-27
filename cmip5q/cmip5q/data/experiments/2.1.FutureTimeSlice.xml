@@ -7,8 +7,8 @@
 	
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale>Explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<description>Simulation of a future decade covering the years 2026-2035, with prescribed SSTs and sea ice concentration anomalies (relative to expt. 3.3). </description>
 	
 
 	<!-- Initial Conditions -->

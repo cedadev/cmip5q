@@ -7,8 +7,8 @@
 
 	-->
 
-    <rationale>Aqua-planet : control run. Consistent with CFMIP requirements, impose zonally uniform SSTs on a planet without continents.</rationale>
-	<why/>
+    <rationale>Aqua-planet : control run.</rationale>
+    <description>Consistent with CFMIP requirements, impose zonally uniform SSTs on a planet without continents.</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
