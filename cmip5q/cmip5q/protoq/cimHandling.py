@@ -61,23 +61,43 @@ class Validator:
         return self.cimHtml
     
     def __validateComponent(self,CIMdoc):
-        ''' Validate a Component '''
-        sct_doc = ET.parse(os.path.join(self.XSLdir,"BasicChecks.sch"))
-        #schematron = ET.Schematron(sct_doc)
-        #if schematron.validate(CIMdoc):
-        #  logging.debug("CIM Document passes the schematron tests")
-        #else:
-        #  logging.debug("CIM Document fails the schematron tests")
+        ''' Validation for a Component '''
 
-        #obtain schematron report in html
-        xslt_doc = ET.parse(os.path.join(self.XSLdir,"schematron-report.xsl"))
-        transform = ET.XSLT(xslt_doc)
-        xslt_doc = transform(sct_doc)
-        transform = ET.XSLT(xslt_doc)
-        self.report = transform(CIMdoc)
-        # find out how many errors and checks there were and set my state appropriately
-        self.nChecks=len(self.report.xpath('//check'))
-        self.nInvalid=len(self.report.xpath('//invalid'))
+        # perform any common validation
+        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"CommonChecks.sch")
+        self.report=report
+        self.nChecks=nChecks
+        self.nInvalid=nInvalid
+        # perform any component specific validation
+        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"ComponentChecks.sch")
+        # add these results to the existing results
+        reportRoot=self.report.getroot()
+        reportRoot.append(report.getroot())
+        self.nChecks+=nChecks
+        self.nInvalid+=nInvalid
+        # calculate any derived state
+        self.__updateState()
+
+    def __validateSimulation(self,CIMdoc):
+        ''' Validation for a Simulation '''
+
+        # perform any simulation specific validation
+        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"SimulationChecks.sch")
+        self.report=report
+        self.nChecks=nChecks
+        self.nInvalid=nInvalid
+        # perform any common validation
+        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"CommonChecks.sch")
+        # add these results to the existing results
+        reportRoot=self.report.getroot()
+        reportRoot.append(report.getroot())
+        self.nChecks+=nChecks
+        self.nInvalid+=nInvalid
+        # calculate any derived state
+        self.__updateState()
+
+    def __updateState(self):
+
         if self.nChecks>0:
             self.percentComplete=str(((self.nChecks-self.nInvalid)*100.0)/self.nChecks)
         else:
@@ -87,20 +107,38 @@ class Validator:
         else:
             self.valid=True
 
-        #also generate the cim as html
+    def __CimAsHtml(self,CIMdoc):
+        ''' generate the cim as html '''
+
+        # first format it using xmlformat.xsl
         xslt_doc = ET.parse(os.path.join(self.XSLdir,"xmlformat.xsl"))
         transform = ET.XSLT(xslt_doc)
         formattedCIMdoc = transform(CIMdoc)
+        # next translate it into html using verbid.xsl
         xslt_doc = ET.parse(os.path.join(self.XSLdir,"verbid.xsl"))
         transform = ET.XSLT(xslt_doc)
-        self.cimHtml = transform(formattedCIMdoc)
-    
+        cimHtml = transform(formattedCIMdoc)
+        return cimHtml
+
+    def __SchematronValidate(self,CIMdoc,SchematronFile,SchematronReport="schematron-report.xsl"):
+        ''' Validation common to both Component and Simulation '''
+        sct_doc = ET.parse(os.path.join(self.XSLdir,SchematronFile))
+        #obtain schematron error report in html
+        xslt_doc = ET.parse(os.path.join(self.XSLdir,SchematronReport))
+        transform = ET.XSLT(xslt_doc)
+        xslt_doc = transform(sct_doc)
+        transform = ET.XSLT(xslt_doc)
+        report = transform(CIMdoc)
+        # find out how many errors and checks there were
+        nChecks = len(report.xpath('//check'))
+        nInvalid = len(report.xpath('//invalid'))
+        return report,nChecks,nInvalid
 
     def validateFile(self,fileName):
         tmpDoc=ET.parse(file)
         self.validateDoc(tmpDoc)
 
-    def validateDoc(self,CIMdoc,cimtype='component'):
+    def validateDoc(self,CIMdoc,cimtype=''):
         ''' This method validates a CIM document '''
         #validate against schema
         if self.schemaValidate:
@@ -117,7 +155,12 @@ class Validator:
 
         if self.contentValidate:
             #validate against schematron checks
-            if cimtype=='component':
+            if cimtype=='Component':
                 self.__validateComponent(CIMdoc)
-      
-       
+            elif cimtype=='Simulation':
+                self.__validateSimulation(CIMdoc)
+            else:
+                raise ValueError('Invalid validation type found')
+
+        # create an html representation of our document
+        self.cimHtml=self.__CimAsHtml(CIMdoc)

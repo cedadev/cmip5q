@@ -230,7 +230,7 @@ class componentHandler(object):
     def validate(self):
         ''' Validate model '''
         validator=Validator()
-        validator.validateDoc(self.XML(allModel=True,recurse=True,composition=True))
+        validator.validateDoc(self.XML(allModel=True,recurse=True,composition=True),'Component')
         errorsHtml=validator.errorsAsHtml()
         cimHtml=validator.xmlAsHtml()
         self.component.validErrors=validator.nInvalid

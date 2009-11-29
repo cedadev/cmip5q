@@ -148,7 +148,7 @@ class simulationHandler(object):
     def validate(self):
         ''' Is this simulation complete? '''
         validator=Validator()
-        validator.validateDoc(self.XML())
+        validator.validateDoc(self.XML(),'Simulation')
         errorsHtml=validator.errorsAsHtml()
         cimHtml=validator.xmlAsHtml()
         s=Simulation.objects.get(pk=self.simid)
