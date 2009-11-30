@@ -115,11 +115,10 @@
         <td>{{i.ctype}}</td><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
         {% endfor %} 
         </table>
-        <p class="guidance"> Update this list using the "Runtime Inputs" button </p>
+        <p class="guidance"> Update this list using the "Inputs Needed" button </p>
         {% if isRealm %}
-        <p> You may find that the inputs don't match onto the components described below
-        this level in the heirarchy. If so, please identify relevant cross-component inputs at
-        the level of this "realm" component, using the "Runtime Requirements" button.</p>
+        <p> It is possible that the components below this "realm" do not provide a sensible place to
+        put all the scientifically important inputs which might be required by this realm. If so, please describe them here!</p>
         {% endif %}   
     </div>
     {% endif %}
