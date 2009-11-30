@@ -6,8 +6,8 @@
 	The chemistry/aerosol community plans to put together experiments with short-lived species and pollutants (probably two to three years hence)
 	-->
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale>The chemistry/aerosol community plans to put together experiments with short-lived species and pollutants (probably two to three years hence).</rationale>
+	<description>Experiment not yet formulated. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

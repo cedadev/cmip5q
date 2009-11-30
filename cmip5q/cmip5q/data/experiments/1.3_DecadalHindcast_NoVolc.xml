@@ -7,8 +7,9 @@
 	“possible impact of volcano”. These runs could either all be 10 years long, or the 1960 and 1980 runs could be 30 years to assess the longer term impact of the volcanoes.
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale>Assess the impact of volcanic eruptions on decadal predictions.  </rationale>
+	<description>Additional runs for experiment 1.1 from 1960, 1975, 1980, 1985 and 1990 without including the Agung, El Chichon and Pinatubo eruptions.
+		These runs could either all be 10 years long, or the 1960 and 1980 runs could be 30 years to assess the longer term impact of the volcanoes.</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

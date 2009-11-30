@@ -5,8 +5,8 @@
 	Repeat of the 1.1 2005 forecast with an imposed “Pinatubo” eruption in 2010
 	-->
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why>To assess the climatic impact of a pinutubo-style volcanic eruption in the near-future</why>
+	<rationale>Assess the climatic impact of a pinutubo-style volcanic eruption in the near-future. </rationale>
+	<description>Repeat of the experiment 1.1 2005 forecast with an imposed “Pinatubo” eruption in 2010. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

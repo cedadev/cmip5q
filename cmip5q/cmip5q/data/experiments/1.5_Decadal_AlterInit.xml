@@ -7,8 +7,8 @@
 	Comparison of initialization strategies - for example, a repeat of runs (1.1) using an alternate initialization strategy or alternate initial data
 	-->
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale>Comparison of initialization strategies, since there is at present no generally accepted “best” way to initialize models. </rationale>
+	<description>Comparison of initialization strategies - for example, a repeat of experiment 1.1 using an alternate initialization strategy or alternate initial data. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">

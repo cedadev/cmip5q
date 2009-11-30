@@ -5,8 +5,9 @@
 	As in 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era
 	-->
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state (from 'A Summary of the CMIP5 Experiment Design' by Karl Taylor et al. 2008)</rationale>
-	<why/>
+	<rationale> To explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<description>As in experiments 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era
+	</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
