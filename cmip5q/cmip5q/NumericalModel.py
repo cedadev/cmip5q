@@ -40,7 +40,7 @@ class NumericalModel:
         if klass != Centre:
             raise ValueError('Need a valid django centre class for NumericalModel, got %s'%klass)
         self.centre=centre
-        self.joe=ResponsibleParty.objects.filter(centre=centre).get(name='Unknown')
+        self.joe=ResponsibleParty.objects.filter(centre=centre)[0]
         
         if id==0: xml=True
         if xml and id<>0:

@@ -117,7 +117,7 @@ class MyCouplingFormSet:
                 centre_id=self.model.centre.id
                 cf.icreset=ClosureReset(centre_id,simulation.id,q,'ic')
                 cf.ecreset=ClosureReset(centre_id,simulation.id,q,'ec')
-            title='Coupling into: %s'%q.targetInput
+            title='Binding for: %s'%q.targetInput
             if self.simulation: title+=' for simulation %s'%self.simulation
             for key in self.couplingVocabs:
                 cf.fields[key].queryset=self.couplingVocabs[key]

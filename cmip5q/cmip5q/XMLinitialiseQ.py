@@ -69,6 +69,10 @@ VocabList={'Realms':
 
     #ensembleTypes
     'EnsembleTypes':('Differing Start Date','Differing Initialisation','Perturbed Physics'),
+    
+    #calendarTypes
+    'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
+    
     }
 
 def reloadVocab(key):

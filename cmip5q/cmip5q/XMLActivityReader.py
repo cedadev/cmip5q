@@ -2,6 +2,7 @@ from protoq.models import *
 from xml.etree import ElementTree as ET
 import uuid
 import logging
+import unittest
 
 cimv='http://www.metaforclimate.eu/cim/1.1'
 typekey='{http://www.w3.org/2001/XMLSchema-instance}type'
@@ -18,7 +19,7 @@ def getText2(elem,path):
     if e is None: 
         return '' 
     else: return e.text or ''
-
+    
 class numericalRequirement:
     def __init__(self,elem):
         self.description=getText(elem,'description')
@@ -48,45 +49,66 @@ class numericalRequirement:
         n.save()
         return n.id
 
-class NumericalExperiment:
+class Duration(object):
+    def __init__(self,elem):
+        if elem is None:
+            self.start,self.end,self.lengthYears=None,None,None
+        else:
+            self.start=getText(elem,'startDate')
+            self.end=getText(elem,'endDate')
+            self.length=getText(elem,'lengthYears')
+            if self.length=='': self.length=None
+        
+def calendar(elem):
+    cvalues=Value.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
+    cnames=[str(i) for i in cvalues]
+    if elem:
+        cc=elem[0].tag.split('}')[1]
+        if cc in cnames:
+            return cvalues.get(value=cc)
+        else:
+            logging.info('Did not find calendar type '+cc) 
+    else:
+        logging.debug('Could not find calendar')
+    return None
+
+class NumericalExperiment(object):
     ''' Handles the reading of a numerical experiment, and the insertion into the django db '''
     
     def __init__(self,filename):
-        ''' Reads CIM V1.0 format numerical experiments '''
-        self.etree=ET.parse(filename)
-        logging.debug('Parsing filename %s'%filename)
-	self.root=self.etree.getroot() 
+        ''' Reads CIM format numerical experiments '''
         
-        self.rationale=getText(self.root,'rationale')
-        self.why=getText(self.root,'Why')
+        self.etree=ET.parse(filename)
+        logging.debug('Parsing experiment filename %s'%filename)
+	
+        self.root=self.etree.getroot() 
+        
+        for element in ['rationale','description','shortName','longName']:
+            self.__setattr__(element,getText(self.root,element))
         
         self.numericalRequirements=[]
-        
         for r in self.root.findall('{%s}numericalRequirement'%cimv):
             n=numericalRequirement(r)
             if n.id<>'':self.numericalRequirements.append(n)
             
-        (s,e)=('{%s}requiredDuration/{%s}startDate'%(cimv,cimv),
-                '{%s}requiredDuration/{%s}endDate'%(cimv,cimv))
-                
-        self.duration=[getText2(self.root,i) for i in (s,e)]
-                      
+        self.duration=Duration(self.root.find('{%s}requiredDuration'%cimv))
+        self.calendar=calendar(self.root.find('{%s}calendar'%cimv))
         self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
-        self.shortName=getText(self.root,'shortName')
-        self.longName=getText(self.root,'longName')
-        logging.debug('Experiment %s has %s requirements'%(self.shortName,len(self.numericalRequirements)))
-   
+
+        
     def load(self):
         ''' Loads information into the django database '''
         
         E=Experiment(rationale=self.rationale,
-                     why=self.why,
+                     description=self.description,
                      docID=self.docID,
                      shortName=self.shortName,
-                     startDate=self.duration[0],
-                     endDate=self.duration[1])
-        if self.longName is not None: E.longName=self.longName
-        
+                     startDate=self.duration.start,
+                     endDate=self.duration.end,
+                     length=self.duration.length,
+                     longName=self.longName,
+                     calendar=self.calendar,
+                     )     
         E.save()   # we need to do this before we can have a manytomany field instance
         
         #Do all the numerical requirements.
@@ -94,20 +116,15 @@ class NumericalExperiment:
         
         for r in self.numericalRequirements:
             rid=r.load()
-            E.requirements.add(rid)
-        
+            E.requirements.add(rid) 
         E.save()
-       
         return E.id
-
-if __name__=="__main__":
-    import sys
-    logging.basicConfig(
-    level = logging.INFO,
-    format = '%(asctime)s %(levelname)s %(message)s',)
-    filename=sys.argv[1]
-    x=NumericalExperiment(filename)
         
+class TestFunctions(unittest.TestCase): 
+    def testExperiment(self):
+        d='data/experiments/'
+        filename='6.7b_Aquaplanet_4CO2.xml'
+        x=NumericalExperiment(d+filename)
         
             
         

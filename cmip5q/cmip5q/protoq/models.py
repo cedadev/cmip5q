@@ -217,13 +217,15 @@ class Platform(Doc):
 class Experiment(models.Model):
     ''' A CMIP5 Experiment '''
     rationale=models.TextField(blank=True,null=True)
-    why=models.TextField(blank=True,null=True)
+    description=models.TextField(blank=True,null=True)
     requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
     docID=models.CharField(max_length=128)
     shortName=models.CharField(max_length=64)
     longName=models.CharField(max_length=256,blank=True,null=True)
-    startDate=models.CharField(max_length=32)
-    endDate=models.CharField(max_length=32)
+    startDate=models.CharField(max_length=32,blank=True,null=True)
+    endDate=models.CharField(max_length=32,blank=True,null=True)
+    length=models.FloatField(blank=True,null=True)
+    calendar=models.ForeignKey('Value',blank=True,null=True)
     def __unicode__(self):
         return self.shortName
     class Meta:
