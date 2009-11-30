@@ -204,16 +204,18 @@ class Translator:
     def addExperiment(self,expClass,rootElement):
         expElement=ET.SubElement(rootElement,'Q_Experiment')
         ET.SubElement(expElement,'Q_Rationale').text=expClass.rationale
-        ET.SubElement(expElement,'Q_Why').text=expClass.why
+        ET.SubElement(expElement,'Q_Description').text=expClass.description
         reqsElement=ET.SubElement(expElement,'Q_NumericalRequirements')
         for reqClass in expClass.requirements.all():
             self.addRequirement(reqClass,reqsElement)
         ET.SubElement(expElement,'Q_DocID').text=expClass.docID
         ET.SubElement(expElement,'Q_ShortName').text=expClass.shortName
         ET.SubElement(expElement,'Q_LongName').text=expClass.longName
-        ET.SubElement(expElement,'Q_StartDate').text=expClass.startDate
-        ET.SubElement(expElement,'Q_EndDate').text=expClass.endDate
-        
+        durationElement=ET.SubElement(expElement,'Q_Duration')
+        ET.SubElement(durationElement,'Q_StartDate').text=expClass.startDate
+        ET.SubElement(durationElement,'Q_EndDate').text=expClass.endDate
+        ET.SubElement(durationElement,'Q_length').text=str(expClass.length)
+        ET.SubElement(durationElement,'Q_calendar').text=str(expClass.calendar)
 
     def setComponentOptions(self,recurse,composition):
 
@@ -386,6 +388,7 @@ class Translator:
             self.addReference(ref,refsElement)
 
     def addReference(self,refInstance,rootElement):
+        if refInstance is None: return
         refElement=ET.SubElement(rootElement,'Q_reference')
         ET.SubElement(refElement,'Q_name').text=refInstance.name
         ET.SubElement(refElement,'Q_citation').text=refInstance.citation
