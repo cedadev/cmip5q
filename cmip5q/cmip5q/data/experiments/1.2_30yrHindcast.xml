@@ -4,10 +4,10 @@
 	<!-- Notes from document:
 	Extend to 30 years the expt. 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. A minimum ensemble size of 3 should be produced for each start date.
 	-->
-	<rationale> 
+	<rationale> Ensembles of 30-year hindcasts and predictions.
 		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
 		influence. </rationale>
-	<description>30-year hindcast/prediction. Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. 
+	<description>Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. 
 		A minimum ensemble size of 3 should be produced for each start date.</description>
 	
 	<!-- Initial Conditions -->

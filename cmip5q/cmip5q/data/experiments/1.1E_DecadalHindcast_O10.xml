@@ -5,7 +5,9 @@
 	Additional runs to expand each ensemble to a size of O(10). <<in this case 1.1>>
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<rationale>Increase ensemble size of experiment 1.1, 10-year hindcasts and predictions.
+		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
+		influence. </rationale>
 	<description>Additional runs for experiment 1.1 to expand each ensemble to a size of O(10). </description>
 	
 	<!-- Initial Conditions -->
@@ -162,10 +164,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.1E Decadal
+		1.1-E decadalXXXX
 	</shortName>
     <longName> 
-    	10-year prediction - O(10) ensemble 
+    	1.1-E 10-year hindcast/prediction initialized in year XXXX - O(10) ensemble 
 	</longName>
 	
      <calendar>

@@ -5,8 +5,10 @@
 	As in 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era
 	-->
 	
-	<rationale> To explore the degree to which future climate states depend on the initial climate state. </rationale>
-	<description>As in experiments 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era
+	<rationale> Initialize 10-year simulations from additional start dates annually in 2000s. 
+		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
+		influence.</rationale>
+	<description>As in experiments 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era.
 	</description>
 	
 	<!-- Initial Conditions -->
@@ -163,10 +165,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.1I Decadal
+		1.1-I decadalXXXX
 	</shortName>
     <longName> 
-		10-year prediction - additional start dates
+    	1.1-I 10-year hindcast/prediction initialized in year XXXX - additional start dates
 	</longName>
      
     <calendar>
