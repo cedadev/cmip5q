@@ -30,11 +30,12 @@
 	-->
 
 	<rationale> 
-		To assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
+		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
 		influence. 
 	</rationale>
 		
-	<description>The atmospheric composition (and other conditions) should 
+	<description>Decadal Hindcast/Prediction.
+		The atmospheric composition (and other conditions) should 
 		be prescribed as in the historical run (expt. 3.2) and the RCP4.5 scenario (expt. 4.1) of the long-term suite of experiments.
 		Ocean initial conditions should be in some way representative of the observed anomalies or full fields for the start date. 
 		Land, sea-ice and atmosphere initial conditions are left to the discretion of each group.</description>
@@ -193,10 +194,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.1 Decadal
+		1.1 decadalXXXX
 	</shortName>
     <longName> 
-		10-year prediction
+		1.1 10-year hindcast/prediction initialized in year XXXX
 	</longName>
     
     <calendar>

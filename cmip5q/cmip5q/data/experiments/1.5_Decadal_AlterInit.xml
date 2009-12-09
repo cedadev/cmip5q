@@ -8,7 +8,7 @@
 	-->
 	
 	<rationale>Comparison of initialization strategies, since there is at present no generally accepted “best” way to initialize models. </rationale>
-	<description>Comparison of initialization strategies - for example, a repeat of experiment 1.1 using an alternate initialization strategy or alternate initial data. </description>
+	<description>Decadal hindcast/prediction. Comparison of initialization strategies - for example, a repeat of experiment 1.1 using an alternate initialization strategy or alternate initial data. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -170,10 +170,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.5 Decadal-i
+		1.5 decadalXXXX
 	</shortName>
     <longName> 
-		Initialization alternatives
+		1.5 decadal hindcast/forecast utilizing alternative initializations and initialized in year XXXX.
 	</longName>
      
     <calendar>

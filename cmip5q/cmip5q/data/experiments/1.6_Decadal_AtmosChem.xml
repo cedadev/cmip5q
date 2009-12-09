@@ -7,7 +7,7 @@
 	-->
 	
 	<rationale>The chemistry/aerosol community plans to put together experiments with short-lived species and pollutants (probably two to three years hence).</rationale>
-	<description>Experiment not yet formulated. </description>
+	<description>Near-term runs with enhanced chemistry/aerosol models. Precise experiment not yet formulated. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -26,7 +26,7 @@
 	<shortName>
 		1.6 Chemistry
 	</shortName>
-    <longName> Chemistry-focused runs</longName>
+    <longName>1.6 Chemistry-focused runs</longName>
      
     <calendar>
 		<daily-360/>

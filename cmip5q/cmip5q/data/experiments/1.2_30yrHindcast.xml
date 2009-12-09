@@ -4,8 +4,11 @@
 	<!-- Notes from document:
 	Extend to 30 years the expt. 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. A minimum ensemble size of 3 should be produced for each start date.
 	-->
-	<rationale> To explore the degree to which future climate states depend on the initial climate state. </rationale>
-	<description>Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. A minimum ensemble size of 3 should be produced for each start date.</description>
+	<rationale> 
+		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
+		influence. </rationale>
+	<description>30-year hindcast/prediction. Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. 
+		A minimum ensemble size of 3 should be produced for each start date.</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -166,10 +169,10 @@
     </numericalRequirement>
 
 	<shortName>
-		1.2 Decadal
+		1.2 decadalXXXX
 	</shortName>
     <longName> 
-		30-year prediction
+		1.2 30-year prediction/hindcast initialized in year XXXX.
 	</longName>
      
     <calendar>

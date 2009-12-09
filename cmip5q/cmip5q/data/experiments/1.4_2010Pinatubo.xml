@@ -6,7 +6,7 @@
 	-->
 	
 	<rationale>Assess the climatic impact of a pinutubo-style volcanic eruption in the near-future. </rationale>
-	<description>Repeat of the experiment 1.1 2005 forecast with an imposed “Pinatubo” eruption in 2010. </description>
+	<description>Pinatubo-like eruption imposed. Repeat of the experiment 1.1 2005 forecast with an imposed “Pinatubo” eruption in 2010. </description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -174,10 +174,10 @@
 	
 	
 	<shortName>
-		1.4 Volcano 2010
+		1.4 volcano2010
 	</shortName>
     <longName> 
-		prediction with 2010 volcano
+		1.4 decadal prediction with 2010 volcano
 	</longName>
      
     <calendar>
