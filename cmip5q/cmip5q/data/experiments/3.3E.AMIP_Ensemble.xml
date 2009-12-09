@@ -7,7 +7,7 @@
 	
 	-->
 
-	<rationale> To explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<rationale>AMIP ensemble. To explore the degree to which future climate states depend on the initial climate state. </rationale>
 	<description>Additional AMIP runs (expt. 3.3) but with different initial conditions imposed on the atmosphere and possibly also the land surface. 
 		Yield an ensemble of size ≥3. </description>
 	
@@ -116,10 +116,10 @@
 	
 		
 	<shortName>
-		3.3E AMIP
+		3.3-E amip
 	</shortName>
     <longName> 
-		AMIP Ensemble
+		3.3-E AMIP Ensemble
 	</longName>
      
     <calendar>

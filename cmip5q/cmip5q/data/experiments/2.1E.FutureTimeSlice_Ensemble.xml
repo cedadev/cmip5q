@@ -7,7 +7,7 @@
 	
 	-->
 
-	<rationale> Explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<rationale>2030 time-slice ensemble. Explore the degree to which future climate states depend on the initial climate state. </rationale>
 	<description>Additional expt. 2.1 runs but with different initial conditions imposed on the atmosphere, sea-ice and ocean and possibly also the land). Yield an ensemble of size ≥3. 
 		The changes in climatological SSTs and sea-ice used in prescribing the SST and sea-ice in these extended time-slice runs should, 
 		when available, be taken from more than one pair of coupled atmosphere/ocean model runs.</description>

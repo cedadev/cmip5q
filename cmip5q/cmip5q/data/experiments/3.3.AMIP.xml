@@ -7,7 +7,7 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     
-    <rationale>Baseline simulation for model evaluation.</rationale>
+    <rationale>AMIP. Baseline simulation for model evaluation.</rationale>
     <description>AMIP (1979 - at least 2008).
         Impose SSTs and sea ice from observations but with other conditions as in experiment 3.2 historical.
     </description>
@@ -103,10 +103,10 @@
     </numericalRequirement>
     
     <shortName>
-		3.3 AMIP
+		3.3 amip
 	</shortName>
     <longName>
-		AMIP
+		3.3 AMIP
 	</longName>
     
     <Calendar>

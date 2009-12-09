@@ -11,7 +11,7 @@
 
 	-->
 
-    <rationale>For models that do not have 20th century (experiment 3.2) and other standard runs, a 100 year control integration is required. 
+    <rationale>Pre-Industrial Control. For models that do not have 20th century (experiment 3.2) and other standard runs, a 100 year control integration is required. 
         Evaluate model drift, transient climate response and ocean heat uptake. Give some idea of the 
         natural coupled modes of variability in the model. </rationale>
     <description>Shortened version of the pre-industrial control run (experiment 3.1). </description>
@@ -76,10 +76,10 @@
     </numericalRequirement>
 	    
 	<shortName>
-		3.1S PI control
+		3.1-S piControl
 	</shortName>
     <longName> 
-		pre-industrial control - shortened
+		3.1-S pre-industrial control - shortened
 	</longName>
 	
     <calendar>

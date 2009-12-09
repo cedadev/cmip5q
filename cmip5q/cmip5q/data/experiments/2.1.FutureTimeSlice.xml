@@ -7,7 +7,7 @@
 	
 	-->
 
-	<rationale>Explore the degree to which future climate states depend on the initial climate state. </rationale>
+	<rationale>2030 time-slice. Explore the degree to which future climate states depend on the initial climate state. </rationale>
 	<description>Simulation of a future decade covering the years 2026-2035, with prescribed SSTs and sea ice concentration anomalies (relative to expt. 3.3). </description>
 	
 
@@ -86,10 +86,10 @@
     </numericalRequirement>
 	
 	<shortName>
-		2.1 SST-2030
+		2.1 sst2030
 	</shortName>
     <longName> 
-		2030 time-slice
+		2.1 2030 time-slice
 	</longName>
      
     <calendar>
