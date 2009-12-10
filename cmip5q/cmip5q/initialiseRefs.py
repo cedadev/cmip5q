@@ -5,7 +5,7 @@ import logging
 
 def initialiseRefs():
     ''' This routine initialises the database with some obvious files for boundary conditoins etc '''
-    CSVinfo = csv.reader(open('Refs_CSV.csv'), delimiter=';', quotechar='|')
+    CSVinfo = csv.reader(open('data/References/Refs_CSV.csv'), delimiter=';', quotechar='|')
     # this is the vocab that we always use for reference types:
     v=Vocab.objects.get(name='ReferenceTypes')
     # loop over all rerences in spreadsheet
