@@ -80,8 +80,8 @@
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
     </numericalRequirement>
     
-    <shortName>4.2 RCP-8.5</shortName>
-    <longName>RCP8.5</longName>
+    <shortName>4.2 rcp85</shortName>
+    <longName>4.2 RCP8.5</longName>
     
     <Calendar>
         <realCalendar/>
