@@ -74,10 +74,10 @@
     </numericalRequirement>
     
     <shortName>
-		6.2a SST Clim
+		6.2a sstClim
 	</shortName>
     <longName>
-		Control SST Climatology
+		6.2a Control SST Climatology
 	</longName>
     
     <Calendar>

@@ -55,10 +55,10 @@
     </numericalRequirement> 
     
     <shortName>
-		6.2b SST Clim 4xCO2
+		6.2b sstClim4xco2
 	</shortName>
     <longName>
-		SST Climatology With 4XCO2 Forcing
+		6.2b SST Climatology With 4XCO2 Forcing
 	</longName>
     
     <Calendar>

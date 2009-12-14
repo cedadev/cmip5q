@@ -72,7 +72,7 @@
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">	
-		<id xsi:type="Identifier">bc.098</id>
+		<id xsi:type="Identifier">bc.098a</id>
 		<name>5.5-1.bc.rad </name>
 		<description>Forced with prescribed CO2 concentrations following spin off 
 		    from the control (expt. 3.1) at the same point as expt. 6.1 and impose 

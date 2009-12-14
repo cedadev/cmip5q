@@ -27,10 +27,10 @@
     </numericalRequirement> 
     
 	<shortName>
-		6.3E abrupt 4xCO2
+		6.3-E abrupt4xco2
 	</shortName>
     <longName> 
-		Abrupt 4XCO2 - Ensemble
+		6.3-E Abrupt 4XCO2 - Ensemble
 	</longName>
      
     <calendar>
