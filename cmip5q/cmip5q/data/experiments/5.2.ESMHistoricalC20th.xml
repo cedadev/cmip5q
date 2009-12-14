@@ -7,7 +7,7 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     
-    <rationale> Exploring the impact of climate-carbon cycle coupling in 
+    <rationale>ESM historical. Explore the impact of climate-carbon cycle coupling in 
         quantifying the carbon cycle feedback during the 20th century. </rationale>
     <description> Historical simulation (1850 to 2005) as in experiment 3.2_historical 
         but emissions-forced (with atmospheric CO2 determined by the model itself)</description>
@@ -79,10 +79,10 @@
     </numericalRequirement>
     
     <shortName>
-		5.2 ESM historical
+		5.2 esmHistorical
 	</shortName>
     <longName>
-		ESM historical
+		5.2 ESM historical
 	</longName>
     
     <Calendar>

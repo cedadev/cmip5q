@@ -7,82 +7,88 @@
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.001</id>
-        <name>5.5.ic</name>
+        <name>5.5-1.ic</name>
         <description>A description of initial condition for the control run </description>
     </numericalRequirement>
     
 	<!-- Boundary Conditions -->
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.001</id>
-        <name>5.5.bc.wmg.conc</name>
+        <name>5.5-1.bc.wmg.conc</name>
         <description>Prescribed atmospheric concentrations of pre-industrial well mixed gases:
             excluding CO2</description>
     </numericalRequirement>
         
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.003</id>
-        <name>5.5.bc.sls.conc</name>
+        <name>5.5-1.bc.sls.conc</name>
         <description>Prescribed atmospheric concentration of pre-industrial short lived (reactive)
             gas species</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.004</id>
-        <name>5.5.bc.nat_aer.conc</name>
+        <name>5.5-1.bc.nat_aer.conc</name>
         <description>Prescribed concentrations of pre-industrial natural aerosols</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.005</id>
-        <name>5.5.bc.nat_aer_precur.conc</name>
+        <name>5.5-1.bc.nat_aer_precur.conc</name>
         <description>Prescribed concentrations of pre-industrial natural aerosol
             precursors</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.006</id>
-        <name>5.5.bc.sl_aer.conc</name>
+        <name>5.5-1.bc.sl_aer.conc</name>
         <description>Prescribed concentrations of pre-industrial short lived (reactive) aerosol
             species</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.007</id>
-        <name>5.5.bc.nat_aer.em</name>
+        <name>5.5-1.bc.nat_aer.em</name>
         <description>Prescribed emissions of pre-industrial natural aerosols</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.008</id>
-        <name>5.5.bc.nat_aer_precur.em</name>
+        <name>5.5-1.bc.nat_aer_precur.em</name>
         <description>Prescribed emissions of pre-industrial natural aerosol precursors</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.009</id>
-        <name>5.5.bc.sl_aer.em</name>
+        <name>5.5-1.bc.sl_aer.em</name>
         <description>Prescribed emissions of pre-industrial short lived (reactive) aerosol
             species</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.010</id>
-        <name>5.5.bc.LandUse</name>
+        <name>5.5-1.bc.LandUse</name>
         <description>Unperturbed Pre-Industrial Land Use</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">	
 		<id xsi:type="Identifier">bc.098</id>
-		<name>5.5.bc.rad </name>
-		<description>Forced with prescribed CO2 concentrations following either (1) spin off from the control (expt. 3.1) at the same point as expt. 6.1 and impose conditions identical to the control except that the carbon cycle &quot;sees&quot; atmospheric CO2 concentration increase at a rate of 1%/yr (as in expt. 6.1)or ( 2) spin off from the control (expt. 3.1) at the same point as expt. 3.2 and impose conditions identical to the control except that only the radiation code &quot;sees&quot; increasing atmospheric CO2 concentrations that are identical to those prescribed in expt. 3.2 (for the historical period) and expt. 4.1 (RCP4.5 for the future). For both the carbon cycle responds to the climate change alone</description>
+		<name>5.5-1.bc.rad </name>
+		<description>Forced with prescribed CO2 concentrations following spin off 
+		    from the control (expt. 3.1) at the same point as expt. 6.1 and impose 
+		    conditions identical to the control except that the carbon cycle 
+		    &quot;sees&quot; atmospheric CO2 concentration increase at a rate of 
+		    1%/yr (as in expt. 6.1). The carbon cycle responds to the climate 
+		    change alone.
+		</description>
 	</numericalRequirement>
 		
 		
 	<shortName>
-		5.5 ESM fdbk
+		5.5-1 esmFdbk1
 	</shortName>
     <longName> 
-		ESM feedback 
+		5.5-1 ESM feedback 1
 	</longName>
 	
 	<calendar>

@@ -7,7 +7,7 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:gco="http://www.isotc211.org/2005/gco">
     
-    <rationale>Control for exploring the impact of climate-carbon cycle coupling in 
+    <rationale>ESM pre-industrial control. Explore the impact of climate-carbon cycle coupling in 
     quantifying the carbon cycle feedback on projected climated change.</rationale>
     <description>
         Impose non-evolving pre-industrial conditions as in experiment 3.1_piControl
@@ -63,10 +63,10 @@
     </numericalRequirement>
     
     <shortName>
-		5.1 ESM control
+		5.1 esmControl
 	</shortName>
     <longName>
-		ESM pre-industrial control
+		5.1 ESM pre-industrial control
 	</longName>
     
     <Calendar>
