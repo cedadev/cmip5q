@@ -9,8 +9,8 @@
 
 	-->
 
-	<rationale/>
-	<description/>
+	<rationale>Climate change detection attribution experiment. </rationale>
+	<description>Historical simulation but with natural focing only - ensemble.</description>
 	
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
@@ -105,10 +105,10 @@
     </numericalRequirement>
         
    <shortName>
-		7.1E Historical Nat
+		7.1E historicalNat
 	</shortName>
     <longName> 
-		natural-only - Ensemble
+		7.1E natural-only historical - Ensemble
 	</longName>
         
    <calendar>

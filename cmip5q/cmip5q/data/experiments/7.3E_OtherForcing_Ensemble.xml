@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 
-	<rationale/>
-	<description/>
+	<rationale>Climate change detection attribution experiment. </rationale>
+	<description>Historical simulation but with other individual forcing agents - ensemble.  </description>
 	
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
@@ -85,10 +85,10 @@
     </numericalRequirement>    
    
 	<shortName>
-		7.3E Historical
+		7.3E historical???
 	</shortName>
     <longName> 
-		other-only - Ensemble
+		7.3E other-only historical - Ensemble
 	</longName>
      
    <calendar>
