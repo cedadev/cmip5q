@@ -89,7 +89,9 @@ class simulationHandler(object):
                 else: oldmodel=s.numericalModel
                 news=simform.save()
                 logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))
-                if news.numericalModel!=oldmodel:news.resetConformances()
+                if news.numericalModel!=oldmodel:
+                    news.resetConformances()
+                    news.resetCoupling()
                 return HttpResponseRedirect(afterURL)
             else:
                 logging.debug('SIMFORM not valid [%s]'%simform.errors)

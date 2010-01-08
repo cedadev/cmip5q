@@ -40,16 +40,12 @@ class MyComponentInputFormSet(ComponentInputFormSet):
         ''' No local specialisation, yet '''
         pass
     def __getCouplingGroup(self):
-        ''' Local method to get the appropriate coupling group, or if necessary
-        create it '''
+        ''' Local method to get the appropriate coupling group '''
         cgroupset=self.component.model.couplinggroup_set.all()
-        if len(cgroupset):
-            cg=cgroupset.get(simulation=None)
-            return cg
-        else:
-            cg=CouplingGroup(component=self.component.model)
-            cg.save()
-            return cg
+        assert(len(cgroupset)<>0,'All models should have a coupling group, but what about %s'%self.component.model)
+        cg=cgroupset.get(simulation=None)
+        return cg
+        
     def save(self):
         ''' Loop over form instances, add extra material, and couplings as necessary'''
         instances=ComponentInputFormSet.save(self,commit=False)

@@ -105,7 +105,7 @@ class Component(Doc):
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
    
     centre=models.ForeignKey('Centre',blank=True,null=True)
-    
+             
     def validate(self):
         # I don't work yet as I need my local component_id
         ''' Check to see if component is valid. Returns True/False '''
@@ -117,6 +117,7 @@ class Component(Doc):
 
     def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''
+        # currently don't copy couplings here ...
         if centre.__class__!=Centre:
             raise ValueError('Invalid centre passed to component copy')
         
@@ -132,7 +133,8 @@ class Component(Doc):
         kwargs['centre']=centre
         
         new=Component(**kwargs)
-        new.save() # we want an id
+        new.save() # we want an id, even though we might have one already ... 
+        #if new.isModel: print '2',new.couplinggroup_set.all()
        
         # now handle the references
         for r in self.references.all():
@@ -163,9 +165,9 @@ class Component(Doc):
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
         for i in inputset: i.makeNewCopy(new)
-                
-        new.save()
+        new.save()        
         return new
+    
     def couplings(self,simulation=None):
         ''' Return a coupling set for me, in a simulation or not '''
         if not self.isModel:
@@ -175,6 +177,15 @@ class Component(Doc):
             cg=mygroups.get(simulation=simulation)
             return Coupling.objects.filter(parent=cg)
         else: return []
+        
+    def save(self,*args,**kwargs):
+        ''' Create a coupling group on first save '''
+        cgload=0
+        if self.isModel and self.id is None: cgload=1
+        Doc.save(self,*args,**kwargs)
+        if cgload:
+            cg=CouplingGroup(component=self)
+            cg.save()
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
@@ -322,6 +333,17 @@ class Simulation(Doc):
         for r in reqs:
             c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
             c.save()
+    
+    def resetCoupling(self):
+        # we had some couplings, but we need to get rid of them for some reason
+        # (usually because we've just change model)
+        cgs=self.couplinggroup_set.all()
+        if len(cgs)<>0:
+            assert(len(cgs)==1,'Expect only one coupling group for simulation %s'%self)
+            cg=cgs[0]
+            cg.delete()
+        # now put back the ones from the model
+        self.updateCoupling()
         
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -647,9 +669,15 @@ class ConformanceForm(forms.ModelForm):
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
-        group=CouplingGroup.objects.get(simulation=simulation)
         self.fields['mod'].queryset=simulation.modelMod.all()
-        self.fields['coupling'].queryset=Coupling.objects.filter(parent=group)
+        groups=CouplingGroup.objects.filter(simulation=simulation)  # we only expect one
+        #it's possible we might end up trying to add conformances with no inputs ....
+        if len(groups)<>0:
+            assert (len(groups)==1, 'Simulation %s should have one or no coupling groups'%simulation)
+            self.fields['coupling'].queryset=Coupling.objects.filter(parent=groups[0])
+        else:
+            self.fields['coupling'].queryset=[]
+        print 'BNL',len(groups),simulation,self.fields['coupling'].queryset
         v=Vocab.objects.get(name='ConformanceTypes')
         self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
         self.showMod=len(self.fields['mod'].queryset)
