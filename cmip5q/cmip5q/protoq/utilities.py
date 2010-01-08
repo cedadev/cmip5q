@@ -89,7 +89,11 @@ class tabs(list):
             if item[2][1]==0:
                 return tab(item[0],'',-1)
             else: 
-                obj={'Model':Component,'Simulation':Simulation}[item[0]].objects.get(id=item[2][1])
+                try:
+                    obj={'Model':Component,'Simulation':Simulation}[item[0]].objects.get(id=item[2][1])
+                except:
+                    logging.info('Attempt to access deleted component or simulation %s,%s'%(item[0],item[2][1]))
+                    return tab(item[0],'',-1)
                 return tab('%s:%s'%(item[0][0:3],obj),
                            reverse(item[1],args=item[2]),
                            page==item[0])
