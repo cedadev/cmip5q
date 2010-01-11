@@ -7,6 +7,7 @@ from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.db.models.query import CollectedObjects, delete_objects
 
+from atom import Feed
 from modelUtilities import uniqueness, refLinkField
 import uuid
 import logging
@@ -49,7 +50,39 @@ def soft_delete(obj):
     else:
         delete_objects(on_death_row)
         return True,{}
-
+    
+class DocFeed(Feed):
+    ''' This is the atom feed for xml documents available from the questionnaire '''
+    # See http://code.google.com/p/django-atompub/wiki/UserGuide
+    feed_id='http://meta4.ceda.ac.uk/questionnaire/feed'
+    feed_title='CMIP5 model metadata'
+    feed_subtitle='Metafor questionnaire- completed documents'
+    feed_authors=[{'name':'The metafor team'}]
+    feed_categories=[{'term':'Component'},{'term':'Platform'},{'term':'Simulation'}]
+    #feed_rights
+    def items(self):
+        # start with platforms
+        return Platform.objects.all().order_by('-updated')
+    def item_id(self,item):
+        return item.uri
+    def item_title(self,item):
+        t=item.title
+        if len(t):
+            return '%s (%s)'%(item.abbrev,item.title)
+        else: return item.abbrev
+    def item_authors(self,item):
+        if item.author is not None:
+            return [{'name': item.author.name,'email':item.author.email}]
+        else: return []
+    def item_updated(self,item):
+        return item.updated
+    def item_published(self,item):
+        return item.created
+    def item_summary(self,item):
+        return item.description
+    def item_content(self,item):
+        return 'Text placeholder for xml atom content'
+    
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)

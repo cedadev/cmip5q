@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+from protoq.models import DocFeed
+
 urlpatterns = patterns('',
     # Example:
     # (r'^cmip5q/', include('cmip5q.foo.urls')),
@@ -123,6 +125,12 @@ urlpatterns = patterns('',
     (r'^cmip5/vocab/$','cmip5q.protoq.vocab.list'),
     (r'^cmip5/vocab/(?P<vocabID>\d+)/$','cmip5q.protoq.vocab.show'),
     #(r'^cmip5/vocab/(?P<docID>\d+)/(?P<valID>\d+)/$','cmip5q.protoq.vocab.list'),
+        
+    # Atom Feeds
+    (r"^cmip5/feeds/(.*)/$", "django.contrib.syndication.views.feed", {
+        "feed_dict": {
+            "f1": DocFeed,
+        }}),
 
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),
