@@ -829,7 +829,7 @@ class ComponentForm(forms.ModelForm):
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))
     #link=forms.URLField(widget=forms.TextInput(attrs={'size':'55'}))
-    link=refLinkField(widget=forms.TextInput(attrs={'size':'55'}))
+    link=refLinkField(widget=forms.TextInput(attrs={'size':'55'}),required=False)
     class Meta:
         model=Reference
         exclude=('centre',)
