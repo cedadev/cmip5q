@@ -169,8 +169,16 @@ class BaseViewHandler:
             if self.resource['id']<>'0':
                 instance=self.resource['class'].objects.get(id=self.resource['id'])
                 if instance.centre==self.centre: 
-                    instance.delete()
-                    return HttpResponseRedirect(okURL)
+                    success,related_objects=instance.delete()
+                    if success:
+                        return HttpResponseRedirect(okURL)
+                    else:
+                        templateable=[]
+                        for i in related_objects.unordered_keys():
+                            templateable.append(i._meta.module_name)
+                            templateable.append([related_objects[i][k] for k in related_objects[i]])
+                        print templateable
+                        return render_to_response('invalid_delete.html',{'klass':self.resource['type'],'instance':instance,'failed':templateable})
                 else:
                     return HttpResponse("Invalid")
         #all other cases are invalid

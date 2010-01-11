@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<h1> Failed to delete "{{klass}}" instance: {{instance}} </h1>
+<p> This object cannot be deleted until other objects which point to it have been fixed so they no longer reference it </p>
+<h4> Objects which reference this one </h4>
+<ul>
+{{ failed|unordered_list }}
+</ul>
+<p> Use your browser back button to return </p>
+</div>
+{% endblock %}

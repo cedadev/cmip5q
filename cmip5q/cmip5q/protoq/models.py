@@ -5,9 +5,50 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
+from django.db.models.query import CollectedObjects, delete_objects
+
 from modelUtilities import uniqueness, refLinkField
 import uuid
 import logging
+
+def soft_delete(obj):
+    ''' This method provided to use to override native model deletes to avoid
+    cascade on delete ... the first requirement is only in responsible parties,
+    but it may exist elsewhere, so we put it up here as a standalone method '''
+    # with help from stack overflow
+    
+    assert obj._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (
+                      obj._meta.object_name, obj._meta.pk.attname)
+
+    # My first attempt to do this was simply to override the django delete 
+    # method and only delete the actual instance, but this can leave the
+    # related objects with hanging links to nothing ... which can then
+    # be replaced with the *wrong* objects ... so we either have an error
+    # or wrong data ... no, no, no ...
+    # seen_objs = CollectedObjects()
+    # seen_objs.add(model=obj.__class__, pk=obj.pk, obj=obj, parent_model=None)
+    # delete_objects(seen_objs)
+
+    # Second attempt, can we parse all the collected objects? Well yes, but
+    # it's as clunky as hell, much better I think to tell the user to undo
+    # this, so now we return a list of objects which need editing to undo
+    on_death_row = CollectedObjects()
+    obj._collect_sub_objects(on_death_row)
+    # and ideally clear them all ... but that's hard, and impossible if
+    # they don't have null=True ... wait til this gets fixed in django.
+    # Meanwhile just remove self from the list of deletables and return
+    # odr={klass1:{id1:instance, id2:instance ...},klass2:{...}}
+    klass=obj.__class__
+    n=0  # number of objects to be deleted
+    for k in on_death_row.unordered_keys():
+        n+=len(on_death_row[k]) 
+    if n<>1:
+        del(on_death_row.data[klass][obj.id])
+        if len(on_death_row.data[klass])==0: del(on_death_row.data[klass])
+        return False,on_death_row
+    else:
+        delete_objects(on_death_row)
+        return True,{}
 
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
@@ -20,6 +61,8 @@ class ResponsibleParty(models.Model):
     centre=models.ForeignKey('Centre',blank=True,null=True) # for access control
     def __unicode__(self):
         return self.abbrev
+    def delete(self):
+        return soft_delete(self)    
     
 class Centre(ResponsibleParty):
     ''' A CMIP5 modelling centre '''
@@ -65,6 +108,9 @@ class Doc(models.Model):
     def __myclass(self):
         ''' Presumably there is a hidden method on models.Model to do this '''
         return str(self.__class__).split('.')[-1][0:-2]
+    def delete(self):
+        ''' Avoid deleting documents which have foreign keys to this instance'''
+        soft_delete(self)
     #@models.permalink
     #def get_absolute_url(self):
     #    return  ('/display/%s/%s'%[self.__myclass(),self.uri])
@@ -79,6 +125,8 @@ class Reference(models.Model):
     centre=models.ForeignKey('Centre',blank=True,null=True)
     def __unicode__(self):
         return self.name
+    def delete(self):
+        soft_delete(self)
     
 class Component(Doc):
     ''' A model component '''
