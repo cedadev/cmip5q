@@ -130,6 +130,9 @@ background: #FFFACD;  /* needs to be the same as tabcontent */
 /* for component highlighting in yui tree */
 .highlight { background-color:#CDC9A5;} /* colour same as boxer2 */
 
+/* for entry highlighting */
+.inputH1 {font-size:larger;font-weight:bold}
+
 /* Notes from yui docs:# The style of the text label/href when using TextNode
     . ygtvlabel[link,visited,hover]
     Due to a bug in the font smoothing algorithm in Internet Explorer, these styles define a white background 

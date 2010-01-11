@@ -795,6 +795,7 @@ class ComponentForm(forms.ModelForm):
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     
     #implemented=forms.BooleanField(required=True)
+    abbrev=forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     #
