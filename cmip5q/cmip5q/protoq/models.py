@@ -548,9 +548,9 @@ class Coupling(models.Model):
     original=models.ForeignKey('Coupling',blank=True,null=True)
     def __unicode__(self):
         if self.parent.simulation:
-            return 'Coupling4:%s(in %s)'%(self.targetInput,self.parent.simulation)
+            return 'CouplingFor:%s(in %s)'%(self.targetInput,self.parent.simulation)
         else:
-            return 'Coupling4:%s'%self.targetInput
+            return 'CouplingFor:%s'%self.targetInput
     def copy(self,group):
         '''Make a copy of self, and associate with a new group'''
         # first make a copy of self
