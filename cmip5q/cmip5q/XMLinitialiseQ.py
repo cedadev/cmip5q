@@ -55,7 +55,7 @@ VocabList={'Realms':
     'relations':('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf'),
 
     #types of conformance, just allow one.
-    'ConformanceTypes':('Via Inputs','Via Model Mods', 'Via Combination'),
+    'ConformanceTypes':('Standard Config','Via Inputs','Via Model Mods', 'Via Combination','Not Conformant'),
 
     # types of modification
     'ModificationTypes':('ModelMod','InputMod'),
