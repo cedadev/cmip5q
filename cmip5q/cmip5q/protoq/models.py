@@ -872,7 +872,7 @@ class ComponentInputForm(forms.ModelForm):
     
 class ResponsiblePartyForm(forms.ModelForm):
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
-    webpage=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
+    webpage=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     name=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}))
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
     address=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
