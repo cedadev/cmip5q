@@ -33,11 +33,11 @@ class Translator:
     def c2text(self,c):
         comp=ET.Element('div')
         '''shortName'''
-        ET.SubElement(comp,'b').text='shortName : '+c.abbrev
+        ET.SubElement(comp,'p').text='Component Short Name : '+c.abbrev
         '''longName'''
-        ET.SubElement(comp,'p').text='longName : '+c.title
+        ET.SubElement(comp,'p').text='Component Long Name : '+c.title
         '''description'''
-        ET.SubElement(comp,'p').text='description : '+c.description
+        ET.SubElement(comp,'p').text='Component Description : '+c.description
 
         pgset=ParamGroup.objects.filter(component=c)
         for pg in pgset:
@@ -45,33 +45,53 @@ class Translator:
             pset=NewParam.objects.filter(constraint=constraintSet[0])
             if len(pset)>0:
                 '''name'''
-                ET.SubElement(comp,'p').text='name (pg) : '+pg.name
+                # ET.SubElement(comp,'p').text='name (pg) : '+pg.name
                 # the internal questionnaire representation is that all parameters
                 # are contained in a constraint group
                 for con in constraintSet:
                     pset=NewParam.objects.filter(constraint=con)
                     for p in pset:
+                        ''' space '''
+                        ET.SubElement(comp,'br')
                         '''name'''
-                        ET.SubElement(comp,'p').text='name (p) : '+p.name
+                        ET.SubElement(comp,'p').text='Property Name : '+pg.name+':'+p.name
                         '''definition'''
-                        ET.SubElement(comp,'p').text='definition : '+p.definition
-                        '''controlled vocab?'''
-                        ET.SubElement(comp,'p').text='controlled : '+str(p.controlled)
+                        ET.SubElement(comp,'p').text='Property Definition : '+p.definition
+                        '''controlled vocab does not work as expected '''
+                        # ET.SubElement(comp,'p').text='Controlled Vocabulary : '+str(p.controlled)
                         '''value'''
-                        ET.SubElement(comp,'p').text='value'+p.value
+                        if p.ptype=='XOR' :
+                            ET.SubElement(comp,'p').text='Property form : Single Valued CV'
+                        elif p.ptype=='OR' :
+                            ET.SubElement(comp,'p').text='Property form : Multiple Valued CV'
+                        else :
+                            ET.SubElement(comp,'p').text='Property form : unrestricted'
+
                         if p.vocab :
                             ''' I am constrained by vocab '''
                             ''' find all values associated with this vocab '''
                             # all values that are part of this vocab
                             valset=Value.objects.filter(vocab=p.vocab)
                             values=""
+                            counter=0
                             for v in valset:
                                 '''name'''
-                                values=values+v.value+", "
-                            ET.SubElement(comp,'p').text='vocab : '+values
+                                counter+=1
+                                values=values+v.value
+                                if counter != len(valset) :
+                                    values=values+", "
+                            ET.SubElement(comp,'p').text='Property Vocabulary : '+values
+                        ET.SubElement(comp,'p').text='Property Value : '+p.value
                         if p.units :
-                            ET.SubElement(comp,'p').text='units : '+p.units
-                        ET.SubElement(comp,'p').text='numeric : '+str(p.numeric)
+                            ET.SubElement(comp,'p').text='Property Units : '+p.units
+                        #else :
+                        #    ET.SubElement(comp,'p').text='Property Units : none'
+                        if p.numeric :
+                            ValueType="numeric"
+                        else :
+                            ValueType="string"
+                        if not(p.vocab) :
+                            ET.SubElement(comp,'p').text='Property DataType : '+ValueType
         return comp
 
     def cimRoot(self):
