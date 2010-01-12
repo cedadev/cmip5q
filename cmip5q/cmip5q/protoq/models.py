@@ -6,6 +6,8 @@ from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.db.models.query import CollectedObjects, delete_objects
+from django.db.models import permalink
+
 
 from atom import Feed
 from modelUtilities import uniqueness, refLinkField
@@ -50,39 +52,7 @@ def soft_delete(obj):
     else:
         delete_objects(on_death_row)
         return True,{}
-    
-class DocFeed(Feed):
-    ''' This is the atom feed for xml documents available from the questionnaire '''
-    # See http://code.google.com/p/django-atompub/wiki/UserGuide
-    feed_id='http://meta4.ceda.ac.uk/questionnaire/feed'
-    feed_title='CMIP5 model metadata'
-    feed_subtitle='Metafor questionnaire- completed documents'
-    feed_authors=[{'name':'The metafor team'}]
-    feed_categories=[{'term':'Component'},{'term':'Platform'},{'term':'Simulation'}]
-    #feed_rights
-    def items(self):
-        # start with platforms
-        return Platform.objects.all().order_by('-updated')
-    def item_id(self,item):
-        return item.uri
-    def item_title(self,item):
-        t=item.title
-        if len(t):
-            return '%s (%s)'%(item.abbrev,item.title)
-        else: return item.abbrev
-    def item_authors(self,item):
-        if item.author is not None:
-            return [{'name': item.author.name,'email':item.author.email}]
-        else: return []
-    def item_updated(self,item):
-        return item.updated
-    def item_published(self,item):
-        return item.created
-    def item_summary(self,item):
-        return item.description
-    def item_content(self,item):
-        return 'Text placeholder for xml atom content'
-    
+
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)
@@ -107,6 +77,8 @@ class Centre(ResponsibleParty):
 
 class Doc(models.Model):
     ''' Abstract class for general properties '''
+    #all documents associated with a centre
+    centre=models.ForeignKey('Centre',blank=True,null=True)
     title=models.CharField(max_length=128,blank=True,null=True)
     abbrev=models.CharField(max_length=25)
     author=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_author')
@@ -144,9 +116,17 @@ class Doc(models.Model):
     def delete(self):
         ''' Avoid deleting documents which have foreign keys to this instance'''
         soft_delete(self)
+    # how can you get at me?:
     #@models.permalink
-    #def get_absolute_url(self):
+    #def get_absolute_url(self):   
     #    return  ('/display/%s/%s'%[self.__myclass(),self.uri])
+    
+    # the following three url views exploit the get_absolute_url defined in the subclasses.
+    def urlxml(self):
+        return('%s_XML'%self.__myclass(),[str(self.centre.id),str(self.id),])
+    urlxml=permalink(urlxml)
+        
+    
   
 class Reference(models.Model):
     ''' An academic Reference '''
@@ -184,8 +164,6 @@ class Component(Doc):
     
     # direct children components:
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
-   
-    centre=models.ForeignKey('Centre',blank=True,null=True)
              
     def validate(self):
         # I don't work yet as I need my local component_id
@@ -294,7 +272,6 @@ class ComponentInput(models.Model):
 
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
-    centre=models.ForeignKey('Centre')
     compiler=models.CharField(max_length=128)
     vendor=models.CharField(max_length=128)
     compilerVersion=models.CharField(max_length=32)
@@ -343,8 +320,7 @@ class Simulation(Doc):
     experiment=models.ForeignKey(Experiment)
     #platforms
     platform=models.ForeignKey(Platform)
-    #each simulation run by one centre
-    centre=models.ForeignKey('Centre')
+   
     # following will be used to construct the DOI
     authorList=models.TextField()
     
@@ -697,6 +673,50 @@ class InputMod(Modification):
 class ModelMod(Modification):
     #we could try and get to the parameter values as well ...
     component=models.ForeignKey(Component)
+    
+class DocFeed(Feed):
+    ''' This is the atom feed for xml documents available from the questionnaire '''
+    # See http://code.google.com/p/django-atompub/wiki/UserGuide
+    feeds={'platform':Platform.objects.all(),
+           'simulation':Simulation.objects.all(),
+           'component':Component.objects.filter(isModel=True)}
+    def get_object(self,params):
+        ''' Used for parameterised feeds '''
+        assert params[0] in self.feeds,'Unknown feed request'
+        return params[0]
+    def feed_id (self,model):
+        return 'http://meta4.ceda.ac.uk/questionnaire/feed/%s'%model
+    def feed_title(self,model):
+        return 'CMIP5 model %s metadata'%model
+    def feed_subtitle(self,model):
+        return 'Metafor questionnaire - completed %s documents'%model
+    def feed_authors(self,model):
+        return [{'name':'The metafor team'}]
+    def items(self,model):
+        return self.feeds[model].order_by('-updated')
+    def item_id(self,item):
+        return item.uri
+    def item_title(self,item):
+        t=item.title
+        if len(t):
+            return '%s (%s)'%(item.abbrev,item.title)
+        else: return item.abbrev
+    def item_authors(self,item):
+        if item.author is not None:
+            return [{'name': item.author.name,'email':item.author.email}]
+        else: return []
+    def item_updated(self,item):
+        return item.updated
+    def item_published(self,item):
+        return item.created
+    def item_summary(self,item):
+        if item.description:
+            return item.description
+        else:
+            return '%s'%item
+    def item_content(self,item):
+        ''' Return out of line link to the content'''
+        return {"type": "application/xml", "src": item.urlxml()},""
     
 #
 # =========================================================================================

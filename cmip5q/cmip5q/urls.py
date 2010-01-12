@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/refs/$','cmip5q.protoq.views.componentRefs'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/validate/$','cmip5q.protoq.views.componentValidate'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/view/$','cmip5q.protoq.views.componentView'),   
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML'),
+    url(r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML',name='Component_XML'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/text/$','cmip5q.protoq.views.componentText'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Numerics/$','cmip5q.protoq.views.componentNum'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/coupling/$','cmip5q.protoq.views.componentCup'),
@@ -49,8 +49,8 @@ urlpatterns = patterns('',
                 'cmip5q.protoq.views.simulationEdit'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/validate/$',
                 'cmip5q.protoq.views.simulationValidate'),  
-    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/export/$',
-                'cmip5q.protoq.views.simulationExport'),  
+    url(r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/XML/$',
+                'cmip5q.protoq.views.simulationXML',name='Simulation_XML'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/view/$',
                 'cmip5q.protoq.views.simulationView'), 
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/coupling/$',
@@ -60,15 +60,18 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/conformance/$',
                 'cmip5q.protoq.views.conformanceMain'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/copy/$',
-                'cmip5q.protoq.views.simulationCopy'),                     
+                'cmip5q.protoq.views.simulationCopy'),
+                                         
     #           
     # platforms/add/centre_id
     # platforms/edit/platform_id
     #
-    (r'^cmip5/(?P<centre_id>\d+)/platform/add$',
+    (r'^cmip5/(?P<centre_id>\d+)/platform/add/$',
             'cmip5q.protoq.views.platformEdit'),
-    (r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/edit$',
+    (r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/edit/$',
             'cmip5q.protoq.views.platformEdit'),
+    url(r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/XML/$',
+            'cmip5q.protoq.views.platformXML',name='Platform_XML'),         
     #
     # experiment/view/experiment_id
     (r'^cmip5/(?P<cen_id>\d+)/experiment/(?P<experiment_id>\d+)/$',
@@ -128,9 +131,9 @@ urlpatterns = patterns('',
     #(r'^cmip5/vocab/(?P<docID>\d+)/(?P<valID>\d+)/$','cmip5q.protoq.vocab.list'),
         
     # Atom Feeds
-    (r"^cmip5/feeds/(.*)/$", "django.contrib.syndication.views.feed", {
+    (r"^feeds/(.*)/$", "django.contrib.syndication.views.feed", {
         "feed_dict": {
-            "f1": DocFeed,
+            "cmip5": DocFeed,
         }}),
 
     # Uncomment the next line to enable the admin:

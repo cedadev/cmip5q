@@ -179,7 +179,7 @@ def simulationView(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simid=simulation_id)
     return s.view()
 
-def simulationExport(request,centre_id,simulation_id):
+def simulationXML(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simid=simulation_id)
     return s.XMLasHTML()
 
@@ -257,6 +257,9 @@ def platformEdit(request,centre_id,platform_id=None):
     return render_to_response('platform.html',
                 {'pform':pform,'url':editURL,'c':c,'pname':pname,
                 'tabs':tabs(request,centre_id,'Platform')})
+
+def platformXML(request,cenre_id,platform_id):
+    return HttpResponse('Not implemented')
         
 ########## EXPERIMENT VIEWS ##################
     
