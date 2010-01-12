@@ -115,6 +115,11 @@ def componentXML(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.XMLasHTML()
   
+def componentText(request,centre_id,component_id):
+    ''' Return a textual view of the component with possible values '''
+    c=componentHandler(centre_id,component_id)
+    return c.XMLasText()
+  
 def componentCup(request,centre_id,component_id):
     ''' Return couplings for a component '''
     c=couplingHandler(centre_id,request)

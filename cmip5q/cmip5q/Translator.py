@@ -30,6 +30,50 @@ class Translator:
         self.outputComposition=True # aka coupling information
         self.simClass=None
 
+    def c2text(self,c):
+        comp=ET.Element('div')
+        '''shortName'''
+        ET.SubElement(comp,'b').text='shortName : '+c.abbrev
+        '''longName'''
+        ET.SubElement(comp,'p').text='longName : '+c.title
+        '''description'''
+        ET.SubElement(comp,'p').text='description : '+c.description
+
+        pgset=ParamGroup.objects.filter(component=c)
+        for pg in pgset:
+            constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+            pset=NewParam.objects.filter(constraint=constraintSet[0])
+            if len(pset)>0:
+                '''name'''
+                ET.SubElement(comp,'p').text='name (pg) : '+pg.name
+                # the internal questionnaire representation is that all parameters
+                # are contained in a constraint group
+                for con in constraintSet:
+                    pset=NewParam.objects.filter(constraint=con)
+                    for p in pset:
+                        '''name'''
+                        ET.SubElement(comp,'p').text='name (p) : '+p.name
+                        '''definition'''
+                        ET.SubElement(comp,'p').text='definition : '+p.definition
+                        '''controlled vocab?'''
+                        ET.SubElement(comp,'p').text='controlled : '+str(p.controlled)
+                        '''value'''
+                        ET.SubElement(comp,'p').text='value'+p.value
+                        if p.vocab :
+                            ''' I am constrained by vocab '''
+                            ''' find all values associated with this vocab '''
+                            # all values that are part of this vocab
+                            valset=Value.objects.filter(vocab=p.vocab)
+                            values=""
+                            for v in valset:
+                                '''name'''
+                                values=values+v.value+", "
+                            ET.SubElement(comp,'p').text='vocab : '+values
+                        if p.units :
+                            ET.SubElement(comp,'p').text='units : '+p.units
+                        ET.SubElement(comp,'p').text='numeric : '+str(p.numeric)
+        return comp
+
     def cimRoot(self):
         ''' return the top level cim document invarient structure '''
         root=ET.Element('CIMRecord', \

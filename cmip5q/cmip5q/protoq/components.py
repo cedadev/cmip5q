@@ -144,6 +144,7 @@ class componentHandler(object):
         urls['view']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
         urls['validate']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
         urls['export']=reverse('cmip5q.protoq.views.componentXML',args=(self.centre_id,c.id))
+        urls['text']=reverse('cmip5q.protoq.views.componentText',args=(self.centre_id,c.id))
         
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
@@ -253,6 +254,13 @@ class componentHandler(object):
         xmlDoc=translator.q2cim(c,docType='Component')
         return xmlDoc
     
+    def XMLasText(self):
+        translator=Translator()
+        c=self.component
+        htmlDoc=translator.c2text(c)
+        html=ET.tostring(htmlDoc)
+        return render_to_response('text.html',{'HTML':html})
+
     def XMLasHTML(self,allModel=True):
         assert(allModel,True,'Support for not processing the entire model is not yet included')
         CIMDoc=self.XML(allModel,recurse=True,composition=True)
