@@ -1,19 +1,19 @@
-LUHa.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product that covers the historical period from 1500 to 2005, computes landuse and transitions between cropland, pasture, primary land and secondary (recovering) land, including the effects of wood harvest and shifting cultivation 
-LUHa_t1.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but for the historical period from 1700-2005,,,,
-LUHa_u2.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but also including land-use changes and transitions from/to urban land,,,,
-LUHa_t1u2.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but for the historical period from 1700-2005 and also including land-use changes and transitions from/to urban land,,,,
-LUHa.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from Image group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005), computes landuse and transitions between cropland, pasture, primary land and secondary (recovering) land, including the effects of wood harvest and shifting cultivation.
-LUHa_t1.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_image.v1.1_rc1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005,,,,
-LUHa_u2.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_image.v1.1_rc1 but also including land-use changes and transitions from/to urban land,,,,
-LUHa_t1u2.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa_t1.v1_image.v1.1_rc1 but also including land-use changes and transitions from/to urban land,,,,
-"biofuels_image.rc1;http://luh.sr.unh.edu/data.shtml;Other;""Fractional gridded information on biofuels - The IMAGE team primarily treats biofuels as crops. They provided us with fractions of each gridcell occupied by each of 19 different croptypes",,,,
-LUHa.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from MiniCAM group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005),,,,
-LUHa_t1.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_minicam.v1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005,,,,
-LUHa_u2.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_minicam.v1 but also including land-use changes and transitions from/to urban land,,,,
-LUHa_t1u2.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa_t1.v1_minicam.v1 but also including land-use changes and transitions from/to urban land,,,,
-biofuels_minicam.rc1;http://luh.sr.unh.edu/data.shtml;Other;Fractional gridded information on biofuels - The MiniCAM team treats biofuels as herbaceous crops,,,,
-LUHa.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from Message group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005),,,,
-LUHa_t1.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa.v1_message.v1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005,,,,
+LUHa.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product that covers the historical period from 1500 to 2005
+LUHa_t1.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but for the historical period from 1700-2005
+LUHa_u2.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but also including land-use changes and transitions from/to urban land
+LUHa_t1u2.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1 but for the historical period from 1700-2005 and also including land-use changes and transitions from/to urban land
+LUHa.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from Image group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005)
+LUHa_t1.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_image.v1.1_rc1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005
+LUHa_u2.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_image.v1.1_rc1 but also including land-use changes and transitions from/to urban land
+LUHa_t1u2.v1_image.v1.1_rc1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa_t1.v1_image.v1.1_rc1 but also including land-use changes and transitions from/to urban land
+"biofuels_image.rc1;http://luh.sr.unh.edu/data.shtml;Other;""Fractional gridded information on biofuels - The IMAGE team primarily treats biofuels as crops. They provided us with fractions of each gridcell occupied by each of 19 different croptypes"
+LUHa.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from MiniCAM group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005)
+LUHa_t1.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_minicam.v1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005
+LUHa_u2.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa.v1_minicam.v1 but also including land-use changes and transitions from/to urban land
+LUHa_t1u2.v1_minicam.v1;http://luh.sr.unh.edu/data.shtml;Other;The same as LUHa_t1.v1_minicam.v1 but also including land-use changes and transitions from/to urban land
+biofuels_minicam.rc1;http://luh.sr.unh.edu/data.shtml;Other;Fractional gridded information on biofuels - The MiniCAM team treats biofuels as herbaceous crops
+LUHa.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from Message group) that covers the period from 2005 to 2100 (built off the historical product LUHa.v1 for 1500-2005)
+LUHa_t1.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa.v1_message.v1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005
 LUHa_u2.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa.v1_message.v1 but also including land-use changes and transitions from/to urban land
 LUHa_t1u2.v1_message.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa_t1.v1_message.v1 but also including land-use changes and transitions from/to urban land
 biofuels_message.rc1;http://luh.sr.unh.edu/data.shtml;Other;Fractional gridded information on biofuels - The message team treats biofuels as part of wood harvest
@@ -21,6 +21,11 @@ LUHa.v1_aim.v1;http://luh.sr.unh.edu/data.shtml;Other;Baseline product (from Aim
 LUHa_t1.v1_aim.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa.v1_aim.v1 but built off our historical product LUHa_t1.v1 for the historical period from 1700-2005
 LUHa_u2.v1_aim.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa.v1_aim.v1 but also including land-use changes and transitions from/to urban land
 LUHa_t1u2.v1_aim.v1;http://luh.sr.unh.edu/data.shtml;Other;the same as LUHa_t1.v1_aim.v1 but also including land-use changes and transitions from/to urban land
+"PICNTRL_MIDYR;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;Text;CMIP5 recommendations for annual average, global mean concentrations for preindustrial control run"
+"PRE2005_MIDYR;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;Text;CMIP5 recommendations for annual average, global mean concentrations for pre-2005"
+"RCP3PD_MIDYR;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;Text;CMIP5 recommendations for annual average, global mean concentrations for RCP3-Peak&Decline"
+"RCP45_MIDYR;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;Text;CMIP5 recommendations for annual average, global mean concentrations for RCP 4.5"
+"RCP85_MIDYR;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;Text;CMIP5 recommendations for annual average, global mean concentrations for RCP 4.5"
 IPCC_emissions_CH4_anthropogenic_1850_0.5x0.5_v0_14_10_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1850) for anthropogenic CH4
 IPCC_emissions_CH4_anthropogenic_1860_0.5x0.5_v0_14_10_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1860) for anthropogenic CH4
 IPCC_emissions_CH4_anthropogenic_1870_0.5x0.5_v0_14_10_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1870) for anthropogenic CH4
@@ -53,3 +58,19 @@ IPCC_emissions_SO2_anthropogenic_1970_0.5x0.5_v1_13_05_2009.nc;http://www.iiasa.
 IPCC_emissions_SO2_anthropogenic_1980_0.5x0.5_v1_13_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1980) for anthropogenic SO2
 IPCC_emissions_SO2_anthropogenic_1990_0.5x0.5_v1_13_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1990) for anthropogenic SO2
 IPCC_emissions_SO2_anthropogenic_2000_0.5x0.5_v1_20_04_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (2000) for anthropogenic SO2
+IPCC_emissions_NO_anthropogenic_1850_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1850) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1860_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1860) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1870_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1870) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1880_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1880) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1890_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1890) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1900_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1900) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1910_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1910) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1920_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1920) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1930_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1930) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1940_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1940) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1950_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1950) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1960_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1960) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1970_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1970) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1980_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1980) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_1990_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (1990) for anthropogenic NO
+IPCC_emissions_NO_anthropogenic_2000_0.5x0.5_v1_07_05_2009.nc;http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=download;NetCDF;Historical emissions data (2000) for anthropogenic NO
