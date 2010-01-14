@@ -9,7 +9,7 @@
 <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
 </table>-->
 <table><tr>
-<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> {% if c.controlled %} {% else %}
+<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} (status {{c.status}})</h1> </td> {% if c.controlled %} {% else %}
     <td>
         <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
             <input type="hidden" name="deleteMe" value="1"/>
@@ -59,8 +59,8 @@
                   {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
                 </td></tr>
                 {% if cform.showImplemented %}
-                <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
-                <td colspan="3">{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr>
+                {% if not isModel %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
+                <td colspan="3">{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr> {% endif %}
                 {% endif %}
                 <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
                 <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>

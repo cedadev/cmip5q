@@ -2,7 +2,11 @@
 {% block content %}
 <div class="inner">
     <div class="boxer">
-        <h1> Edit platform {{pname}} for {{c}}</h1>
+    {% if p %}
+        <h1> Edit platform {{p}} for {{p.centre}} (validation status {{p.status}})</h1>
+    {% else %}
+        <h1> Create new platform for {{c}}</h1>
+    {% endif %}
     </div>
     <div class="boxer2">
     <form action='{{url}}' method='post'>
@@ -10,7 +14,6 @@
         <table>
         <tr>
             <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
-           
         </tr>
         <tr>
             <td>Contact:&nbsp;{{pform.contact.errors}}</td><td>{{pform.contact}}</td>

@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.loader import render_to_string
 from cmip5q.protoq.utilities import tabs
-from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden
+from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden,HttpResponseBadRequest
 from cmip5q.protoq.utilities import sublist
 import logging
 
@@ -169,21 +169,26 @@ class BaseViewHandler:
             if self.resource['id']<>'0':
                 instance=self.resource['class'].objects.get(id=self.resource['id'])
                 if instance.centre==self.centre: 
-                    success,related_objects=instance.delete()
-                    if success:
-                        return HttpResponseRedirect(okURL)
-                    else:
-                        templateable=[]
-                        for i in related_objects.unordered_keys():
-                            templateable.append(i._meta.module_name)
-                            templateable.append([related_objects[i][k] for k in related_objects[i]])
-                        print templateable
-                        return render_to_response('invalid_delete.html',{'klass':self.resource['type'],'instance':instance,'failed':templateable})
-                else:
-                    return HttpResponse("Invalid")
-        #all other cases are invalid
-        return HttpResponse('Invalid')
-        
+                    if 'confirmed' in request.POST:
+                        success,related_objects=instance.delete()
+                        if success:
+                            return HttpResponseRedirect(okURL)
+                        else:
+                            # We shouldn't ever get here
+                            return HttpResponseBadRequest('Invalid data request (somehow something is still linking to this object)')
+                    else: 
+                        success,related_objects=instance.delete(simulate=True)
+                        if success:
+                            url=request.path
+                            return render_to_response('confirm_delete.html',
+                                    {'klass':self.resource['type'],'url':url,'i':instance})
+                        else:
+                            # show the user the things they need to handle
+                            return render_to_response('invalid_delete.html',
+                                        {'klass':self.resource['type'],'instance':instance,'failed':related_objects})
+        #all other cases are invalid      
+        return HttpResponseBadRequest("Invalid delete request")
+    
     def assign(self,request):
         ''' This method binds to the target resource, a number of the resources managed
         by this one. eg If this class is instantiated with resourceType = file, and

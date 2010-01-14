@@ -66,7 +66,7 @@ class simulationHandler(object):
                     args=(self.centreid,s.id,))
             urls['validate']=reverse('cmip5q.protoq.views.simulationValidate',
                     args=(self.centreid,s.id,))
-            urls['export']=reverse('cmip5q.protoq.views.simulationExport',
+            urls['export']=reverse('cmip5q.protoq.views.simulationXML',
                     args=(self.centreid,s.id,))
             urls['view']=reverse('cmip5q.protoq.views.simulationView',
                     args=(self.centreid,s.id,))

@@ -132,6 +132,13 @@ background: #FFFACD;  /* needs to be the same as tabcontent */
 
 /* for entry highlighting */
 .inputH1 {font-size:larger;font-weight:bold}
+.valid {color:green}
+.invalid {color:red}
+/* Establish the default (mandatory) widget borders, and override in the forms for the non-mandatory widgets
+This was test code, only partially implemented in platform. Bottom line: couple of days coding ... so
+not for now ...
+.boxer input {background-color:yellow}
+.boxer .optin {background-color:white} */
 
 /* Notes from yui docs:# The style of the text label/href when using TextNode
     . ygtvlabel[link,visited,hover]

@@ -45,7 +45,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
             <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></td>
             <td>
              <form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
-            <td><p class="cmip5q">placeholder</p></td>
+            <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td>
         </tr>
         <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");

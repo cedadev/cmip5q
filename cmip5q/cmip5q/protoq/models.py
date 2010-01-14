@@ -6,6 +6,8 @@ from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.db.models.query import CollectedObjects, delete_objects
+from django.db.models.fields.related import ForeignKey
+
 from django.db.models import permalink
 
 
@@ -14,10 +16,16 @@ from modelUtilities import uniqueness, refLinkField
 import uuid
 import logging
 
-def soft_delete(obj):
+def soft_delete(obj,simulate=False):
     ''' This method provided to use to override native model deletes to avoid
     cascade on delete ... the first requirement is only in responsible parties,
-    but it may exist elsewhere, so we put it up here as a standalone method '''
+    but it may exist elsewhere, so we put it up here as a standalone method.
+    If simulate is passed as true, we don't actually do the delete ... but
+    see if we could have done it.
+          The method returns a tuple boolean and dict. The boolean will be true if 
+    it is possible to delete the object (nothing links to it). If the booleaan
+    is false, then the dict is a dictionary keyed by models into instances which link 
+    to it, and which need to be unlinked before a delete can occur.'''
     # with help from stack overflow
     
     assert obj._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (
@@ -32,25 +40,56 @@ def soft_delete(obj):
     # seen_objs.add(model=obj.__class__, pk=obj.pk, obj=obj, parent_model=None)
     # delete_objects(seen_objs)
 
-    # Second attempt, can we parse all the collected objects? Well yes, but
-    # it's as clunky as hell, much better I think to tell the user to undo
-    # this, so now we return a list of objects which need editing to undo
     on_death_row = CollectedObjects()
     obj._collect_sub_objects(on_death_row)
     # and ideally clear them all ... but that's hard, and impossible if
     # they don't have null=True ... wait til this gets fixed in django.
-    # Meanwhile just remove self from the list of deletables and return
-    # odr={klass1:{id1:instance, id2:instance ...},klass2:{...}}
+    # Meanwhile just return the list of direct linkers 
+    # NB: odr={klass1:{id1:instance, id2:instance ...},klass2:{...}}
     klass=obj.__class__
     n=0  # number of objects to be deleted
     for k in on_death_row.unordered_keys():
         n+=len(on_death_row[k]) 
     if n<>1:
-        del(on_death_row.data[klass][obj.id])
-        if len(on_death_row.data[klass])==0: del(on_death_row.data[klass])
-        return False,on_death_row
+        #delve into the metadata to find out what managers point at this model,
+        #then use all those to filter out direct relationships to this one.
+        related_models=on_death_row.keys()
+        # now find all the foreign keys
+        directly_linked_models=[]
+        fkeys={}
+        linkdict={}
+        for model in related_models:
+            for f in model._meta.fields:
+                if isinstance(f, ForeignKey) and f.rel.to == klass: 
+                    if model not in directly_linked_models:directly_linked_models.append(model)
+                    # get the foreign keys for later use 
+                    if model in fkeys:
+                        if f not in fkeys[model]: 
+                            fkeys[model].append(f)
+                    else:
+                        fkeys[model]=[f]
+        # parse the instances to check they link to this one
+        # start by rejecting models which don't actually have a foreign key into this objects class
+        for model in related_models:
+            if model not in directly_linked_models: del(on_death_row.data[model])
+        # now parse the instances and see if they have any direct link to this one (they might
+        # be in the list because they link to objects that link to this one, even though they have fks
+        # that would allow direct links).
+        # it's probably be cleaner to go backwards ... now we know the foreign keys, we should
+        # be able to get querysets and see if the object is in the queryset ... but this works too.
+        for model in on_death_row.unordered_keys():
+            # find all the foreign keys to the object.
+            for id in on_death_row.data[model]:
+                referer=on_death_row.data[model][id]
+                for fk in fkeys[model]:
+                    fk_value = getattr(referer, "%s_id" % fk.name)
+                    if fk_value is not None:
+                        mname=model._meta.module_name
+                        if mname not in linkdict: linkdict[mname]=[] 
+                        linkdict[mname].append(referer)
+        return False,linkdict
     else:
-        delete_objects(on_death_row)
+        if not simulate: delete_objects(on_death_row)
         return True,{}
 
 class ResponsibleParty(models.Model):
@@ -64,8 +103,8 @@ class ResponsibleParty(models.Model):
     centre=models.ForeignKey('Centre',blank=True,null=True) # for access control
     def __unicode__(self):
         return self.abbrev
-    def delete(self):
-        return soft_delete(self)    
+    def delete(self,*args,**kwargs):
+        return soft_delete(self,*args,**kwargs)    
     
 class Centre(ResponsibleParty):
     ''' A CMIP5 modelling centre '''
@@ -101,6 +140,12 @@ class Doc(models.Model):
     numberOfValidationChecks=models.IntegerField(default=0,editable=False)
     # following is used by the user to declare the document is "ready"
     isComplete=models.BooleanField(default=False)
+    def status(self):
+        ''' Return a percentage completion in terms of validation '''
+        if self.validErrors<>-1 and self.numberOfValidationChecks<>0:
+            return 100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks)
+        else: return 0.0
+        # FIXME: and eventually see if we have a children attribute and sum them up ...
     def __unicode__(self):
         return self.abbrev
     class Meta:
@@ -113,9 +158,9 @@ class Doc(models.Model):
     def __myclass(self):
         ''' Presumably there is a hidden method on models.Model to do this '''
         return str(self.__class__).split('.')[-1][0:-2]
-    def delete(self):
+    def delete(self,*args,**kwargs):
         ''' Avoid deleting documents which have foreign keys to this instance'''
-        soft_delete(self)
+        soft_delete(self,*args,**kwargs)
     # how can you get at me?:
     #@models.permalink
     #def get_absolute_url(self):   
@@ -138,8 +183,8 @@ class Reference(models.Model):
     centre=models.ForeignKey('Centre',blank=True,null=True)
     def __unicode__(self):
         return self.name
-    def delete(self):
-        soft_delete(self)
+    def delete(self,*args,**kwargs):
+        soft_delete(self,*args,**kwargs)
     
 class Component(Doc):
     ''' A model component '''
@@ -165,6 +210,10 @@ class Component(Doc):
     # direct children components:
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
              
+             
+#    def status(self):
+#            
+    
     def validate(self):
         # I don't work yet as I need my local component_id
         ''' Check to see if component is valid. Returns True/False '''
@@ -903,12 +952,10 @@ class ReferenceForm(forms.ModelForm):
         ''' Needed to ensure reference name uniqueness within a centre '''
         return uniqueness(self,self.hostCentre,'name')
     
-
-
 class PlatformForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
-    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'size':5}),required=False)
+    description=forms.CharField(widget=forms.Textarea(attrs={'class':'optin','cols':"80",'rows':"4"}),required=False)
+    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'class':'optin','size':5}),required=False)
+    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'class':'optin','size':5}),required=False)
     class Meta:
         model=Platform
         exclude=('centre','uri','metadataMaintainer')

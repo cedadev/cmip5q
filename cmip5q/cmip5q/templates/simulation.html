@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-    <h2> {{label}} a simulation in {{exp}}</h2>
+    {% ifequal label 'Update' %} 
+    <h1> Update simulation {{s}} in experiment {{exp}}(validation status {{s.status}}) </h1>
+    {% else %}
+    <h1> Create a simulation in experiment {{exp}}</h1>
+    {% endifequal %}
     <p>({{exp.rationale}} {{exp.why}})</p>
 </div>
 

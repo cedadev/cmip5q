@@ -233,13 +233,12 @@ def platformEdit(request,centre_id,platform_id=None):
             pform=MyPlatformForm(c)
         elif request.method=='POST':
             pform=MyPlatformForm(c,request.POST)
-        pname=''
+        p=None
         puri=str(uuid.uuid1())
     else:
         editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))
         p=Platform.objects.get(id=platform_id)
         puri=p.uri
-        pname=p.abbrev
         if request.method=='GET':
             pform=MyPlatformForm(c,instance=p)
         elif request.method=='POST':
@@ -255,7 +254,7 @@ def platformEdit(request,centre_id,platform_id=None):
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
     
     return render_to_response('platform.html',
-                {'pform':pform,'url':editURL,'c':c,'pname':pname,
+                {'pform':pform,'url':editURL,'p':p,'c':c,
                 'tabs':tabs(request,centre_id,'Platform')})
 
 def platformXML(request,cenre_id,platform_id):
