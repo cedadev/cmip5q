@@ -7,18 +7,18 @@
 
 from protoq.models import *
 import uuid
+from vocabs.InputTransformations import properties
 
 #this tuple should provide the PCMDI controlled vocabulary for centre names
 centres=(('NCAS','UK National Centre for Atmospheric Science'),
          ('NCAR','US National Centre for Atmospheric Research'),
          ('MOHC','UK Met Office Hadley Centre'),
          ('GFDL','US Geophysical Fluid Dynamics Laboratory'),
-         ('IPSL','FR Institute Simone Pierre Laplace'),
+         ('IPSL','FR Institute Pierre Simone Laplace'),
          ('MPIM','DE Max Planck Institute for Meteorology'), 
          ('CMIP5','Dummy Centre used to hold model template'),
          ('Example','Dummy Centre used to hold examples'),
      )
-     
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
 
@@ -33,13 +33,6 @@ VocabList={'Realms':
     'ReferenceTypes':('Webpage','Online Refereed','Offline Refereed',
                       'Online Other','Offline Other'),
 
-    # these support couplings 
-    'couplingType':('Files','OASIS3','OASIS4','FMS','ESMF','CCSM Flux coupler','MCT',
-                    'Shared Memory','Other'),
-    'SpatialRegridding':('None','Non-Convervative','Conservative'),
-    'SpatialRegriddingType':('N/A','2D-FirstOrder','2D-SecondOrder','2D-ThirdOrder',
-                         '3D-FirstOrder','3D-SecondOrder','3d-ThirdOrder','Other'),
-    'TemporalRegridding':('None','TimeAverage','TimeAccumulation','lastAvailable','Linear','Other'),
     'FreqUnits':('seconds','minutes','hours','days','months','years','decades'),
 
     # and these will support platforms
@@ -74,6 +67,17 @@ VocabList={'Realms':
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
     
     }
+    
+def loadProperties(args):
+    from vocabs.InputTransformations import properties
+    #properties={'abc':(def,[(a,d),(b,d),(c,d),.._,}
+    for arg in args:
+        v=Vocab(uri=str(uuid.uuid1(1)),name=arg)
+        v.save()
+        defn,values=properties[arg]
+        for r,d in values:
+            rv=Value(vocab=v,value=r,definition=d)
+            rv.save()
 
 def reloadVocab(key):
     ''' Used to reset vocabulariews '''
@@ -107,3 +111,8 @@ def initialise():
         rp.save()
             
     for k in VocabList: loadvocab(k)
+    
+    # now get the specialist vocabs
+    # currently just coupling
+    loadProperties(('InputTechnique','SpatialRegrid','TimeTransformation'))
+    

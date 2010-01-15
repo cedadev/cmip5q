@@ -1,46 +1,33 @@
 <div class="boxer">
 <h3>{{f.title}}  ({{f.cf.instance.targetInput.ctype}})</h3>
 <hr>
-{% ifequal f.cf.instance.targetInput.ctype f.bcv %}
-<p> (1) This section describes the coupling method and how often the coupling occurred </p>
-<p>Coupling Type: {{f.cf.ctype.errors}}{{f.cf.ctype}}&nbsp;
+<!-- Boundary condition -->
+<p> Describe the input technique and how often it occurred </p>
+<p>Coupling Type: {{f.cf.inputTechnique.errors}}{{f.cf.inputTechnique}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 {{f.cf.FreqUnits.errors}}{{f.cf.FreqUnits}}</p>
 <hr>
-<p>(2) <b> Couplings</b> This section describes how other components are coupled to inputs. </p> 
-{% if s %} 
-<p>If you have set values for these in your model description, you can copy them using this link: <a id="iclink{{f.cf.icreset.coupling.id}}" href="{{f.cf.icreset.url}}">Copy</a></p>
-{% endif %}
-<p> Enter zero or more inputs from other components (a new blank form will appear after each save): </p>
-{{ f.ic.management_form}}
 <table>
-{% for ff in f.ic.forms %}
-{% include 'closure.html' %}
-{% endfor %}
-</table>
-<hr> 
-<p> (3) <b> Forcings </b> This section describes how files are coupled to inputs.</p>
-{% endifequal %}
-{{ f.ic.management_form}}
-{% if s %}
-<p>If you have set values for these in your model description, you can copy them using this link: <a id="eclink{{f.cf.ecreset.coupling.id}}" href="{{f.cf.ecreset.url}}">Copy</a></p>
-{% endif %}
-<p> Enter {% ifequal f.cf.instance.targetInput.ctype f.bcv %} zero or more inputs {% else %} input {% endifequal %} from files: 
-    {% ifnotequal f.cf.instance.targetInput.ctype f.bcv %} (Ignore subsequent blank forms in this case).
-    {% else %}
-    (a new blank form will appear after each save).
-    {% endifnotequal %} Use the files tab if you don't see any files to choose in the "From" dropdown selector, and then navigate back here.
-</p>
-{{f.cf.targetInput}}{{f.cf.parent}}{{f.cf.original}}
-{{f.ec.management_form}}
-<table>
-{% for ff in f.ec.forms %}
-{% include 'closure.html' %}
-{% endfor %}
+<tr><td colspan="2"> Enter input details. It
+is likely you will only need to enter material in both columns if you have a regional model. New blank rows will appear after rows which have been completed and saved. Only use these if you wish to enter multiple sources as input </td></tr>
+<tr><th width="50%"> From files </th><th> From other model components </th></tr>
+<tr><td>
+   {{f.ec.management_form}}
+    <table class="boxer">
+    {% for ff in f.ec.forms %}
+    {% include 'closure.html' %}
+    {% endfor %}
+    </table>
+</td><td>
+     {{ f.ic.management_form}}
+    <table class="boxer">
+    {% for ff in f.ic.forms %}
+    {% include 'closure.html' %}
+    {% endfor %}
+    </table>
+</td></tr>
 </table>
 <hr>
-{% ifequal f.cf.instance.targetInput.ctype f.bcv %}
-<p> (4) Describe how these input(s) were manipulated when providing the {{f.title}}</p>
+<p> Describe how these input(s) were manipulated when providing the {{f.title}}</p>
 {{f.cf.manipulation.errors}}{{f.cf.manipulation}}
-{% endifequal %}
 </div>

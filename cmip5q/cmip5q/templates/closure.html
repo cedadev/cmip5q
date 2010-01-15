@@ -1,11 +1,13 @@
-<tr class="{% cycle 'row1' 'row2' %}"><td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
-<td colspan="2">
-<!-- ifnotequal f.cf.instance.targetInput.ctype f.afv -->
-Spatial Regridding: {{ff.spatialRegridding.errors}} {{ff.spatialRegridding}} &nbsp;Spatial type:
-{{ff.spatialType.errors}}{{ff.spatialType}}&nbsp;
-Temporal Regridding: {{ff.temporalRegridding.errors}} {{ff.temporalRegridding}} &nbsp; </td>
-<!-- This is where we put the endifnotequal -->
+<tr class="{% cycle 'row1' 'row2' %}">
+    <td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
+    <td>
+        <table>
+        <tr><td> 
+        Spatial Regridding: {{ff.spatialRegrid.errors}} {{ff.spatialRegrid}}
+        </td></tr><tr><td>
+Temporal Transformation: {{ff.temporalTransform.errors}} {{ff.temporalTransform}}
+        </td></tr>
+        </table>
+    </td>
 </tr>
-<tr class="{% cycle 'row1' 'row2' %}"><td></td><td> Describe any per input details if required:</td>
-<td>{{ff.inputDescription.errors}}{{ff.inputDescription}}</td></tr>
 {% for hid in ff.hidden_fields %} {{hid}}{% endfor %}

@@ -93,18 +93,18 @@ class MyCouplingFormSet:
         icvalue=ctypes.get(value='InitialCondition') # used for layout on closure form
 
         # setup our vocabularies
-        ctype=Value.objects.filter(vocab=Vocab.objects.get(name='couplingType'))
+        inputTechnique=Value.objects.filter(vocab=Vocab.objects.get(name='InputTechnique'))
         FreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
-        spatialRegridding=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegridding'))
-        spatialType=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegriddingType'))
-        temporalRegridding=Value.objects.filter(vocab=Vocab.objects.get(name='TemporalRegridding'))
         
-        self.couplingVocabs={'ctype':ctype,
+        # for closures
+        spatialRegrid=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegrid'))
+        temporalTransform=Value.objects.filter(vocab=Vocab.objects.get(name='TimeTransformation'))
+        
+        self.couplingVocabs={ 'inputTechnique':inputTechnique,
                 'FreqUnits':FreqUnits}
-        self.closureVocabs={'spatialRegridding':spatialRegridding,
-                'temporalRegridding':temporalRegridding,
-                'spatialType':spatialType}
-                
+        self.closureVocabs={'spatialRegrid':spatialRegrid,
+                'temporalTransform':temporalTransform}
+               
         # rather than use a django formset for the couplings, we'll do them by
         # hand, but do the closures using a formset ...
         
@@ -117,7 +117,7 @@ class MyCouplingFormSet:
                 centre_id=self.model.centre.id
                 cf.icreset=ClosureReset(centre_id,simulation.id,q,'ic')
                 cf.ecreset=ClosureReset(centre_id,simulation.id,q,'ec')
-            title='Binding for: %s'%q.targetInput
+            title='Binding for input : %s'%q.targetInput
             if self.simulation: title+=' for simulation %s'%self.simulation
             for key in self.couplingVocabs:
                 cf.fields[key].queryset=self.couplingVocabs[key]

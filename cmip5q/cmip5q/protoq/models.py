@@ -225,7 +225,7 @@ class Component(Doc):
 
     def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''
-        # currently don't copy couplings here ...
+        # currently don't copys here ...
         if centre.__class__!=Centre:
             raise ValueError('Invalid centre passed to component copy')
         
@@ -467,10 +467,10 @@ class Value(models.Model):
     value=models.CharField(max_length=64)
     vocab=models.ForeignKey(Vocab)
     definition=models.TextField(blank=True)
-    version=models.CharField(max_length=64,blank=True)
+    version=models.CharField(max_length=64,blank=True)    
     def __unicode__(self):  
         return self.value
-    
+
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
@@ -598,7 +598,7 @@ class Coupling(models.Model):
     # coupling for:
     targetInput=models.ForeignKey(ComponentInput)
     # coupling details (common to all closures)
-    ctype=models.ForeignKey('Value',related_name='%(class)s_corder',blank=True,null=True)
+    inputTechnique=models.ForeignKey('Value',related_name='%(class)s_InputTechnique',blank=True,null=True)
     FreqUnits=models.ForeignKey('Value',related_name='%(class)s_FreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
@@ -612,7 +612,7 @@ class Coupling(models.Model):
     def copy(self,group):
         '''Make a copy of self, and associate with a new group'''
         # first make a copy of self
-        args=['ctype','couplingFreq','FreqUnits','manipulation','targetInput']
+        args=['inputTechnique','couplingFreq','FreqUnits','manipulation','targetInput']
         kw={'original':self,'parent':group}
         for a in args:kw[a]=self.__getattribute__(a)
         new=Coupling(**kw)
@@ -636,16 +636,13 @@ class CouplingClosure(models.Model):
     # we don't need a closed attribute, since the absence of a target means it's open.
     coupling=models.ForeignKey(Coupling,blank=True,null=True)
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
-    spatialRegridding=models.ForeignKey('Value',related_name='%(class)s_SpatialRegridding')
-    spatialType=models.ForeignKey('Value',related_name='%(class)s_SpatialType')
-    temporalRegridding=models.ForeignKey('Value',related_name='%(class)s_TemporalRegridder')
-    inputDescription=models.TextField(blank=True,null=True)
+    spatialRegrid=models.ForeignKey('Value',related_name='%(class)s_SpatialRegrid')
+    temporalTransform=models.ForeignKey('Value',related_name='%(class)s_TemporalTransform')
    
     def makeNewCopy(self,coupling):
         ''' Copy closure to a new coupling '''
         kw={'coupling':coupling}
-        for key in ['spatialRegridding','spatialType',
-                    'temporalRegridding','inputDescription','target']:
+        for key in ['spatialRegrid','temporalTransform','target']:
             kw[key]=self.__getattribute__(key)
         new=self.__class__(**kw)
         new.save()
@@ -852,14 +849,12 @@ class CouplingForm(forms.ModelForm):
         model=Coupling
         #exclude=('parent', 'targetInput','original')
 class InternalClosureForm(forms.ModelForm):
-     inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
      class Meta:
          model=InternalClosure
      def specialise(self):
          pass
 
-class ExternalClosureForm(forms.ModelForm):#InternalClosureForm): not sure why this was here 11/11/09
-     inputDescription=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'2'}))
+class ExternalClosureForm(forms.ModelForm):
      class Meta:
          model=ExternalClosure
      def specialise(self):
