@@ -5,6 +5,8 @@ import logging
 import unittest
 
 cimv='http://www.metaforclimate.eu/cim/1.1'
+gmd='http://www.isotc211.org/2005/gmd'
+gco="http://www.isotc211.org/2005/gco"
 typekey='{http://www.w3.org/2001/XMLSchema-instance}type'
 
 def getText(elem,path):
@@ -14,50 +16,77 @@ def getText(elem,path):
         return ''
     else:
         return (e.text or '')
+    
 def getText2(elem,path):
     e=elem.find(path)
     if e is None: 
         return '' 
     else: return e.text or ''
     
-class numericalRequirement:
-    def __init__(self,elem):
-        self.description=getText(elem,'description')
-        self.id=getText(elem,'id')
-        self.name=getText(elem,'name')
+def numericalRequirement (elem):
+    description=getText(elem,'description')
+    id=getText(elem,'id')
+    name=getText(elem,'name')
+    
+    if typekey in elem.attrib.keys():
+        ctype=elem.attrib[typekey]
+    else: ctype=''
+    v=Vocab.objects.get(name='NumReqTypes')
+    ctypeVals=Value.objects.filter(vocab=v)
+    try:
+        ctype=ctypeVals.get(value=ctype)
+    except:
+        logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,name,id))
+        ctype=None
+    
+    if not name or name=='':
+        logging.debug('Numerical Requirement %s [%s,%s]'%(id,description,ctype))
+    
+    n=NumericalRequirement(description=description,name=name,ctype=ctype)
+    n.save()
+    return n
         
-        if typekey in elem.attrib.keys():
-            ctype=elem.attrib[typekey]
-        else: ctype=''
-        v=Vocab.objects.get(name='NumReqTypes')
-        ctypeVals=Value.objects.filter(vocab=v)
-        try:
-            self.ctype=ctypeVals.get(value=ctype)
-        except:
-            logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,self.name,self.id))
-            self.ctype=None
-       
-        if not self.name or self.name=='':
-            logging.debug('Numerical Requirement %s [%s,%s]'%(self.id,self.description,self.ctype))
-        # FIXME assumes no xlinks
+        
+def metaAuthor(elem):
+    ''' Oh what a nasty piece of code this is, but I don't have time to do it properly '''
+    #FIXME do this properly with lxml and xpath with namespaces
+    s=ET.tostring(elem)
+    if s.find('Charlotte')>-1: 
+        n='Charlotte Pascoe'
+        c=ResponsibleParty.objects.filter(name=n)
+        if len(c)==0:
+            p=ResponsibleParty(name=n,abbrev=n,uri=str(uuid.uuid1()),
+                               email='Charlotte.Pascoe@stfc.ac.uk')
+            p.save()
+        else: p=c[0]
+    elif s.find('Gerard')>1:
+        n='Gerard Devine'
+        c=ResponsibleParty.objects.filter(name=n)
+        if len(c)==0:
+            p=ResponsibleParty(name=n,abbrev=n,uri=str(uuid.uuid1()),
+                            email='g.m.devine@reading.ac.uk')
+            p.save()
+        else: p=c[0]
+    else: p=None
+    logging.debug('Metadata maintainer: %s'%p)
+    return p
 
-    def load(self):
-        ''' Load into django database '''
-        n=NumericalRequirement(description=self.description,
-                               name=self.name,
-                               ctype=self.ctype)
-        n.save()
-        return n.id
-
-class Duration(object):
-    def __init__(self,elem):
+def duration(elem,calendar):
         if elem is None:
-            self.start,self.end,self.lengthYears=None,None,None
-        else:
-            self.start=getText(elem,'startDate')
-            self.end=getText(elem,'endDate')
-            self.length=getText(elem,'lengthYears')
-            if self.length=='': self.length=None
+            return None
+        try:
+            etxt=getText(elem,'lengthYears')
+            length=float(etxt)
+        except:
+            logging.info('Unable to read length from %s'%etxt)
+            length=None
+        d=ClosedDateRange(startDate=getText(elem,'startDate'),
+                              endDate=getText(elem,'endDate'),
+                              length=length,
+                              calendar=calendar)
+        d.save()
+        logging.debug('Experiment duration %s'%d)
+        return d
         
 def calendar(elem):
     cvalues=Value.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
@@ -76,55 +105,52 @@ class NumericalExperiment(object):
     ''' Handles the reading of a numerical experiment, and the insertion into the django db '''
     
     def __init__(self,filename):
-        ''' Reads CIM format numerical experiments '''
+        ''' Reads CIM format numerical experiments, create an experiment, and then link
+        the numerical requirements in as well'''
         
-        self.etree=ET.parse(filename)
+        etree=ET.parse(filename)
         logging.debug('Parsing experiment filename %s'%filename)
 	
-        self.root=self.etree.getroot() 
+        root=etree.getroot()
         
-        for element in ['rationale','description','shortName','longName']:
-            self.__setattr__(element,getText(self.root,element))
+        #basic document stuff, note q'naire doc not identical to experiment bits ...
+        doc={'description':'description','shortName':'abbrev','longName':'title'}
+        for key in doc:
+            self.__setattr__(doc[key],getText(root,key))
         
-        self.numericalRequirements=[]
-        for r in self.root.findall('{%s}numericalRequirement'%cimv):
-            n=numericalRequirement(r)
-            if n.id<>'':self.numericalRequirements.append(n)
-            
-        self.duration=Duration(self.root.find('{%s}requiredDuration'%cimv))
-        self.calendar=calendar(self.root.find('{%s}calendar'%cimv))
-        self.docID=(self.root.find('{%s}documentID'%cimv).text or 'No ID Found')
+        self.rationale=getText(root,key)
+        #calendar before date
+        self.calendar=calendar(root.find('{%s}calendar'%cimv))
+        self.requiredDuration=duration(root.find('{%s}requiredDuration'%cimv),self.calendar)
+        
+        # going to ignore the ids in the file, and be consistent with the rest of the q'naire
+        # documents
+      
+        # bypass reading all that nasty gmd party stuff ...
+        author=metaAuthor(root.find('{%s}author'%cimv))
 
-        
-    def load(self):
-        ''' Loads information into the django database '''
-        
         E=Experiment(rationale=self.rationale,
                      description=self.description,
-                     docID=self.docID,
-                     shortName=self.shortName,
-                     startDate=self.duration.start,
-                     endDate=self.duration.end,
-                     length=self.duration.length,
-                     longName=self.longName,
-                     calendar=self.calendar,
-                     )     
-        E.save()   # we need to do this before we can have a manytomany field instance
-        
-        #Do all the numerical requirements.
-        # FIXME, assume that they're all independent and no xlinks.
-        
-        for r in self.numericalRequirements:
-            rid=r.load()
-            E.requirements.add(rid) 
+                     uri=str(uuid.uuid1()),
+                     abbrev=self.abbrev,
+                     title=self.title,
+                     requiredDuration=self.requiredDuration,
+                     requiredCalendar=self.calendar,
+                     metadataMaintainer=author)
         E.save()
-        return E.id
+        
+        for r in root.findall('{%s}numericalRequirement'%cimv):
+            n=numericalRequirement(r)
+            E.requirements.add(n)
         
 class TestFunctions(unittest.TestCase): 
     def testExperiment(self):
+        import os
         d='data/experiments/'
-        filename='6.7b_Aquaplanet_4CO2.xml'
-        x=NumericalExperiment(d+filename)
+        for f in os.listdir(d):
+            if f.endswith('.xml'):
+                x=NumericalExperiment(os.path.join(d, f)) 
+        
         
             
         

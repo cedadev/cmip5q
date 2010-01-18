@@ -30,7 +30,6 @@ experimentDir = './data/experiments'
 for f in os.listdir(experimentDir):
     if f.endswith('.xml'):
 	    x=NumericalExperiment(os.path.join(experimentDir, f)) 
-	    x.load()
 
 # initialise a model template
 initialiseModel()

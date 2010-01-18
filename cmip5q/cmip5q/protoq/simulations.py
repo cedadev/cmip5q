@@ -187,8 +187,7 @@ class simulationHandler(object):
         ''' Return a listing of simulations for a given centre '''
         
         c=Centre.objects.get(pk=self.centreid)
-        exp=[]
-        
+       
         #little class to monkey patch up the stuff needed for the template
         class etmp:
             def __init__(self,abbrev,values,id):
@@ -202,10 +201,11 @@ class simulationHandler(object):
         cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
 
         eset=Experiment.objects.all()
+        exp=[]
         for e in eset:
             sims=e.simulation_set.filter(centre=c.id)
             for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))    
-            exp.append(etmp(e.shortName,sims,e.id))
+            exp.append(etmp(e.abbrev,sims,e.id))
 
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,'csims':csims,'cpurl':cpurl,

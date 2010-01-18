@@ -116,6 +116,14 @@ class Centre(ResponsibleParty):
     party=models.OneToOneField(ResponsibleParty,parent_link=True,related_name='party')
     def __init__(self,*args,**kwargs):
         ResponsibleParty.__init__(self,*args,**kwargs)
+        
+class EditHistoryEvent(models.Model):
+    ''' Used for edit history event logging '''
+    eventDate=models.DateField(auto_now_add=True,editable=False)
+    eventParty=models.ForeignKey(ResponsibleParty)
+    eventAction=models.TextField(blank=True)
+    # following will only means something to whatever creates the event.
+    eventIdentifier=models.CharField(max_length=128)
 
 class Doc(models.Model):
     ''' Abstract class for general properties '''
@@ -143,6 +151,9 @@ class Doc(models.Model):
     numberOfValidationChecks=models.IntegerField(default=0,editable=False)
     # following is used by the user to declare the document is "ready"
     isComplete=models.BooleanField(default=False)
+    # to be used for event histories:
+    editHistory=models.ManyToManyField(EditHistoryEvent,blank=True,null=True)
+    
     def status(self):
         ''' Return a percentage completion in terms of validation '''
         if self.validErrors<>-1 and self.numberOfValidationChecks<>0:
@@ -158,6 +169,8 @@ class Doc(models.Model):
         ''' Used to decide what to do about versions. We only increment the document version
         number with changes once the document is considered to be complete and valid '''
         if self.validErrors==0 and self.isComplete:  self.documentVersion+=1
+        if 'eventParty' in kwargs:
+            self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
         return models.Model.save(self,*args,**kwargs)
     def __myclass(self):
         ''' Presumably there is a hidden method on models.Model to do this '''
@@ -340,23 +353,25 @@ class Platform(Doc):
     interconnect=models.ForeignKey('Value',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
     
-class Experiment(models.Model):
-    ''' A CMIP5 Experiment '''
-    rationale=models.TextField(blank=True,null=True)
-    description=models.TextField(blank=True,null=True)
-    requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
-    docID=models.CharField(max_length=128)
-    shortName=models.CharField(max_length=64)
-    longName=models.CharField(max_length=256,blank=True,null=True)
+class ClosedDateRange(models.Model):
     startDate=models.CharField(max_length=32,blank=True,null=True)
     endDate=models.CharField(max_length=32,blank=True,null=True)
-    length=models.FloatField(blank=True,null=True)
+    length=models.FloatField(blank=True,null=True)  # years
     calendar=models.ForeignKey('Value',blank=True,null=True)
     def __unicode__(self):
-        return self.shortName
-    class Meta:
-        ordering=('shortName',)
-    
+        return '%s to %s (%sy)'%(self.startDate,self.endDate,self.length)
+
+class Experiment(Doc):
+    ''' A CMIP5 Numerical Experiment '''
+    rationale=models.TextField(blank=True,null=True)
+    requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
+    requiredDuration=models.ForeignKey(ClosedDateRange,blank=True,null=True)
+    requiredCalendar=models.ForeignKey('Value',blank=True,null=True,related_name='experiment_calendar')
+    #used to identify groups of experiments
+    memberOf=models.ForeignKey('Experiment',blank=True,null=True)
+    def __unicode__(self):
+        return self.abbrev
+
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
     description=models.TextField()
