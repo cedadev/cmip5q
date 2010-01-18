@@ -184,6 +184,7 @@ class couplingHandler:
         self.urls={'ok':reverse('cmip5q.protoq.views.simulationCup',args=(self.centre_id,simulation_id,)),
               'return':reverse('cmip5q.protoq.views.simulationEdit',args=(self.centre_id,simulation_id,)),
               'returnName':'simulation',
+              'reset':reverse('cmip5q.protoq.views.simulationCupReset',args=(self.centre_id,simulation_id,)),
               }
         return self.__handle(simulation)
     def __handle(self,simulation=None):
@@ -193,6 +194,7 @@ class couplingHandler:
         self.urls['model']=reverse('cmip5q.protoq.views.componentEdit',
                     args=(self.centre_id,model.id,))
         logging.debug('Handling %s coupling request for %s (simulation %s)'%(self.method,model,simulation))
+       
         if self.method=='POST':
             Intform=MyCouplingFormSet(model,simulation,queryset,self.request.POST)
             if Intform.is_valid():
@@ -210,6 +212,7 @@ class couplingHandler:
         'tabs':tabs(self.request,self.centre_id,labelstr)})
         
     def resetClosures(self,simulation_id,coupling_id,ctype):
+        logging.info('Deprecated reset closure method used for %s'%ctype)
         coupling=Coupling.objects.get(id=coupling_id)
         reset=ClosureReset(self.centre_id,simulation_id,coupling,ctype)
         return reset.reset()

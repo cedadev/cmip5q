@@ -61,7 +61,8 @@ urlpatterns = patterns('',
                 'cmip5q.protoq.views.conformanceMain'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/copy/$',
                 'cmip5q.protoq.views.simulationCopy'),
-                                         
+    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/resetCouplings/$',
+                'cmip5q.protoq.views.simulationCupReset'),                 
     #           
     # platforms/add/centre_id
     # platforms/edit/platform_id

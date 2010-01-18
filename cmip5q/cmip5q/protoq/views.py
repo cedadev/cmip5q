@@ -198,10 +198,14 @@ def conformanceMain(request,centre_id,simulation_id):
 def simulationCup(request,centre_id,simulation_id,coupling_id=None,ctype=None):
     ''' Return couplings for a component '''
     c=couplingHandler(centre_id,request)
-    if ctype:
+    if ctype: # this method deprecated.
         return c.resetClosures(simulation_id,coupling_id,ctype)
     else:
         return c.simulation(simulation_id)
+    
+def simulationCupReset(request,centre_id,simulation_id):
+    s=simulationHandler(centre_id,simulation_id)
+    return s.resetCouplings()
    
 #### CONFORMANCE HANDLING APPEARS IN THE SIMULATION FILE  ###########################################################
  

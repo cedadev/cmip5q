@@ -255,5 +255,15 @@ class simulationHandler(object):
                 return HttpResponse('ERROR, %s, malformed POST to simulation copy'%e)
         else:
             return self.list(request)
-    
+        
+    def resetCouplings(self):
+        ''' This method completely resets ALL couplings and ALL closures from the 
+        originals in the model. Note that copy does not do the closures, but
+        this one does. One closure at a time can be done via the coupling handler. '''
+        s=Simulation.objects.get(pk=self.simid)
+        s.resetCoupling(closures=True)
+        # and return to the coupling view 
+        url=reverse('cmip5q.protoq.views.simulationCup',
+                    args=(self.centreid,s.id,))
+        return HttpResponseRedirect(url)
                 

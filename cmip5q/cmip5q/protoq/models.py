@@ -391,21 +391,24 @@ class Simulation(Doc):
         if len(cgs): 
             # we've already got a coupling group, let's update it
             assert(len(cgs)==1,'Simulation %s should only have one coupling group'%self) 
+            cgs=cgs[0]
             modelCouplings=self.numericalModel.couplings()
             myCouplings=self.numericalModel.couplings(self)
             myOriginals=[i.original for i in myCouplings]
             for m in modelCouplings:
                 if m not in myOriginals: 
-                    r=m.copy(cgs[0])
+                    r=m.copy(cgs)
         else:
             # get the model coupling group ... and copy it.
             # it's possible we might be doing this before there is a modelling group
             mcgs=self.numericalModel.couplinggroup_set.all()
             if len(mcgs)==0: 
                 pass # nothing to do
+                cgs=None # I'm not sure this should ever happen any more ...
             else:
                 cgs=mcgs.get(simulation=None)
-                cgs.duplicate4sim(self)
+                cgs=cgs.duplicate4sim(self)
+        return cgs  # it's quite useful to get this back (e.g. for resetclosures etc)
 
     def copy(self,experiment):
         ''' Copy this simulation into a new experiment '''
@@ -440,7 +443,7 @@ class Simulation(Doc):
             c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
             c.save()
     
-    def resetCoupling(self):
+    def resetCoupling(self,closures=False):
         # we had some couplings, but we need to get rid of them for some reason
         # (usually because we've just change model)
         cgs=self.couplinggroup_set.all()
@@ -449,7 +452,8 @@ class Simulation(Doc):
             cg=cgs[0]
             cg.delete()
         # now put back the ones from the model
-        self.updateCoupling()
+        cg=self.updateCoupling()
+        if closures:cg.propagateClosures()
         
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -550,8 +554,7 @@ class DataObject(models.Model):
     featureType=models.ForeignKey('Value',blank=True,null=True)
     # not using this at the moment, but keep for later:
     drsAddress=models.CharField(max_length=256,blank=True)
-    def __unicode__(self):
-        return '%s(%s)'%(self.variable,self.container)
+    def __unicode__(self): return self.variable
     
 class CouplingGroup(models.Model):
     ''' This class is used to help manage the couplings in terms of presentation and
@@ -585,8 +588,8 @@ class CouplingGroup(models.Model):
         myset=self.coupling_set.all()
         for coupling in myset:
             # find all the relevant closures and copy them
-            coupling.progagateClosures()          
-        return '%s couplings updated (with %s closures)'%(len(myset),nc)
+            coupling.propagateClosures()          
+        return '%s couplings updated '%len(myset)
     class Meta:
         ordering=['component']
     def __unicode__(self):
@@ -627,7 +630,7 @@ class Coupling(models.Model):
         for cmodel in [InternalClosure,ExternalClosure]:
             set=cmodel.objects.filter(coupling=self.original)
             for i in set: i.makeNewCopy(self)
-        return '%s updated from %s'(self,self.original)
+        return '%s updated from %s'%(self,self.original)
     class Meta:
         ordering=['targetInput']
     
