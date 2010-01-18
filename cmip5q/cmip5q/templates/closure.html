@@ -1,5 +1,12 @@
 <tr class="{% cycle 'row1' 'row2' %}">
-    <td>From: {{ff.target.errors}}{{ff.target}} &nbsp;  {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
+    <td> {% ifequal ff.instance.ctype 'internal' %}
+    From: {{ff.target.errors}}{{ff.target}} &nbsp; {% else %}
+    <table> 
+    <tr><td>File: {{ff.targetFile.errors}}{{ff.targetFile}}</td></tr>
+    <tr><td>Variable: {{ff.target.errors}}{{ff.target}}</td></tr>
+    </table>
+    {% endifequal %}
+    {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
     <td>
         <table>
         <tr><td> 

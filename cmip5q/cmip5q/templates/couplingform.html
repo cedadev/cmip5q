@@ -1,7 +1,7 @@
 <div class="boxer">
-<h3>{{f.title}}  ({{f.cf.instance.targetInput.ctype}})</h3>
+<h3>{{f.title}}</h3>
 <hr>
-<!-- Boundary condition -->
+<center>
 <p> Describe the input technique and how often it occurred </p>
 <p>Coupling Type: {{f.cf.inputTechnique.errors}}{{f.cf.inputTechnique}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
@@ -12,22 +12,26 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 is likely you will only need to enter material in both columns if you have a regional model. {% endifequal %} New blank rows will appear after rows which have been completed and saved. Only use these if you wish to enter multiple sources as input.  </td></tr>
 <tr><th width="50%"> From files </th>{% ifequal f.cf.instance.targetInput.ctype f.bcv %}<th> From other model components </th>{% endifequal %}</tr>
 <tr><td>
-   {{f.ec.management_form}}
+    {{f.ec.management_form}}
     <table class="boxer">
     {% for ff in f.ec.forms %}
     {% include 'closure.html' %}
     {% endfor %}
     </table>
-</td>{% ifequal f.cf.instance.targetInput.ctype f.bcv %}<td>
-     {{ f.ic.management_form}}
+</td><td>
+    {{ f.ic.management_form}}
+    {% ifequal f.cf.instance.targetInput.ctype f.bcv %}
     <table class="boxer">
     {% for ff in f.ic.forms %}
     {% include 'closure.html' %}
     {% endfor %}
-    </table>
-</td> {% endifequal %}</tr>
+    </table>{% endifequal %}
+</td> </tr>
 </table>
 <hr>
-<p> Describe how these input(s) were manipulated and/or combined when providing the {{f.title}}</p>
-{{f.cf.manipulation.errors}}{{f.cf.manipulation}}
+
+<p> Describe how these input(s) were manipulated and/or combined for input  <em>{{f.cf.instance.targetInput.abbrev}}</em> in component <em>{{ f.cf.instance.targetInput.owner}}</em> 
+{% if s %} for simulation <em>{{s}}</em> {% endif %}{{f.cf.manipulation.errors}}{{f.cf.manipulation}} </p>
+{{ f.cf.targetInput }} {{f.cf.original}} {{f.cf.parent}}
+</center>
 </div>

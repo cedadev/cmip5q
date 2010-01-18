@@ -59,6 +59,8 @@ class MyExternalClosures(ExternalClosureFormSet):
         self.coupling=q
         qset=ExternalClosure.objects.filter(coupling=q)
         ExternalClosureFormSet.__init__(self,data,queryset=qset,prefix=prefix)
+        for i in self.forms:
+            i.specialise()
     def save(self):
         instances=ExternalClosureFormSet.save(self,commit=False)
         logging.debug('saving external closures for %s'%self.coupling)
@@ -106,7 +108,8 @@ class MyCouplingFormSet:
                 'temporalTransform':temporalTransform}
                
         # rather than use a django formset for the couplings, we'll do them by
-        # hand, but do the closures using a formset ...
+        # hand, but do the closures using a formset ... this made sense when
+        # we had lots of closures, but less now ...
         
         self.forms=[]
         # this is the list of relevant realm level components:
@@ -117,7 +120,7 @@ class MyCouplingFormSet:
                 centre_id=self.model.centre.id
                 cf.icreset=ClosureReset(centre_id,simulation.id,q,'ic')
                 cf.ecreset=ClosureReset(centre_id,simulation.id,q,'ec')
-            title='Binding for input : %s'%q.targetInput
+            title='Binding for %s %s'%(q.targetInput.ctype,q.targetInput)
             if self.simulation: title+=' for simulation %s'%self.simulation
             for key in self.couplingVocabs:
                 cf.fields[key].queryset=self.couplingVocabs[key]
@@ -216,6 +219,12 @@ class couplingHandler:
         coupling=Coupling.objects.get(id=coupling_id)
         reset=ClosureReset(self.centre_id,simulation_id,coupling,ctype)
         return reset.reset()
+    
+    def update(self,coupling_id):
+        ''' Used to update just one coupling, probably as an ajax activity '''
+        pass
+            
+        
         
     
         

@@ -309,7 +309,7 @@ class ComponentInput(models.Model):
     realm=models.ForeignKey(Component,related_name="input_realm")
     #constraint=models.ForeignKey('Constraint',null=True,blank=True)
     def __unicode__(self):
-        return '%s:%s'%(self.owner,self.abbrev)
+        return '%s (%s)'%(self.abbrev, self.owner)
     def makeNewCopy(self,component):
         new=ComponentInput(abbrev=self.abbrev,description=self.description,ctype=self.ctype,
                            owner=component,realm=component.realm)
@@ -525,8 +525,10 @@ class NewParam(models.Model):
     
 class DataContainer(models.Model):
     ''' This holds multiple data objects. Some might think of this as a file '''
-    # a name for drop down file lists:
-    name=models.CharField(max_length=64)
+    # a name for drop down file lists (and yes it's short)
+    abbrev=models.CharField(max_length=32)
+    # and a real name for disambiguation, although the link is authorative.
+    name=models.CharField(max_length=128)
     # a link to the object if possible:
     link=models.URLField(blank=True)
     # what's in the container
@@ -538,7 +540,10 @@ class DataContainer(models.Model):
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
     def __unicode__(self):
-        return self.name
+        if self.abbrev <> '':
+            return self.abbrev
+        else: return self.name[0:31]  # truncation ...
+        
     
 class DataObject(models.Model):
     ''' Holds a variable within a data container '''
@@ -641,7 +646,15 @@ class CouplingClosure(models.Model):
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
     spatialRegrid=models.ForeignKey('Value',related_name='%(class)s_SpatialRegrid')
     temporalTransform=models.ForeignKey('Value',related_name='%(class)s_TemporalTransform')
-   
+
+    class Meta:
+        abstract=True
+
+class InternalClosure(CouplingClosure): 
+    target=models.ForeignKey(Component,blank=True,null=True)
+    ctype='internal'
+    def __unicode__(self):
+        return 'iClosure %s'%self.target
     def makeNewCopy(self,coupling):
         ''' Copy closure to a new coupling '''
         kw={'coupling':coupling}
@@ -649,19 +662,21 @@ class CouplingClosure(models.Model):
             kw[key]=self.__getattribute__(key)
         new=self.__class__(**kw)
         new.save()
-    class Meta:
-        abstract=True
-
-class InternalClosure(CouplingClosure): 
-    target=models.ForeignKey(Component,blank=True,null=True)
-    def __unicode__(self):
-        return 'iClosure %s'%self.target
     
 class ExternalClosure(CouplingClosure):
     ''' AKA boundary condition '''
-    target=models.ForeignKey('DataObject',blank=True,null=True)
+    target=models.ForeignKey(DataObject,blank=True,null=True)
+    targetFile=models.ForeignKey(DataContainer,blank=True,null=True)
+    ctype='external'
     def __unicode__(self):
         return 'eClosure %s'%self.target    
+    def makeNewCopy(self,coupling):
+        ''' Copy closure to a new coupling '''
+        kw={'coupling':coupling}
+        for key in ['spatialRegrid','temporalTransform','target','targetFile']:
+            kw[key]=self.__getattribute__(key)
+        new=self.__class__(**kw)
+        new.save()
         
 class Ensemble(models.Model):
     description=models.TextField(blank=True,null=True)
@@ -850,7 +865,7 @@ class CouplingForm(forms.ModelForm):
             self.fields[k].widget=forms.HiddenInput()
     class Meta:
         model=Coupling
-        #exclude=('parent', 'targetInput','original')
+        
 class InternalClosureForm(forms.ModelForm):
      class Meta:
          model=InternalClosure
@@ -861,7 +876,8 @@ class ExternalClosureForm(forms.ModelForm):
      class Meta:
          model=ExternalClosure
      def specialise(self):
-         pass
+         if self.instance.targetFile:
+            self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
                         
 class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
