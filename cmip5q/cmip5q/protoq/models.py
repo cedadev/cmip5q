@@ -104,7 +104,10 @@ class ResponsibleParty(models.Model):
     def __unicode__(self):
         return self.abbrev
     def delete(self,*args,**kwargs):
-        return soft_delete(self,*args,**kwargs)    
+        return soft_delete(self,*args,**kwargs)
+    class Meta:
+        ordering=['name','email']
+    
     
 class Centre(ResponsibleParty):
     ''' A CMIP5 modelling centre '''
@@ -150,6 +153,7 @@ class Doc(models.Model):
         return self.abbrev
     class Meta:
         abstract=True
+        ordering=['abbrev','title']
     def save(self,*args,**kwargs):
         ''' Used to decide what to do about versions. We only increment the document version
         number with changes once the document is considered to be complete and valid '''
@@ -185,6 +189,8 @@ class Reference(models.Model):
         return self.name
     def delete(self,*args,**kwargs):
         soft_delete(self,*args,**kwargs)
+    class Meta:
+        ordering=['name','citation']
     
 class Component(Doc):
     ''' A model component '''
@@ -318,6 +324,8 @@ class ComponentInput(models.Model):
         cg=CouplingGroup.objects.filter(simulation=None).get(component=component.model)
         ci=Coupling(parent=cg,targetInput=new)
         ci.save()
+    class Meta:
+        ordering=['abbrev']
 
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
@@ -467,6 +475,8 @@ class Vocab(models.Model):
     definition=models.TextField(blank=True)
     def __unicode__(self):
        return self.name
+    class Meta:
+        ordering=('name',)
     
 class Value(models.Model):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
@@ -476,6 +486,8 @@ class Value(models.Model):
     version=models.CharField(max_length=64,blank=True)    
     def __unicode__(self):  
         return self.value
+    class Meta:
+        ordering=('value',)
 
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
@@ -545,7 +557,8 @@ class DataContainer(models.Model):
         if self.abbrev <> '':
             return self.abbrev
         else: return self.name[0:31]  # truncation ...
-        
+    class Meta:
+        ordering=('centre','name')
     
 class DataObject(models.Model):
     ''' Holds a variable within a data container '''
@@ -562,6 +575,8 @@ class DataObject(models.Model):
     # not using this at the moment, but keep for later:
     drsAddress=models.CharField(max_length=256,blank=True)
     def __unicode__(self): return self.variable
+    class Meta:
+        ordering=('variable',)
     
 class CouplingGroup(models.Model):
     ''' This class is used to help manage the couplings in terms of presentation and
@@ -704,6 +719,8 @@ class EnsembleMember(models.Model):
     mod=models.ForeignKey('Modification',blank=True,null=True)
     def __unicode__(self):
         return '%s ensemble member %s'%(self.ensemble.simulation,self.memberNumber)
+    class Meta:
+        ordering=('memberNumber',)
     
 class Conformance(models.Model):
     ''' This relates a numerical requirement to an actual solution in the simulation '''
@@ -728,6 +745,8 @@ class Modification(models.Model):
     centre=models.ForeignKey(Centre)
     def __unicode__(self):
         return '%s(%s)'%(self.mnemonic,self.mtype)
+    class Meta:
+        ordering=('mnemonic',)
     
 class InputMod(Modification):
     ''' Simulation initial condition '''
