@@ -16,24 +16,13 @@
     this information when you describe the simulations. You do not need to fill out any (or even all) of these entries
     at this time, but if you are reusing this model with each simulation having minor changes to the inputs, it will be easier 
     to enter the defaults now!{% else %}
-    If you have resolved some (or all) of your inputs when you entered the model description, then most of that information will
-    have been copied into this simulation description. However, we have not <em> by default </em> copied the binding to
-    specific components or files in the boundary conditions - but you <em> can </em> copy them on a case by case basis in the
-    entries below, by using the copy button within each "coupling" section.
+    If you have resolved some (or all) of your inputs when you entered the model description, then you can copy them using the button below ... but only do
+    that if you have not already made changes for <em> this </em> simulation.
     {% endif %} </p>
     
-    <p> There is one "coupling" entry for each input requirement you declared in your model component description. It may be you need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, so you can describe them here. </p>
+    <p> There is one entry for each input requirement you declared in your model component description. It may be you need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, so you can describe them here. </p>
     
-    <p> Recall there are three types of inputs, and the nature of the what we ask depends on what sort of
-    input is required.</p>
-    
-    <p><ul><li> <b> Boundary Conditions</b> Within each such "coupling" entry, there are four subsections: <ol><li>A section describing the coupler used, and the coupling frequency for that particular input.</li><li> A section describing how (potentially multiple) inputs were gathered from other components to feed into the one you are describing. (Note we are only interested in coupling to components at the "realm" level.)</li><li> A section describing how inputs were gathered from (potentially multiple) files (described using the file tab) to feed into the one you are describing,and </li><li> A section describing how the inputs were manipulated to produce the final input. </li></ol> It is likely that you'll only fill out section (2) or section (3) for any one coupling.</li>
-    <li> <b> Initial conditions</b> Within each such coupling entry, we ask you simply to bind the input to between one and many variables from the file/variable combinations you have entered using the file tab.</li>
-    <li> <b> Ancillary Files</b> Within each such coupling entry, we ask you simply to bind the input to one file (and one file only, if you want multiple files, please use multiple input requirements to distinguish them.</li>
-    </ul>
-    </p>
-    
-    <p> The level of detail to input is up to you, but we will be asking you about how your simulation conformed to the experimental requirements on the simulation "conformance" pages. In many cases that will be asking you to link some response of yours to both a particular requirement and a particular input, so if you don't do it now, you might have to come back later :-) (and obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external files. Note also that the simulation description will not validate as complete unless all declared input requirements  are coupled somehow to boundary conditions.</p>
+    <p> The level of detail to input is up to you, but we will be asking you about how your simulation conformed to the experimental requirements on the simulation "conformance" pages. In many cases that will be asking you to link some response of yours to both a particular requirement and a particular input, so if you don't do it now, you might have to come back later :-) (and obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external files. Note also that the simulation description will not validate as complete unless all declared input requirements resolved.</p>
 </div>
     <div class="boxer">
     <h4> Inputs and Resolutions </h4>

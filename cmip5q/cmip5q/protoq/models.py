@@ -454,6 +454,7 @@ class Simulation(Doc):
         # now put back the ones from the model
         cg=self.updateCoupling()
         if closures:cg.propagateClosures()
+
         
 class Vocab(models.Model):
     ''' Holds the values of a choice list aka vocabulary '''
@@ -463,13 +464,14 @@ class Vocab(models.Model):
     uri=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
     version=models.CharField(max_length=64,blank=True)
+    definition=models.TextField(blank=True)
     def __unicode__(self):
-        return self.name
+       return self.name
     
 class Value(models.Model):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
     value=models.CharField(max_length=64)
-    vocab=models.ForeignKey(Vocab)
+    vocab=models.ForeignKey('Vocab')
     definition=models.TextField(blank=True)
     version=models.CharField(max_length=64,blank=True)    
     def __unicode__(self):  
@@ -646,9 +648,9 @@ class CouplingClosure(models.Model):
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
     spatialRegrid=models.ForeignKey('Value',related_name='%(class)s_SpatialRegrid')
     temporalTransform=models.ForeignKey('Value',related_name='%(class)s_TemporalTransform')
-
     class Meta:
         abstract=True
+   
 
 class InternalClosure(CouplingClosure): 
     target=models.ForeignKey(Component,blank=True,null=True)

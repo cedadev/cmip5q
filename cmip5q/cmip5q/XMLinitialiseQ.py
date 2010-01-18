@@ -72,9 +72,9 @@ def loadProperties(args):
     from vocabs.InputTransformations import properties
     #properties={'abc':(def,[(a,d),(b,d),(c,d),.._,}
     for arg in args:
-        v=Vocab(uri=str(uuid.uuid1(1)),name=arg)
-        v.save()
         defn,values=properties[arg]
+        v=Vocab(uri=str(uuid.uuid1(1)),name=arg,definition=defn)
+        v.save()
         for r,d in values:
             rv=Value(vocab=v,value=r,definition=d)
             rv.save()

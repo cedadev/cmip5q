@@ -35,3 +35,9 @@ is likely you will only need to enter material in both columns if you have a reg
 {{ f.cf.targetInput }} {{f.cf.original}} {{f.cf.parent}}
 </center>
 </div>
+<script type="text/javascript">
+        YAHOO.namespace("e{{f.cf.instance.id}}.container");
+	{% for ff in f.ec.forms %}
+            YAHOO.e{{f.cf.instance.id}}.container.ytt{{f.cf.instance.id}} = new YAHOO.widget.Tooltip("ytt{{f.cf.instance.id}}", { context:"tt{{f.cf.instance.id}}", text:"You can shorten the variable list to only those in the relevant file by saving your file choice, then choosing a variable."});
+        {% endfor %}
+    </script>

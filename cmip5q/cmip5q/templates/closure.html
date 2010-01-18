@@ -3,7 +3,7 @@
     From: {{ff.target.errors}}{{ff.target}} &nbsp; {% else %}
     <table> 
     <tr><td>File: {{ff.targetFile.errors}}{{ff.targetFile}}</td></tr>
-    <tr><td>Variable: {{ff.target.errors}}{{ff.target}}</td></tr>
+    <tr><td {% if forloop.first %}id="tt{{f.cf.instance.id}}"{% endif %} >Variable: {{ff.target.errors}}{{ff.target}}</td></tr>
     </table>
     {% endifequal %}
     {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
