@@ -138,7 +138,7 @@ class Translator:
             self.addComponent(ref.numericalModel,modelElement)
             simulationElement=self.cimRecord(root,ref)
             self.addSimulation(ref,simulationElement)
-            experimentElement=self.cimRecord(root,ref)
+            experimentElement=self.cimRecord(root,ref.experiment)
             self.addExperiment(ref.experiment,experimentElement)
             platformElement=self.cimRecord(root,ref.platform)
             self.addPlatform(ref.platform,platformElement)
@@ -406,22 +406,24 @@ class Translator:
                 self.addRequirement(reqClass,expElement)
             ''' supports [0..inf] '''
             ''' shortName [1] '''
-            ET.SubElement(expElement,'shortName').text=expClass.shortName
+            ET.SubElement(expElement,'shortName').text=expClass.abbrev
             ''' longName [1] '''
-            ET.SubElement(expElement,'longName').text=expClass.longName
+            ET.SubElement(expElement,'longName').text=expClass.title
             ''' description [0..1] '''
             ET.SubElement(expElement,'description').text=expClass.description
             ''' calendar [1] '''
             calendarElement=ET.SubElement(expElement,'calendar')
-            calTypeElement=ET.SubElement(calendarElement,str(expClass.calendar))
+            assert(expClass.requiredCalendar)
+            calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.value))
             rangeElement=ET.SubElement(calTypeElement,'range')
             ET.SubElement(rangeElement,'closedDateRange')
             ''' requiredDuration [1] '''
+            assert(expClass.requiredDuration)
             durationElement=ET.SubElement(expElement,'requiredDuration')
-            ET.SubElement(durationElement,'startDate').text=expClass.startDate
-            ET.SubElement(durationElement,'endDate').text=expClass.endDate
+            ET.SubElement(durationElement,'startDate').text=expClass.requiredDuration.startDate
+            ET.SubElement(durationElement,'endDate').text=expClass.requiredDuration.endDate
             if not(self.VALIDCIMONLY) :
-                ET.SubElement(expElement,'Q_lengthYears').text=str(expClass.length)
+                ET.SubElement(expElement,'Q_lengthYears').text=str(expClass.requiredDuration.length)
             ''' documentID [1] '''
             ET.SubElement(expElement,'documentID').text='00000000-0000-0000-0000-000000000000'
             ''' documentAuthor [0..inf] '''
@@ -455,6 +457,7 @@ class Translator:
     
     def addComponent(self,compClass,rootElement):
 
+        assert(compClass)
         if compClass :
             self.addChildComponent(compClass,rootElement,1,self.recurse)
         return rootElement
@@ -563,7 +566,7 @@ class Translator:
 
     def addChildComponent(self,c,root,nest,recurse=True):
 
-      if c.implemented:
+      if c.implemented or nest==1:
         if nest==1:
           # documentVersion has been removed since CIM1.3 (current is CIM1.4)
           #comp=ET.SubElement(root,'modelComponent',{'documentVersion': str(c.documentVersion), 'CIMVersion': '1.4'})
@@ -674,7 +677,8 @@ class Translator:
           
 
       else:
-        logging.debug("component "+c.abbrev+" has implemented set to false")
+          root.append(ET.Comment('Component '+c.abbrev+' has implemented set to false'))
+        #logging.debug("component "+c.abbrev+" has implemented set to false")
       return
 
     def addReferences(self,references,rootElement):
