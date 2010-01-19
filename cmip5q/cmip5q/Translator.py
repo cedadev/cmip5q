@@ -174,12 +174,11 @@ class Translator:
             #single simulation
             simElement=ET.SubElement(rootElement,'simulationRun',{'CIMVersion':'1.4'})
             ''' responsibleParty [0..inf] '''
+            self.addResp(simClass.contact,simElement,'contact')
+            self.addResp(simClass.author,simElement,'author')
+            self.addResp(simClass.funder,simElement,'funder')
+            self.addResp(simClass.centre.party,simElement,'centre')
             ''' principleInvestigator [0..inf] '''
-            if not(self.VALIDCIMONLY) :
-                resps=ET.SubElement(simElement,"Q_responsibleParties")
-                self.addResp(simClass.contact,resps,'contact')
-                self.addResp(simClass.author,resps,'author')
-                self.addResp(simClass.funder,resps,'funder')
             ''' fundingSource [0..inf] '''
             ''' rationale [1..inf] '''
             ET.SubElement(simElement,'rationale').text=simClass.description
@@ -497,13 +496,14 @@ class Translator:
                     ET.SubElement(machineElement,'Q_title').text=platClass.title
                     ET.SubElement(machineElement,'Q_abbrev').text=platClass.abbrev
                     ET.SubElement(machineElement,'Q_description').text=platClass.description
-                    self.addResp(docClass.author,docElement,'author')
+                    #no funder specified for deployments in the questionnaire
+                    #self.addResp(docClass.author,docElement,'author')
                     self.addResp(docClass.funder,docElement,'funder')
                     self.addResp(docClass.contact,docElement,'contact')
 
                 deployElement=ET.SubElement(rootElement,'deployment')
                 ''' deploymentDate [1] '''
-                ET.SubElement(deployElement,'deploymentDate').text='1:1:1'
+                ET.SubElement(deployElement,'deploymentDate').text='0001-01-01T00:00:00'
                 ''' description [0..1] '''
                 ''' machine [1] '''
                 machineElement=ET.SubElement(deployElement,'machine')
@@ -570,8 +570,6 @@ class Translator:
           comp=ET.SubElement(root,'modelComponent',{'CIMVersion': '1.4'})
         else:
           comp=ET.SubElement(root,'modelComponent')
-          #Component isa Doc, however, we already capture the required info so no need to output this. I had a call a specialised version which had any remaining info that is not used by the CIM but it is commented out as I am not sure if this information is useful
-          #self.addComponentDoc(c,comp)
         if self.outputComposition:
             '''composition'''
             self.composition(c,comp)
@@ -632,12 +630,10 @@ class Translator:
         ET.SubElement(comp,'scientificProperties')
         '''grid'''
         '''responsibleParty'''
-        #comp.append(ET.Comment("format for responsible party's is not yet determined"))
-        if not(self.VALIDCIMONLY) :
-            resps=ET.SubElement(comp,"Q_responsibleParties")
-            self.addResp(c.author,resps,'author')
-            self.addResp(c.funder,resps,'funder')
-            self.addResp(c.contact,resps,'contact')
+        self.addResp(c.author,comp,'author')
+        self.addResp(c.funder,comp,'funder')
+        self.addResp(c.contact,comp,'contact')
+        self.addResp(c.centre.party,comp,'centre')
         '''fundingSource'''
         '''citation'''
         if not(self.VALIDCIMONLY) :
@@ -695,35 +691,43 @@ class Translator:
 
     def addResp(self,respClass,rootElement,respType):
         if (respClass) :
-            respElement=ET.SubElement(rootElement,"Q_responsibleParty",{'type':respType})
-            ET.SubElement(respElement,"Q_name").text=respClass.name
-            ET.SubElement(respElement,"Q_webpage").text=respClass.webpage
-            ET.SubElement(respElement,"Q_abbrev").text=respClass.abbrev
-            ET.SubElement(respElement,"Q_email").text=respClass.email
-            ET.SubElement(respElement,"Q_address").text=respClass.address
-            ET.SubElement(respElement,"Q_uri").text=respClass.uri
-        #resp=ET.SubElement(comp,'responsibleParty') #type gmd:xxxx
-        #ciresp=ET.SubElement(resp,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+            if not(self.CIMXML) :
+
+                respElement=ET.SubElement(rootElement,"Q_responsibleParty",{'type':respType})
+                ET.SubElement(respElement,"Q_name").text=respClass.name
+                ET.SubElement(respElement,"Q_webpage").text=respClass.webpage
+                ET.SubElement(respElement,"Q_abbrev").text=respClass.abbrev
+                ET.SubElement(respElement,"Q_email").text=respClass.email
+                ET.SubElement(respElement,"Q_address").text=respClass.address
+                ET.SubElement(respElement,"Q_uri").text=respClass.uri
+            elif respClass.name != 'Unknown' : # skip the default respobject
+                respElement=ET.SubElement(rootElement,'responsibleParty')
+                ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
         #http://www.isotc211.org/2005/gmd
         #CI_ResponsibleParty referenced in citation.xsd
         # <gmd:individualName>
         #name=ET.SubElement(resp,'gmd:individualName')
         #ET.SubElement(name,'gco:CharacterString').text=c.contact
-        #name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
-        ###ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.contact
-        # </gmd:individualName/>
+                if respType=='author' or respType=='contact' :
+                    name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
+                else: # default to organisation if not a contact or an author
+                    name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'organisationName')
+                ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.name+'::'+respClass.abbrev
+        #</gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
         # <gmd:contactInfo>
         #contact=ET.SubElement(ciresp,'gmd:contactInfo')
-        #contact=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'contactInfo')
-        #cicontact=ET.SubElement(contact,self.GMD_NAMESPACE_BRACKETS+'CI_Contact')
+                contact=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'contactInfo')
+                cicontact=ET.SubElement(contact,self.GMD_NAMESPACE_BRACKETS+'CI_Contact')
         #     <gmd:phone/>
         #     <gmd:address>
         #address=ET.SubElement(cicontact,'gmd:address')
-        #address=ET.SubElement(cicontact,self.GMD_NAMESPACE_BRACKETS+'address')
-        #ciaddress=ET.SubElement(address,self.GMD_NAMESPACE_BRACKETS+'CI_Address')
+                address=ET.SubElement(cicontact,self.GMD_NAMESPACE_BRACKETS+'address')
+                ciaddress=ET.SubElement(address,self.GMD_NAMESPACE_BRACKETS+'CI_Address')
         #         <gmd:deliveryPoint/>
+                address=ET.SubElement(ciaddress,self.GMD_NAMESPACE_BRACKETS+'deliveryPoint')
+                ET.SubElement(address,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.address
         #         <gmd:city/>
         #         <gmd:administrativeArea/>
         #         <gmd:postalCode/>
@@ -731,16 +735,21 @@ class Translator:
         #         <gmd:electronicMailAddress>
         #email=ET.SubElement(ciaddress,'gmd:electronicMailAddress')
         #ET.SubElement(email,'gco:CharacterString').text=c.email
-        #email=ET.SubElement(ciaddress,self.GMD_NAMESPACE_BRACKETS+'electronicMailAddress')
-        ###ET.SubElement(email,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=c.email
+                email=ET.SubElement(ciaddress,self.GMD_NAMESPACE_BRACKETS+'electronicMailAddress')
+                ET.SubElement(email,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.email
         #         </gmd:electronicMailAddress>
         #     </gmd:address>
         #     <gmd:onlineResource/>
+                resource=ET.SubElement(cicontact,self.GMD_NAMESPACE_BRACKETS+'onlineResource')
+                ciresource=ET.SubElement(resource,self.GMD_NAMESPACE_BRACKETS+'CI_OnlineResource')
+                linkage=ET.SubElement(ciresource,self.GMD_NAMESPACE_BRACKETS+'linkage')
+                url=ET.SubElement(linkage,self.GMD_NAMESPACE_BRACKETS+'URL').text=respClass.webpage
         #     <gmd:hoursOfService/>
         #     <gmd:contactInstructions/>
         # </gmd:contactInfo>
         # <gmd:role/>
-        #role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')#empty
+                role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')
+                ET.SubElement(role,self.GMD_NAMESPACE_BRACKETS+'CI_RoleCode',{'codeList':'', 'codeListValue':respType})
 
     def composition(self,c,comp):
         couplings=[]
