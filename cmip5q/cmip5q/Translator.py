@@ -110,12 +110,12 @@ class Translator:
         ET.SubElement(cr2,'id').text=rootClass.uri
         return cr2
     
-    def cimRecordRoot(self):
+    def cimRecordRoot(self,rootClass):
         ''' return the top level cim document invarient structure '''
         root=ET.Element('CIMRecord', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
-        ET.SubElement(root,'id').text='00000000-0000-0000-0000-000000000000'
+        ET.SubElement(root,'id').text=rootClass.uri
         return root
 
     def cimRecordSetRoot(self):
@@ -123,7 +123,8 @@ class Translator:
         root=ET.Element('CIMRecordSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
-        ET.SubElement(root,'id').text='00000000-0000-0000-0000-000000000000'
+        # generate a uuid on the fly for a recordset.
+        ET.SubElement(root,'id').text=str(uuid.uuid1())
         return root
 
     def q2cim(self,ref,docType):
@@ -144,7 +145,7 @@ class Translator:
             self.addPlatform(ref.platform,platformElement)
             cimDoc=root
         else :
-            root=self.cimRecordRoot()
+            root=self.cimRecordRoot(ref)
             cimDoc=method(ref,root)
         return cimDoc
         
@@ -184,7 +185,11 @@ class Translator:
             ET.SubElement(simElement,'rationale').text=simClass.description
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
-            ET.SubElement(experimentElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'//CIMRecord/experiment'})
+            expReference=ET.SubElement(experimentElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+            ET.SubElement(expReference,'id').text=simClass.experiment.uri
+            #ET.SubElement(expReference,'name').text=
+            #ET.SubElement(expReference,'version').text=
+            ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
             ''' shortName [1] '''
             ET.SubElement(simElement,'shortName').text=simClass.abbrev
             ''' longName [1] '''
@@ -202,7 +207,11 @@ class Translator:
                     self.addEnsemble(ensembleClass,ensemblesElement)
             ''' deployment [0..1] '''
             deployElement=ET.SubElement(simElement,'deployment')
-            ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'//CIMRecord/deployment'})
+            deployReference=ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+            ET.SubElement(deployReference,'id').text=simClass.platform.uri
+            #ET.SubElement(deployReference,'name').text=
+            #ET.SubElement(deployReference,'version').text=
+            ET.SubElement(deployReference,'description').text='The resources(deployment) on which this simulation ran'
             ''' input [0..inf] ???COUPLING??? '''
             ''' Duration [1] '''
             durationElement=ET.SubElement(simElement,'Duration')
@@ -214,7 +223,11 @@ class Translator:
             ''' simulationID [0..1] '''
             ''' model [1] '''
             modelElement=ET.SubElement(simElement,'model')
-            ET.SubElement(modelElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'//CIMRecord/modelComponent'})
+            modelReference=ET.SubElement(modelElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+            ET.SubElement(modelReference,'id').text=simClass.numericalModel.uri
+            #ET.SubElement(modelReference,'name').text=
+            #ET.SubElement(modelReference,'version').text=
+            ET.SubElement(modelReference,'description').text='The numerical model which this simulation used'
             ''' startPoint [1] '''
             startElement=ET.SubElement(simElement,'startPoint')
             ''' startPoint element has an optional start date and an option end date '''
@@ -224,8 +237,8 @@ class Translator:
             ''' documentID [1] '''
             ET.SubElement(simElement,'documentID').text=simClass.uri
             ''' documentAuthor [0..inf] '''
-            if not(self.VALIDCIMONLY):
-                ET.SubElement(simElement,'Q_documentAuthor').text="Metafor Questionnaire"
+            authorElement=ET.SubElement(simElement,'documentAuthor')
+            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
             ''' documentCreationDate [1] '''
             ET.SubElement(simElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
             ''' documentGenealogy [0..inf] '''
@@ -425,10 +438,10 @@ class Translator:
             if not(self.VALIDCIMONLY) :
                 ET.SubElement(expElement,'Q_lengthYears').text=str(expClass.requiredDuration.length)
             ''' documentID [1] '''
-            ET.SubElement(expElement,'documentID').text='00000000-0000-0000-0000-000000000000'
+            ET.SubElement(expElement,'documentID').text=expClass.uri
             ''' documentAuthor [0..inf] '''
-            if not(self.VALIDCIMONLY):
-                ET.SubElement(expElement,'Q_documentAuthor').text="Metafor Questionnaire"
+            authorElement=ET.SubElement(expElement,'documentAuthor')
+            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
             ''' documentCreationDate [1] '''
             ET.SubElement(expElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
             ''' documentGenealogy [0..inf] '''
@@ -539,8 +552,8 @@ class Translator:
                 ET.SubElement(deployElement,'documentID').text=platClass.uri
                 ''' documentAuthor [0] '''
                 #ET.SubElement(comp,'documentAuthor').text=c.contact
-                if not(self.VALIDCIMONLY):
-                    ET.SubElement(comp,'Q_documentAuthor').text="Metafor Questionnaire"
+                authorElement=ET.SubElement(deployElement,'documentAuthor')
+                self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
                 ''' documentCreationDate [1] '''
                 ET.SubElement(deployElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
                 ''' documentGenealogy [0] '''
@@ -665,8 +678,8 @@ class Translator:
             ET.SubElement(comp,'documentID').text=c.uri
             '''documentAuthor'''
             #ET.SubElement(comp,'documentAuthor').text=c.contact
-            if not(self.VALIDCIMONLY):
-                ET.SubElement(comp,'Q_documentAuthor').text="Metafor Questionnaire"
+            authorElement=ET.SubElement(comp,'documentAuthor')
+            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
             '''documentCreationDate'''
             #ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
             ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
@@ -693,6 +706,14 @@ class Translator:
         ET.SubElement(refElement,'Q_citation').text=refInstance.citation
         ET.SubElement(refElement,'Q_link').text=refInstance.link
 
+    def addSimpleResp(self,respName,rootElement,respType) :
+        ciresp=ET.SubElement(rootElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+        name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
+        ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respName
+        role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')
+        ET.SubElement(role,self.GMD_NAMESPACE_BRACKETS+'CI_RoleCode',{'codeList':'', 'codeListValue':respType})
+
+
     def addResp(self,respClass,rootElement,respType):
         if (respClass) :
             if not(self.CIMXML) :
@@ -706,6 +727,7 @@ class Translator:
                 ET.SubElement(respElement,"Q_uri").text=respClass.uri
             elif respClass.name != 'Unknown' : # skip the default respobject
                 respElement=ET.SubElement(rootElement,'responsibleParty')
+                respElement.append(ET.Comment('responsibleParty uri :: '+respClass.uri))
                 ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
         #http://www.isotc211.org/2005/gmd
         #CI_ResponsibleParty referenced in citation.xsd
