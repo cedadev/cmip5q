@@ -197,7 +197,51 @@ class Translator:
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
-            ''' simulationComposite should be [0..1] but is [1] '''
+            confClassSet=Conformance.objects.filter(simulation=simClass)
+            for confClass in confClassSet:
+                if (confClass.ctype) : # I have a conformance specified
+                    confElement=ET.SubElement(simElement,'conformance')
+                    if self.VALIDCIMONLY :
+                        confElement.append(ET.Comment("Conformance type "+confClass.ctype.value))
+                    else:
+                        ET.SubElement(confElement,'Q_Type').text=confClass.ctype.value
+                    reqElement=ET.SubElement(confElement,'requirement')
+                    deployReference=ET.SubElement(reqElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+                    assert(confClass.requirement)
+                    ET.SubElement(deployReference,'id').text=confClass.requirement.name
+                    #ET.SubElement(deployReference,'name').text=
+                    #ET.SubElement(deployReference,'version').text=
+                    ET.SubElement(deployReference,'description').text='The numerical requirement to which this conformance relates. This numerical requirement is specified in the experiment to which the simulation that contains this conformance relates.'
+                    # hopefully a temporary hack to make CIM conformant output as the CIM requires at least one source so provide a blank one when there are none. If the CIM becomes 0 or more then we don't need this
+                    if confClass.mod.count()==0:
+                        sourceElement=ET.SubElement(confElement,'source')
+                        ET.SubElement(sourceElement,'reference')
+                    # for each modification
+                    for modClass in confClass.mod.all():
+                        sourceElement=ET.SubElement(confElement,'source')
+                        sourceReference=ET.SubElement(sourceElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+                        im=None
+                        mm=None
+                        try:
+                            im=modClass.inputmod
+                        except:
+                            mm=modClass.modelmod
+                        if im:
+                            ET.SubElement(sourceReference,'id').text='TBD'
+                        elif mm:
+                            ET.SubElement(sourceReference,'id').text=modClass.modelmod.component.uri
+                        else:
+                            assert(False) # error
+                        #ET.SubElement(courceReference,'name').text=
+                        #ET.SubElement(sourceReference,'version').text=
+                        assert(modClass.mtype)
+                        ET.SubElement(sourceReference,'description').text=modClass.description
+                        sourceReference.append(ET.Comment('source reference mnemonic :: '+modClass.mnemonic))
+                        sourceReference.append(ET.Comment('source reference type :: '+modClass.mtype.value))
+
+                    ET.SubElement(confElement,'description').text=confClass.description
+
+            ''' simulationComposite [0..1] '''
             ''' ensemble [0..1] '''
             if (simClass.ensembleMembers>1 and not(self.VALIDCIMONLY)) :
                 ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
@@ -738,7 +782,8 @@ class Translator:
                     name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
                 else: # default to organisation if not a contact or an author
                     name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'organisationName')
-                ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.name+'::'+respClass.abbrev
+                ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.name
+                name.append(ET.Comment('responsibleParty abbreviation :: '+respClass.abbrev))
         #</gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
@@ -781,7 +826,7 @@ class Translator:
         couplings=[]
         # couplings are all at the esm (root component) level
         if c.isModel:couplings=c.couplings(simulation=self.simClass)
-        if len(couplings)>0:
+        if len(couplings)>0 and not(self.VALIDCIMONLY):
             composeElement=ET.SubElement(comp,'composition')
             for coupling in couplings:
                 CompInpClass=coupling.targetInput
