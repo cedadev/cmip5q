@@ -66,14 +66,17 @@
                 <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
                 <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>
                              <td>Lead Author:&nbsp;{{cform.author.errors}}{{cform.author}}</td>
-                             <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td></tr>
+                             <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td>
+                			 <td><input checked="checked" type="checkbox" name="gen-implemented" id="id_gen-implemented" /> Tick to copy 'Responsible Party' downwards.</td>
+                </tr>
+                
             </table>
             <!-- Following is hidden -->
             {{cform.controlled}} 
         </div>
         {% if isRealm or isModel %}
         <div class="boxer">
-        <h4>Geneology</h4>
+        <h4>Genealogy</h4>
         <p>Year First  Released:&nbsp;{{cform.yearReleased.errors}}{{cform.yearReleased}}</p>
         <p class="guidance"> The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade.</p>
         <center>
