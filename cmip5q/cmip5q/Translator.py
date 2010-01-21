@@ -552,46 +552,42 @@ class Translator:
 
         if platClass :
             if (self.CIMXML) :
+                deployElement=ET.SubElement(rootElement,'deployment')
                 if not(self.VALIDCIMONLY):
-                    ET.SubElement(machineElement,'Q_title').text=platClass.title
-                    ET.SubElement(machineElement,'Q_abbrev').text=platClass.abbrev
-                    ET.SubElement(machineElement,'Q_description').text=platClass.description
                     #no funder specified for deployments in the questionnaire
                     #self.addResp(docClass.author,docElement,'author')
-                    self.addResp(docClass.funder,docElement,'funder')
-                    self.addResp(docClass.contact,docElement,'contact')
-
-                deployElement=ET.SubElement(rootElement,'deployment')
+                    self.addResp(platClass.funder,deployElement,'funder')
+                    self.addResp(platClass.contact,deployElement,'contact')
                 ''' deploymentDate [1] '''
                 ET.SubElement(deployElement,'deploymentDate').text='0001-01-01T00:00:00'
                 ''' description [0..1] '''
                 ''' machine [1] '''
                 machineElement=ET.SubElement(deployElement,'machine')
-                ET.SubElement(machineElement,'machineName')
+                # platClass.title is never set
+                ET.SubElement(machineElement,'machineName').text=platClass.abbrev
                 if platClass.hardware :
                     ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.value
                 else:
                     ET.SubElement(machineElement,'machineSystem')
-                ET.SubElement(machineElement,'machineLibrary')
-                ET.SubElement(machineElement,'machineDescription')
-                ET.SubElement(machineElement,'machineLocation')
+                #ET.SubElement(machineElement,'machineLibrary')
+                ET.SubElement(machineElement,'machineDescription').text=platClass.description
+                #ET.SubElement(machineElement,'machineLocation')
                 ET.SubElement(machineElement,'machineOperatingSystem').text=platClass.operatingSystem
-                if not(self.VALIDCIMONLY):
-                    ET.SubElement(machineElement,'Q_Vendor').text=platClass.vendor
-                    ET.SubElement(machineElement,'Q_MaxProcessors').text=str(platClass.maxProcessors)
-                    ET.SubElement(machineElement,'Q_CoresPerProcessor').text=str(platClass.coresPerProcessor)
-                    if platClass.processor :
-                        ET.SubElement(machineElement,'Q_ProcessorType').text=platClass.processor.value
-                    if platClass.interconnect :
-                        ET.SubElement(machineElement,'Q_InterconnectType').text=platClass.interconnect.value
+                ET.SubElement(machineElement,'machineVendor').text=platClass.vendor
+                if platClass.interconnect :
+                    ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.value
+                ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
+                ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
+                if platClass.processor :
+                    ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.value
                 ''' compiler [1..inf] '''
                 compilerElement=ET.SubElement(deployElement,'compiler')
                 ET.SubElement(compilerElement,'compilerName').text=platClass.compiler
                 ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
                 ET.SubElement(compilerElement,'compilerLanguage')
-                ET.SubElement(compilerElement,'compilerOptions')
-                ET.SubElement(compilerElement,'compilerEnvironmentVariables')
-                ET.SubElement(compilerElement,'compilerLibrary')
+                #ET.SubElement(compilerElement,'compilerOptions')
+                #ET.SubElement(compilerElement,'compilerEnvironmentVariables')
+                #ET.SubElement(compilerElement,'compilerLibrary')
                 ''' documentID [1] '''
                 ET.SubElement(deployElement,'documentID').text=platClass.uri
                 ''' documentAuthor [0] '''
