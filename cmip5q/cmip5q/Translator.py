@@ -617,6 +617,71 @@ class Translator:
                 self.addValue(platClass.interconnect,interconnectElement)
         return rootElement
 
+    def constraintValid(self,con,conElement,constraintSet) :
+        if con.constraint=='' : # there is no constraint
+            return True
+        else : # need to check the constraint
+            # constraint format is : if <ParamName> [is|has] [not]* "<Value>"[ or "<Value>"]*
+            #ET.SubElement(conElement,'Q_Constraint').text=con.constraint
+            conElement.append(ET.Comment('Constraint : '+con.constraint))
+            parsed=con.constraint.split()
+            assert(parsed[0]=='if','Error in constraint format')
+            assert(parsed[2]=='is' or parsed[2]=='has','Error in constraint format')
+            paramName=parsed[1]
+            #ET.SubElement(conElement,'Q_Constraint_Param').text=paramName
+            if parsed[2]=='is' :
+                singleValueExpected=True
+            else:
+                singleValueExpected=False
+            #ET.SubElement(conElement,'Q_Constraint_SingleValuedParam').text=str(singleValueExpected)
+            if parsed[3]=='not' :
+                negation=True
+                idx=4
+            else :
+                negation=False
+                idx=3
+            #ET.SubElement(conElement,'Q_Constraint_Negation').text=str(negation)
+            nValues=0
+            valueArray=[]
+            while idx<len(parsed) :
+                valueArray.append(parsed[idx].strip('"'))
+                nValues+=1
+                if (idx+1)<len(parsed) :
+                    assert(parsed[idx+1]=='or','Error in constraint format')
+                idx+=2
+            assert(nValues>0)
+            #ET.SubElement(conElement,'Q_Constraint_nValues').text=str(nValues)
+            #for value in valueArray :
+            #    ET.SubElement(conElement,'Q_Constraint_value').text=value
+
+            # now check if the constraint is valid or not
+            # first find the value(s) of the parameter that is referenced
+            found=False
+            refValue=''
+            for con in constraintSet:
+                if not(found):
+                    pset=NewParam.objects.filter(constraint=con)
+                    for p in pset:
+                        if (p.name==paramName) :
+                            found=True
+                            refValue=p.value
+            assert(found,'Error, can not find property that is referenced by constraint')
+            #ET.SubElement(conElement,'Q_Constraint_RefValues').text=refValue
+            if refValue=='' : # the reference parameter does not have any values set
+                return True # output constraint parameters if the reference parameter is not set. This is an arbitrary decision, I could have chosen not to.
+            match=False
+            for value in refValue.split('|'):
+                if not(match) :
+                    stripSpaceValue=value.strip()
+                    if stripSpaceValue != '' :
+                        if stripSpaceValue in valueArray :
+                            match=True
+            #ET.SubElement(conElement,'Q_Constraint_Match').text=str(match)
+            if negation :
+                match=not(match)
+            return match
+
+
     def addChildComponent(self,c,root,nest,recurse=True):
 
       if c.implemented or nest==1:
@@ -632,9 +697,11 @@ class Translator:
         if recurse:
             '''childComponent'''
             for child in c.components.all():
-              if child.implemented:
-                comp2=ET.SubElement(comp,'childComponent')
-                self.addChildComponent(child,comp2,nest+1)
+                if child.implemented:
+                    comp2=ET.SubElement(comp,'childComponent')
+                    self.addChildComponent(child,comp2,nest+1)
+                else :
+                    comp.append(ET.Comment('Component '+child.abbrev+' has implemented set to false'))
         '''parentComponent'''
         '''deployment'''
         '''shortName'''
@@ -659,20 +726,21 @@ class Translator:
                 # the internal questionnaire representation is that all parameters
                 # are contained in a constraint group
                 for con in constraintSet:
-                    pset=NewParam.objects.filter(constraint=con)
-                    for p in pset:
-                        property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
-                        '''shortName'''
-                        ET.SubElement(property,'shortName').text=p.name
-                        '''longName'''
-                        ET.SubElement(property,'longName').text=p.name
-                        '''description'''
-                        '''value'''
+                    if self.constraintValid(con,componentProperty,constraintSet) :
+                        pset=NewParam.objects.filter(constraint=con)
+                        for p in pset:
+                            property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
+                            '''shortName'''
+                            ET.SubElement(property,'shortName').text=p.name
+                            '''longName'''
+                            ET.SubElement(property,'longName').text=p.name
+                            '''description'''
+                            '''value'''
                     # extract all value elements (separated by "|"
-                        for value in p.value.split('|'):
-                            stripSpaceValue=value.strip()
-                            if stripSpaceValue!='':
-                                ET.SubElement(property,'value').text=stripSpaceValue
+                            for value in p.value.split('|'):
+                                stripSpaceValue=value.strip()
+                                if stripSpaceValue!='':
+                                    ET.SubElement(property,'value').text=stripSpaceValue
                     #ET.SubElement(property,'ptype').text=p.ptype
                     #ET.SubElement(property,'vocab').text=p.vocab
                 '''shortName'''
