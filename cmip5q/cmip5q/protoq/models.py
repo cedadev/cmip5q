@@ -183,14 +183,24 @@ class Doc(Fundamentals):
     
     def validate(self):
         ''' All documents should be validatable '''
-        validator=Validator()
+        v=Validator()
         self.XMLO=self.xmlobject()
-        v=validator.validateDoc(self,self.XMLO,cimType=self._meta.module_name)
+        v.validateDoc(self.XMLO,cimtype=self._meta.module_name)
         self.validErrors=v.nInvalid
         self.numberOfValidationChecks=v.nChecks
         logging.debug("%s validate checks=%s"%(self._meta.module_name,self.numberOfValidationChecks))
         logging.debug("%s validate errors=%s"%(self._meta.module_name,self.validErrors))
         return v.valid,v.errorsAsHtml()
+# FIXME: This moved from component to here ... needs something done eventually ...
+#    def validate(self):
+#        # I don't work yet as I need my local component_id
+#       ''' Check to see if component is valid. Returns True/False '''
+#        nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
+#        CIMDoc=nm.export(recurse=False)
+#       sct_doc = ET.parse("xsl/BasicChecks.sch")
+#        schematron = ET.Schematron(sct_doc)
+#        return schematron.validate(CIMFragment)
+    
         
     def export(self):
         ''' Make available for export in the atom feed '''
@@ -301,14 +311,7 @@ class Component(Doc):
 #    def status(self):
 #            
     
-    def validate(self):
-        # I don't work yet as I need my local component_id
-        ''' Check to see if component is valid. Returns True/False '''
-        nm=NumericalModel(Centre.objects.get(id=self.centre_id),component_id)
-        CIMDoc=nm.export(recurse=False)
-        sct_doc = ET.parse("xsl/BasicChecks.sch")
-        schematron = ET.Schematron(sct_doc)
-        return schematron.validate(CIMFragment)
+
 
     def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''

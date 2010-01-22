@@ -131,7 +131,7 @@ class Validator:
         report = transform(CIMdoc)
         print report
         # find out how many errors and checks there were
-        nChecks = len(report.xpath('//Check'))
+        nChecks = len(report.xpath('//check'))
         nInvalid = len(report.xpath('//invalid'))
         return report,nChecks,nInvalid
 
@@ -156,9 +156,9 @@ class Validator:
 
         if self.contentValidate:
             #validate against schematron checks
-            if cimtype=='Component':
+            if cimtype=='component':
                 self.__validateComponent(CIMdoc)
-            elif cimtype=='Simulation':
+            elif cimtype=='simulation':
                 self.__validateSimulation(CIMdoc)
             else:
                 raise ValueError('Invalid validation type found')
