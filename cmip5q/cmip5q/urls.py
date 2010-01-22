@@ -7,6 +7,7 @@ admin.autodiscover()
 
 from protoq.models import DocFeed
 
+
 urlpatterns = patterns('',
     # Example:
     # (r'^cmip5q/', include('cmip5q.foo.urls')),
@@ -15,29 +16,19 @@ urlpatterns = patterns('',
     (r'^cmip5/centres/$','cmip5q.protoq.views.centres'),
     (r'^cmip5/(?P<centre_id>\d+)/$','cmip5q.protoq.views.centre'),
     # 
+    #    generic document handling
+    # 
+    (r'^cmip5/(?P<cid>\d+)/(?P<docType>\D+)/doc/(?P<pkid>\d+)/(?P<method>\D+)/$','cmip5q.protoq.views.genericDoc'),     
+    # 
     # COMPONENTS:
     #   
     (r'^cmip5/(?P<centre_id>\d+)/component/add/$','cmip5q.protoq.views.componentAdd'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/edit/$','cmip5q.protoq.views.componentEdit'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/addsub/$','cmip5q.protoq.views.componentSub'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/refs/$','cmip5q.protoq.views.componentRefs'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/validate/$','cmip5q.protoq.views.componentValidate'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/view/$','cmip5q.protoq.views.componentView'),   
-    url(r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/XML/$','cmip5q.protoq.views.componentXML',name='Component_XML'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/text/$','cmip5q.protoq.views.componentText'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Numerics/$','cmip5q.protoq.views.componentNum'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/coupling/$','cmip5q.protoq.views.componentCup'),
-    (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Outputs/$','cmip5q.protoq.views.componentOut'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/Inputs/$','cmip5q.protoq.views.componentInp'),
     (r'^cmip5/(?P<centre_id>\d+)/component/(?P<component_id>\d+)/copy/$','cmip5q.protoq.views.componentCopy'),
-    #
-    # REFERENCES (now handled in base view)
-    #          
-    #(r'^cmip5/(?P<centre_id>\d+)/references/$','cmip5q.protoq.views.referenceList'),
-    #(r'^cmip5/(?P<centre_id>\d+)/reference/(?P<reference_id>\d+)/$','cmip5q.protoq.views.referenceEdit'),
-    #(r'^cmip5/(?P<centre_id>\d+)/reference/$','cmip5q.protoq.views.referenceEdit'),  
-    #(r'^cmip5/(?P<centre_id>\d+)/assignRefs/(?P<resourceType>\D+)/(?P<resource_id>\d+)/$',
-    #        'cmip5q.protoq.views.assignReferences'),
     #
     # SIMULATIONS
     #
@@ -47,12 +38,6 @@ urlpatterns = patterns('',
                 'cmip5q.protoq.views.simulationAdd'),
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/edit/$',
                 'cmip5q.protoq.views.simulationEdit'),  
-    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/validate/$',
-                'cmip5q.protoq.views.simulationValidate'),  
-    url(r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/XML/$',
-                'cmip5q.protoq.views.simulationXML',name='Simulation_XML'),  
-    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/view/$',
-                'cmip5q.protoq.views.simulationView'), 
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/coupling/$',
                 'cmip5q.protoq.views.simulationCup'), 
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/coupling/(?P<coupling_id>\d+)/(?P<ctype>\D+)/$',
@@ -71,8 +56,6 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.platformEdit'),
     (r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/edit/$',
             'cmip5q.protoq.views.platformEdit'),
-    url(r'^cmip5/(?P<centre_id>\d+)/platform/(?P<platform_id>\d+)/XML/$',
-            'cmip5q.protoq.views.platformXML',name='Platform_XML'),         
     #
     # experiment/view/experiment_id
     (r'^cmip5/(?P<cen_id>\d+)/experiment/(?P<experiment_id>\d+)/$',
@@ -119,10 +102,10 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.assign'),       
 
     # New XML Handler
-    (r'^cmip5/(?P<documentType>\D+)/(?P<docID>\d+)/xmlview$',
-            'cmip5q.protoq.views.xmlview'),     
+    (r'^cmip5/(?P<docType>\D+)/(?P<docID>\d+).xml$',
+            'cmip5q.protoq.views.xml'),     
             
-                # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
         
@@ -140,6 +123,11 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),
 )
+# now add the common document url methods
+#for doc in ['experiment','platform','component','simulation']:
+#    for key in ['validate','view','xml','html','export']:
+#        urlpatterns+=patterns('',(r'^cmip5/(?P<centre_id>\d+)/%s/(?P<%s_id>\d+)/%s/$'%(doc,doc,key),'cmip5q.protoq.views.doc'))
+                        
 if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
         (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),

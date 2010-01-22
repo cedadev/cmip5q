@@ -12,7 +12,7 @@ from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
 from cmip5q.Translator import Translator
-from cmip5q.protoq.cimHandler import cimHandler
+from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
 import uuid
@@ -65,7 +65,7 @@ class MyComponentInputFormSet(ComponentInputFormSet):
                 c=Coupling(parent=self.__getCouplingGroup(),targetInput=i)
                 c.save()
     
-class componentHandler(cimHandler):
+class componentHandler(object):
     
     def __init__(self,centre_id,component_id=None):
         ''' Instantiate a component handler, by loading existing component information '''
@@ -148,15 +148,11 @@ class componentHandler(cimHandler):
         urls['form']=self.url
         urls['refs']=reverse('cmip5q.protoq.views.assign',args=(self.centre_id,'reference',
                              'component',c.id,))
-        urls['outputs']=reverse('cmip5q.protoq.views.componentOut',args=(self.centre_id,c.id,))
         urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
-        urls['numerics']=reverse('cmip5q.protoq.views.componentNum',args=(self.centre_id,c.id))
         urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
         urls['inputs']=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,c.id))
-        urls['view']=reverse('cmip5q.protoq.views.componentView',args=(self.centre_id,c.id))
-        urls['validate']=reverse('cmip5q.protoq.views.componentValidate',args=(self.centre_id,c.id))
-        urls['export']=reverse('cmip5q.protoq.views.componentXML',args=(self.centre_id,c.id))
-        urls['text']=reverse('cmip5q.protoq.views.componentText',args=(self.centre_id,c.id))
+        
+        urls=commonURLs(c,urls)
         
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'
@@ -276,9 +272,6 @@ class componentHandler(cimHandler):
         return render_to_response('inputs.html',{'c':self.component,'urls':urls,
                                    'form':Inpform,
                                    'tabs':tabs(request,self.centre_id,'Inputs for %s'%self.component)})
-        
-    def outputs(self):
-        return HttpResponse('Not implemented')
     
     def copy(self,request):
         ''' Make a copy for later editing. Currently restricted to model components only '''

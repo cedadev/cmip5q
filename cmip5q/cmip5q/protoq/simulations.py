@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs
-from cmip5q.protoq.cimHandler import cimHandler
+from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
 import uuid
@@ -31,7 +31,7 @@ class MyConformanceFormSet(ConformanceFormSet):
         for form in self.forms:
             form.specialise(self.s)
             
-class simulationHandler(cimHandler):
+class simulationHandler(object):
     ''' Simulation is an instance of a cim document which means there are some common methods '''
     
     def __init__(self,centre_id,simid=None,expid=None):
@@ -69,14 +69,9 @@ class simulationHandler(cimHandler):
                     args=(self.centreid,s.id,))
             urls['ens']=reverse('cmip5q.protoq.views.ensemble',
                     args=(self.centreid,s.id,))
-            urls['validate']=reverse('cmip5q.protoq.views.simulationValidate',
-                    args=(self.centreid,s.id,))
-            urls['export']=reverse('cmip5q.protoq.views.simulationXML',
-                    args=(self.centreid,s.id,))
-            urls['view']=reverse('cmip5q.protoq.views.simulationView',
-                    args=(self.centreid,s.id,))
             urls['mod']=reverse('cmip5q.protoq.views.assign',
                      args=(self.centreid,'modelmod','simulation',s.id,))
+            urls=commonURLs(s,urls)
             # dont think we should be able to get to input mods from here ...
             #urls['ics']=reverse('cmip5q.protoq.views.assign',
             #         args=(self.centreid,'inputmod','simulation',s.id,))        

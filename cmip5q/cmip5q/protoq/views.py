@@ -10,6 +10,7 @@ from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import  tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
+from cmip5q.protoq.cimHandler import cimHandler
 from cmip5q.protoq.XML import *
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
@@ -18,6 +19,30 @@ import uuid
 import logging
 
 MESSAGE=''
+
+def genericDoc(request,cid,docType,pkid,method):
+    ''' Handle the generic documents '''
+    try:
+        klass={'simulation':Simulation,'experiment':Experiment,'component':Component,
+           'platform:':Platform}[docType]
+    except:
+        return HttpResponseBadRequest('Document type %s not known'%docType)
+    try:
+        obj=klass.objects.get(id=pkid)
+    except:
+        return HttpResponseBadRequest('Document id %s not known as %s'%(pkid,docType))
+    c=cimHandler(obj)
+    try:
+        cmethod=getattr(c,method)
+    except:
+        return HttpResponseBadRequest('Method %s not known as a generic document handler'%method)
+
+    return cmethod()
+
+
+def xml(request,documentType,docID):
+    ''' Placeholder for persisted document handling'''
+    return HttpResponse('not implemented')
 
 def index(request):
     #find all the centre objects
@@ -134,11 +159,6 @@ def componentNum(request,centre_id,component_id):
     ''' Return numerics of the component '''
     c=componentHandler(centre_id,component_id)
     return c.numerics()
-
-def componentOut(request,centre_id,component_id):
-   ''' return outputs of a component '''
-   c=componentHandler(centre_id,component_id)
-   return c.outputs()
 
 def componentCopy(request,centre_id,component_id):
    c=componentHandler(centre_id,component_id)
@@ -467,11 +487,4 @@ def assign(request,cen_id,resourceType,targetType,target_id):
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 
-
-def xmlview(request,documentType,docID):
-    ''' Placeholder document handling'''
-    if documentType=='experiment':
-        r=XMLExperimentHandler(documentType,docID)
-    return r.xml(request)
-    
     
