@@ -7,9 +7,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs
-from cmip5q.protoq.cimHandling import *
-
-from cmip5q.Translator import Translator
+from cmip5q.protoq.cimHandler import cimHandler
 
 from django import forms
 import uuid
@@ -33,15 +31,22 @@ class MyConformanceFormSet(ConformanceFormSet):
         for form in self.forms:
             form.specialise(self.s)
             
-class simulationHandler(object):
+class simulationHandler(cimHandler):
+    ''' Simulation is an instance of a cim document which means there are some common methods '''
     
     def __init__(self,centre_id,simid=None,expid=None):
         ''' Initialise based on what the request needs '''
         self.centreid=centre_id
         self.centre=Centre.objects.get(pk=centre_id)
-        self.simid=simid
+        self.pkid=simid
         self.expid=expid
         self.errors={}
+        if self.pkid:
+            self.s=Simulation.objects.get(pk=self.pkid)
+            self.Klass=self.s.__class__
+        else:
+            self.s=None
+            self.Klass='Unknown as yet by simulation handler'
         
     def __handle(self,request,s,e,url,label,fix):
         ''' This method handles the form itself for both the add and edit methods '''
@@ -112,11 +117,11 @@ class simulationHandler(object):
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
              'cset':cset,'coset':cs,'ensemble':ensemble,
              'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
-        
+            # note that cform points to simform too, to support completion.html
     def edit(self,request,fix=False):
         ''' Handle providing and receiving edit forms '''
        
-        s=Simulation.objects.get(pk=self.simid)
+        s=self.s
         s.updateCoupling()
         e=s.experiment
         url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id,))
@@ -147,41 +152,7 @@ class simulationHandler(object):
         label='Add'
         return self.__handle(request,s,e,url,label,False)
         
-    def validate(self):
-        ''' Is this simulation complete? '''
-        validator=Validator()
-        validator.validateDoc(self.XML(),'Simulation')
-        errorsHtml=validator.errorsAsHtml()
-        cimHtml=validator.xmlAsHtml()
-        s=Simulation.objects.get(pk=self.simid)
-        s.validErrors=validator.nInvalid
-        s.numberOfValidationChecks=validator.nChecks
-        logging.debug("simulation validate checks="+str(s.numberOfValidationChecks))
-        logging.debug("simulation validate errors="+str(s.validErrors))
-        logging.debug("simulation percent complete="+str(validator.percentComplete))
-        return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
-    
-    def view(self):
-        ''' Return a "pretty" version of self '''
-        return self.HTML()
-      
-    def HTML(self):
-        html=viewer(self.XML())
-        return HttpResponse(html)
-    
-    def XML(self):
-        ''' XML view of self as an lxml element tree instance'''
-        translator=Translator()
-        s=Simulation.objects.get(pk=self.simid)
-        xmlDoc=translator.q2cim(s,docType='Simulation')
-        return xmlDoc
-
-    def XMLasHTML(self):
-        CIMDoc=self.XML()
-        #docStr=ET.tostring(CIMDoc,"UTF-8")
-        mimetype='application/xml'
-        docStr=ET.tostring(CIMDoc,pretty_print=True)
-        return HttpResponse(docStr,mimetype)
+ 
 
     def list(self,request):
         ''' Return a listing of simulations for a given centre '''
@@ -214,7 +185,7 @@ class simulationHandler(object):
     def conformanceMain(self,request):
         ''' Displays the main conformance view '''
 
-        s=Simulation.objects.get(pk=self.simid)
+        s=self.s
         e=s.experiment
         
         urls={'self':reverse('cmip5q.protoq.views.conformanceMain',
@@ -247,7 +218,7 @@ class simulationHandler(object):
                 targetExp=request.POST['targetExp']
                 exp=Experiment.objects.get(id=targetExp)
                 targetSim=request.POST['targetSim']
-                s=Simulation.objects.get(id=targetSim)
+                s=self.s
                 ss=s.copy(exp)
                 url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
                 return HttpResponseRedirect(url)
@@ -260,7 +231,7 @@ class simulationHandler(object):
         ''' This method completely resets ALL couplings and ALL closures from the 
         originals in the model. Note that copy does not do the closures, but
         this one does. One closure at a time can be done via the coupling handler. '''
-        s=Simulation.objects.get(pk=self.simid)
+        s=self.s
         s.resetCoupling(closures=True)
         # and return to the coupling view 
         url=reverse('cmip5q.protoq.views.simulationCup',

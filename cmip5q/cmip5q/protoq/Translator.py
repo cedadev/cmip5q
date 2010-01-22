@@ -130,19 +130,19 @@ class Translator:
     def q2cim(self,ref,docType):
 
         ''' primary public entry point. '''
-        method_name = 'add' + str(docType)
+        method_name = 'add_' + str(docType)
         logging.debug("q2cim calling "+method_name)
         method = getattr(self, method_name)
-        if method_name=='addSimulation' and self.CIMXML :
+        if method_name=='add_simulation' and self.CIMXML :
             root=self.cimRecordSetRoot()
             modelElement=self.cimRecord(root,ref.numericalModel)
-            self.addComponent(ref.numericalModel,modelElement)
+            self.add_component(ref.numericalModel,modelElement)
             simulationElement=self.cimRecord(root,ref)
-            self.addSimulation(ref,simulationElement)
+            self.add_simulation(ref,simulationElement)
             experimentElement=self.cimRecord(root,ref.experiment)
-            self.addExperiment(ref.experiment,experimentElement)
+            self.add_experiment(ref.experiment,experimentElement)
             platformElement=self.cimRecord(root,ref.platform)
-            self.addPlatform(ref.platform,platformElement)
+            self.add_platform(ref.platform,platformElement)
             cimDoc=root
         else :
             root=self.cimRecordRoot(ref)
@@ -169,7 +169,7 @@ class Translator:
             # reference the modification here to avoid replication as it is stored as part of the simulation
             self.addModificationRef(ensMemberClass.mod,ensMemberElement)
 
-    def addSimulation(self,simClass,rootElement):
+    def add_simulation(self,simClass,rootElement):
 
         if (self.CIMXML):
             #single simulation
@@ -297,7 +297,7 @@ class Translator:
             #Simulation isa Doc
             self.addDoc(simClass,simElement)
             modelElement=ET.SubElement(simElement,'Q_NumericalModel')
-            self.addComponent(simClass.numericalModel,modelElement)
+            self.add_component(simClass.numericalModel,modelElement)
             ET.SubElement(simElement,'Q_EnsembleCount').text=str(simClass.ensembleMembers)
             # add ensemble information from Ensemble class
             # There should be a one to one mapping but we can not be sure here
@@ -306,8 +306,8 @@ class Translator:
             assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
             for ensembleClass in ensembleClassSet :
                 self.addEnsemble(ensembleClass,ensemblesElement)
-            self.addExperiment(simClass.experiment,simElement)
-            self.addPlatform(simClass.platform,simElement)
+            self.add_experiment(simClass.experiment,simElement)
+            self.add_platform(simClass.platform,simElement)
             self.addCentre(simClass.centre,simElement)
             ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
             modelModsElement=ET.SubElement(simElement,'Q_ModelMods')
@@ -445,7 +445,7 @@ class Translator:
                 self.addCouplingRef(coupClass,coupElement)
             ET.SubElement(confElement,'Q_Description').text=confClass.description
 
-    def addExperiment(self,expClass,rootElement):
+    def add_experiment(self,expClass,rootElement):
         if (self.CIMXML):
             expElement=ET.SubElement(rootElement,'numericalExperiment',{'CIMVersion': '1.4','control':'false'})
             ''' responsibleParty [0..inf] '''
@@ -512,7 +512,7 @@ class Translator:
         self.recurse=recurse
         self.outputComposition=composition
     
-    def addComponent(self,compClass,rootElement):
+    def add_component(self,compClass,rootElement):
 
         assert(compClass)
         if compClass :
@@ -548,7 +548,7 @@ class Translator:
             ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
         
 
-    def addPlatform(self,platClass,rootElement):
+    def add_platform(self,platClass,rootElement):
 
         if platClass :
             if (self.CIMXML) :

@@ -7,12 +7,17 @@ from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.db.models.query import CollectedObjects, delete_objects
 from django.db.models.fields.related import ForeignKey
+from lxml import etree as ET
 
 from django.db.models import permalink
 
 
 from atom import Feed
 from modelUtilities import uniqueness, refLinkField
+
+from protoq.cimHandling import *
+
+
 import uuid
 import logging
 
@@ -92,6 +97,143 @@ def soft_delete(obj,simulate=False):
         if not simulate: delete_objects(on_death_row)
         return True,{}
 
+   
+class EditHistoryEvent(models.Model):
+    ''' Used for edit history event logging '''
+    eventDate=models.DateField(auto_now_add=True,editable=False)
+    eventParty=models.ForeignKey('ResponsibleParty')
+    eventAction=models.TextField(blank=True)
+    # following will only means something to whatever creates the event.
+    eventIdentifier=models.CharField(max_length=128)
+
+class Fundamentals(models.Model):
+    ''' These is an abstract class carrying fundamentals in common between CIM documents
+    as currently described in the questionnaire, and CIM documents as exported from the
+    questionnaire. It's a convenience class for the questionnaire alone '''
+    # The URI should only change if the thing described by the document changes.
+    # That is, once assigned, the URI never changes, and once exported, the document should persist.
+    # If the thing itself changes, we should copy the document, give it a new URI, and update it ...
+    uri=models.CharField(max_length=64,unique=True,editable=False)    
+    # However, we can have descriptions which differ because the way we describe it has changed,
+    # if that happens, we should modify the version identifier which follows AND the documentVersion.
+    metadataVersion=models.CharField(max_length=128,editable=False)
+    # The following should only be updated when the document is valid, and the document has
+    # been exported as a new version. However, note that while it is possible in principle for
+    # this to change with subcomponents, it's not likely as currently implemented.
+    documentVersion=models.IntegerField(default=1,editable=False)
+    
+    class Meta:
+        abstract=True
+ 
+class CIMObject (Fundamentals):
+    ''' This is an exported CIM object. Once exported, the questionnaire can't molest it,
+    but it's included here, because the questionnaire can return it '''
+    cimtype=models.CharField(max_length=64)
+    xmlfile=models.FileField(upload_to='bnl')
+    # These are update by the parent doc, which is why they're not "fundamentals"
+    created=models.DateField()
+    updated=models.DateField()
+    
+class Doc(Fundamentals):
+    ''' Abstract class for general properties of the CIM documents handled in the questionnaire '''
+    
+    # Parties (all documents are associated with a centre)
+    centre=models.ForeignKey('Centre',blank=True,null=True)
+    author=models.ForeignKey('ResponsibleParty',blank=True,null=True,related_name='%(class)s_author')
+    funder=models.ForeignKey('ResponsibleParty',blank=True,null=True,related_name='%(class)s_funder')
+    contact=models.ForeignKey('ResponsibleParty',blank=True,null=True,related_name='%(class)s_contact')
+    metadataMaintainer=models.ForeignKey('ResponsibleParty',blank=True,null=True,
+                       related_name='%(class)s_metadataMaintainer')
+    
+    title=models.CharField(max_length=128,blank=True,null=True)
+    abbrev=models.CharField(max_length=25)
+    description=models.TextField(blank=True)
+   
+    # next two are used to calculate the status bar, and are filled in by the validation software
+    validErrors=models.IntegerField(default=-1,editable=False)
+    numberOfValidationChecks=models.IntegerField(default=0,editable=False)
+    # following is used by the user to declare the document is "ready"
+    isComplete=models.BooleanField(default=False)
+    # to be used for event histories:
+    editHistory=models.ManyToManyField(EditHistoryEvent,blank=True,null=True)
+    # next two are automagically populated
+    created=models.DateField(auto_now_add=True,editable=False)
+    updated=models.DateField(auto_now=True,editable=False)
+    class Meta:
+        abstract=True
+        ordering=['abbrev','title']
+        
+    def status(self):
+        ''' Return a percentage completion in terms of validation '''
+        if self.validErrors<>-1 and self.numberOfValidationChecks<>0:
+            return 100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks)
+        else: return 0.0
+        # FIXME: and eventually see if we have a children attribute and sum them up ...
+        
+    def xmlobject(self):
+        ''' Return an lxml object view of me '''
+        from protoq.Translator import Translator  # needs to be deferred down here to avoid circularity
+        translator=Translator()
+        return translator.q2cim(self,docType=self._meta.module_name)
+    
+    def xml(self):
+        ''' Return an xml string version of me '''
+        if not self.XMLO: self.XMLO=self.xmlobject()
+        return ET.tostring(self.XMLO,pretty_print=True)
+    
+    def validate(self):
+        ''' All documents should be validatable '''
+        validator=Validator()
+        self.XMLO=self.xmlobject()
+        v=validator.validateDoc(self,self.XMLO,cimType=self._meta.module_name)
+        self.validErrors=v.nInvalid
+        self.numberOfValidationChecks=v.nChecks
+        logging.debug("%s validate checks=%s"%(self._meta.module_name,self.numberOfValidationChecks))
+        logging.debug("%s validate errors=%s"%(self._meta.module_name,self.validErrors))
+        return v.valid,v.errorsAsHtml()
+        
+    def export(self):
+        ''' Make available for export in the atom feed '''
+        # first redo validation to make sure this really is ok
+        valid,html=self.validate()
+        self.isComplete=valid
+        # now store the document ...
+        keys=['uri','metadataVersion','documentVersion','created','updated']
+        attrs={}
+        for key in keys: attrs[key]=self.__getattribute__(key)
+        cfile=CIMObject(**attrs)
+        cfile.cimtype=self._meta.module_name
+        cfile.xmlFile=self.xml()
+        cfile.save()
+    
+    def __unicode__(self):
+        return self.abbrev
+   
+    def save(self,*args,**kwargs):
+        ''' Used to decide what to do about versions. We only increment the document version
+        number with changes once the document is considered to be complete and valid '''
+        if self.isComplete:  
+            self.isComplete=False
+            self.documentVersion+=1
+            self.validErrors=-1   # now force a revalidation before any future document incrementing.
+        if 'eventParty' in kwargs:
+            self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
+        return models.Model.save(self,*args,**kwargs)
+    
+    def delete(self,*args,**kwargs):
+        ''' Avoid deleting documents which have foreign keys to this instance'''
+        soft_delete(self,*args,**kwargs)
+    # how can you get at me?:
+    #@models.permalink
+    #def get_absolute_url(self):   
+    #    return  ('/display/%s/%s'%[self._meta.module_name,self.uri])
+    
+    # the following three url views exploit the get_absolute_url defined in the subclasses.
+    def urlxml(self):
+        return('%s_XML'%self._meta.module_name,[str(self.centre.id),str(self.id),])
+    urlxml=permalink(urlxml)
+ 
+  
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)
@@ -106,8 +248,7 @@ class ResponsibleParty(models.Model):
     def delete(self,*args,**kwargs):
         return soft_delete(self,*args,**kwargs)
     class Meta:
-        ordering=['name','email']
-    
+        ordering=['abbrev','name','email']
     
 class Centre(ResponsibleParty):
     ''' A CMIP5 modelling centre '''
@@ -117,79 +258,6 @@ class Centre(ResponsibleParty):
     def __init__(self,*args,**kwargs):
         ResponsibleParty.__init__(self,*args,**kwargs)
         
-class EditHistoryEvent(models.Model):
-    ''' Used for edit history event logging '''
-    eventDate=models.DateField(auto_now_add=True,editable=False)
-    eventParty=models.ForeignKey(ResponsibleParty)
-    eventAction=models.TextField(blank=True)
-    # following will only means something to whatever creates the event.
-    eventIdentifier=models.CharField(max_length=128)
-
-class Doc(models.Model):
-    ''' Abstract class for general properties '''
-    #all documents associated with a centre
-    centre=models.ForeignKey('Centre',blank=True,null=True)
-    title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.CharField(max_length=25)
-    author=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_author')
-    funder=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_funder')
-    contact=models.ForeignKey(ResponsibleParty,blank=True,null=True,related_name='%(class)s_contact')
-    metadataMaintainer=models.ForeignKey(ResponsibleParty,blank=True,null=True,
-                       related_name='%(class)s_metadataMaintainer')
-    description=models.TextField(blank=True)
-    # the following two are (or should be) set at document construction time:
-    uri=models.CharField(max_length=64,unique=True,editable=False)                  
-    metadataVersion=models.CharField(max_length=128,editable=False)
-    # following is updated by the save if the document is valid. NB: this version applies to 
-    # each individual component ... not the overall component.
-    documentVersion=models.IntegerField(default=1,editable=False)
-    # next two are automagically populated, and are used for the atom feed as well as being of general use.
-    created=models.DateField(auto_now_add=True,editable=False)
-    updated=models.DateField(auto_now=True,editable=False)
-    # next two are used to calculate the status bar, and are filled in by the validation software
-    validErrors=models.IntegerField(default=-1,editable=False)
-    numberOfValidationChecks=models.IntegerField(default=0,editable=False)
-    # following is used by the user to declare the document is "ready"
-    isComplete=models.BooleanField(default=False)
-    # to be used for event histories:
-    editHistory=models.ManyToManyField(EditHistoryEvent,blank=True,null=True)
-    
-    def status(self):
-        ''' Return a percentage completion in terms of validation '''
-        if self.validErrors<>-1 and self.numberOfValidationChecks<>0:
-            return 100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks)
-        else: return 0.0
-        # FIXME: and eventually see if we have a children attribute and sum them up ...
-    def __unicode__(self):
-        return self.abbrev
-    class Meta:
-        abstract=True
-        ordering=['abbrev','title']
-    def save(self,*args,**kwargs):
-        ''' Used to decide what to do about versions. We only increment the document version
-        number with changes once the document is considered to be complete and valid '''
-        if self.validErrors==0 and self.isComplete:  self.documentVersion+=1
-        if 'eventParty' in kwargs:
-            self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
-        return models.Model.save(self,*args,**kwargs)
-    def __myclass(self):
-        ''' Presumably there is a hidden method on models.Model to do this '''
-        return str(self.__class__).split('.')[-1][0:-2]
-    def delete(self,*args,**kwargs):
-        ''' Avoid deleting documents which have foreign keys to this instance'''
-        soft_delete(self,*args,**kwargs)
-    # how can you get at me?:
-    #@models.permalink
-    #def get_absolute_url(self):   
-    #    return  ('/display/%s/%s'%[self.__myclass(),self.uri])
-    
-    # the following three url views exploit the get_absolute_url defined in the subclasses.
-    def urlxml(self):
-        return('%s_XML'%self.__myclass(),[str(self.centre.id),str(self.id),])
-    urlxml=permalink(urlxml)
-        
-    
-  
 class Reference(models.Model):
     ''' An academic Reference '''
     name=models.CharField(max_length=24)
@@ -327,11 +395,15 @@ class ComponentInput(models.Model):
     #it to improve performance:
     realm=models.ForeignKey(Component,related_name="input_realm")
     #constraint=models.ForeignKey('Constraint',null=True,blank=True)
+    cfname=models.ForeignKey('Value',blank=True,null=True,related_name='input_cfname')
+    units=models.CharField(max_length=64,blank=True)
+    
     def __unicode__(self):
         return '%s (%s)'%(self.abbrev, self.owner)
     def makeNewCopy(self,component):
         new=ComponentInput(abbrev=self.abbrev,description=self.description,ctype=self.ctype,
-                           owner=component,realm=component.realm)
+                           owner=component,realm=component.realm,
+                           cfname=self.cfname,units=self.units)
         new.save()
         # if we've made a new input, we need a new coupling
         cg=CouplingGroup.objects.filter(simulation=None).get(component=component.model)
@@ -374,7 +446,7 @@ class Experiment(Doc):
 
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
-    nr_id=models.CharField(max_length=64)
+    docid=models.CharField(max_length=64)
     description=models.TextField()
     name=models.CharField(max_length=128)
     ctype=models.ForeignKey('Value',blank=True,null=True)
@@ -583,7 +655,7 @@ class DataObject(models.Model):
     # if the data object is a variable within a dataset at the target uri, give the variable
     variable=models.CharField(max_length=128,blank=True)
     # and if possible the CF name
-    cftype=models.CharField(max_length=512,blank=True)
+    cfname=models.ForeignKey('Value',blank=True,null=True,related_name='data_cfname')
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
     # not using this at the moment, but keep for later: csml/science type
@@ -780,7 +852,8 @@ class DocFeed(Feed):
     # See http://code.google.com/p/django-atompub/wiki/UserGuide
     feeds={'platform':Platform.objects.all(),
            'simulation':Simulation.objects.all(),
-           'component':Component.objects.filter(isModel=True)}
+           'component':Component.objects.filter(isModel=True),
+           'experiment':Experiment.objects.all()}
     def get_object(self,params):
         ''' Used for parameterised feeds '''
         assert params[0] in self.feeds,'Unknown feed request'
@@ -1012,8 +1085,9 @@ class PlatformForm(forms.ModelForm):
         exclude=('centre','uri','metadataMaintainer')
         
 class ComponentInputForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"2"}),required=False)
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}))
+    units=forms.CharField(widget=forms.TextInput(attrs={'size':'48'}),required=False)
     class Meta:
         model=ComponentInput
         exclude=('owner','realm') # we know these
@@ -1091,7 +1165,6 @@ class DataContainerForm(forms.ModelForm):
 class DataObjectForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
     variable=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
-    cftype=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}),required=False)
     class Meta:
         model=DataObject
         exclude=('featureType','drsAddress','container')

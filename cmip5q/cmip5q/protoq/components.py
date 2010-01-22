@@ -10,9 +10,9 @@ from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
-from cmip5q.protoq.cimHandling import *
 
 from cmip5q.Translator import Translator
+from cmip5q.protoq.cimHandler import cimHandler
 
 from django import forms
 import uuid
@@ -65,13 +65,14 @@ class MyComponentInputFormSet(ComponentInputFormSet):
                 c=Coupling(parent=self.__getCouplingGroup(),targetInput=i)
                 c.save()
     
-class componentHandler(object):
+class componentHandler(cimHandler):
     
     def __init__(self,centre_id,component_id=None):
         ''' Instantiate a component handler, by loading existing component information '''
         
         self.centre_id=centre_id
-        self.id=component_id
+        self.pkid=component_id
+        self.Klass='Unknown by component handler as yet'
         
         if component_id is None:
             ''' This is a brand new component '''
@@ -83,13 +84,24 @@ class componentHandler(object):
         else:
             try:
                 self.component=Component.objects.get(id=component_id)
+                self.Klass=self.component.__class__
             except Exception,e:
                 logging.debug('Attempt to open an unknown component %s'%component_id)
                 raise Exception,e
         
         self.url=reverse('cmip5q.protoq.views.componentEdit',
                          args=(self.centre_id,self.component.id))
+       
             
+    def XMLasText(self):
+        # FIXME: split this into model and view activities ...
+        translator=Translator()
+        c=self.component  # and move to cimHandler
+        htmlDoc=translator.c2text(c)
+        html=ET.tostring(htmlDoc)
+        return render_to_response('text.html',{'HTML':html})
+    
+    
     def addsub(self,request):
         ''' Add a subcomponent to a parent, essentially, we create a subcomponent, and return
         it for editing  '''
@@ -223,64 +235,14 @@ class componentHandler(object):
             'refu':refu,'baseURLa':baseURLa,'baseURLr':baseURLr,
             'tabs':tabs(request,self.centre_id,'References for %s'%c),
             'notAjax':not request.is_ajax()})
-
-    def validate(self):
-        ''' Validate model '''
-        validator=Validator()
-        validator.validateDoc(self.XML(allModel=True,recurse=True,composition=True),'Component')
-        errorsHtml=validator.errorsAsHtml()
-        cimHtml=validator.xmlAsHtml()
-        self.component.validErrors=validator.nInvalid
-        self.component.numberOfValidationChecks=validator.nChecks
-        logging.debug("component validate checks="+str(validator.nChecks))
-        logging.debug("component validate errors="+str(validator.nInvalid))
-        logging.debug("component percent complete="+str(validator.percentComplete))
-        return render_to_response('validation.html',{'sHTML':errorsHtml,'cimHTML':cimHtml})
-    
-    def view(self):
-        ''' HTML view of self '''
-        ''' Return a CIM XML view for the moment'''
-        #return self.XML(mimetype="doc/cim/xml")
-        return self.HTML()
-    
-    def XML(self,allModel=True,recurse=True,composition=True):
-        ''' XML view of self as an element tree instance'''
-        translator=Translator()
-        if (allModel) :
-            c=self.component.model
-        else:
-            c=self.component
-        translator.setComponentOptions(recurse,composition)
-        xmlDoc=translator.q2cim(c,docType='Component')
-        return xmlDoc
-    
-    def XMLasText(self):
-        translator=Translator()
-        c=self.component
-        htmlDoc=translator.c2text(c)
-        html=ET.tostring(htmlDoc)
-        return render_to_response('text.html',{'HTML':html})
-
-    def XMLasHTML(self,allModel=True):
-        assert(allModel,True,'Support for not processing the entire model is not yet included')
-        CIMDoc=self.XML(allModel,recurse=True,composition=True)
-        #docStr=ET.tostring(CIMDoc,"UTF-8")
-        mimetype='application/xml'
-        docStr=ET.tostring(CIMDoc,pretty_print=True)
-        return HttpResponse(docStr,mimetype)
-
-    def HTML(self,allModel=True):
-        ''' Rupert's nice XML view of self'''
-        html=viewer(self.XML(allModel=True,recurse=True,composition=True))
-        return HttpResponse(html)
         
     def coupling(self,request,ctype=None):
         ''' Handle the construction of component couplings '''
         # we do the couplings for the parent model of a component
         model=self.component.model
-        okURL=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,self.id,))
+        okURL=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,self.pkid,))
         urls={'self':reverse('cmip5q.protoq.views.componentCup',
-                args=(self.centre_id,self.id,))
+                args=(self.centre_id,self.pkid,))
               }
         cg=CouplingGroup.objects.filter(component=model).get(simulation=None)
         if request.method=='POST':
@@ -298,7 +260,7 @@ class componentHandler(object):
         
     def inputs(self,request):
         ''' Handle the construction of input requirements into a component '''
-        okURL=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,self.id,))
+        okURL=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,self.pkid,))
         urls={'ok':okURL,'self':self.url}
         if request.method=='POST':
             Inpform=MyComponentInputFormSet(self.component,self.component.isRealm,

@@ -9,7 +9,9 @@
 <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
 </table>-->
 <table><tr>
-<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} (status {{c.status}})</h1> </td> {% if c.controlled %} {% else %}
+<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} (status {{c.status}})</h1> </td> 
+    {% if c.controlled %} 
+    {% else %}
     <td>
         <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
             <input type="hidden" name="deleteMe" value="1"/>
@@ -52,7 +54,6 @@
     <div class="boxer2">
     <form action="{{urls.form}}" method='post'>
         <div class="boxer">    
-            <!--<h4> General Characteristics </h4>-->
             <table>
                 <tr><td class="inputH1">Short Name:&nbsp;{{cform.abbrev.errors}}</td>
                 <td colspan="3">

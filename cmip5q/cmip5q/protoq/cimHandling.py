@@ -129,8 +129,9 @@ class Validator:
         xslt_doc = transform(sct_doc)
         transform = ET.XSLT(xslt_doc)
         report = transform(CIMdoc)
+        print report
         # find out how many errors and checks there were
-        nChecks = len(report.xpath('//check'))
+        nChecks = len(report.xpath('//Check'))
         nInvalid = len(report.xpath('//invalid'))
         return report,nChecks,nInvalid
 
@@ -163,4 +164,5 @@ class Validator:
                 raise ValueError('Invalid validation type found')
 
         # create an html representation of our document
-        self.cimHtml=self.__CimAsHtml(CIMdoc)
+        self.cimHtml=''#self.__CimAsHtml(CIMdoc)
+        # don't really want to see the HTML for now ...

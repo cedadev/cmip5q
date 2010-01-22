@@ -11,6 +11,7 @@
     <div class="boxer2">
     <form action='{{url}}' method='post'>
         <div class="boxer">
+        <table><tr><td>
         <table>
         <tr>
             <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
@@ -19,6 +20,7 @@
             <td>Contact:&nbsp;{{pform.contact.errors}}</td><td>{{pform.contact}}</td>
             <td>Funder:&nbsp;{{pform.funder.errors}}</td><td>{{pform.funder}}</td></tr>
         </tr>
+        </table></td><td width="20%"> {% include 'completion.html' %} </td></tr>
         </table>
         </div>
         <div class="boxer">

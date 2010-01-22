@@ -258,8 +258,9 @@ def platformEdit(request,centre_id,platform_id=None):
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
     
     return render_to_response('platform.html',
-                {'pform':pform,'url':editURL,'p':p,'c':c,
+                {'pform':pform,'url':editURL,'p':p,'c':c,'esgready':1,'cform':pform,
                 'tabs':tabs(request,centre_id,'Platform')})
+                # point cform at pform too so that the completion html can use a common variable.
 
 def platformXML(request,cenre_id,platform_id):
     return HttpResponse('Not implemented')

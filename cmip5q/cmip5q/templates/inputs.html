@@ -9,7 +9,7 @@ inputs:<ul><li>spatially varying <b>"initial conditions"</b> for prognostic vari
 
 <p> You can enter multiple inputs here, each time you add a new input, it will be saved, and a new entry form will appear for subsequent inputs. </p>
 
-<p> You can "bind" each of these input requirements to variable(s) in file(s) (or in the case of a boundary condition another component) in two different places: on the "coupling" pages at the top level components within your model (to establish default coupling), and on the "coupling" page of the simulation description, where you can establish new bindings or override the default behaviour.</p> 
+<p> You can "bind" each of these input requirements to variable(s) in file(s) (or in the case of a boundary condition, if desired, another component) in two different places: on the "Resolve Inputs" pages at the top level components within your model (to establish default coupling), and on the "Resolve Inputs" page of the simulation description, where you can establish new bindings or override the default behaviour. Only the latter is saved to output - the first option is simply a convenience to reduce having to enter the same information.</p> 
 </div>
 
 <div class="boxer">
@@ -21,12 +21,16 @@ inputs:<ul><li>spatially varying <b>"initial conditions"</b> for prognostic vari
             <div class="boxer">
                 <table>
                     <tr class="{% cycle 'row1' 'row2'%}">
-                        <td>Name: {{f.abbrev.errors}} {{f.abbrev}} </td>
+                        <td>Short Name: {{f.abbrev.errors}}</td><td> {{f.abbrev}}</td>
                         <td>Input Type: {{f.ctype.errors}} {{f.ctype}} </td>
                         <td>{% if not forloop.last %} (delete: {{f.DELETE.errors}}{{f.DELETE}}){% endif %}</td>
                     </tr>
                     <tr class="{% cycle 'row1' 'row2'%}">
-                    <td colspan="3">Description:{{f.description.errors}}{{f.description}}</td>
+                    <td>Description:{{f.description.errors}}</td><td colspan="3">{{f.description}}</td>
+                    </tr>
+                    <tr><td colspan="4">In some cases an input corresponds to an actual variable, if so, please enter the units, and if possible the CF standard name:</td></tr>
+                     <tr><td>Units:{{f.units.errors}}</td><td>{{f.units}}}</td>
+                        <td coslpan="2">CF Name:{{f.cfname.errors}}{{f.cfname}}</td>
                     </tr>
                     {% for hid in f.hidden_fields %} {{hid}} {% endfor %}       
                 </table> 

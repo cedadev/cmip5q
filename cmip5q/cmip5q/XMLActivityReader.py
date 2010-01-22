@@ -25,7 +25,7 @@ def getText2(elem,path):
     
 def numericalRequirement (elem):
     description=getText(elem,'description')
-    nr_id=getText(elem,'id')
+    docid=getText(elem,'id')
     name=getText(elem,'name')
     
     if typekey in elem.attrib.keys():
@@ -36,13 +36,13 @@ def numericalRequirement (elem):
     try:
         ctype=ctypeVals.get(value=ctype)
     except:
-        logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,name,id))
+        logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,name,docid))
         ctype=None
     
     if not name or name=='':
         logging.debug('Numerical Requirement %s [%s,%s]'%(id,description,ctype))
     
-    n=NumericalRequirement(nr_id=nr_id,description=description,name=name,ctype=ctype)
+    n=NumericalRequirement(description=description,name=name,ctype=ctype,docid=docid)
     n.save()
     return n
         
