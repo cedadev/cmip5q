@@ -25,7 +25,7 @@ def getText2(elem,path):
     
 def numericalRequirement (elem):
     description=getText(elem,'description')
-    id=getText(elem,'id')
+    nr_id=getText(elem,'id')
     name=getText(elem,'name')
     
     if typekey in elem.attrib.keys():
@@ -42,7 +42,7 @@ def numericalRequirement (elem):
     if not name or name=='':
         logging.debug('Numerical Requirement %s [%s,%s]'%(id,description,ctype))
     
-    n=NumericalRequirement(description=description,name=name,ctype=ctype)
+    n=NumericalRequirement(nr_id=nr_id,description=description,name=name,ctype=ctype)
     n.save()
     return n
         

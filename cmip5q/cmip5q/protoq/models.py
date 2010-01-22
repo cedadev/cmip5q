@@ -374,6 +374,7 @@ class Experiment(Doc):
 
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
+    nr_id=models.CharField(max_length=64)
     description=models.TextField()
     name=models.CharField(max_length=128)
     ctype=models.ForeignKey('Value',blank=True,null=True)
