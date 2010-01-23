@@ -7,6 +7,8 @@ admin.autodiscover()
 
 from protoq.models import DocFeed
 
+# this is not actually correct, since strictly we need hexadecimal following this pattern
+uuid='\w\w\w\w\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w\w\w\w\w\w\w\w\w'
 
 urlpatterns = patterns('',
     # Example:
@@ -18,7 +20,9 @@ urlpatterns = patterns('',
     # 
     #    generic document handling
     # 
-    (r'^cmip5/(?P<cid>\d+)/(?P<docType>\D+)/doc/(?P<pkid>\d+)/(?P<method>\D+)/$','cmip5q.protoq.views.genericDoc'),     
+    (r'^cmip5/(?P<cid>\d+)/(?P<docType>\D+)/doc/(?P<pkid>\d+)/(?P<method>\D+)/$','cmip5q.protoq.views.genericDoc'),  
+    (r'^cmip5/(?P<docType>\D+)/(?P<uri>%s)/$'%uuid,'cmip5q.protoq.views.persistedDoc'),
+    (r'^cmip5/(?P<docType>\D+)/(?P<uri>%s)/(?P<version>\d+)/$'%uuid,'cmip5q.protoq.views.persistedDoc'),                     
     # 
     # COMPONENTS:
     #   
@@ -101,10 +105,6 @@ urlpatterns = patterns('',
     # ASSIGN            
     (r'^cmip5/(?P<cen_id>\d+)/assign/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.assign'),       
-
-    # New XML Handler
-    (r'^cmip5/(?P<docType>\D+)/(?P<docID>\d+).xml$',
-            'cmip5q.protoq.views.xml'),     
             
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

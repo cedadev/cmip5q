@@ -40,9 +40,21 @@ def genericDoc(request,cid,docType,pkid,method):
     return cmethod()
 
 
-def xml(request,documentType,docID):
-    ''' Placeholder for persisted document handling'''
-    return HttpResponse('not implemented')
+def persistedDoc(request,docType,uri,version=0):
+    ''' persisted document handling'''
+    if docType not in ('platform','experiment','simulation','component'):
+            return HttpResponseBadRequest('Invalid document type requests - %s'%docType)
+    set=CIMObject.objects.filter(uri=uri)
+    if len(set)==0:
+        return HttpRepsonseBadRequest('Document with uri - %s - not found'%uri)
+    if version<>0:
+        try:
+            obj=set.get(documentVersion=version)
+        except:
+            return HttpResponseBadRequest('Document with uri - %s - has no version %s'%(uri,version))
+    else:
+        obj=set[-1]
+    return obj.xmlfile
 
 def index(request):
     #find all the centre objects

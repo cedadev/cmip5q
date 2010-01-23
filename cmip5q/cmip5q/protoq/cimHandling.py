@@ -129,7 +129,6 @@ class Validator:
         xslt_doc = transform(sct_doc)
         transform = ET.XSLT(xslt_doc)
         report = transform(CIMdoc)
-        print report
         # find out how many errors and checks there were
         nChecks = len(report.xpath('//check'))
         nInvalid = len(report.xpath('//invalid'))

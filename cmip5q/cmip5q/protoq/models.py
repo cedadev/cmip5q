@@ -113,7 +113,10 @@ class Fundamentals(models.Model):
     # The URI should only change if the thing described by the document changes.
     # That is, once assigned, the URI never changes, and once exported, the document should persist.
     # If the thing itself changes, we should copy the document, give it a new URI, and update it ...
-    uri=models.CharField(max_length=64,unique=True,editable=False)    
+    # The uri appears in subclasses, because it needs to be unique in the Doc children, but is
+    # allowed to be duplicated in the CIMObjects (albeit not with the same metadataversion and 
+    # document version.
+    #
     # However, we can have descriptions which differ because the way we describe it has changed,
     # if that happens, we should modify the version identifier which follows AND the documentVersion.
     metadataVersion=models.CharField(max_length=128,editable=False)
@@ -128,11 +131,19 @@ class Fundamentals(models.Model):
 class CIMObject (Fundamentals):
     ''' This is an exported CIM object. Once exported, the questionnaire can't molest it,
     but it's included here, because the questionnaire can return it '''
-    cimtype=models.CharField(max_length=64)
+    uri=models.CharField(max_length=64,editable=False)    
+    cimtype=models.CharField(max_length=64,editable=False)
     xmlfile=models.FileField(upload_to='bnl')
     # These are update by the parent doc, which is why they're not "fundamentals"
-    created=models.DateField()
-    updated=models.DateField()
+    created=models.DateField(editable=False)
+    updated=models.DateField(editable=False)
+    # The following attributes are needed to provide "discovery" via atom entries:
+    author=models.ForeignKey('ResponsibleParty',blank=True,null=True,related_name='%(class)s_author')
+    title=models.CharField(max_length=128,blank=True,null=True)
+    description=models.TextField(blank=True)
+    @models.permalink
+    def get_absolute_url(self):
+        return ('cmip5q.protoq.views.persistedDoc',(self.cimtype,self.uri,self.documentVersion))
     
 class Doc(Fundamentals):
     ''' Abstract class for general properties of the CIM documents handled in the questionnaire '''
@@ -145,6 +156,7 @@ class Doc(Fundamentals):
     metadataMaintainer=models.ForeignKey('ResponsibleParty',blank=True,null=True,
                        related_name='%(class)s_metadataMaintainer')
     
+    uri=models.CharField(max_length=64,unique=True,editable=False)
     title=models.CharField(max_length=128,blank=True,null=True)
     abbrev=models.CharField(max_length=25)
     description=models.TextField(blank=True)
@@ -178,7 +190,7 @@ class Doc(Fundamentals):
     
     def xml(self):
         ''' Return an xml string version of me '''
-        if not self.XMLO: self.XMLO=self.xmlobject()
+        if len(self.XMLO): self.XMLO=self.xmlobject()
         return ET.tostring(self.XMLO,pretty_print=True)
     
     def validate(self):
@@ -206,15 +218,22 @@ class Doc(Fundamentals):
         ''' Make available for export in the atom feed '''
         # first redo validation to make sure this really is ok
         valid,html=self.validate()
+        logging.info('Exporting document regardless of validation state')
         self.isComplete=valid
-        # now store the document ...
-        keys=['uri','metadataVersion','documentVersion','created','updated']
-        attrs={}
-        for key in keys: attrs[key]=self.__getattribute__(key)
-        cfile=CIMObject(**attrs)
-        cfile.cimtype=self._meta.module_name
-        cfile.xmlFile=self.xml()
-        cfile.save()
+        if True: # FIXME: valid:
+            # now store the document ...
+            keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
+            attrs={}
+            for key in keys: attrs[key]=self.__getattribute__(key)
+            cfile=CIMObject(**attrs)
+            cfile.cimtype=self._meta.module_name
+            cfile.xmlFile=self.xml()
+            cfile.title='%s (%s)'%(self.abbrev,self.title)
+            cfile.save()
+            return 'Document %s available at %s'%(self.uri,cfile.get_absolute_url())
+        else:
+            return 'Unable to export invalid document'
+            
     
     def __unicode__(self):
         return self.abbrev
@@ -853,10 +872,11 @@ class ModelMod(Modification):
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''
     # See http://code.google.com/p/django-atompub/wiki/UserGuide
-    feeds={'platform':Platform.objects.all(),
-           'simulation':Simulation.objects.all(),
-           'component':Component.objects.filter(isModel=True),
-           'experiment':Experiment.objects.all()}
+    feeds={'platform':CIMObject.objects.filter(cimtype='platform'),
+           'simulation':CIMObject.objects.filter(cimtype='simulation'),
+           'component':CIMObject.objects.filter(cimtype='component'),
+           'experiment':CIMObject.objects.filter(cimtype='experiment'),
+           'all':CIMObject.objects.all()}
     def get_object(self,params):
         ''' Used for parameterised feeds '''
         assert params[0] in self.feeds,'Unknown feed request'
@@ -874,10 +894,7 @@ class DocFeed(Feed):
     def item_id(self,item):
         return item.uri
     def item_title(self,item):
-        t=item.title
-        if len(t):
-            return '%s (%s)'%(item.abbrev,item.title)
-        else: return item.abbrev
+        return item.title
     def item_authors(self,item):
         if item.author is not None:
             return [{'name': item.author.name,'email':item.author.email}]
@@ -890,10 +907,10 @@ class DocFeed(Feed):
         if item.description:
             return item.description
         else:
-            return '%s'%item
+            return '%s:%s'%(item.cimtype,item.title)
     def item_content(self,item):
         ''' Return out of line link to the content'''
-        return {"type": "application/xml", "src": item.urlxml()},""
+        return {"type": "application/xml", "src": item.get_absolute_url()},""
     
 #
 # =========================================================================================

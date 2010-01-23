@@ -39,4 +39,5 @@ class cimHandler(object):
 
     def export(self):
         ''' Mark as complete and export to an atom feed '''
-        return HttpResponse('not implemented')
+        msg=self.obj.export()
+        return HttpResponse('not properly implemented:%s'%msg)
