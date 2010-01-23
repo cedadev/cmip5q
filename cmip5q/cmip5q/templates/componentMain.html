@@ -42,11 +42,8 @@
         <div class="boxer">
           <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
           <p><a id="cuplinkbut" href="{{urls.coupling}}"> Resolve Inputs</a></p> 
-          <!--<p><a id="outlinkbut" href="{{urls.outputs}}"> Outputs</a></p>-->
-          <p><a id="viewlinkbut" href="{{urls.view}}">View</a></p>
-          <p><a id="vallinkbut" href="{{urls.validate}}">Validate</a></p>
-          <p><a id="xmllinkbut" href="{{urls.export}}">Export XML</a></p>
-          <p><a id="textlinkbut" href="{{urls.text}}">Export Text</a></p>
+          <p><a id="txtlinkbut" href="{{urls.text}}">Export Text</a></p>
+          {% include 'docbuttons.html' %}
         </div>
       </td>
       <td valign="top" width="900px">
@@ -156,15 +153,9 @@
 
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
-        var oLinkButton1 = new YAHOO.widget.Button("viewlinkbut"); 
-        var oLinkButton2 = new YAHOO.widget.Button("vallinkbut"); 
-        var oLinkbutton9 = new YAHOO.widget.Button("xmllinkbut");
-        var oLinkbutton10 = new YAHOO.widget.Button("textlinkbut");
         var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
-       
-        var oLinkButton5 = new YAHOO.widget.Button("numlinkbut"); 
         var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
-        //var olinkButton7 = new YAHOO.widget.Button("outlinkbut");//
+        var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
         var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
         var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
         var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 

@@ -125,22 +125,7 @@ def componentRefs(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.manageRefs(request)
     
-def componentValidate(request,centre_id,component_id):
-    ''' Validate a component against whatever rules we develop '''
-    c=componentHandler(centre_id,component_id)
-    return c.validate()
-    
-def componentView(request,centre_id,component_id):
-    ''' View a version of the component description "nicely" laid out'''
-    c=componentHandler(centre_id,component_id)
-    return c.view()
-    
-def componentXML(request,centre_id,component_id):
-    ''' Return an xml version of the component, slightly pretty printed '''
-    c=componentHandler(centre_id,component_id)
-    return c.XMLasHTML()
-  
-def componentText(request,centre_id,component_id):
+def componentTxt(request,centre_id,component_id):
     ''' Return a textual view of the component with possible values '''
     c=componentHandler(centre_id,component_id)
     return c.XMLasText()
@@ -154,11 +139,6 @@ def componentInp(request,centre_id,component_id):
     ''' Return inputs for a component '''
     c=componentHandler(centre_id,component_id)
     return c.inputs(request)
-
-def componentNum(request,centre_id,component_id):
-    ''' Return numerics of the component '''
-    c=componentHandler(centre_id,component_id)
-    return c.numerics()
 
 def componentCopy(request,centre_id,component_id):
    c=componentHandler(centre_id,component_id)

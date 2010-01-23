@@ -151,8 +151,9 @@ class componentHandler(object):
         urls['subcomp']=reverse('cmip5q.protoq.views.componentSub',args=(self.centre_id,c.id,))
         urls['coupling']=reverse('cmip5q.protoq.views.componentCup',args=(self.centre_id,c.id))
         urls['inputs']=reverse('cmip5q.protoq.views.componentInp',args=(self.centre_id,c.id))
+        urls['text']=reverse('cmip5q.protoq.views.componentTxt',args=(self.centre_id,c.id))
         
-        urls=commonURLs(c,urls)
+        urls=commonURLs(c.model,urls)
         
         baseURL=reverse('cmip5q.protoq.views.componentAdd',args=(self.centre_id,))
         template='+EDID+'

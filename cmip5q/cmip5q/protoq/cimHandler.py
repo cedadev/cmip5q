@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 
 def commonURLs(obj,dictionary):
     '''Add urls for the common methods to a dictionary for use in a template '''
-    for key in ['validate','view','xml','html','export']:
+    for key in ['validate','xml','html','export']:
         dictionary[key]=reverse('cmip5q.protoq.views.genericDoc',args=(obj.centre.id,obj._meta.module_name,obj.id,key))
     return dictionary
     
@@ -25,12 +25,9 @@ class cimHandler(object):
         ''' Is this object complete? '''
         valid,html=self.obj.validate()
         return render_to_response('validation.html',{'sHTML':html,'cimHTML':''})
-    
-    def view(self):
-        ''' Return a "pretty" version of self '''
-        return self.html()
       
     def html(self):
+        ''' Return a "pretty" version of self '''
         html=viewer(self._XMLO())
         return HttpResponse(html)
 
