@@ -11,7 +11,7 @@ from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
-from cmip5q.Translator import Translator
+from cmip5q.protoq.Translator import Translator
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
