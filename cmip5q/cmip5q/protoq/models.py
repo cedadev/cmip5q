@@ -10,6 +10,7 @@ from django.db.models.fields.related import ForeignKey
 from lxml import etree as ET
 
 from django.db.models import permalink
+from django.core.files import File
 
 
 from atom import Feed
@@ -20,6 +21,7 @@ from protoq.cimHandling import *
 
 import uuid
 import logging
+from django.core.files.base import ContentFile
 
 def soft_delete(obj,simulate=False):
     ''' This method provided to use to override native model deletes to avoid
@@ -144,6 +146,11 @@ class CIMObject (Fundamentals):
     @models.permalink
     def get_absolute_url(self):
         return ('cmip5q.protoq.views.persistedDoc',(self.cimtype,self.uri,self.documentVersion))
+    def save(self,*args,**kwargs):
+        ''' We should have a local save method to ensure the version policy is not broken '''
+        # FIXME
+        return Fundamentals.save(self,*args,**kwargs)
+    
     
 class Doc(Fundamentals):
     ''' Abstract class for general properties of the CIM documents handled in the questionnaire '''
@@ -217,22 +224,25 @@ class Doc(Fundamentals):
     def export(self):
         ''' Make available for export in the atom feed '''
         # first redo validation to make sure this really is ok
+        if self.isComplete:
+            return False,'This document has already been exported',None
         valid,html=self.validate()
-        logging.info('Exporting document regardless of validation state')
+        logging.info('WARNING Exporting document for ESG regardless of validation state')
         self.isComplete=valid
         if True: # FIXME: valid:
-            # now store the document ...
+            # now store the document ... 
             keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
             attrs={}
             for key in keys: attrs[key]=self.__getattribute__(key)
             cfile=CIMObject(**attrs)
             cfile.cimtype=self._meta.module_name
-            cfile.xmlFile=self.xml()
+            cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype,self.uri,self.documentVersion),
+                               ContentFile(self.xml()),save=False)
             cfile.title='%s (%s)'%(self.abbrev,self.title)
             cfile.save()
-            return 'Document %s available at %s'%(self.uri,cfile.get_absolute_url())
+            return True,'Version %s of %s document %s has been permanently stored'%(self.documentVersion,cfile.cimtype,self.uri),cfile.get_absolute_url()
         else:
-            return 'Unable to export invalid document'
+            return False,'Unable to export invalid document'
             
     
     def __unicode__(self):
@@ -252,16 +262,11 @@ class Doc(Fundamentals):
     def delete(self,*args,**kwargs):
         ''' Avoid deleting documents which have foreign keys to this instance'''
         soft_delete(self,*args,**kwargs)
-    # how can you get at me?:
-    #@models.permalink
-    #def get_absolute_url(self):   
-    #    return  ('/display/%s/%s'%[self._meta.module_name,self.uri])
-    
-    # the following three url views exploit the get_absolute_url defined in the subclasses.
-    def urlxml(self):
-        return('%s_XML'%self._meta.module_name,[str(self.centre.id),str(self.id),])
-    urlxml=permalink(urlxml)
- 
+        
+    @models.permalink
+    def edit_url(self):
+        ''' How can we edit me? '''
+        return ('cmip5q.protoq.views.%sEdit'%self._meta.module_name,(self.centre_id,self.id,))
   
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''

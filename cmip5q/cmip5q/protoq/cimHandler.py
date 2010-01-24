@@ -21,15 +21,23 @@ class cimHandler(object):
         ''' XML view of self as an lxml element tree instance '''
         return self.obj.xmlobject()  
     
+    def _versions(self):
+        ''' Provide a list of versions of this CIM document '''
+        return HttpResponse('not implemented')
+    
     def validate(self):
         ''' Is this object complete? '''
         valid,html=self.obj.validate()
-        return render_to_response('validation.html',{'sHTML':html,'cimHTML':''})
+        urls=commonURLs(self.obj,{})
+        del urls['validate']  # we've just done it
+        return render_to_response('cimpage.html',{'source':'Validation','obj':self.obj,'html':html,'urls':urls})
       
     def html(self):
         ''' Return a "pretty" version of self '''
         html=viewer(self._XMLO())
-        return HttpResponse(html)
+        urls=commonURLs(self.obj,{})
+        del urls['html']
+        return render_to_response('cimpage.html',{'source':'View','obj':self.obj,'html':html,'urls':urls})
 
     def xml(self):
         #docStr=ET.tostring(CIMDoc,"UTF-8")
@@ -39,5 +47,12 @@ class cimHandler(object):
 
     def export(self):
         ''' Mark as complete and export to an atom feed '''
-        msg=self.obj.export()
-        return HttpResponse('not properly implemented:%s'%msg)
+        ok,msg,url=self.obj.export()
+        html='<p>%s</p>'%msg
+        urls=commonURLs(self.obj,{'persisted':url})
+        del urls['export']
+        return render_to_response('cimpage.html',{'source':'Export to CMIP5','obj':self.obj,'html':html,
+                                  'urls':urls})
+    
+   
+    

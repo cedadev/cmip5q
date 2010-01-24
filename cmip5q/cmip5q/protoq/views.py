@@ -39,7 +39,6 @@ def genericDoc(request,cid,docType,pkid,method):
 
     return cmethod()
 
-
 def persistedDoc(request,docType,uri,version=0):
     ''' persisted document handling'''
     if docType not in ('platform','experiment','simulation','component'):
@@ -49,12 +48,16 @@ def persistedDoc(request,docType,uri,version=0):
         return HttpRepsonseBadRequest('Document with uri - %s - not found'%uri)
     if version<>0:
         try:
+            set=set.filter(documentVersion=version)
+            if len(set)<>1: 
+                logging.info('CIM Document Inconsistency - %s identical versions'%len(set))
             obj=set.get(documentVersion=version)
         except:
+            logging.info('Attempt to retrieve %s with version %s failed'%(uri,version))
             return HttpResponseBadRequest('Document with uri - %s - has no version %s'%(uri,version))
     else:
-        obj=set[-1]
-    return obj.xmlfile
+        obj=set[len(set)-1]
+    return HttpResponse(obj.xmlfile.read())
 
 def index(request):
     #find all the centre objects
