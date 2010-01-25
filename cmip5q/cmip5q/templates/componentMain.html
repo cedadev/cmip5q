@@ -1,13 +1,6 @@
+{% extends "twopanel.html" %}
 
-{% extends "base.html" %}
-{% block content %} 
-
-<div class="boxer"> 
-<!--
-<tr><td width="800px"><h1> Model Component {{c.abbrev }} </h1></td>
-<td width="20%"> {% if isRealm %}<p><a id="inplinkbut" href="{{urls.inputs}}">Runtime Inputs</a></p>{% endif %}
-<p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p></td></tr>
-</table>-->
+{% block titlerow %}
 <table><tr>
 <td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} (status {{c.status}})</h1> </td> 
     {% if c.controlled %} 
@@ -20,34 +13,32 @@
     </td>
     {% endif %}
     </tr></table>
- </div>
+{% endblock %}
 
-<table class="navmain">
-   <tr>
-      <td valign="top" width="200px">
-        <div class="boxer">
-            <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
-            <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
-            <h4>Component {{c.abbrev}}</h4>
-            <p class="guidance"> Please add details of any other relevant
-            subcomponents of this component <p>
-            <p><form action="{{urls.subcomp}}" method="POST">
-                <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/></form></p>
-        </div>
-        <div class="boxer"> 
-        <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
-           {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Inputs Needed</a></p>{% endif %}
-            <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
-        </div>
-        <div class="boxer">
-          <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
-          <p><a id="cuplinkbut" href="{{urls.coupling}}"> Resolve Inputs</a></p> 
-          <p><a id="txtlinkbut" href="{{urls.text}}">Export Text</a></p>
-          {% include 'docbuttons.html' %}
-        </div>
-      </td>
-      <td valign="top" width="900px">
-      
+{% block leftcolumn %}
+    <div class="boxer">
+        <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
+        <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
+        <h4>Component {{c.abbrev}}</h4>
+        <p class="guidance"> Please add details of any other relevant
+        subcomponents of this component <p>
+        <p><form action="{{urls.subcomp}}" method="POST">
+            <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/></form></p>
+    </div>
+    <div class="boxer"> 
+    <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
+        {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Inputs Needed</a></p>{% endif %}
+        <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
+    </div>
+    <div class="boxer">
+        <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
+        <p><a id="cuplinkbut" href="{{urls.coupling}}"> Resolve Inputs</a></p> 
+        <p><a id="txtlinkbut" href="{{urls.text}}">Export Text</a></p>
+        {% include 'docbuttons.html' %}
+    </div>
+{% endblock %}
+
+{% block mainpanel %}
     <div class="boxer2">
     <form action="{{urls.form}}" method='post'>
         <div class="boxer">    
@@ -102,10 +93,10 @@
             <p>{{cform.description}}</p> 
             </center> 
         </div>
-    <center><input id="updateButton1" type="submit" value="Save"/>
-    </center>
+        <center><input id="updateButton1" type="submit" value="Save"/>
+        </center>
     </form>
-    </div>
+    </div><!-- boxer2 div -->
     
     {% if inps|length %}
     <div class="boxer">
@@ -139,17 +130,18 @@
         </table>
         {% endif %}
     </div>
+    
     {% if isModel %}
     <div class="boxer">
-    <h4> Required Inputs and Couplings </h4>
-    <table>
-    {% for bc in cset %}
-    <tr class="{%cycle  'row2' 'row1'%}"><td>{{bc.targetInput.ctype}}</td><td>{{bc}} uses {{bc.internalclosure_set.all|length}} internal link(s) and {{bc.externalclosure_set.all|length}} file link(s) by default.</tr>
-    {% endfor %}
-    </table>
+        <h4> Required Inputs and Couplings </h4>
+        <table>
+        {% for bc in cset %}
+        <tr class="{%cycle  'row2' 'row1'%}"><td>{{bc.targetInput.ctype}}</td><td>{{bc}} uses {{bc.internalclosure_set.all|length}} internal link(s) and {{bc.externalclosure_set.all|length}} file link(s) by default.</tr>
+        {% endfor %}
+        </table>
     </div>
     {% endif %}
-</td></tr></table>
+
 
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
@@ -191,4 +183,4 @@ YAHOO.util.Event.onDOMReady(YAHOO.protoq.tree.initTree);
 </script>
 <!-- End of YUI treeview stuff for body -->
 
-{% endblock%}
+{% endblock %}

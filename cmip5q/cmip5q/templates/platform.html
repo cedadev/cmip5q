@@ -1,17 +1,20 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="inner">
-    <div class="boxer">
-    {% if p %}
+{% extends 'twopanel.html' %}
+{% block titlerow %}
+ {% if p %}
         <h1> Edit platform {{p}} for {{p.centre}} (validation status {{p.status}})</h1>
     {% else %}
         <h1> Create new platform for {{c}}</h1>
     {% endif %}
-    </div>
+{% endblock %}
+{% block leftcolumn %}
+<div class="boxer">
+    <p> empty </p>
+</div>
+{% endblock %}
+{% block mainpanel %}
     <div class="boxer2">
     <form action='{{url}}' method='post'>
         <div class="boxer">
-        <table><tr><td>
         <table>
         <tr>
             <td>Name:{{pform.abbrev.errors}}</td><td>{{pform.abbrev}}</td>
@@ -20,7 +23,6 @@
             <td>Contact:&nbsp;{{pform.contact.errors}}</td><td>{{pform.contact}}</td>
             <td>Funder:&nbsp;{{pform.funder.errors}}</td><td>{{pform.funder}}</td></tr>
         </tr>
-        </table></td><td width="20%"> {% include 'completion.html' %} </td></tr>
         </table>
         </div>
         <div class="boxer">
@@ -45,5 +47,4 @@
         <center> <input type="submit" value="Save"/></center>
     </form>
     </div>
-</div>
 {% endblock %}
