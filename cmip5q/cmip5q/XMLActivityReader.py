@@ -15,7 +15,7 @@ def getText(elem,path):
     if e is None: 
         return ''
     else:
-        return (e.text or '')
+        return e.text or ''
     
 def getText2(elem,path):
     e=elem.find(path)
@@ -23,30 +23,12 @@ def getText2(elem,path):
         return '' 
     else: return e.text or ''
     
-def numericalRequirement (elem):
-    description=getText(elem,'description')
-    docid=getText(elem,'id')
-    name=getText(elem,'name')
+def getTextN(elem,path):
+    r=getText(elem,path)
+    if r=='':
+        return None
+    else: return r
     
-    if typekey in elem.attrib.keys():
-        ctype=elem.attrib[typekey]
-    else: ctype=''
-    v=Vocab.objects.get(name='NumReqTypes')
-    ctypeVals=Value.objects.filter(vocab=v)
-    try:
-        ctype=ctypeVals.get(value=ctype)
-    except:
-        logging.debug('Invalid numerical requirement type (%s) in %s,%s'%(ctype,name,docid))
-        ctype=None
-    
-    if not name or name=='':
-        logging.debug('Numerical Requirement %s [%s,%s]'%(id,description,ctype))
-    
-    n=NumericalRequirement(description=description,name=name,ctype=ctype,docid=docid)
-    n.save()
-    return n
-        
-        
 def metaAuthor(elem):
     ''' Oh what a nasty piece of code this is, but I don't have time to do it properly '''
     #FIXME do this properly with lxml and xpath with namespaces
@@ -71,22 +53,83 @@ def metaAuthor(elem):
     logging.debug('Metadata maintainer: %s'%p)
     return p
 
+
+def numericalRequirement (elem):
+    
+    args={'docid':getText(elem,'id')}
+    for a in ['description','name']:args[a]=getTextN(elem,a)
+    
+    if typekey in elem.attrib.keys():
+        ctype=elem.attrib[typekey]
+    else: ctype='NumericalRequirement'
+    v=Vocab.objects.get(name='NumReqTypes')
+    ctypeVals=Value.objects.filter(vocab=v)
+    try:
+        ctype=ctypeVals.get(value=ctype)
+    except:
+        logging.info('Invalid numerical requirement type [%s] - from %s'%(ctype,args))
+        return None
+    args['ctype']=ctype
+    
+    if str(ctype)=='SpatioTemporalConstraint':
+        # anyone else think these frequency units should be periods?
+        myvocab={'frequencyUnits':'FreqUnits',
+                 'averagingUnits':'FreqUnits',
+                 'spatialResolutionUnits':'SpatialResolutionTypes'}
+        op=elem.find('{%s}outputPeriod'%cimv)
+        args['outputPeriod']=outputPeriod(op)
+            
+        for a in ['temporalAveraging','outputFrequency']:
+            args[a]=getTextN(elem,a)
+        for a in ['frequencyUnits','averagingUnits','spatialResolution']:
+            vv=getTextN(elem,a)
+            if vv:
+                v=Vocab.objects.get(name=myvocab[a])
+                try:
+                    val=Value.objects.filter(vocab=v).get(value=vv)
+                    args[a]=val
+                except:
+                    logging.info('Invalid unit %s not found in vocab %s'%(vv,v))
+        n=SpatioTemporalConstraint(**args)
+        logging.debug('spatio temporal constraint has args %s'%args)
+    else:
+        n=NumericalRequirement(**args)
+    n.save()
+    
+    for r in elem.findall('{%s}numericalRequirement'%cimv):
+        nn=numericalRequirement(r)
+        if nn: n.consistsOf.add(nn)
+
+    # Now make sure we return the numerical requirement not any subclasses
+    # Not sure I need to do this, but just in case ...
+    try:
+        sc=n.__getattribute__('numericalrequirement_ptr')
+        return sc  # return the parent class
+    except AttributeError:
+        return n
+        
+def outputPeriod(elem):
+    ''' Handle the output period of a spatio temporal constraint '''
+    o=duration(elem,None)
+    if elem.text: o.description=elem.text
+    return o
+
 def duration(elem,calendar):
-        if elem is None:
-            return None
-        try:
-            etxt=getText(elem,'lengthYears')
-            length=float(etxt)
-        except:
-            logging.info('Unable to read length from %s'%etxt)
-            length=None
-        d=ClosedDateRange(startDate=getText(elem,'startDate'),
-                              endDate=getText(elem,'endDate'),
-                              length=length,
-                              calendar=calendar)
-        d.save()
-        logging.debug('Experiment duration %s'%d)
-        return d
+    if elem is None:
+        return None
+    try:
+        etxt=getText(elem,'lengthYears')
+        length=float(etxt)
+    except:
+        logging.info('Unable to read length from %s'%etxt)
+        length=None
+    d=ClosedDateRange(startDate=getTextN(elem,'startDate'),
+                            endDate=getTextN(elem,'endDate'),
+                            length=length,
+                            calendar=calendar)
+    d.save()
+    logging.debug('Experiment duration %s'%d)
+    return d
         
 def calendar(elem):
     cvalues=Value.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))

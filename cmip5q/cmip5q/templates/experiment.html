@@ -15,7 +15,29 @@
         <div class="backgrey">
             <table>
                 {% for r in reqs %}
-                    <tr><td>{{r.name}}</td><td>{{r.ctype}}<td>{{r.description}}</td></tr>
+                    <tr><td>{{r.name}}</td><td>{{r.ctype}}</td>
+                        <td><table class="backgrey">
+                            <tr><td colspan="3">
+                            {% if r.description %}{{r.description}}{% endif %}
+                            {% if r.spatiotemporalconstraint %}
+                                {% if r.spatiotemporalconstraint.outputPeriod %}
+                                    <br/>Output Period:{{r.spatiotemporalconstraint.outputPeriod }} {% endif %}
+                                {% if r.spatiotemporalconstraint.frequencyUnits %}
+                                    <br/>Output Frequency:{{r.spatiotemporalconstraint.frequencyUnits }} {% endif %}
+                            {% endif %}
+                            </td></tr>
+                            <!-- Can only handle one level down ... we'd like django template recursion -->
+                            {% for rr in r.consistsOf.all %} 
+                            <tr><td>{{rr.name}}</td><td>{{rr.ctype}}</td>
+                                <td>
+                                {% if rr.description %}{{rr.description}} {% endif %}
+                             
+                                {% if rr.consistsOf.all %} (Further requirement children ommitted {% endif %}
+                                </td>
+                             </tr>
+                            {% endfor %}
+                        </table></td>
+                    </tr>
                 {% endfor %}
             </table>
         </div>

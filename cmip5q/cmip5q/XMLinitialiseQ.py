@@ -67,8 +67,10 @@ VocabList={'Realms':
     'ModelModTypes':('ParameterChange','CodeChange'),
 
     # types of numerical requirement 
-    'NumReqTypes':('BoundaryCondition','InitialCondition'),
-
+    'NumReqTypes':('NumericalRequirement','BoundaryCondition','InitialCondition','SpatioTemporalConstraint'),
+    # should be used in spatio temporal constraints
+    'SpatialResolutionTypes':('',),
+    
     #ensembleTypes
     'EnsembleTypes':('Differing Start Date','Differing Initialisation','Perturbed Physics'),
     

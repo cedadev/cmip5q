@@ -466,14 +466,27 @@ class Platform(Doc):
     processor=models.ForeignKey('Value',related_name='processorVal',null=True,blank=True)
     interconnect=models.ForeignKey('Value',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
+
+    
     
 class ClosedDateRange(models.Model):
+    ''' Actually this is a DateRange as well '''
     startDate=models.CharField(max_length=32,blank=True,null=True)
+    calendar=models.ForeignKey('Value',blank=True,null=True,related_name='date_calendar')
+    description=models.TextField() # occasionally it's too hard to fix it.
     endDate=models.CharField(max_length=32,blank=True,null=True)
     length=models.FloatField(blank=True,null=True)  # years
-    calendar=models.ForeignKey('Value',blank=True,null=True)
+    lengthUnits=models.ForeignKey('Value',blank=True,null=True,related_name='date_lengthunits')
     def __unicode__(self):
-        return '%s to %s (%sy)'%(self.startDate,self.endDate,self.length)
+        d=''
+        if self.description:
+            d='%s: '%self.description
+        if self.startDate:
+            d+=self.startDate
+        if self.endDate:
+            return d+' to %s (%s%s)'%(self.endDate,self.length,self.lengthUnits)
+        else:
+            return d+' onwards'
 
 class Experiment(Doc):
     ''' A CMIP5 Numerical Experiment '''
@@ -489,12 +502,24 @@ class Experiment(Doc):
 class NumericalRequirement(models.Model):
     ''' A numerical Requirement '''
     docid=models.CharField(max_length=64)
-    description=models.TextField()
+    description=models.TextField(blank=True,null=True)
     name=models.CharField(max_length=128)
     ctype=models.ForeignKey('Value',blank=True,null=True)
+    consistsOf=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     def __unicode__(self):
         return self.name
     
+class SpatioTemporalConstraint(NumericalRequirement):
+    frequencyUnits=models.ForeignKey('Value',blank=True,null=True,
+        related_name='stc_frequencyUnits')
+    outputFrequency=models.IntegerField(null=True)
+    spatialResolution=models.ForeignKey('Value',blank=True,null=True,
+        related_name='stc_spatialRes')
+    averagingUnits=models.ForeignKey('Value',blank=True,null=True,
+        related_name='stc_averagingUnits')
+    temporalAveraging=models.IntegerField(null=True)
+    outputPeriod=models.ForeignKey(ClosedDateRange,blank=True,null=True)
+
 class Simulation(Doc):
     ''' A CMIP5 Simulation '''
     # models may be used for multiple simulations
@@ -885,6 +910,9 @@ class InputMod(Modification):
 class ModelMod(Modification):
     #we could try and get to the parameter values as well ...
     component=models.ForeignKey(Component)
+    
+
+    
     
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''
