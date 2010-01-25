@@ -213,7 +213,7 @@ class simulationHandler(object):
                 targetExp=request.POST['targetExp']
                 exp=Experiment.objects.get(id=targetExp)
                 targetSim=request.POST['targetSim']
-                s=self.s
+                s=Simulation.objects.get(id=targetSim)
                 ss=s.copy(exp)
                 url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
                 return HttpResponseRedirect(url)

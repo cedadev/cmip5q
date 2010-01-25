@@ -42,7 +42,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         {% for m in models %}
         <tr class="{% cycle 'row2' 'row1'%}">
             <td width="45%">{{m.abbrev}}</td>
-            <td> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></td>
+            <td><span class="{{m.qstatus}}"> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></span></td>
             <td>
              <form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
             <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td>
@@ -71,7 +71,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         <tbody>
         {% for m in platforms %}
         <tr class="{% cycle 'row2' 'row1'%}" ><td width="50%">{{m.abbrev}}</td>
-        <td><a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">edit</a></td></tr>
+        <td><span class="{{m.qstatus}}"><a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">edit</a></span></td></tr>
         <script type="text/javascript">
             var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
         </script>
@@ -93,7 +93,8 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         <tbody>
         {% for sgroup in sims %}
         <tr class="{% cycle 'row2' 'row1'%}"><td>{% for s in sgroup %} 
-           <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
+           <span class="{{s.qstatus}}">
+           <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a></span>
            <script type="text/javascript">
                 var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
            </script>

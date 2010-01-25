@@ -16,7 +16,7 @@
             {% for e in experiments %}
             <tr><td><a href="{{e.url}}">{{e.abbrev}}</a></td><td >
             {% for s in e.values %}
-                <span class="{% if s.isComplete%}done{%else%}undone{%endif%}"> <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a></span>
+                <span class="{{s.qstatus}}"> <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a></span>
                 <script type="text/javascript">
                     var oLinkSimEdButton{{s.id}} = new YAHOO.widget.Button("simEdButton{{s.id}}");
                 </script>

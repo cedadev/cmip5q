@@ -188,7 +188,16 @@ class Doc(Fundamentals):
             return 100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks)
         else: return 0.0
         # FIXME: and eventually see if we have a children attribute and sum them up ...
-        
+    
+    def qstatus(self):
+        ''' This is a convenience method which returns an overarching status from:
+          '[invalid; valid, but not submitted; and submitted] '''
+        if self.isComplete:
+            return 'done'
+        elif self.status<>100.0:
+            return 'undone'
+        else: return 'ready'
+    
     def xmlobject(self):
         ''' Return an lxml object view of me '''
         from protoq.Translator import Translator  # needs to be deferred down here to avoid circularity
@@ -228,7 +237,9 @@ class Doc(Fundamentals):
             return False,'This document has already been exported',None
         valid,html=self.validate()
         logging.info('WARNING Exporting document for ESG regardless of validation state')
-        self.isComplete=True #valid, FIXME
+        valid=True # FIXME
+        self.isComplete=valid
+        self.save(complete=self.isComplete) # make that completeness status last.
         if self.isComplete: 
             # now store the document ... 
             keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
@@ -242,7 +253,7 @@ class Doc(Fundamentals):
             cfile.save()
             return True,'Version %s of %s document %s has been permanently stored'%(self.documentVersion,cfile.cimtype,self.uri),cfile.get_absolute_url()
         else:
-            return False,'Unable to export invalid document'
+            return False,'Unable to export invalid document',None
             
     
     def __unicode__(self):
@@ -251,7 +262,11 @@ class Doc(Fundamentals):
     def save(self,*args,**kwargs):
         ''' Used to decide what to do about versions. We only increment the document version
         number with changes once the document is considered to be complete and valid '''
-        if self.isComplete:  
+        if 'complete' in kwargs:
+            self.isComplete=kwargs['complete']
+            del kwargs['complete']
+        elif self.isComplete:
+            # this is a save AFTER we've marked it complete, so it must be a change.  
             self.isComplete=False
             self.documentVersion+=1
             self.validErrors=-1   # now force a revalidation before any future document incrementing.
@@ -501,9 +516,6 @@ class Simulation(Doc):
     
     # this next is here in case we need it later, but I think we shouldn't
     inputMod=models.ManyToManyField('InputMod',blank=True,null=True)
-    
-    def save(self):
-        Doc.save(self)
         
     def updateCoupling(self):
         ''' Update my couplings, in case the user has added some inputs (and hence couplings)

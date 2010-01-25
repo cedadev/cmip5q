@@ -1,18 +1,19 @@
 {% extends "twopanel.html" %}
 
 {% block titlerow %}
-<table><tr>
-<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} (status {{c.status}})</h1> </td> 
+<table  width="100%" class="{{c.qstatus}}"><tr>
+<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> <td>
     {% if c.controlled %} 
+        {% if c.isComplete %} 
+            Complete and Submitted 
+        {% else %} Validation Status: {{c.status}} {% endif%}
     {% else %}
-    <td>
         <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
             <input type="hidden" name="deleteMe" value="1"/>
             <input id="deleteButton" type="submit" value="Delete"/>
         </form>
-    </td>
     {% endif %}
-    </tr></table>
+    </td></tr></table>
 {% endblock %}
 
 {% block leftcolumn %}
