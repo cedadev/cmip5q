@@ -1,6 +1,26 @@
 import logging
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
+from django.template import loader
+from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
+from django.core.exceptions import ObjectDoesNotExist
+
+def render_badrequest(*args, **kwargs):
+    """
+    Returns a HttpResponseBadRequest whose content is filled with the result of calling
+    django.template.loader.render_to_string() with the passed arguments.
+    """
+    httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
+    return HttpResponseBadRequest(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+
+def gracefulNotFound(method):
+    ''' Used to decororate view methods to handle not found gracefully '''
+    def trap(*args,**kwargs):
+        try:
+            return method(*args,**kwargs)
+        except ObjectDoesNotExist,e:
+            return render_badrequest('error.html',{'message':e})
+    return trap
 
 def RemoteUser(request,document):
     ''' Assign a metadata maintainer if we have one '''

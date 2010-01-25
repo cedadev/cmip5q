@@ -1,5 +1,5 @@
 # Create your views here.
-from django.template import Context, loader
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
@@ -12,6 +12,8 @@ from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler
 from cmip5q.protoq.XML import *
+from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound
+
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
 from django import forms
@@ -26,17 +28,16 @@ def genericDoc(request,cid,docType,pkid,method):
         klass={'simulation':Simulation,'experiment':Experiment,'component':Component,
            'platform:':Platform}[docType]
     except:
-        return HttpResponseBadRequest('Document type %s not known'%docType)
+        return render_badrequest('error.html',{'message:':'Document type %s not known'%docType})
     try:
         obj=klass.objects.get(id=pkid)
     except:
-        return HttpResponseBadRequest('Document id %s not known as %s'%(pkid,docType))
+        return render_badrequest('error.html',{'message':'Document id %s not known as %s'%(pkid,docType)})
     c=cimHandler(obj)
     try:
         cmethod=getattr(c,method)
     except:
-        return HttpResponseBadRequest('Method %s not known as a generic document handler'%method)
-
+        return render_badrequest('error.html',{'message':'Method %s not known as a generic document handler'%method})
     return cmethod()
 
 def persistedDoc(request,docType,uri,version=0):
@@ -45,7 +46,7 @@ def persistedDoc(request,docType,uri,version=0):
             return HttpResponseBadRequest('Invalid document type requests - %s'%docType)
     set=CIMObject.objects.filter(uri=uri)
     if len(set)==0:
-        return HttpRepsonseBadRequest('Document with uri - %s - not found'%uri)
+        return render_badrequest('error.html',{'message':'Document with uri - %s - not found'%uri})
     if version<>0:
         try:
             set=set.filter(documentVersion=version)
@@ -54,20 +55,16 @@ def persistedDoc(request,docType,uri,version=0):
             obj=set.get(documentVersion=version)
         except:
             logging.info('Attempt to retrieve %s with version %s failed'%(uri,version))
-            return HttpResponseBadRequest('Document with uri - %s - has no version %s'%(uri,version))
+            return render_badrequest('error.html',{'message':'Document with uri - %s - has no version %s'%(uri,version)})
     else:
         obj=set[len(set)-1]
-    return HttpResponse(obj.xmlfile.read())
+    return HttpResponse(obj.xmlfile.read(),mimetype='application/xml')
 
 def index(request):
     #find all the centre objects
     centre_list=Centre.objects.all()
-    #get a template
-    t=loader.get_template('default.html')
     f=CentreForm() 
-    #put some stuff into the template
-    c=Context({'centre_list':centre_list,'cf':f})
-    return HttpResponse(t.render(c))
+    return render_to_response('default.html',{'centre_list':centre_list,'cf':f})
    
 def centres(request):
     ''' For choosing amongst centres '''
@@ -124,37 +121,44 @@ def componentAdd(request,centre_id):
     ''' Add a component '''
     c=componentHandler(centre_id)
     return c.edit(request)
-    
+
+@gracefulNotFound
 def componentEdit(request,centre_id,component_id):
     ''' Edit a component '''
     c=componentHandler(centre_id,component_id)
     return c.edit(request)
     
+@gracefulNotFound   
 def componentSub(request,centre_id,component_id):
     ''' Add a subcomponent onto a component '''
     c=componentHandler(centre_id,component_id)
     return c.addsub(request)
     
+@gracefulNotFound
 def componentRefs(request,centre_id,component_id):
     ''' Manage the references associated with a component '''
     c=componentHandler(centre_id,component_id)
     return c.manageRefs(request)
     
+@gracefulNotFound
 def componentTxt(request,centre_id,component_id):
     ''' Return a textual view of the component with possible values '''
     c=componentHandler(centre_id,component_id)
     return c.XMLasText()
   
+@gracefulNotFound
 def componentCup(request,centre_id,component_id):
     ''' Return couplings for a component '''
     c=couplingHandler(centre_id,request)
     return c.component(component_id)
 
+@gracefulNotFound
 def componentInp(request,centre_id,component_id):
     ''' Return inputs for a component '''
     c=componentHandler(centre_id,component_id)
     return c.inputs(request)
 
+@gracefulNotFound
 def componentCopy(request,centre_id,component_id):
    c=componentHandler(centre_id,component_id)
    return c.copy(request)
@@ -178,6 +182,7 @@ def componentCopy(request,centre_id,component_id):
 #    
 ###### SIMULATION HANDLING ######################################################
 
+@gracefulNotFound
 def simulationEdit(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simid=simulation_id)
     return s.edit(request)
@@ -186,30 +191,21 @@ def simulationAdd(request,centre_id,experiment_id):
     s=simulationHandler(centre_id,expid=experiment_id)
     return s.add(request)
 
-def simulationValidate(request,centre_id,simulation_id):
-    s=simulationHandler(centre_id,simid=simulation_id)
-    return s.validate()
-
-def simulationView(request,centre_id,simulation_id):
-    s=simulationHandler(centre_id,simid=simulation_id)
-    return s.view()
-
-def simulationXML(request,centre_id,simulation_id):
-    s=simulationHandler(centre_id,simid=simulation_id)
-    return s.XMLasHTML()
-
 def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)
 
+@gracefulNotFound
 def simulationCopy(request,centre_id):
     s=simulationHandler(centre_id)
     return s.copy(request)
 
+@gracefulNotFound
 def conformanceMain(request,centre_id,simulation_id):
     s=simulationHandler(centre_id,simulation_id)
     return s.conformanceMain(request)
 
+@gracefulNotFound
 def simulationCup(request,centre_id,simulation_id,coupling_id=None,ctype=None):
     ''' Return couplings for a component '''
     c=couplingHandler(centre_id,request)
@@ -224,6 +220,7 @@ def simulationCupReset(request,centre_id,simulation_id):
    
 #### CONFORMANCE HANDLING APPEARS IN THE SIMULATION FILE  ###########################################################
  
+@gracefulNotFound
 def conformanceEdit(request,cen_id,sim_id,req_id):
     s=simulationHandler(cen_id,simid=sim_id)
     return s.conformanceEdit(request,req_id)
@@ -242,6 +239,7 @@ class MyPlatformForm(PlatformForm):
         self.fields['funder'].queryset=qs
         self.fields['contact'].queryset=qs
         
+@gracefulNotFound
 def platformEdit(request,centre_id,platform_id=None):
     ''' Handle platform editing '''
     c=Centre.objects.get(id=centre_id)
@@ -276,9 +274,6 @@ def platformEdit(request,centre_id,platform_id=None):
                 {'pform':pform,'url':editURL,'p':p,'c':c,'esgready':1,'cform':pform,
                 'tabs':tabs(request,centre_id,'Platform')})
                 # point cform at pform too so that the completion html can use a common variable.
-
-def platformXML(request,cenre_id,platform_id):
-    return HttpResponse('Not implemented')
         
 ########## EXPERIMENT VIEWS ##################
     
@@ -478,7 +473,7 @@ def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType
     to resource target_id of type targetType '''
     if resourceType=='file':
-        return HttpResponseBadRequest('Cannot assign files to targets, assign objects from within them!')
+        return render_badrequest('error.html',{'message':'Cannot assign files to targets, assign objects from within them!'})
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 

@@ -3,6 +3,8 @@
 <h4> Error </h4>
 <center>
 <p>{{message}}</p>
+{% if url %}
 <p><a href="{{url}}"> return </a></p>
+{% endif %}
 </center>
 {% endblock %}

@@ -228,8 +228,8 @@ class Doc(Fundamentals):
             return False,'This document has already been exported',None
         valid,html=self.validate()
         logging.info('WARNING Exporting document for ESG regardless of validation state')
-        self.isComplete=valid
-        if True: # FIXME: valid:
+        self.isComplete=True #valid, FIXME
+        if self.isComplete: 
             # now store the document ... 
             keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
             attrs={}
