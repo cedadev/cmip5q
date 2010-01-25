@@ -231,6 +231,9 @@ class MyPlatformForm(PlatformForm):
     def __init__(self,centre,*args,**kwargs):
         PlatformForm.__init__(self,*args,**kwargs)
         self.vocabs={'hardware':Vocab.objects.get(name='hardwareType'),
+                     'vendor':Vocab.objects.get(name='vendorType'),
+                     'compiler':Vocab.objects.get(name='compilerType'),
+                     'operatingSystem':Vocab.objects.get(name='operatingSystemType'),
                      'processor':Vocab.objects.get(name='processorType'),
                      'interconnect':Vocab.objects.get(name='interconnectType')}
         for key in self.vocabs:

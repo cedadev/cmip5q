@@ -456,13 +456,13 @@ class ComponentInput(models.Model):
 
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
-    compiler=models.CharField(max_length=128)
-    vendor=models.CharField(max_length=128)
     compilerVersion=models.CharField(max_length=32)
     maxProcessors=models.IntegerField(null=True,blank=True)
     coresPerProcessor=models.IntegerField(null=True,blank=True)
-    operatingSystem=models.CharField(max_length=128,blank=True)
     hardware=models.ForeignKey('Value',related_name='hardwareVal',null=True,blank=True)
+    vendor=models.ForeignKey('Value',related_name='vendorVal',null=True,blank=True)
+    compiler=models.ForeignKey('Value',related_name='compilerVal',null=True,blank=True)
+    operatingSystem=models.ForeignKey('Value',related_name='operatingSystemVal',null=True,blank=True)
     processor=models.ForeignKey('Value',related_name='processorVal',null=True,blank=True)
     interconnect=models.ForeignKey('Value',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280

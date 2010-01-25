@@ -37,6 +37,15 @@ VocabList={'Realms':
 
     # and these will support platforms
     'hardwareType':('Vector','Parallel','Beowulf'),
+    'vendorType':('Cray Inc','Dell','Fujitsu','Hitachi','IBM','Intel','NEC','SGI','Sun Microsystems',
+               'Appro International','Linux Networx','Self-made','Hewlett-Packard','Dawning',
+               'Bull SA','T-Platforms','NEC/Sun','DALCO AG Switzerland','ClusterVision/Dell',
+               'Koi Computers','Pyramid Computer','ACTION','ClusterVision/IBM','SKIF/T-Platforms',
+               'Raytheon-Aspen Systems/Appro','Lenovo','NUDT','DELL\ACS','Dell/Sun/IBM','Other'),
+    
+    'compilerType':('Absoft','Intel','Lahey','NAG','Silverfrost','Portland PGI','Pathscale','Other'),
+    
+    'operatingSystemType':('Linux','AIX','Darwin','Unicos','Irix64','Other'),
 
     #following extended from top500 site:
     'processorType':('NEC','Sparc','Intel IA-64','Intel EM64T','AMD X86_64',
