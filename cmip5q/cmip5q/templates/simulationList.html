@@ -6,43 +6,43 @@
     to the appropriate CMIP5 experiment.</p>
     <p> You are expected to use the add simulation button to add simulations, after which you can edit
     their descriptions. You can choose to add placeholders for all simulations now, or add them over
-    time, and either way, come back and edit the simulation descriptions at a later date. </p>
-    
-    <p class="guidance">For each experiment, you can see listed the simulations from this centre conforming to the model.</p>
-    <p class="cmip5q"> (NB: The experiments, and their descriptions will be entered via the CIM instances)<p>
-        <div class="backgrey">
-    <table width="100%">
-        <tr><th width="20%">Experiment Name</th><th> Edit Simulations </th><th> Add Simulations </th></tr>
-        {% for e in experiments %}
-        <tr><td><a href="{{e.url}}">{{e.abbrev}}</a></td><td >
-        {% for s in e.values %}
-            <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
-            <script type="text/javascript">
-                var oLinkSimEdButton{{s.id}} = new YAHOO.widget.Button("simEdButton{{s.id}}");
+    time, and either way, come back and edit the simulation descriptions at a later date. Each simulation
+    can have multiple ensemble members (initial condition or physical model variants), which can be described
+    from within the simulation description pages.
+    <p> If you choose to copy a simulation, the copy will NOT copy ensemble member descriptions (if they exist), we assume that the new simulation will have different ensemble characteristics. </p>
+    <div class="backgrey">
+        <table width="100%">
+            <tr><th width="20%">Experiment Name</th><th> Edit Simulations </th><th> Add Simulations </th></tr>
+            {% for e in experiments %}
+            <tr><td><a href="{{e.url}}">{{e.abbrev}}</a></td><td >
+            {% for s in e.values %}
+                <span class="{% if s.isComplete%}done{%else%}undone{%endif%}"> <a id="simEdButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a></span>
+                <script type="text/javascript">
+                    var oLinkSimEdButton{{s.id}} = new YAHOO.widget.Button("simEdButton{{s.id}}");
+                </script>
+            {% endfor %}
+            </td> <td width="40%"> 
+                <table><tr>
+                <td>Add</td><td><a id="simAddButton{{forloop.counter}}" href="{{e.new}}">New</a> 
+                </td><td>or, from existing:</td><td>
+                <form action="{{cpurl}}" method="POST">
+                <input type="hidden" name="targetExp" value="{{e.id}}">
+                <select name="targetSim" size="1">
+                    <option value="---" selected="true">-------</option>
+                    {% for cp in csims %}<option value="{{cp.id}}">{{cp}}</option> {% endfor %}
+                </select>,<input type="submit" id="cp4_{{e.id}}button" value="Copy"/></span>
+                </form>
+                </td></tr></table>
+            </td>    
+            <script type="text/javascript"> 
+                var oLinkButton{{forloop.counter}} = new YAHOO.widget.Button("simAddButton{{forloop.counter}}");
+                var oCopyButton{{forloop.counter}} = new YAHOO.widget.Button("cp4_{{e.id}}button",
+                    {value:"cp4_{{e.id}}button"});
             </script>
-        {% endfor %}
-        </td> <td width="40%"> 
-            <table><tr>
-            <td>Add</td><td><a id="simAddButton{{forloop.counter}}" href="{{e.new}}">New</a> 
-            </td><td>or, from existing:</td><td>
-            <form action="{{cpurl}}" method="POST">
-            <input type="hidden" name="targetExp" value="{{e.id}}">
-            <select name="targetSim" size="1">
-                <option value="---" selected="true">-------</option>
-                {% for cp in csims %} <option value="{{cp.id}}">{{cp}}</option> {% endfor %}
-            </select>, <input type="submit" id="cp4_{{e.id}}button" value="Copy"/>
-            </form>
-            </td></tr></table>
-        </td>    
-        <script type="text/javascript"> 
-            var oLinkButton{{forloop.counter}} = new YAHOO.widget.Button("simAddButton{{forloop.counter}}");
-            var oCopyButton{{forloop.counter}} = new YAHOO.widget.Button("cp4_{{e.id}}button",
-                  {value:"cp4_{{e.id}}button"});
-        </script>
-        </td></tr>
-        {% endfor %}
-    </table>
-        </div>
+            </td></tr>
+            {% endfor %}
+        </table>
+    </div>
 
 </div>
 {% endblock %}

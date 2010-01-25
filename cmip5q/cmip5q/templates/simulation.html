@@ -1,10 +1,21 @@
 {% extends "twopanel.html" %}
 {% block titlerow %}
+    <table width="100%" class="{% if s.isComplete %}done{% else %}undone{% endif %}">
+    <tr>
+    <td>
     {% ifequal label 'Update' %} 
-    <h1> Update simulation {{s}} in experiment {{exp}}(validation status {{s.status}}) </h1>
+    <h1> Update simulation {{s}} in experiment {{exp}}</h1>
     {% else %}
     <h1> Create a simulation in experiment {{exp}}</h1>
     {% endifequal %}
+    </td>
+    <td> {% if s.isComplete %}
+     Complete and Submitted
+     {% else %} Validation Status: {{s.status}}
+     {% endif %} 
+    </td>
+    </tr>
+    </table>
     <p>({{exp.rationale}})</p>
 {% endblock %}
 

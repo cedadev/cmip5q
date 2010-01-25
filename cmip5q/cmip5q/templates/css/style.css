@@ -145,3 +145,9 @@ not for now ...
     Due to a bug in the font smoothing algorithm in Internet Explorer, these styles define a white background 
     for the labels thus, TreeViews have to be drawn over a white background or the background-color 
     definition of these styles adjusted to match your background. */
+    
+/* Following used to mark CMIP5 completed simulations on the simulation list */    
+.done .yui-button .first-child {background-color:#CCFF99; }
+.undone .yui-button .first-child {background-color:#F5CF85; }
+.done {background-color:#CCFF99;}
+.undone {background-color:#F5CF85;}

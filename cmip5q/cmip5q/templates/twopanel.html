@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="boxer">
+{% block titlerow %} {% endblock %}
+</div>
+<table class="navmain">
+   <tr>
+      <td valign="top" width="200px">
+        {% block leftcolumn %} {% endblock %}
+      </td>
+      <td>
+        {% block mainpanel %} {% endblock %}
+      </td>
+    </tr>
+</table>
+{% endblock %}
