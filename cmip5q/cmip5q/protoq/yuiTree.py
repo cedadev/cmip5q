@@ -68,6 +68,11 @@ class yuiTree2:
         self.html+=self.__li(cstring,component.id,component.abbrev)
         self.found.append(component.id)
         if len(children)==0: return
+        # now, if I myself am not implemented, I shouldn't show my children, 
+        # but I should show myself, so I can be switched back on
+        if not component.implemented: 
+            print 'No children from ',component
+            return
         self.html+='<ul>\n'
         for c in children: self.__walk(c)
         self.html+='</ul>'

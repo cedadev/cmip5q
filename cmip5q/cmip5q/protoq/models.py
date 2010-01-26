@@ -589,7 +589,8 @@ class Simulation(Doc):
             r=m.duplicate4sim(s)
         # conformance:
         # we can't duplicate that, since we don't know the conformance are the same unless we 
-        # have a mapping page somewhere ... 
+        # have a mapping page somewhere ... so we reset
+        s.resetConformances()
         return s
         
     def resetConformances(self):
@@ -1085,11 +1086,10 @@ class ComponentForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     
-    #implemented=forms.BooleanField(required=True)
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    #
+    
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
    
     implemented=forms.BooleanField(required=False)

@@ -50,14 +50,16 @@
                 </td></tr>
                 {% if cform.showImplemented %}
                 {% if not isModel %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
-                <td colspan="3">{{cform.implemented}} Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.</td></tr> {% endif %}
+                <td colspan="3">{{cform.implemented}} {% if cform.instance.implemented %} 
+                Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.
+                {% else %} Tick the box to describe an implementation of {{cform.instance.scienceType}} {% endif %}
+                </td></tr> {% endif %}
                 {% endif %}
                 <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
                 <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
                 <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>
                              <td>Lead Author:&nbsp;{{cform.author.errors}}{{cform.author}}</td>
                              <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td>
-                			 <td><input checked="checked" type="checkbox" name="gen-implemented" id="id_gen-implemented" /> Tick to copy 'Responsible Party' downwards.</td>
                 </tr>
                 
             </table>
@@ -88,9 +90,7 @@
         <div class="boxer"> 
             <h4> Additional Information</h4>
             <center>
-            <p class="guidance">If you have chosen "other" in an attribute description above, please 
-            provide details of that "other" here.</p>
-            <p> Please also provide any other information that will help the interpretation of simulations using this component. </p>
+            <p class="guidance">Please provide any further information that will help describe this component (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
             <p>{{cform.description}}</p> 
             </center> 
         </div>
@@ -99,28 +99,31 @@
     </form>
     </div><!-- boxer2 div -->
     
-    {% if inps|length %}
+    
     <div class="boxer">
-        <h4> Inputs required by this component are: </h4>
-        <table>
-        <tr><th> Type </th><th> Short Name </th><th>Description </th></tr>
-        {% for i in inps %}
-        <tr class="{%cycle  'row2' 'row1'%}">
-        <td>{{i.ctype}}</td><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
-        {% endfor %} 
-        </table>
-        <p class="guidance"> Update this list using the "Inputs Needed" button </p>
+        <h4> Inputs required by this component</h4>
+        {% if inps|length %}
+            <table>
+            <tr><th> Type </th><th> Short Name </th><th>Description </th></tr>
+            {% for i in inps %}
+            <tr class="{%cycle  'row2' 'row1'%}">
+            <td>{{i.ctype}}</td><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
+            {% endfor %} 
+            </table>
+            <p class="guidance"> Update this list using the "Inputs Needed" button </p>
+        {% else %}
+            <p class="guidance"> No inputs are yet associated with this component. Use the "Inputs Needed" (left menu) button to add required inputs as necessary.</p>
+        {% endif %}
         {% if isRealm %}
-        <p> It is possible that the components below this "realm" do not provide a sensible place to
-        put all the scientifically important inputs which might be required by this realm. If so, please describe them here!</p>
-        {% endif %}   
+            <p> It is possible that the components below this "realm" do not provide a sensible place to
+            put all the scientifically important inputs which might be required by this realm. If so, please describe them here!</p>
+        {% endif %}
     </div>
-    {% endif %}
     
     <div class="boxer">
         <h4> References (associated with this component) </h4>
         {% if refs|length_is:0 %} 
-        <p class="guidance"> No references are yet associated with this component. Use the reference button to add references</p>
+        <p class="guidance"> No references are yet associated with this component. Use the "References" button (left menu) to add references.</p>
         {% else %}
         <p class="guidance"> Update this list using the reference button.</p>
         <table width="100%" class="backgrey">
