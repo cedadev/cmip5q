@@ -8,6 +8,7 @@
 from protoq.models import *
 import uuid
 from vocabs.InputTransformations import properties
+from cf import CFtable
 
 #this tuple should provide the PCMDI controlled vocabulary for centre names
 centres=(('NCAS','UK National Centre for Atmospheric Science'),
@@ -79,6 +80,24 @@ VocabList={'Realms':
     
     }
     
+def loadCF():
+     p=os.path.join('vocabs','cf-standard-name-table.xml')
+     cf=CFtable(p)
+     v=Vocab(uri='cf-standard-name-table.xml',name='cf-standard-names',version=cf.version)
+     v.save()
+     vu=Vocab(uri='cf-standard-name-table-units',name='cf-standard-name-units',version=cf.version)
+     vu.save()
+     ulist=[]
+     for e in cf.names:
+         if e.units not in ulist:
+            u=Value(vocab=vu,value=e.units)
+            u.save()
+            ulist.append(e.units)
+         else:
+            u=Value.objects.filter(value=e.units).get(vocab=vu)
+         pp=PhysicalProperty(vocab=v,value=e.name,definition=e.description,units=u)
+         pp.save()
+
 def loadProperties(args):
     from vocabs.InputTransformations import properties
     #properties={'abc':(def,[(a,d),(b,d),(c,d),.._,}
@@ -126,4 +145,5 @@ def initialise():
     # now get the specialist vocabs
     # currently just coupling
     loadProperties(('InputTechnique','SpatialRegrid','TimeTransformation'))
+    loadCF()
     

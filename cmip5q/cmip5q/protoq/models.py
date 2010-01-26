@@ -633,14 +633,17 @@ class Vocab(models.Model):
     
 class Value(models.Model):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
-    value=models.CharField(max_length=64)
+    value=models.CharField(max_length=128)
     vocab=models.ForeignKey('Vocab')
     definition=models.TextField(blank=True)
-    version=models.CharField(max_length=64,blank=True)    
+    version=models.CharField(max_length=64,blank=True)
     def __unicode__(self):  
         return self.value
     class Meta:
         ordering=('value',)
+
+class PhysicalProperty(Value):
+    units=models.ForeignKey(Value,related_name='property_units')
 
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''

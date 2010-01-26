@@ -5,6 +5,7 @@ setup_environ(settings)
 
 from NumericalModel import *
 from XMLActivityReader import *
+from cf import *
 
 if __name__=="__main__":
    
