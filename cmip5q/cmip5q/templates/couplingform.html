@@ -1,16 +1,19 @@
 <div class="boxer">
 <h3>{{f.title}}</h3>
+{% ifequal f.cf.instance.targetInput.ctype f.bcv %}
 <hr>
 <center>
 <p> Describe the input technique and how often it occurred </p>
 <p>Coupling Type: {{f.cf.inputTechnique.errors}}{{f.cf.inputTechnique}}&nbsp;
 Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
-{{f.cf.FreqUnits.errors}}{{f.cf.FreqUnits}}</p>
+{{f.cf.FreqUnits.errors}}{{f.cf.FreqUnits}}
+</p>
 <hr>
+{% endifequal %}
 <table>
 <tr><td colspan="2"> Enter input details. {% ifequal f.cf.instance.targetInput.ctype f.bcv %} It
 is likely you will only need to enter material in both columns if you have a regional model. {% endifequal %} New blank rows will appear after rows which have been completed and saved. Only use these if you wish to enter multiple sources as input.  </td></tr>
-<tr><th width="50%"> From files </th>{% ifequal f.cf.instance.targetInput.ctype f.bcv %}<th> From other model components </th>{% endifequal %}</tr>
+<tr><th {% ifequal f.cf.instance.targetInput.ctype f.bcv%} width="50%"{% endifequal %}> From files </th><th> {% ifequal f.cf.instance.targetInput.ctype f.bcv %}From other model components {% endifequal %}</th></tr>
 <tr><td>
     {{f.ec.management_form}}
     <table class="boxer">
