@@ -43,7 +43,7 @@
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.007</id>
-		<name>1.1_1960.ic.oc</name>
+		<name>1.1.ic.oc</name>
 		<description>Ocean Initial Conditions must represent in some measure the observed anomolies for the start date used</description>
 	</numericalRequirement>
 	
