@@ -7,8 +7,8 @@
 	<rationale> Ensembles of 30-year hindcasts and predictions.
 		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
 		influence. </rationale>
-	<description>Extend to 30 years the experiment 1.1 integrations with initial dates near the end of 1960, 1980 and 2005. 
-		A minimum ensemble size of 3 should be produced for each start date.</description>
+	<description>Extend to 30 years the experiment 1.1 integration with initial date in 2005. 
+		A minimum ensemble size of 3 should be produced.</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -169,20 +169,21 @@
     </numericalRequirement>
 
 	<shortName>
-		1.2 decadalXXXX
+		1.2 decadal2005
 	</shortName>
     <longName> 
-		1.2 30-year prediction/hindcast initialized in year XXXX.
+		1.2 30-year prediction/hindcast initialized in year 2005
 	</longName>
      
     <calendar>
-    	<realCalendar/>
+    	<realCalendar></realCalendar>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
-		<startDate> 1965-09-01T00:00:00Z</startDate>
-		<endDate> 2036-01-01T00:00:00Z </endDate>
-		<lengthYears>70.25</lengthYears>
+		<startDate> 2005-09-01T00:00:00Z</startDate>
+		<endDate> 2035-12-31T23:59:59Z </endDate>
+		<lengthYears>30</lengthYears>
 	</requiredDuration>
+	
 	<author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>
