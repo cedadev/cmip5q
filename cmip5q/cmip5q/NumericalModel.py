@@ -234,10 +234,20 @@ class ComponentParser:
                
     def add(self, doSubs, realm=None):
         u=str(uuid.uuid1())
+        # add spaces before any capital letters to make the tree formatting look nicer
+        name=self.item.attrib['name']
+        nameWithSpaces=''
+        idx=0
+        for char in name :
+            if idx>0 : # skip first string value as we do not want spaces at the beginning of a string
+                if char.isupper() and name[idx-1].isalpha() :
+                    nameWithSpaces+=' '
+            nameWithSpaces+=char
+            idx+=1
         component = Component(
                 title='',
                 scienceType=self.item.attrib['name'],
-                abbrev=self.item.attrib['name'],
+                abbrev=nameWithSpaces,
                 controlled=True,
                 uri=u,
                 centre=self.model.centre,
