@@ -24,8 +24,8 @@ centres=(('NCAS','UK National Centre for Atmospheric Science'),
 # that is, the top level areas under the model definitions.
 
 VocabList={'Realms':
-     ('Land Ice','Ocean','SeaIce','Atmosphere','Ocean Biogeo Chemistry',
-     'AtmosphericChemistry','Aerosols','Land Surface'),
+     ('LandIce','Ocean','SeaIce','Atmosphere','OceanBiogeoChemistry',
+     'AtmosphericChemistry','Aerosols','LandSurface'),
      
      # controlled vocabulary for file formats
      'FileFormats':('NetCDF','Grib','PP','Excel','Text','HDF','Other'),
