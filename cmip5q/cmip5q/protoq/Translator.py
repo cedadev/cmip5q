@@ -108,6 +108,7 @@ class Translator:
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
         ET.SubElement(cr2,'id').text=rootClass.uri
+        ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
         return cr2
     
     def cimRecordRoot(self,rootClass):
@@ -116,6 +117,7 @@ class Translator:
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
         ET.SubElement(root,'id').text=rootClass.uri
+        ET.SubElement(root,'version').text=str(rootClass.documentVersion)
         return root
 
     def cimRecordSetRoot(self):
@@ -185,11 +187,7 @@ class Translator:
             ET.SubElement(simElement,'rationale').text=simClass.description
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
-            expReference=ET.SubElement(experimentElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
-            ET.SubElement(expReference,'id').text=simClass.experiment.uri
-            #ET.SubElement(expReference,'name').text=
-            #ET.SubElement(expReference,'version').text=
-            ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
+            self.addCIMReference(simClass.experiment,experimentElement)
             ''' shortName [1] '''
             ET.SubElement(simElement,'shortName').text=simClass.abbrev
             ''' longName [1] '''
@@ -890,7 +888,45 @@ class Translator:
         couplings=[]
         # couplings are all at the esm (root component) level
         if c.isModel:couplings=c.couplings(simulation=self.simClass)
-        if len(couplings)>0 and not(self.VALIDCIMONLY):
+        if len(couplings)>0 :
+            composeElement=ET.SubElement(comp,'composition')
+            for coupling in couplings:
+                CompInpClass=coupling.targetInput
+                assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
+                assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
+                assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
+                couplingType=CompInpClass.ctype.value
+                if couplingType=='BoundaryCondition' :
+                    couplingType='boundaryCondition'
+                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+                '''connection'''
+                '''description'''
+                '''timeProfile'''
+                '''timeLag'''
+                '''spatialRegridding'''
+                '''timeTransformation'''
+                '''couplingSource'''
+                iClosures=InternalClosure.objects.filter(coupling=coupling)
+                for iclos in iClosures:
+                    closure=ET.SubElement(couplingElement,'couplingSource')
+                    assert iclos.target, 'target should exist for a closure'
+                    self.addCIMReference(iclos.target,closure)
+
+                eClosures=ExternalClosure.objects.filter(coupling=coupling)
+                for ExtClosClass in eClosures:
+                    closure=ET.SubElement(couplingElement,'couplingSource')
+                    assert iclos.target, 'target should exist for a closure'
+                    self.addCIMReference(ExtClosClass.target,closure)
+
+                '''couplingTarget'''
+                targetElement=ET.SubElement(couplingElement,'couplingTarget')
+                self.addCIMReference(CompInpClass.owner,targetElement)
+
+                '''priming'''
+                
+            ET.SubElement(composeElement,'description').text='Input coupling details for component '+c.abbrev
+
+        elif len(couplings)>0 :
             composeElement=ET.SubElement(comp,'composition')
             for coupling in couplings:
                 CompInpClass=coupling.targetInput
@@ -986,4 +1022,16 @@ class Translator:
         self.addReference(dataObjectClass.reference,dataElement)
         # dataClass.featureType is unused at the moment
         # dataClass.drsAddress is unused at the moment
+
+    def addCIMReference(self,rootClass,rootElement):
+                targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''})
+                ''' id '''
+                ET.SubElement(targetRef,'id').text=rootClass.uri
+                ''' name '''
+                ET.SubElement(targetRef,'name').text=rootClass._meta.module_name
+                ''' version '''
+                ET.SubElement(targetRef,'version').text=str(rootClass.documentVersion)
+                ''' description '''
+                ET.SubElement(targetRef,'description').text=rootClass._meta.module_name+' is '+rootClass.abbrev
+                #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
 
