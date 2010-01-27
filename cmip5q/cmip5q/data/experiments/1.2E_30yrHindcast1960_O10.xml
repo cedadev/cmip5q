@@ -5,10 +5,9 @@
 	Additional runs to expand each ensemble to a size of O(10). <<in this case 1.2>>
 	-->
 
-	<rationale>Increase ensemble size of experiment 1.2, 30-year hindcasts and predictions.
-		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
-		influence.  </rationale>
-	<description>Additional runs for experiment 1.2 to expand each ensemble to a size of O(10).</description>
+	<rationale>Increase ensemble size of experiment 1.2 (1960).
+	</rationale>
+	<description>Additional runs for experiment 1.2 (1960) to expand ensemble to a size of O(10).</description>
 	
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
@@ -164,19 +163,19 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.2-E decadalXXXX
+		1.2-E decadal1960
 	</shortName>
     <longName> 
-    	1.2-E 30-year hindcast/prediction initialized in year XXXX - O(10) ensemble
+    	1.2-E 30-year hindcast/prediction initialized in year 1960 - O(10) ensemble
 	</longName>
      
    	<calendar>
    		<realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
-		<startDate> 1965-09-01T00:00:00Z</startDate>
-		<endDate> 2036-01-01T00:00:00Z </endDate>
-		<lengthYears>70.25</lengthYears>
+		<startDate> 1960-09-01T00:00:00Z</startDate>
+		<endDate> 1990-12-31T23:59:59Z </endDate>
+		<lengthYears>30</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>
