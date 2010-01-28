@@ -32,7 +32,7 @@ def completionHelper(request,vocabName):
         if request.GET.has_key(u'q'):
             value = request.GET[u'q']
             # Ignore queries shorter than length 3
-            if 1:#len(value) > 2:
+            if len(value) > 2:
                 try:
                     v=Vocab.objects.get(name=vocabName)
                 except: return HttpResponseBadRequest('Invalid vocab %s'%vocabName)

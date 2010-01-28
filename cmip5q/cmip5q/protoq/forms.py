@@ -96,9 +96,8 @@ class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}),required=True)
     units=forms.CharField(widget=forms.TextInput(attrs={'size':'48'}),required=False)
-    cfname=ValueAutocompleteField(Vocab,'CFStandardNames',Value,required=False)
-    #def cfname(self):
-    #    return ValueAutocompleteField(Vocab,'CFStandardNames',Value,required=False)
+    cfname=ValueAutocompleteField(Vocab,'CFStandardNames',Value,required=False,size=60)
+ 
     class Meta:
         model=ComponentInput
         exclude=('owner','realm') # we know these
