@@ -49,12 +49,16 @@
                   {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
                 </td></tr>
                 {% if cform.showImplemented %}
-                {% if not isModel %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
-                <td colspan="3">{{cform.implemented}} {% if cform.instance.implemented %} 
-                Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.
-                {% else %} Tick the box to describe an implementation of {{cform.instance.scienceType}} {% endif %}
-                </td></tr> {% endif %}
-                {% endif %}
+                    {% if isModel %} {{cform.implemented.as_hidden}}
+                    {% else %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
+                    <td colspan="3">{{cform.implemented}} 
+                        {% if cform.instance.implemented %} 
+                        Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.
+                        {% else %} Tick the box to describe an implementation of {{cform.instance.scienceType}} 
+                        {% endif %}
+                    </td></tr> 
+                    {% endif %}
+                {% else %}{{cform.implemented.as_hidden}}{% endif %}
                 <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
                 <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
                 <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>

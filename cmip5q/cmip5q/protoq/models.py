@@ -271,7 +271,7 @@ class Doc(Fundamentals):
             self.validErrors=-1   # now force a revalidation before any future document incrementing.
         if 'eventParty' in kwargs:
             self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
-        return models.Model.save(self,*args,**kwargs)
+        return Fundamentals.save(self,*args,**kwargs)
     
     def delete(self,*args,**kwargs):
         ''' Avoid deleting documents which have foreign keys to this instance'''

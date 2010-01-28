@@ -8,10 +8,6 @@ from protoq.models import *
 from modelUtilities import uniqueness, refLinkField
 from protoq.autocomplete import AutocompleteWidget, ValueAutocompleteField
 
-
-          
-
-        
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
