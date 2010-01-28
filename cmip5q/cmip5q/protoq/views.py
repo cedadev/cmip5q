@@ -5,6 +5,8 @@ from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 
 from cmip5q.protoq.models import *
+from cmip5q.protoq.forms import *
+
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import  tabs, sublist
@@ -19,8 +21,27 @@ from cmip5q.protoq.coupling import couplingHandler
 from django import forms
 import uuid
 import logging
+import simplejson
 
 MESSAGE=''
+
+def completionHelper(request,vocabName):
+    ''' This method provides support for ajax autocompletion within a specific vocabulary '''
+    results = []
+    if request.method == "GET":
+        if request.GET.has_key(u'q'):
+            value = request.GET[u'q']
+            # Ignore queries shorter than length 3
+            if 1:#len(value) > 2:
+                try:
+                    v=Vocab.objects.get(name=vocabName)
+                except: return HttpResponseBadRequest('Invalid vocab %s'%vocabName)
+                model_results = Value.objects.filter(vocab=v).filter(value__startswith=value)
+                results = [ (x.__unicode__(), x.id) for x in model_results ]
+   
+        json = simplejson.dumps(results)
+        return HttpResponse(json, mimetype='application/json')
+    return HttpResponse
 
 def genericDoc(request,cid,docType,pkid,method):
     ''' Handle the generic documents '''

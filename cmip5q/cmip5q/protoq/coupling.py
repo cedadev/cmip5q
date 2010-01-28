@@ -7,6 +7,8 @@ from django.forms.models import modelformset_factory
 from django import forms
 
 from cmip5q.protoq.models import *
+from cmip5q.protoq.forms import *
+
 from cmip5q.protoq.utilities import tabs
 
 InternalClosureFormSet=modelformset_factory(InternalClosure,can_delete=True,

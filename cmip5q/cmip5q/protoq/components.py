@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.forms.models import modelformset_factory
 
 from cmip5q.protoq.models import *
+from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
 from cmip5q.NumericalModel import NumericalModel

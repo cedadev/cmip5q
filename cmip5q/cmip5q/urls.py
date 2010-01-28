@@ -18,6 +18,9 @@ urlpatterns = patterns('',
     (r'^cmip5/centres/$','cmip5q.protoq.views.centres'),
     (r'^cmip5/(?P<centre_id>\d+)/$','cmip5q.protoq.views.centre'),
     # 
+    # ajax vocabulary handler
+    url(r'^ajax/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper',name='ajax_value'),
+    #
     #    generic document handling
     # 
     (r'^cmip5/(?P<cid>\d+)/(?P<docType>\D+)/doc/(?P<pkid>\d+)/(?P<method>\D+)/$','cmip5q.protoq.views.genericDoc'),  
@@ -111,7 +114,7 @@ urlpatterns = patterns('',
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
         
     # Vocabs
-    (r'^cmip5/vocab/$','cmip5q.protoq.vocab.list'),
+    url(r'^cmip5/vocab/$','cmip5q.protoq.vocab.list',name="vocab_display"),
     (r'^cmip5/vocab/(?P<vocabID>\d+)/$','cmip5q.protoq.vocab.show'),
     #(r'^cmip5/vocab/(?P<docID>\d+)/(?P<valID>\d+)/$','cmip5q.protoq.vocab.list'),
         

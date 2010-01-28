@@ -29,8 +29,8 @@ inputs:<ul><li>spatially varying <b>"initial conditions"</b> for prognostic vari
                     <td>Description:{{f.description.errors}}</td><td colspan="3">{{f.description}}</td>
                     </tr>
                     <tr><td colspan="4">In some cases an input corresponds to an actual variable, if so, please enter the units, and if possible the CF standard name:</td></tr>
-                     <tr><td>Units:{{f.units.errors}}</td><td>{{f.units}}}</td>
-                        <td coslpan="2">CF Name:{{f.cfname.errors}}{{f.cfname}}</td>
+                     <tr><td>Units:{{f.units.errors}}</td><td>{{f.units}}</td>
+                        <td colspan="2">CF Name:{{f.cfname.errors}}{{f.cfname}}</td>
                     </tr>
                     {% for hid in f.hidden_fields %} {{hid}} {% endfor %}       
                 </table> 

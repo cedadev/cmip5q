@@ -53,7 +53,6 @@ class NumericalModel:
         else:
             raise ValueError('Nothing to do in NumericalModel')
         
-        
     def copy(self):
         
         new=self.top.makeNewCopy(self.centre)

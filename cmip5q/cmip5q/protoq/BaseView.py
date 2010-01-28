@@ -1,4 +1,6 @@
 from cmip5q.protoq.models import *
+from cmip5q.protoq.forms import *
+
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.loader import render_to_string

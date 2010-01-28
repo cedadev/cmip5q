@@ -83,9 +83,9 @@ VocabList={'Realms':
 def loadCF():
      p=os.path.join('vocabs','cf-standard-name-table.xml')
      cf=CFtable(p)
-     v=Vocab(uri='cf-standard-name-table.xml',name='cf-standard-names',version=cf.version)
+     v=Vocab(uri='cf-standard-name-table.xml',name='CFStandardNames',version=cf.version)
      v.save()
-     vu=Vocab(uri='cf-standard-name-table-units',name='cf-standard-name-units',version=cf.version)
+     vu=Vocab(uri='cf-standard-name-table-units',name='CFStandardNameUnits',version=cf.version)
      vu.save()
      ulist=[]
      for e in cf.names:
