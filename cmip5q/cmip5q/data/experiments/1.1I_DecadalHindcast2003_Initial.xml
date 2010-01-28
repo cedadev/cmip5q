@@ -8,7 +8,7 @@
 	<rationale> Initialize 10-year simulations from additional start dates annually in 2000s. 
 		Assess model skill in forecasting climate change on time-scales when the initial climate may exert some 
 		influence.</rationale>
-	<description>As in experiments 1.1 and 1.1-E, but initialized near the end of 2001, 2002, 2003, 2004, 2006 (2007, and beyond) to take advantage of the better ocean data of the Argo float era.
+	<description>As in experiments 1.1 and 1.1-E, but initialized near the end of 2003 to take advantage of the better ocean data of the Argo float era.
 	</description>
 	
 	<!-- Initial Conditions -->
@@ -165,19 +165,19 @@
     </numericalRequirement>
 	
 	<shortName>
-		1.1-I decadalXXXX
+		1.1-I decadal2003
 	</shortName>
     <longName> 
-    	1.1-I 10-year hindcast/prediction initialized in year XXXX - additional start dates
+    	1.1-I 10-year hindcast/prediction initialized in year 2003 - additional start dates
 	</longName>
      
     <calendar>
     	<realCalendar/>
 	</calendar>
 	<requiredDuration xsi:type="ClosedDateRange">
-		<startDate> 2001-09-01T00:00:00Z</startDate>
-		<endDate> 2020-01-01T00:00:00Z </endDate>
-		<lengthYears>18.25</lengthYears>
+		<startDate> 2003-09-01T00:00:00Z</startDate>
+		<endDate> 2013-12-31T23:59:59Z </endDate>
+		<lengthYears>10</lengthYears>
 	</requiredDuration>
 	<author>
 		<gmd:CI_ResponsibleParty>
