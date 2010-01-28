@@ -202,6 +202,9 @@ class Doc(Fundamentals):
         ''' Return an lxml object view of me '''
         from protoq.Translator import Translator  # needs to be deferred down here to avoid circularity
         translator=Translator()
+        if self._meta.module_name=='simulation' :
+            # composition defaults to false
+            translator.setComponentOptions(recurse=True,composition=True)
         return translator.q2cim(self,docType=self._meta.module_name)
     
     def xml(self):

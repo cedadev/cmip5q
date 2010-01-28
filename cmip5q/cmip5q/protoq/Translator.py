@@ -36,7 +36,7 @@ class Translator:
     def __init__(self):
         ''' Set any initial state '''
         self.recurse=True
-        self.outputComposition=True # aka coupling information
+        self.outputComposition=False # aka coupling information
         self.simClass=None
 
     def c2text(self,c):
@@ -127,6 +127,7 @@ class Translator:
                              nsmap=self.NSMAP)
         # generate a uuid on the fly for a recordset.
         ET.SubElement(root,'id').text=str(uuid.uuid1())
+        ET.SubElement(root,'version').text='1'
         return root
 
     def q2cim(self,ref,docType):
@@ -445,7 +446,7 @@ class Translator:
 
     def add_experiment(self,expClass,rootElement):
         if (self.CIMXML):
-            expElement=ET.SubElement(rootElement,'numericalExperiment',{'CIMVersion': '1.4','control':'false'})
+            expElement=ET.SubElement(rootElement,'numericalExperiment',{'CIMVersion': '1.4'})
             ''' responsibleParty [0..inf] '''
             ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
@@ -570,8 +571,12 @@ class Translator:
                 #ET.SubElement(machineElement,'machineLibrary')
                 ET.SubElement(machineElement,'machineDescription').text=platClass.description
                 #ET.SubElement(machineElement,'machineLocation')
-                ET.SubElement(machineElement,'machineOperatingSystem').text=platClass.operatingSystem
-                ET.SubElement(machineElement,'machineVendor').text=platClass.vendor
+                if platClass.operatingSystem :
+                    machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.value})
+                    vsEl=ET.SubElement(machOSEl,'vocabularyServer')
+                    ET.SubElement(vsEl,'vocabularyName')
+                if platClass.vendor :
+                    ET.SubElement(machineElement,'machineVendor').text=platClass.vendor.value
                 if platClass.interconnect :
                     ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.value
                 ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
@@ -580,7 +585,8 @@ class Translator:
                     ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.value
                 ''' compiler [1..inf] '''
                 compilerElement=ET.SubElement(deployElement,'compiler')
-                ET.SubElement(compilerElement,'compilerName').text=platClass.compiler
+                if platClass.compiler :
+                    ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.value
                 ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
                 ET.SubElement(compilerElement,'compilerLanguage')
                 #ET.SubElement(compilerElement,'compilerOptions')
@@ -689,9 +695,8 @@ class Translator:
           comp=ET.SubElement(root,'modelComponent',{'CIMVersion': '1.4'})
         else:
           comp=ET.SubElement(root,'modelComponent')
-        if self.outputComposition:
-            '''composition'''
-            self.composition(c,comp)
+        '''composition'''
+        self.composition(c,comp)
         if recurse:
             '''childComponent'''
             for child in c.components.all():
@@ -774,7 +779,8 @@ class Translator:
         #ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
         typeElement=ET.SubElement(comp,'type',{'value':c.scienceType})
         #CIM1.4 requires at least one server subelement for validation even if it is empty i.e. does nothing
-        ET.SubElement(typeElement,'server')
+        vsElement=ET.SubElement(typeElement,'vocabularyServer')
+        ET.SubElement(vsElement,'vocabularyName')
         '''component timestep info not explicitely supplied in questionnaire'''
         #if nest==2:
                 #timing=ET.SubElement(comp,'timing',{'units':'units'})
@@ -888,43 +894,50 @@ class Translator:
         couplings=[]
         # couplings are all at the esm (root component) level
         if c.isModel:couplings=c.couplings(simulation=self.simClass)
-        if len(couplings)>0 :
-            composeElement=ET.SubElement(comp,'composition')
-            for coupling in couplings:
-                CompInpClass=coupling.targetInput
-                assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
-                assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
-                assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
-                couplingType=CompInpClass.ctype.value
-                if couplingType=='BoundaryCondition' :
-                    couplingType='boundaryCondition'
-                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
-                '''connection'''
-                '''description'''
-                '''timeProfile'''
-                '''timeLag'''
-                '''spatialRegridding'''
-                '''timeTransformation'''
-                '''couplingSource'''
-                iClosures=InternalClosure.objects.filter(coupling=coupling)
-                for iclos in iClosures:
-                    closure=ET.SubElement(couplingElement,'couplingSource')
-                    assert iclos.target, 'target should exist for a closure'
-                    self.addCIMReference(iclos.target,closure)
+        if len(couplings)>0 and self.CIMXML :
+            if self.outputComposition :
+                composeElement=ET.SubElement(comp,'composition')
+                for coupling in couplings:
+                    CompInpClass=coupling.targetInput
+                    assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
+                    assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
+                    assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
+                    couplingType=CompInpClass.ctype.value
+                    if couplingType=='BoundaryCondition' :
+                        couplingType='boundaryCondition'
+                    elif couplingType=='AncillaryFile' :
+                        couplingType='forcing'
+                    elif couplingType=='InitialCondition' :
+                        couplingType='initialForcing'
+                    couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+                    '''connection'''
+                    '''description'''
+                    ET.SubElement(couplingElement,'description').text=CompInpClass.description
+                    '''timeProfile'''
+                    '''timeLag'''
+                    '''spatialRegridding'''
+                    '''timeTransformation'''
+                    '''couplingSource'''
+                    iClosures=InternalClosure.objects.filter(coupling=coupling)
+                    for iclos in iClosures:
+                        closure=ET.SubElement(couplingElement,'couplingSource')
+                        assert iclos.target, 'target should exist for a closure'
+                        self.addCIMReference(iclos.target,closure)
 
-                eClosures=ExternalClosure.objects.filter(coupling=coupling)
-                for ExtClosClass in eClosures:
-                    closure=ET.SubElement(couplingElement,'couplingSource')
-                    assert iclos.target, 'target should exist for a closure'
-                    self.addCIMReference(ExtClosClass.target,closure)
+                    eClosures=ExternalClosure.objects.filter(coupling=coupling)
+                    for ExtClosClass in eClosures:
+                        closure=ET.SubElement(couplingElement,'couplingSource')
+                        assert iclos.target, 'target should exist for a closure'
+                        self.addCIMReference(ExtClosClass.target,closure)
 
-                '''couplingTarget'''
-                targetElement=ET.SubElement(couplingElement,'couplingTarget')
-                self.addCIMReference(CompInpClass.owner,targetElement)
+                    '''couplingTarget'''
+                    targetElement=ET.SubElement(couplingElement,'couplingTarget')
+                    self.addCIMReference(CompInpClass.owner,targetElement)
 
-                '''priming'''
-                
-            ET.SubElement(composeElement,'description').text='Input coupling details for component '+c.abbrev
+                    '''priming'''
+                ET.SubElement(composeElement,'description').text='Input coupling details for component '+c.abbrev
+            else :
+                comp.append(ET.Comment('Coupling information exists but its output has been switched off for this CIM Object'))
 
         elif len(couplings)>0 :
             composeElement=ET.SubElement(comp,'composition')
