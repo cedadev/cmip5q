@@ -78,6 +78,9 @@ VocabList={'Realms':
     #calendarTypes
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
     
+    #simulation relationship types
+    'SimRelationships':('hasControl','extends','other'),
+    
     }
     
 def loadCF():

@@ -69,6 +69,13 @@
             </table>
             </div>
             <div class="boxer">
+            <h4> Related Simulation </h4>
+            <p> If this simulation has a related control simulation or extends another, please identify it here. {% if ensemble %} (Such relationships may extend between ensembles too.){% endif %} </p>
+            <p>Simulation {{s}} {{rform.value}}{{rform.value.errors}} simulation {{rform.sto}}{{rform.sto.errors}}</p>
+            <table><tr><td>Details (if necessary):</td><td> {{rform.description.errors}}{{rform.description}}</td></tr></table>
+            </div>
+            <div class="boxer">
+            <h4> Authorship </h4>
             <center>
             <p>Please enter the list of authors you wish to appear in a DOI for this simulation
             {{simform.authorList.errors}}:</p><p>{{simform.authorList}}</p>

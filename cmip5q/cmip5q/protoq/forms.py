@@ -322,7 +322,7 @@ class SimulationForm(forms.ModelForm):
         #dealt with on other pages. NB: note that if you don't exclude things, then a form
         #will expect them, and set them to None if they don't come back in the post ... a quiet
         #loss of information ...
-        exclude=('centre','experiment','uri','modelMod','inputMod')
+        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
@@ -339,3 +339,16 @@ class SimulationForm(forms.ModelForm):
             e.save()
         e.updateMembers()
         return s
+        
+class SimRelationshipForm(forms.ModelForm):
+    description=forms.CharField(widget=forms.Textarea({'cols':"80",'rows':"2"}),required=False)
+    class Meta:
+        model=SimRelationship
+        exclude=('vocab','sfrom')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        #if self.instance is None: 
+        #    self.instance=self.model(sfrom=s,vocab=Vocab.objects.get(name=vocab))
+        self.fields['value'].queryset=Value.objects.filter(vocab=self.instance.vocab)
+        self.fields['sto'].queryset=Simulation.objects.filter(centre=self.instance.sfrom.centre)
+  

@@ -77,12 +77,15 @@ class simulationHandler(object):
             #urls['ics']=reverse('cmip5q.protoq.views.assign',
             #         args=(self.centreid,'inputmod','simulation',s.id,))        
         
+        # A the moment we're only assuming one related simulation so we don't have to
+        # deal with a formset
+        rsims=s.related_to.all()
+        if len(rsims)==0:
+            r=SimRelationship(vocab=Vocab.objects.get(name='SimRelationships'),sfrom=s)
+        else: r=rsims[0]
         if request.method=='POST':
-            # we can't do the following, because on initialisation, we don't know what
-            # s.id is for a new simulation
-            #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
-            
-            simform=SimulationForm(request.POST,instance=s)
+            relform=SimRelationshipForm(request.POST,instance=r,prefix='rel')
+            simform=SimulationForm(request.POST,instance=s,prefix='sim')
             simform.specialise(self.centre)
             if simform.is_valid():
                 if label=='Add':
@@ -93,13 +96,18 @@ class simulationHandler(object):
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
+                if relform.is_valid():
+                    relform.save()
+                else: print relform.errors
+                    
                 return HttpResponseRedirect(news.edit_url())
             else:
                 logging.debug('SIMFORM not valid [%s]'%simform.errors)
         else:
-            simform=SimulationForm(instance=s)
+            simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
-        
+            relform=SimRelationshipForm(instance=r,prefix='rel')
+            print relform.as_p()
         # work out what we want to say about couplings
         cset=[]
         if label !='Add': cset=s.numericalModel.couplings(s)
@@ -111,7 +119,7 @@ class simulationHandler(object):
             
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
-             'cset':cset,'coset':cs,'ensemble':ensemble,
+             'cset':cset,'coset':cs,'ensemble':ensemble,'rform':relform,
              'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
             # note that cform points to simform too, to support completion.html
     def edit(self,request):
@@ -146,7 +154,7 @@ class simulationHandler(object):
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
         label='Add'
-        return self.__handle(request,s,e,url,label,False)
+        return self.__handle(request,s,e,url,label)
         
  
 

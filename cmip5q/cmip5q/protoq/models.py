@@ -282,6 +282,28 @@ class Doc(Fundamentals):
         ''' How can we edit me? '''
         return ('cmip5q.protoq.views.%sEdit'%self._meta.module_name,(self.centre_id,self.id,))
   
+class Relationship(models.Model):
+    ''' Used to describe relationships between entities '''
+    # if we have a controlled vocab for the relationships, it's this one.
+    vocab=models.ForeignKey('Vocab',blank=True,null=True)
+    # and it's this member of that vocabulary
+    value=models.ForeignKey('Value',blank=True,null=True)
+    # but sometimes we can't do it with just a term, so let's have some text too.
+    description=models.TextField(blank=True,null=True)
+    def __unicode__(self):
+        if self.value:
+            if self.description:
+                return '%s (%s)'%(self.value,self.description)
+            else: return str(self.value)
+        else: return str(self.description)
+    class Meta:
+        abstract=True
+
+class SimRelationship(Relationship):
+    sfrom=models.ForeignKey('Simulation',related_name='related_from')
+    sto=models.ForeignKey('Simulation',related_name='related_to')
+
+
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     name=models.CharField(max_length=128,blank=True)
@@ -540,6 +562,9 @@ class Simulation(Doc):
     
     # this next is here in case we need it later, but I think we shouldn't
     inputMod=models.ManyToManyField('InputMod',blank=True,null=True)
+    
+    # the following to support relationships to ourselves
+    relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
         
     def updateCoupling(self):
         ''' Update my couplings, in case the user has added some inputs (and hence couplings)
@@ -913,9 +938,6 @@ class InputMod(Modification):
 class ModelMod(Modification):
     #we could try and get to the parameter values as well ...
     component=models.ForeignKey(Component)
-    
-
-    
     
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''

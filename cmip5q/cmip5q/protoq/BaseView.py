@@ -199,7 +199,7 @@ class BaseViewHandler:
         target view via targetURL. We provide targetType and targetID to allow 
         the construction of return URLs when we go to the editor ...'''
          
-        title='Assign %s(s) to %s'%(self.resource['type'],self.target['instance'])
+        title='Assign %s(s) to %s %s'%(self.resource['type'],self.target['type'],self.target['instance'])
         objects=self.objects()
 
         data=[(r.id,str(r)) for r in objects]
