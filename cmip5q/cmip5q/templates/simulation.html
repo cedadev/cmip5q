@@ -93,7 +93,8 @@
     {% if s.modelMod.all|length %}
     <div class="boxer">
         <h4> Modifications to the base model</h4>
-        <p> These are parameter and code modifications with respect to the base model </p>
+        <p> These are parameter and code modifications with respect to the base model. 
+        {% if ensemble %} They apply to all ensemble members {% endif %}</p>
         <table>
         <tr><th> Name </th><th>Description</th></tr>
         {% for m in s.modelMod.all %} 

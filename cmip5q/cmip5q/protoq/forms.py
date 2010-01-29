@@ -318,8 +318,11 @@ class SimulationForm(forms.ModelForm):
     authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     class Meta:
         model=Simulation
-        #these are enforced by the workflow leading to the form
-        exclude=('centre','experiment','uri')
+        #the first three are enforced by the workflow leading to the form, the second two are
+        #dealt with on other pages. NB: note that if you don't exclude things, then a form
+        #will expect them, and set them to None if they don't come back in the post ... a quiet
+        #loss of information ...
+        exclude=('centre','experiment','uri','modelMod','inputMod')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(

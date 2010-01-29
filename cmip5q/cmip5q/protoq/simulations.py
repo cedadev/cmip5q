@@ -49,7 +49,7 @@ class simulationHandler(object):
             self.s=None
             self.Klass='Unknown as yet by simulation handler'
         
-    def __handle(self,request,s,e,url,label,fix):
+    def __handle(self,request,s,e,url,label):
         ''' This method handles the form itself for both the add and edit methods '''
         logging.debug('entering simulation handle routine')
         
@@ -77,7 +77,7 @@ class simulationHandler(object):
             #urls['ics']=reverse('cmip5q.protoq.views.assign',
             #         args=(self.centreid,'inputmod','simulation',s.id,))        
         
-        if not fix and request.method=='POST':
+        if request.method=='POST':
             # we can't do the following, because on initialisation, we don't know what
             # s.id is for a new simulation
             #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
@@ -114,7 +114,7 @@ class simulationHandler(object):
              'cset':cset,'coset':cs,'ensemble':ensemble,
              'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
             # note that cform points to simform too, to support completion.html
-    def edit(self,request,fix=False):
+    def edit(self,request):
         ''' Handle providing and receiving edit forms '''
        
         s=self.s
@@ -122,7 +122,7 @@ class simulationHandler(object):
         e=s.experiment
         url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id,))
         label='Update'
-        return self.__handle(request,s,e,url,label,fix)
+        return self.__handle(request,s,e,url,label)
        
     def add(self,request):
         ''' Create a new simulation instance '''
