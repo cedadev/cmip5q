@@ -1,4 +1,5 @@
 # django jquery autocomplete widget based on the django snippet http://www.djangosnippets.org/snippets/1097/
+# json variant informed from http://solutions.treypiepmeier.com/2009/12/10/using-jquery-autocomplete-with-django/
 
 from django import forms
 from django.utils.safestring import mark_safe
