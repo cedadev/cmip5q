@@ -81,7 +81,7 @@ class simulationHandler(object):
             # we can't do the following, because on initialisation, we don't know what
             # s.id is for a new simulation
             #editURL=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id))
-            afterURL=reverse('cmip5q.protoq.views.simulationList',args=(self.centreid,))
+            
             simform=SimulationForm(request.POST,instance=s)
             simform.specialise(self.centre)
             if simform.is_valid():
@@ -93,7 +93,7 @@ class simulationHandler(object):
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
-                return HttpResponseRedirect(afterURL)
+                return HttpResponseRedirect(news.edit_url())
             else:
                 logging.debug('SIMFORM not valid [%s]'%simform.errors)
         else:
