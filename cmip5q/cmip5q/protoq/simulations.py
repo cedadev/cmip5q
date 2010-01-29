@@ -79,14 +79,26 @@ class simulationHandler(object):
         
         # A the moment we're only assuming one related simulation so we don't have to
         # deal with a formset
-        rsims=s.related_to.all()
+        rsims=s.related_from.all()
         if len(rsims)==0:
+            # we need to instantiate with the right vocab and this simulation
             r=SimRelationship(vocab=Vocab.objects.get(name='SimRelationships'),sfrom=s)
-        else: r=rsims[0]
+        else:
+            # what we start with 
+            r=rsims[0]
+            
         if request.method=='POST':
             relform=SimRelationshipForm(request.POST,instance=r,prefix='rel')
             simform=SimulationForm(request.POST,instance=s,prefix='sim')
             simform.specialise(self.centre)
+            if relform.is_valid():
+                r=relform.save()
+            else:
+                # if there is no sto, then we should delete this relationship instance and move on.
+                if len(rsims)<>0: rsims[0].delete()
+                logging.info('Error with related simulation form [%s]'%relform.errors)
+                # Just in case we've broken the other form ...
+                r=SimRelationship(vocab=Vocab.objects.get(name='SimRelationships'),sfrom=s)
             if simform.is_valid():
                 if label=='Add':
                     oldmodel=None
@@ -96,18 +108,14 @@ class simulationHandler(object):
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
-                if relform.is_valid():
-                    relform.save()
-                else: print relform.errors
-                    
                 return HttpResponseRedirect(news.edit_url())
             else:
-                logging.debug('SIMFORM not valid [%s]'%simform.errors)
+                logging.info('SIMFORM not valid [%s]'%simform.errors)
         else:
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
-            relform=SimRelationshipForm(instance=r,prefix='rel')
-            print relform.as_p()
+            
+        relform=SimRelationshipForm(instance=r,prefix='rel')
         # work out what we want to say about couplings
         cset=[]
         if label !='Add': cset=s.numericalModel.couplings(s)

@@ -196,6 +196,7 @@ class EnsembleForm(forms.ModelForm):
         model=Ensemble
         exclude=('simulation')
     def __init__(self,*args,**kwargs):
+        logging.debug('initialising ensemble form')
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.fields['etype'].queryset=Value.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
 
@@ -204,16 +205,17 @@ class EnsembleMemberForm(forms.ModelForm):
         model=EnsembleMember
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
+        logging.debug('initialising ensemble set')
         if self.instance:
             # find the set of modifications which are appropriate for the current centre
             etype=self.instance.ensemble.etype
             vet=Vocab.objects.get(name='EnsembleTypes')
             # probably don't need the filter, but just to make sure ...
-            pp=Value.objects.filter(vocab=vet).get(name='PerturbedPhysics')
+            pp=Value.objects.filter(vocab=vet).get(value='Perturbed Physics')
             if etype==pp:
-                qs=ModelMods.filter(centre=self.instance.ensemble.simulation.centre)
+                qs=ModelMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
             else:
-                qs=InputMods.filter(centre=self.instance.ensemble.simulation.centre)
+                qs=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
             self.fields['mod'].queryset=qs  
  
 class ModForm(forms.ModelForm):
@@ -236,7 +238,7 @@ class InputModForm(ModForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
     class Meta:
         model=InputMod
-        exclude=('centre')
+        exclude=('centre','date')
     def specialise(self,simulation):
         group=CouplingGroup.objects.get(simulation=simulation)
         self.fields['inputs'].queryset=Coupling.objects.filter(parent=group)
@@ -351,4 +353,5 @@ class SimRelationshipForm(forms.ModelForm):
         #    self.instance=self.model(sfrom=s,vocab=Vocab.objects.get(name=vocab))
         self.fields['value'].queryset=Value.objects.filter(vocab=self.instance.vocab)
         self.fields['sto'].queryset=Simulation.objects.filter(centre=self.instance.sfrom.centre)
+        
   

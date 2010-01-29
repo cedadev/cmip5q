@@ -326,7 +326,7 @@ def ensemble(request,cen_id,sim_id):
     e.updateMembers()  # in case members were deleted via their code mods or ics.
     members=e.ensemblemember_set.all()
         
-    EnsembleMemberFormset=modelformset_factory(EnsembleMember,extra=0,exclude=('ensemble','memberNumber'))
+    EnsembleMemberFormset=modelformset_factory(EnsembleMember,form=EnsembleMemberForm,extra=0,exclude=('ensemble','memberNumber'))
     
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
           'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
@@ -458,6 +458,9 @@ class ViewHandler(BaseViewHandler):
             objects=objects.order_by('mnemonic')
         elif self.resource['type']=='parties':
             objects=objects.filter(centre=self.centre).order_by('name')
+        elif self.resource['type']=='inputmod':
+            objects=objects.filter(centre=self.centre)
+            objects=objects.order_by('mnemonic')
         return objects
         
     def constraints(self):

@@ -73,7 +73,7 @@ VocabList={'Realms':
     'SpatialResolutionTypes':('',),
     
     #ensembleTypes
-    'EnsembleTypes':('Differing Start Date','Differing Initialisation','Perturbed Physics'),
+    'EnsembleTypes':('Initial Condition','Perturbed Physics','Perturbed Boundary Conditions'),
     
     #calendarTypes
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),

@@ -293,9 +293,9 @@ class Relationship(models.Model):
     def __unicode__(self):
         if self.value:
             if self.description:
-                return '%s (%s)'%(self.value,self.description)
-            else: return str(self.value)
-        else: return str(self.description)
+                return '%s %s (%s)'%(self.value,self.sto,self.description)
+            else: return '%s %s'%(self.sto,self.value)
+        else: return '%s %s'%(self.sto,self.description)
     class Meta:
         abstract=True
 

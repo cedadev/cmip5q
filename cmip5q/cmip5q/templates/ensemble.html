@@ -1,58 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Ensemble Characteristics for simulation: "{{s}}" </h1>
-
+    <h1> Ensemble Characteristics for simulation: "{{s}}" </h1>
 </div>
 <div class="boxer">
-<div class="boxer2">
-<center>
-<form action={{urls.self}} method="POST">
-<table>
-<tr><td width="20%">Ensemble Type:
-{{eform.etype.errors}}
-</td>
-<td>{{eform.etype}}&nbsp;</td></tr>
-<tr><td>General notes about the ensemble:{{eform.description.errors}}</td>
-<td>{{eform.description}}</td></tr>
-<tr><td>&nbsp;</td><td></td></tr>
-<tr><td colspan="2"> Now enter the details which explain how the ensemble members differ.
-</td></tr>
-{% if eform.instance.etype %}
-{{eformset.management_form}}
-{% for form in eformset.forms %}
-<tr><td>Member {{forloop.counter}} uses {{form.mod.errors}}</td><td>{{form.mod}} </td></tr>
-{% for hid in form.hidden_fields %} {{hid}}{% endfor %}
-{% endfor %}
-{% for hid in form.hidden_fields %} {{hid}}{% endfor %}
-{% else %}
-<tr><td colspan="2"> You need to save the form before you can assign details to
-initial ensemble members </td></tr>
-{% endif %}
+    <div class="boxer2">
+        <center>
+        <form action={{urls.self}} method="POST">
+            <table>
+                <tr><td width="20%">Ensemble Type:{{eform.etype.errors}}</td>
+                    <td>{{eform.etype}}&nbsp;</td></tr>
+                <tr><td>General notes about the ensemble:{{eform.description.errors}}</td>
+                    <td>{{eform.description}}</td></tr>
+                <tr><td>&nbsp;</td><td></td></tr>
+                    <tr><td colspan="2"> Now enter the details which explain how the ensemble members differ.
+                    </td></tr>
+                {% if eform.instance.etype %}
+                    {{eformset.management_form}}
+                    {% for form in eformset.forms %}
+                    <tr><td>Member {{forloop.counter}} uses {{form.mod.errors}}</td><td>{{form.mod}} </td></tr>
+                    {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+                    {% endfor %}
+                    {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+                {% else %}
+                    <tr><td colspan="2"> You need to save the form before you can assign details to
+                    initial ensemble members. </td></tr>
+                {% endif %}
+            </table>
+            <input id="subDatBut" type="submit" value="Save Description">
+        </form>
+        </center>
+    </div>
+</div>
+<div><center>
+    <a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>
+    <a id="codebut" href="{{urls.mods}}">Manage Code Modifications</a>
+    <a id="icbut" href="{{urls.ics}}">Manage Input Modifications</a>
+</center></div>
 
-</table>
-<input id="subDatBut" type="submit" value="Save Description">
-</form>
-</center>
-</div>
-
-
-</div>
-<div>
-<center>
-<a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a>
-<a id="codebut" href="{{urls.mods}}">Manage Code Modifications</a>
-<a id="icbut" href="{{urls.ics}}">Manage Input Modifications</a>
-</center>
-</div>
-</div>
 <script type="text/javascript">
-var subDatBut = new YAHOO.widget.Button("varSubBut",
-                {value:"varSubButvalue"});
-var oLinkButton1 = new YAHOO.widget.Button("simbut");
-var oLinkButton2 = new YAHOO.widget.Button("codebut");
-var oLinkButton3 = new YAHOO.widget.Button("icbut");
+    var subDatBut = new YAHOO.widget.Button("varSubBut",
+                    {value:"varSubButvalue"});
+    var oLinkButton1 = new YAHOO.widget.Button("simbut");
+    var oLinkButton2 = new YAHOO.widget.Button("codebut");
+    var oLinkButton3 = new YAHOO.widget.Button("icbut");
 </script>
-
 
 {% endblock%}
