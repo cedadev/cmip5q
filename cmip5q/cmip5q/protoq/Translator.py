@@ -107,8 +107,12 @@ class Translator:
         ''' return the top level cim document invarient structure '''
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
-        ET.SubElement(cr2,'id').text=rootClass.uri
-        ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
+        try :
+            ET.SubElement(cr2,'id').text=rootClass.uri
+            ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
+        except :
+            ET.SubElement(cr2,'id').text='TBD for '+rootClass._meta.module_name
+            ET.SubElement(cr2,'version').text='TBD for '+rootClass._meta.module_name
         return cr2
     
     def cimRecordRoot(self,rootClass):
@@ -146,6 +150,17 @@ class Translator:
             self.add_experiment(ref.experiment,experimentElement)
             platformElement=self.cimRecord(root,ref.platform)
             self.add_platform(ref.platform,platformElement)
+
+            uniqueFileList=[]
+            couplings=ref.numericalModel.couplings(simulation=self.simClass)
+            for coupling in couplings :
+                externalClosures=ExternalClosure.objects.filter(coupling=coupling)
+                for externalClosure in externalClosures :
+                    if externalClosure.targetFile not in uniqueFileList :
+                        uniqueFileList.append(externalClosure.targetFile)
+            for fileObject in uniqueFileList :
+                dataObjectElement=self.cimRecord(root,fileObject)
+                self.add_dataobject(fileObject,dataObjectElement)
             cimDoc=root
         else :
             root=self.cimRecordRoot(ref)
@@ -812,11 +827,26 @@ class Translator:
             self.addReference(ref,refsElement)
 
     def addReference(self,refInstance,rootElement):
-        if refInstance is None: return
-        refElement=ET.SubElement(rootElement,'Q_reference')
-        ET.SubElement(refElement,'Q_name').text=refInstance.name
-        ET.SubElement(refElement,'Q_citation').text=refInstance.citation
-        ET.SubElement(refElement,'Q_link').text=refInstance.link
+        if refInstance :
+            if self.CIMXML :
+                ref1Element=ET.SubElement(rootElement,'citation')
+                ref2Element=ET.SubElement(ref1Element,'citation')
+                citeElement=ET.SubElement(ref2Element,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
+                titleElement=ET.SubElement(citeElement,'title')
+                ET.SubElement(titleElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.name
+                ctElement=ET.SubElement(citeElement,'collectiveTitle')
+                ET.SubElement(ctElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.citation
+                presElement=ET.SubElement(citeElement,'presentationForm')
+                ET.SubElement(presElement,self.GMD_NAMESPACE_BRACKETS+'CI_PresentationFormCode').text=refInstance.refType
+                ociteElement=ET.SubElement(citeElement,'otherCitationDetails')
+                ET.SubElement(ociteElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.link
+            else :
+                refElement=ET.SubElement(rootElement,'Q_reference')
+                ET.SubElement(refElement,'Q_name').text=refInstance.name
+                ET.SubElement(refElement,'Q_citation').text=refInstance.citation
+                ET.SubElement(refElement,'Q_link').text=refInstance.link
+                if refInstance.refValue :
+                    ET.SubElement(refElement,'Q_refType').text=refInstance.refType.value
 
     def addSimpleResp(self,respName,rootElement,respType) :
         ciresp=ET.SubElement(rootElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
@@ -837,7 +867,10 @@ class Translator:
                 ET.SubElement(respElement,"Q_email").text=respClass.email
                 ET.SubElement(respElement,"Q_address").text=respClass.address
                 ET.SubElement(respElement,"Q_uri").text=respClass.uri
-            elif respClass.name != 'Unknown' : # skip the default respobject
+            else :
+                if respClass.name == 'Unknown' : # skip the default respobject
+                    rootElement.append(ET.Comment('responsibleParty '+respType+ ' is set to unknown. No CIM output will be generated.'))
+                    return
                 respElement=ET.SubElement(rootElement,'responsibleParty')
                 respElement.append(ET.Comment('responsibleParty uri :: '+respClass.uri))
                 ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
@@ -912,8 +945,18 @@ class Translator:
                     couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
                     '''connection'''
                     '''description'''
-                    ET.SubElement(couplingElement,'description').text=CompInpClass.description
+                    ET.SubElement(couplingElement,'description').text=coupling.manipulation
                     '''timeProfile'''
+                    units=''
+                    if coupling.FreqUnits :
+                        units=str(coupling.FreqUnits.value)
+                    if units!='' or coupling.couplingFreq!=None :
+                        tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units})
+                        #ET.SubElement(tpElement,'start')
+                        #ET.SubElement(tpElement,'end')
+                        ET.SubElement(tpElement,'rate').text=str(coupling.couplingFreq)
+                    if coupling.inputTechnique :
+                        tpElement.append(ET.Comment('input technique :: '+coupling.inputTechnique.value))
                     '''timeLag'''
                     '''spatialRegridding'''
                     '''timeTransformation'''
@@ -925,10 +968,12 @@ class Translator:
                         self.addCIMReference(iclos.target,closure)
 
                     eClosures=ExternalClosure.objects.filter(coupling=coupling)
-                    for ExtClosClass in eClosures:
+                    for eclos in eClosures:
                         closure=ET.SubElement(couplingElement,'couplingSource')
-                        assert iclos.target, 'target should exist for a closure'
-                        self.addCIMReference(ExtClosClass.target,closure)
+                        try :
+                            self.addCIMReference(eclos.target,closure)
+                        except :
+                            closure.append(ET.Comment('error: file target is null'))
 
                     '''couplingTarget'''
                     targetElement=ET.SubElement(couplingElement,'couplingTarget')
@@ -1037,14 +1082,43 @@ class Translator:
         # dataClass.drsAddress is unused at the moment
 
     def addCIMReference(self,rootClass,rootElement):
-                targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''})
-                ''' id '''
-                ET.SubElement(targetRef,'id').text=rootClass.uri
-                ''' name '''
-                ET.SubElement(targetRef,'name').text=rootClass._meta.module_name
-                ''' version '''
-                ET.SubElement(targetRef,'version').text=str(rootClass.documentVersion)
-                ''' description '''
-                ET.SubElement(targetRef,'description').text=rootClass._meta.module_name+' is '+rootClass.abbrev
-                #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
+        if rootClass._meta.module_name=='dataobject' :
+            targetRef=ET.SubElement(rootElement,'reference')
+            targetRef.append(ET.Comment('dataobject references not yet implemented'))
+        else :
+            targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''})
+            ''' id '''
+            ET.SubElement(targetRef,'id').text=rootClass.uri
+            ''' name '''
+            ET.SubElement(targetRef,'name').text=rootClass._meta.module_name
+            ''' version '''
+            ET.SubElement(targetRef,'version').text=str(rootClass.documentVersion)
+            ''' description '''
+            ET.SubElement(targetRef,'description').text=rootClass._meta.module_name+' is '+rootClass.abbrev
 
+            #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
+
+    def add_dataobject(self,fileClass,rootElement):
+
+        if fileClass :
+            doElement=ET.SubElement(rootElement,'dataObject')
+            doElement.append(ET.Comment('ABBREVIATION: '+fileClass.abbrev))
+            doElement.append(ET.Comment('DESCRIPTION: '+fileClass.description))
+            storeElement=ET.SubElement(doElement,'storage')
+            lfElement=ET.SubElement(storeElement,'localFileStorage',{'dataFormat':fileClass.format.value})
+            ET.SubElement(lfElement,'fileName').text=fileClass.name
+            ipElement=ET.SubElement(storeElement,'ipStorage')
+            ET.SubElement(ipElement,'fileName').text=fileClass.link
+            self.addReference(fileClass.reference,doElement)
+            for variable in DataObject.objects.filter(container=fileClass) :
+                contentElement=ET.SubElement(doElement,'content')
+                contentElement.append(ET.Comment('DESCRIPTION: '+variable.description))
+                if variable.cfname :
+                    ET.SubElement(contentElement,'topic').text=variable.cfname.value
+                    contentElement.append(ET.Comment('non-cfname: '+variable.variable))
+                elif variable.variable!='' :
+                    ET.SubElement(contentElement,'topic').text=variable.variable
+
+                if variable.reference :
+                    contentElement.append(ET.Comment('ARGHHH: there is a reference'))
+                # not used in questionnaire : featureType, drsAddress
