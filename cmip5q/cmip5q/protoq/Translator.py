@@ -41,12 +41,57 @@ class Translator:
 
     def c2text(self,c):
         comp=ET.Element('div')
+        
+        ET.SubElement(comp,'h1').text='Component details'
+
+        # component location in the hierarchy
+        tmpComp=c
+        compHierarchy=''
+        while not tmpComp.isModel :
+            parents=Component.objects.filter(components=tmpComp)
+            assert len(parents)==1 ,'I am expecting one and only one parent'
+            tmpComp=parents[0]
+            compHierarchy='/'+tmpComp.abbrev+compHierarchy
+        ET.SubElement(comp,'p').text='Location : '+compHierarchy
+            
         '''shortName'''
-        ET.SubElement(comp,'p').text='Component Short Name : '+c.abbrev
+        ET.SubElement(comp,'p').text='Short Name : '+c.abbrev
         '''longName'''
-        ET.SubElement(comp,'p').text='Component Long Name : '+c.title
+        ET.SubElement(comp,'p').text='Long Name : '+c.title
         '''description'''
-        ET.SubElement(comp,'p').text='Component Description : '+c.description
+        ET.SubElement(comp,'p').text='Description : '+c.description
+
+        # add any references
+        ET.SubElement(comp,'h1').text='References ['+str(len(c.references.all()))+']'
+        for reference in c.references.all():
+            #ET.SubElement(comp,'p').text='name: '+reference.name
+            ET.SubElement(comp,'p').text=reference.citation
+            #ET.SubElement(comp,'p').text='link: '+reference.link
+            #if reference.refType :
+            #    ET.SubElement(comp,'p').text='type: '+reference.refType.value
+
+        ET.SubElement(comp,'h1').text='Properties'
+        
+        table=ET.SubElement(comp,'table',{'border':'1'})
+        titleRow=ET.SubElement(table,'tr')
+        ET.SubElement(titleRow,'td').text='Property'
+        ET.SubElement(titleRow,'td').text='Definition'
+        ET.SubElement(titleRow,'td').text='Type'
+        ET.SubElement(titleRow,'td').text='Options'
+        ET.SubElement(titleRow,'td').text='Value'
+        ET.SubElement(titleRow,'td').text='Units'
+        ET.SubElement(titleRow,'td').text='Value Type'
+
+#<table border="1">
+#<tr>
+#<td>row 1, cell 1</td>
+#<td>row 1, cell 2</td>
+#</tr>
+#<tr>
+#<td>row 2, cell 1</td>
+#<td>row 2, cell 2</td>
+#</tr>
+#</table> 
 
         pgset=ParamGroup.objects.filter(component=c)
         for pg in pgset:
@@ -60,21 +105,19 @@ class Translator:
                 for con in constraintSet:
                     pset=NewParam.objects.filter(constraint=con)
                     for p in pset:
-                        ''' space '''
-                        ET.SubElement(comp,'br')
-                        '''name'''
-                        ET.SubElement(comp,'p').text='Property Name : '+pg.name+':'+p.name
+                        row=ET.SubElement(table,'tr')
+                        ET.SubElement(row,'td').text=pg.name+':'+p.name
                         '''definition'''
-                        ET.SubElement(comp,'p').text='Property Definition : '+p.definition
+                        ET.SubElement(row,'td').text=p.definition
                         '''controlled vocab does not work as expected '''
                         # ET.SubElement(comp,'p').text='Controlled Vocabulary : '+str(p.controlled)
                         '''value'''
                         if p.ptype=='XOR' :
-                            ET.SubElement(comp,'p').text='Property form : Single Valued CV'
+                            ET.SubElement(row,'td').text='Single Valued CV'
                         elif p.ptype=='OR' :
-                            ET.SubElement(comp,'p').text='Property form : Multiple Valued CV'
+                            ET.SubElement(row,'td').text='Multiple Valued CV'
                         else :
-                            ET.SubElement(comp,'p').text='Property form : unrestricted'
+                            ET.SubElement(row,'td').text='Unrestricted'
 
                         if p.vocab :
                             ''' I am constrained by vocab '''
@@ -89,18 +132,23 @@ class Translator:
                                 values=values+v.value
                                 if counter != len(valset) :
                                     values=values+", "
-                            ET.SubElement(comp,'p').text='Property Vocabulary : '+values
-                        ET.SubElement(comp,'p').text='Property Value : '+p.value
+                            ET.SubElement(row,'td').text=values
+                        else :
+                            ET.SubElement(row,'td').text='n/a'
+                        ET.SubElement(row,'td').text=p.value
                         if p.units :
-                            ET.SubElement(comp,'p').text='Property Units : '+p.units
-                        #else :
-                        #    ET.SubElement(comp,'p').text='Property Units : none'
+                            ET.SubElement(row,'td').text=p.units
+                        else :
+                            ET.SubElement(row,'td').text='n/a'
                         if p.numeric :
                             ValueType="numeric"
                         else :
                             ValueType="string"
-                        if not(p.vocab) :
-                            ET.SubElement(comp,'p').text='Property DataType : '+ValueType
+                        if p.vocab :
+                            ET.SubElement(row,'td').text='n/a'
+                        else :
+                            ET.SubElement(row,'td').text=ValueType
+
         return comp
 
     def cimRecord(self,rootElement,rootClass) :
