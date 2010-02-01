@@ -188,6 +188,9 @@ class Translator:
         method_name = 'add_' + str(docType)
         logging.debug("q2cim calling "+method_name)
         method = getattr(self, method_name)
+        # make a special case for simulation as we output
+        # all information associated with a simulation
+        # using a CIMRecordSet
         if method_name=='add_simulation' and self.CIMXML :
             root=self.cimRecordSetRoot()
             modelElement=self.cimRecord(root,ref.numericalModel)
@@ -826,8 +829,7 @@ class Translator:
         self.addResp(c.centre.party,comp,'centre')
         '''fundingSource'''
         '''citation'''
-        if not(self.VALIDCIMONLY) :
-            self.addReferences(c.references,comp)
+        self.addReferences(c.references,comp)
         ''' RF associating genealogy with the component rather than the document '''
         if (nest<=2 and not(self.VALIDCIMONLY)):
             genealogy=ET.SubElement(comp,'Q_genealogy')
@@ -870,24 +872,24 @@ class Translator:
       return
 
     def addReferences(self,references,rootElement):
-        refsElement=ET.SubElement(rootElement,'Q_references')
         for ref in references.all():
-            self.addReference(ref,refsElement)
+            self.addReference(ref,rootElement)
 
     def addReference(self,refInstance,rootElement):
         if refInstance :
             if self.CIMXML :
-                ref1Element=ET.SubElement(rootElement,'citation')
-                ref2Element=ET.SubElement(ref1Element,'citation')
-                citeElement=ET.SubElement(ref2Element,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
-                titleElement=ET.SubElement(citeElement,'title')
-                ET.SubElement(titleElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.name
-                ctElement=ET.SubElement(citeElement,'collectiveTitle')
-                ET.SubElement(ctElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.citation
-                presElement=ET.SubElement(citeElement,'presentationForm')
-                ET.SubElement(presElement,self.GMD_NAMESPACE_BRACKETS+'CI_PresentationFormCode').text=refInstance.refType
-                ociteElement=ET.SubElement(citeElement,'otherCitationDetails')
-                ET.SubElement(ociteElement,'self.GCO_NAMESPACE_BRACKETS'+CharacterString).text=refInstance.link
+                refElement=ET.SubElement(rootElement,'citation')
+                citeElement=ET.SubElement(refElement,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
+                titleElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'title')
+                ET.SubElement(titleElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.name
+                # CIM expects a date element even if it is empty
+                ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'date')
+                presElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'presentationForm')
+                ET.SubElement(presElement,self.GMD_NAMESPACE_BRACKETS+'CI_PresentationFormCode',{'codeList':'','codeListValue':str(refInstance.refType)})
+                ociteElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'otherCitationDetails')
+                ET.SubElement(ociteElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.link
+                ctElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'collectiveTitle')
+                ET.SubElement(ctElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.citation
             else :
                 refElement=ET.SubElement(rootElement,'Q_reference')
                 ET.SubElement(refElement,'Q_name').text=refInstance.name
