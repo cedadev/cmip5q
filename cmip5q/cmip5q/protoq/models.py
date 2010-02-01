@@ -301,7 +301,7 @@ class Relationship(models.Model):
 
 class SimRelationship(Relationship):
     sfrom=models.ForeignKey('Simulation',related_name='related_from')
-    sto=models.ForeignKey('Simulation',related_name='related_to')
+    sto=models.ForeignKey('Simulation',related_name='related_to',blank=True,null=True)
 
 
 class ResponsibleParty(models.Model):

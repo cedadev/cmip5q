@@ -80,26 +80,15 @@ class simulationHandler(object):
         # A the moment we're only assuming one related simulation so we don't have to
         # deal with a formset
         rsims=s.related_from.all()
-        if len(rsims)==0:
-            # we need to instantiate with the right vocab and this simulation
-            r=SimRelationship(vocab=Vocab.objects.get(name='SimRelationships'),sfrom=s)
-        else:
-            # what we start with 
+        if len(rsims):
             r=rsims[0]
-            
+        else: r=None
         if request.method=='POST':
-            relform=SimRelationshipForm(request.POST,instance=r,prefix='rel')
+            # do the simualation first ... 
             simform=SimulationForm(request.POST,instance=s,prefix='sim')
             simform.specialise(self.centre)
-            if relform.is_valid():
-                r=relform.save()
-            else:
-                # if there is no sto, then we should delete this relationship instance and move on.
-                if len(rsims)<>0: rsims[0].delete()
-                logging.info('Error with related simulation form [%s]'%relform.errors)
-                # Just in case we've broken the other form ...
-                r=SimRelationship(vocab=Vocab.objects.get(name='SimRelationships'),sfrom=s)
             if simform.is_valid():
+                simok=True
                 if label=='Add':
                     oldmodel=None
                 else: oldmodel=s.numericalModel
@@ -108,14 +97,23 @@ class simulationHandler(object):
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
-                return HttpResponseRedirect(news.edit_url())
-            else:
+            elif not simform.is_valid():
+                simok=False
                 logging.info('SIMFORM not valid [%s]'%simform.errors)
+            relform=SimRelationshipForm(s,request.POST,instance=r,prefix='rel') 
+            if relform.is_valid():
+                if simok: 
+                    r=relform.save()
+                    return HttpResponseRedirect(news.edit_url())    
+            else:
+                # if there is no sto, then we should delete this relationship instance and move on.
+                pass
         else:
+            relform=SimRelationshipForm(s,instance=r,prefix='rel')
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
             
-        relform=SimRelationshipForm(instance=r,prefix='rel')
+       
         # work out what we want to say about couplings
         cset=[]
         if label !='Add': cset=s.numericalModel.couplings(s)

@@ -389,11 +389,25 @@ class SimRelationshipForm(forms.ModelForm):
     class Meta:
         model=SimRelationship
         exclude=('vocab','sfrom')
-    def __init__(self,*args,**kwargs):
+    def __init__(self,simulation,*args,**kwargs):
+        self.simulation=simulation
+        self.vocab=Vocab.objects.get(name='SimRelationships')
         forms.ModelForm.__init__(self,*args,**kwargs)
-        #if self.instance is None: 
-        #    self.instance=self.model(sfrom=s,vocab=Vocab.objects.get(name=vocab))
-        self.fields['value'].queryset=Value.objects.filter(vocab=self.instance.vocab)
-        self.fields['sto'].queryset=Simulation.objects.filter(centre=self.instance.sfrom.centre)
+        self.fields['value'].queryset=Value.objects.filter(vocab=self.vocab)
+        self.fields['sto'].queryset=Simulation.objects.filter(centre=self.simulation.centre)
+    def clean(self):
+        tmp=self.cleaned_data.copy()
+        for k in 'value','sto':
+            if k in tmp:
+                if tmp[k] is None: del tmp[k]
+        if 'sto' in tmp or 'value' in tmp:
+            if 'sto' not in tmp or 'value' not in tmp:
+                raise forms.ValidationError('Need both related simulation and relationship')
+        return self.cleaned_data
+    def save(self):
+        s=forms.ModelForm.save(self,commit=False)
+        s.sfrom=self.simulation
+        s.save()
+
         
   
