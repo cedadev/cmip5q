@@ -79,19 +79,6 @@ class Translator:
         ET.SubElement(titleRow,'td').text='Type'
         ET.SubElement(titleRow,'td').text='Options'
         ET.SubElement(titleRow,'td').text='Value'
-        ET.SubElement(titleRow,'td').text='Units'
-        ET.SubElement(titleRow,'td').text='Value Type'
-
-#<table border="1">
-#<tr>
-#<td>row 1, cell 1</td>
-#<td>row 1, cell 2</td>
-#</tr>
-#<tr>
-#<td>row 2, cell 1</td>
-#<td>row 2, cell 2</td>
-#</tr>
-#</table> 
 
         pgset=ParamGroup.objects.filter(component=c)
         for pg in pgset:
@@ -103,52 +90,54 @@ class Translator:
                 # the internal questionnaire representation is that all parameters
                 # are contained in a constraint group
                 for con in constraintSet:
-                    pset=NewParam.objects.filter(constraint=con)
-                    for p in pset:
-                        row=ET.SubElement(table,'tr')
-                        ET.SubElement(row,'td').text=pg.name+':'+p.name
-                        '''definition'''
-                        ET.SubElement(row,'td').text=p.definition
-                        '''controlled vocab does not work as expected '''
-                        # ET.SubElement(comp,'p').text='Controlled Vocabulary : '+str(p.controlled)
-                        '''value'''
-                        if p.ptype=='XOR' :
-                            ET.SubElement(row,'td').text='Single Valued CV'
-                        elif p.ptype=='OR' :
-                            ET.SubElement(row,'td').text='Multiple Valued CV'
-                        else :
-                            ET.SubElement(row,'td').text='Unrestricted'
+                    # we want to always output options with contraints in case people change their minds
+                    # if self.constraintValid(con,constraintSet) :
+                    if True :
+                        pset=NewParam.objects.filter(constraint=con)
+                        for p in pset:
+                            row=ET.SubElement(table,'tr')
+                            if con.constraint!='' :
+                                ET.SubElement(row,'td').text='['+con.constraint+']'+pg.name+':'+p.name
+                            else :
+                                ET.SubElement(row,'td').text=pg.name+':'+p.name
+                            '''definition'''
+                            ET.SubElement(row,'td').text=p.definition
+                            '''controlled vocab does not work as expected '''
+                            # ET.SubElement(comp,'p').text='Controlled Vocabulary : '+str(p.controlled)
+                            '''value'''
+                            if p.ptype=='XOR' :
+                                ET.SubElement(row,'td').text='One value from list'
+                            elif p.ptype=='OR' :
+                                ET.SubElement(row,'td').text='One or more values from list'
+                            else :
+                                myUnits=""
+                                if p.units :
+                                    myUnits=p.units
+                                ValueType=""
+                                if p.numeric :
+                                    ValueType="numeric"
+                                else :
+                                    ValueType="string"
+                                myType=""
+                                ET.SubElement(row,'td').text='Unrestricted (units="'+myUnits+'") (type="'+ValueType+'")'
 
-                        if p.vocab :
-                            ''' I am constrained by vocab '''
-                            ''' find all values associated with this vocab '''
-                            # all values that are part of this vocab
-                            valset=Value.objects.filter(vocab=p.vocab)
-                            values=""
-                            counter=0
-                            for v in valset:
-                                '''name'''
-                                counter+=1
-                                values=values+v.value
-                                if counter != len(valset) :
-                                    values=values+", "
-                            ET.SubElement(row,'td').text=values
-                        else :
-                            ET.SubElement(row,'td').text='n/a'
-                        ET.SubElement(row,'td').text=p.value
-                        if p.units :
-                            ET.SubElement(row,'td').text=p.units
-                        else :
-                            ET.SubElement(row,'td').text='n/a'
-                        if p.numeric :
-                            ValueType="numeric"
-                        else :
-                            ValueType="string"
-                        if p.vocab :
-                            ET.SubElement(row,'td').text='n/a'
-                        else :
-                            ET.SubElement(row,'td').text=ValueType
-
+                            if p.vocab :
+                                ''' I am constrained by vocab '''
+                                ''' find all values associated with this vocab '''
+                                # all values that are part of this vocab
+                                valset=Value.objects.filter(vocab=p.vocab)
+                                values=""
+                                counter=0
+                                for v in valset:
+                                    '''name'''
+                                    counter+=1
+                                    values=values+v.value
+                                    if counter != len(valset) :
+                                        values=values+", "
+                                ET.SubElement(row,'td').text=values
+                            else :
+                                ET.SubElement(row,'td').text='n/a'
+                            ET.SubElement(row,'td').text=p.value
         return comp
 
     def cimRecord(self,rootElement,rootClass) :
@@ -687,13 +676,12 @@ class Translator:
                 self.addValue(platClass.interconnect,interconnectElement)
         return rootElement
 
-    def constraintValid(self,con,conElement,constraintSet) :
+    def constraintValid(self,con,constraintSet) :
         if con.constraint=='' : # there is no constraint
             return True
         else : # need to check the constraint
             # constraint format is : if <ParamName> [is|has] [not]* "<Value>"[ or "<Value>"]*
             #ET.SubElement(conElement,'Q_Constraint').text=con.constraint
-            conElement.append(ET.Comment('Constraint : '+con.constraint))
             parsed=con.constraint.split()
             assert(parsed[0]=='if','Error in constraint format')
             assert(parsed[2]=='is' or parsed[2]=='has','Error in constraint format')
@@ -795,7 +783,9 @@ class Translator:
                 # the internal questionnaire representation is that all parameters
                 # are contained in a constraint group
                 for con in constraintSet:
-                    if self.constraintValid(con,componentProperty,constraintSet) :
+                    if con.constraint!='' :
+                        componentProperty.append(ET.Comment('Constraint : '+con.constraint))
+                    if self.constraintValid(con,constraintSet) :
                         pset=NewParam.objects.filter(constraint=con)
                         for p in pset:
                             property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
