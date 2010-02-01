@@ -101,12 +101,12 @@ class ComponentInputForm(forms.ModelForm):
     class Meta:
         model=ComponentInput
         exclude=('owner','realm') # we know these
-    def __init__(self,*args,**kwargs):
-        
+    def __init__(self,*args,**kwargs):       
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='InputTypes')
         self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
         # this can't go in the attributes section, because of import issues, deferring it works ...
+           
        
 class DataContainerForm(forms.ModelForm):
     ''' This is the form used to edit "files" ... '''

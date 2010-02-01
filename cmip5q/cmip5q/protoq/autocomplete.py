@@ -21,6 +21,7 @@ CLIENT_CODEJS = """
             max: 200,
             cacheLength: 20,
             width: 500,
+            selectFirst: false,
             parse: function(data) {
                 return $.map(data, function(row) {
                     return { data:row, value:row[1], result:row[0] };
@@ -41,7 +42,7 @@ class ValueAutocompleteField(forms.fields.CharField):
     """
     model = None
     url = None
-
+    
     def __init__(self, Vocab, vocabname, Value, size=0, *args, **kwargs):
        
         #self.url=reverse('cmip5q.protoq.views.completionHelper',args=(vocabname,))
@@ -56,13 +57,20 @@ class ValueAutocompleteField(forms.fields.CharField):
             *args, **kwargs)
 
     def clean(self, value):
-        logging.debug('saving autocomplete %s'%value)
+        if value==u'':
+            # This is the case where nothing has been set anyway. 
+            return None 
+        # so this next is just a hack, but ...
+        text=self.widget.submitted_text
+        if text==u'': 
+            #override the id returned, and assume the user wanted to set it to zero
+            return None
         try: 
             obj = self.vocab.get(pk=value)
         except Exception,e:
             raise Exception,e
             #raise ValidationError(u'Invalid item selected')            
-        return obj     
+        return obj
 
 class AutocompleteWidget(forms.widgets.TextInput):
     """ widget autocomplete for text fields
@@ -71,13 +79,19 @@ class AutocompleteWidget(forms.widgets.TextInput):
     def __init__(self,vocab,
                  lookup_url=None, size=0,
                  *args, **kw):
+        self.changed=False
         super(forms.widgets.TextInput, self).__init__(*args, **kw)
         # url for Datasource
         self.lookup_url = lookup_url
         self.vocab=vocab
         self.size=size
+        
        
-
+    def _has_changed(self, initial, data):
+        if not self.changed:
+            self.changed=forms.widgets.TextInput._has_changed(self,initial,data)
+        return self.changed
+        
     def render(self, name, value, attrs):
         if value == None:
             value = ''
@@ -103,5 +117,13 @@ class AutocompleteWidget(forms.widgets.TextInput):
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns None if it's not provided.
         """
-
-        return data.get(name, None)
+        value=data.get(name,None)
+        
+        # we need this to get a handle on contradictions
+        text=data.get('%s_text'%name,None)
+        self.submitted_text=text
+        if value<>u'' and text==u'':
+            # user is trying not to set this field
+            self.changed=True
+        
+        return value
