@@ -928,12 +928,24 @@ class Modification(models.Model):
     class Meta:
         ordering=('mnemonic',)
     
+class InputClosureMod(models.Model):
+    ''' Maps onto a specific closure and identifies the modifications to it '''
+    coupling=models.ForeignKey(Coupling)
+    targetClosure=models.ForeignKey(ExternalClosure)
+    targetFile=models.ForeignKey(DataContainer,blank=True,null=True)
+    target=models.ForeignKey(DataObject,blank=True,null=True)
+    def __unicode__(self):
+        return 'Mod to %s %s'%(copuling,targetClosure)
+    
 class InputMod(Modification):
     ''' Simulation initial condition '''
     # could need a date to override the date in the file for i.c. ensembles.
-    date=models.DateField(blank=True,null=True) # watch out, model calendars
+    # So we use this when the date we want in the model overrides the one in the file.
+    revisedDate=models.DateField(blank=True,null=True) # watch out, model calendars
     # could be to multiple inputs ... otherwise it'd get untidy
-    inputs=models.ManyToManyField(Coupling,blank=True,null=True)
+    revisedInputs=models.ManyToManyField(Coupling,blank=True,null=True)
+    # always set these based on the revisedInputs
+    revisedClosures=models.ManyToManyField(InputClosureMod,blank=True,null=True)
          
 class ModelMod(Modification):
     #we could try and get to the parameter values as well ...

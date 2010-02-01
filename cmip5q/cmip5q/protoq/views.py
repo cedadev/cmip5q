@@ -374,7 +374,7 @@ class ViewHandler(BaseViewHandler):
                              'class':ModelMod,'form':ModelModForm},
                         'inputmod':{'attname':'inputMod',
                             'title':'Input Modifications','tab':'InputMods',
-                             'class':InputMod,'form':InputModForm}, 
+                             'class':InputMod,'form':InputModIndex}, 
                         'file':{'attname':'dataContainer',
                             'title':'Files and Variables','tab':'Files & Vars',
                             'class':DataContainer,'form':DataHandlingForm},

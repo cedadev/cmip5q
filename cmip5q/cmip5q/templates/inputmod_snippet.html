@@ -1,5 +1,20 @@
+<table width="100%">
+<tr><td width="50%">
 <table>
-{{form}}
+{% with form.master as f %}
+<tr><td> Mnemonic {{f.mnemonic.errors}}</td><td>{{f.mnemonic}}
+
+for inputs to simulation {{f.simulation}}</td></tr>
+<tr> <td> Describe what has been done in this modification {{f.description.errors}}</td>
+<td>{{f.description}}</td></tr> 
+<td> Select which input bindings have been modified.
+{{f.revisedInputs.errors}}.
+(Hold down "Control", or "Command" on a Mac, to select more than one. To "unselect" you can shift click on a selected value.)</td><td>{{f.revisedInputs}}</td></tr>
+</table>
+{% endwith %}
+</td><td>
+</td>
+</tr>
 </table>
 <center>
     <input id="subDatBut" type="submit" value="Save">

@@ -156,7 +156,7 @@ class DataHandlingForm(object):
         if instance:
             qset=DataObject.objects.filter(container=instance)
         else:
-            qset=DataObject.objects.filter(variable=None) # should get an empty set
+            qset=DataObject.objects.none()
         self.oform=self.DataObjectFormSet(postData,queryset=qset,prefix='oform')
         self.hostCentre=None
     def is_valid(self):
@@ -186,9 +186,6 @@ class DataHandlingForm(object):
     
     errors=property(handleError,None)
     hostCentre=property(getCentre,setCentre)
-    
-
-
 
 class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
@@ -224,28 +221,72 @@ class ModForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):  
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.hostCentre=None
-    def save(self):
+    def save(self,attr=None):
         o=forms.ModelForm.save(self,commit=False)
         o.centre=self.hostCentre
+        if attr is not None:
+            o.__setattr__(attr[0],attr[1])
         o.save()
         return o
     def clean(self):
         ''' Needed to ensure reference name uniqueness within a centre '''
         return uniqueness(self,self.hostCentre,'mnemonic')
         
-        
+
+class InputClosureModForm(forms.ModelForm):
+    class Meta:
+        model=InputClosureMod
+        exclude='targetClosure'  # that's set by the input modd
+    def specialise(self):
+         if self.instance.targetFile:
+            self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
+                 
 class InputModForm(ModForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    revisedDate=forms.DateField(required=False)
+    #revisedClosures=forms.ModelMultipleChoiceField(widget=forms.HiddenInput(),required=True)
     class Meta:
         model=InputMod
-        exclude=('centre','date')
+        exclude=('centre','mtype')
+    def __init__(self,*args,**kwargs):
+        ModForm.__init__(self,*args,**kwargs)
+        self.ivocab=Vocab.objects.get(name='InputTypes')
+        self.ic=Value.objects.filter(vocab=self.ivocab).get(value='InitialCondition')
+    def specialise(self,group):
+        self.fields['revisedInputs'].queryset=Coupling.objects.filter(parent=group).filter(targetInput__ctype=self.ic)
+        self.group=group
+        self.simulation=group.simulation
+    def save(self):
+        f=ModForm.save(self,attr=('mtype',self.ic))
+        self.save_m2m()
+        return f
+    
+class InputModIndex(object):
+    ''' Used to bundle the form and child formsets together to help base view '''
+    closureforms=modelformset_factory(InputClosureMod,form=InputClosureModForm,can_delete=True)
+   
+    def __init__(self,postData=None,instance=None):
+        self.master=InputModForm(postData,instance=instance,prefix='mform')
+        self.hostCentre=None
     def specialise(self,simulation):
-        group=CouplingGroup.objects.get(simulation=simulation)
-        self.fields['inputs'].queryset=Coupling.objects.filter(parent=group)
-        ivocab=Vocab.objects.get(name='InputTypes')
-        self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)       
-
-
+        self.cg=CouplingGroup.objects.get(simulation=simulation)
+        self.s=simulation
+        self.master.specialise(self.cg)
+    def is_valid(self):
+        return self.master.is_valid()
+    def save(self):
+        m=self.master.save()
+        return m
+    def handleError(self):
+        return self.master.errors
+    def getCentre(self):
+        return self.master.hostCentre
+    def setCentre(self,val):
+        self.master.hostCentre=val
+     
+    errors=property(handleError,None)
+    hostCentre=property(getCentre,setCentre)  
+      
 class ModelModForm(ModForm):
     class Meta:
         model=ModelMod
