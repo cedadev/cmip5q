@@ -254,7 +254,10 @@ class Translator:
             confClassSet=Conformance.objects.filter(simulation=simClass)
             for confClass in confClassSet:
                 if (confClass.ctype) : # I have a conformance specified
-                    confElement=ET.SubElement(simElement,'conformance')
+                    if confClass.ctype.value=='Not Conformant' :
+                        confElement=ET.SubElement(simElement,'conformance',{'conformant':'false'})
+                    else :
+                        confElement=ET.SubElement(simElement,'conformance',{'conformant':'true'})
                     if self.VALIDCIMONLY :
                         confElement.append(ET.Comment("Conformance type "+confClass.ctype.value))
                     else:
@@ -613,10 +616,12 @@ class Translator:
                     self.addResp(platClass.funder,deployElement,'funder')
                     self.addResp(platClass.contact,deployElement,'contact')
                 ''' deploymentDate [1] '''
-                ET.SubElement(deployElement,'deploymentDate').text='0001-01-01T00:00:00'
+                # deploymentDate is now optional
+                #ET.SubElement(deployElement,'deploymentDate').text='0001-01-01T00:00:00'
                 ''' description [0..1] '''
-                ''' machine [1] '''
-                machineElement=ET.SubElement(deployElement,'machine')
+                ''' platform [1] '''
+                platformElement=ET.SubElement(deployElement,'platform')
+                machineElement=ET.SubElement(platformElement,'machine')
                 # platClass.title is never set
                 ET.SubElement(machineElement,'machineName').text=platClass.abbrev
                 if platClass.hardware :
@@ -639,7 +644,7 @@ class Translator:
                 if platClass.processor :
                     ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.value
                 ''' compiler [1..inf] '''
-                compilerElement=ET.SubElement(deployElement,'compiler')
+                compilerElement=ET.SubElement(platformElement,'compiler')
                 if platClass.compiler :
                     ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.value
                 ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
