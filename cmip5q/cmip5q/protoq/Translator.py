@@ -97,7 +97,7 @@ class Translator:
                         for p in pset:
                             row=ET.SubElement(table,'tr')
                             if con.constraint!='' :
-                                ET.SubElement(row,'td').text='['+con.constraint+']'+pg.name+':'+p.name
+                                ET.SubElement(row,'td').text=pg.name+':['+con.constraint+']'+p.name
                             else :
                                 ET.SubElement(row,'td').text=pg.name+':'+p.name
                             '''definition'''
@@ -258,10 +258,7 @@ class Translator:
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'false'})
                     else :
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'true'})
-                    if self.VALIDCIMONLY :
-                        confElement.append(ET.Comment("Conformance type "+confClass.ctype.value))
-                    else:
-                        ET.SubElement(confElement,'Q_Type').text=confClass.ctype.value
+                    confElement.append(ET.Comment("Conformance type "+confClass.ctype.value))
                     reqElement=ET.SubElement(confElement,'requirement')
                     deployReference=ET.SubElement(reqElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
                     assert(confClass.requirement)
@@ -269,11 +266,7 @@ class Translator:
                     #ET.SubElement(deployReference,'name').text=
                     #ET.SubElement(deployReference,'version').text=
                     ET.SubElement(deployReference,'description').text='The numerical requirement to which this conformance relates. This numerical requirement is specified in the experiment to which the simulation that contains this conformance relates.'
-                    # hopefully a temporary hack to make CIM conformant output as the CIM requires at least one source so provide a blank one when there are none. If the CIM becomes 0 or more then we don't need this
-                    if confClass.mod.count()==0:
-                        sourceElement=ET.SubElement(confElement,'source')
-                        ET.SubElement(sourceElement,'reference')
-                    # for each modification
+                    # for each modelmod modification
                     for modClass in confClass.mod.all():
                         sourceElement=ET.SubElement(confElement,'source')
                         sourceReference=ET.SubElement(sourceElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
@@ -295,6 +288,13 @@ class Translator:
                         ET.SubElement(sourceReference,'description').text=modClass.description
                         sourceReference.append(ET.Comment('source reference mnemonic :: '+modClass.mnemonic))
                         sourceReference.append(ET.Comment('source reference type :: '+modClass.mtype.value))
+
+                    # for each modelmod modification
+                    for couplingClass in confClass.coupling.all():
+                        sourceElement=ET.SubElement(confElement,'source')
+                        assert couplingClass.targetInput, 'Error, couplingclass should have a targetinput'
+                        targetInput=couplingClass.targetInput
+                        sourceReference=ET.SubElement(sourceElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#'+targetInput.abbrev}) # a blank href means the same document
 
                     ET.SubElement(confElement,'description').text=confClass.description
 
