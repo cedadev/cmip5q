@@ -148,8 +148,9 @@ class Translator:
             ET.SubElement(cr2,'id').text=rootClass.uri
             ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
         except :
-            ET.SubElement(cr2,'id').text='TBD for '+rootClass._meta.module_name
-            ET.SubElement(cr2,'version').text='TBD for '+rootClass._meta.module_name
+            cr2.append(ET.Comment('ID TBD for '+rootClass._meta.module_name))
+            ET.SubElement(cr2,'id').text='00000000-0000-0000-0000-000000000000'
+            ET.SubElement(cr2,'version').text='0'
         return cr2
     
     def cimRecordRoot(self,rootClass):
@@ -976,55 +977,14 @@ class Translator:
             if self.outputComposition :
                 composeElement=ET.SubElement(comp,'composition')
                 for coupling in couplings:
-                    CompInpClass=coupling.targetInput
-                    assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
-                    assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
-                    assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
-                    couplingType=CompInpClass.ctype.value
-                    if couplingType=='BoundaryCondition' :
-                        couplingType='boundaryCondition'
-                    elif couplingType=='AncillaryFile' :
-                        couplingType='forcing'
-                    elif couplingType=='InitialCondition' :
-                        couplingType='initialForcing'
-                    couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
-                    '''connection'''
-                    '''description'''
-                    ET.SubElement(couplingElement,'description').text=coupling.manipulation
-                    '''timeProfile'''
-                    units=''
-                    if coupling.FreqUnits :
-                        units=str(coupling.FreqUnits.value)
-                    if units!='' or coupling.couplingFreq!=None :
-                        tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units})
-                        #ET.SubElement(tpElement,'start')
-                        #ET.SubElement(tpElement,'end')
-                        ET.SubElement(tpElement,'rate').text=str(coupling.couplingFreq)
-                    if coupling.inputTechnique :
-                        tpElement.append(ET.Comment('input technique :: '+coupling.inputTechnique.value))
-                    '''timeLag'''
-                    '''spatialRegridding'''
-                    '''timeTransformation'''
-                    '''couplingSource'''
-                    iClosures=InternalClosure.objects.filter(coupling=coupling)
-                    for iclos in iClosures:
-                        closure=ET.SubElement(couplingElement,'couplingSource')
-                        assert iclos.target, 'target should exist for a closure'
-                        self.addCIMReference(iclos.target,closure)
-
-                    eClosures=ExternalClosure.objects.filter(coupling=coupling)
-                    for eclos in eClosures:
-                        closure=ET.SubElement(couplingElement,'couplingSource')
-                        try :
-                            self.addCIMReference(eclos.target,closure)
-                        except :
-                            closure.append(ET.Comment('error: file target is null'))
-
-                    '''couplingTarget'''
-                    targetElement=ET.SubElement(couplingElement,'couplingTarget')
-                    self.addCIMReference(CompInpClass.owner,targetElement)
-
-                    '''priming'''
+                    # output each link separately as the questionnaire keeps information
+                    # about transformations on a link by link basis
+                    extclosures=ExternalClosure.objects.filter(coupling=coupling)
+                    for closure in extclosures :
+                        self.addCoupling(coupling,closure,composeElement)
+                    intclosures=InternalClosure.objects.filter(coupling=coupling)
+                    for closure in intclosures :
+                        self.addCoupling(coupling,closure,composeElement)
                 ET.SubElement(composeElement,'description').text='Input coupling details for component '+c.abbrev
             else :
                 comp.append(ET.Comment('Coupling information exists but its output has been switched off for this CIM Object'))
@@ -1094,6 +1054,56 @@ class Translator:
                 '''couplingTarget'''
                 '''priming'''
 
+    def addCoupling(self,coupling,closure,composeElement) :
+        CompInpClass=coupling.targetInput
+        assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
+        assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
+        assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
+        couplingType=CompInpClass.ctype.value
+        if couplingType=='BoundaryCondition' :
+            couplingType='boundaryCondition'
+        elif couplingType=='AncillaryFile' :
+            couplingType='forcing'
+        elif couplingType=='InitialCondition' :
+            couplingType='initialForcing'
+        couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+        '''connection'''
+        '''description'''
+        ET.SubElement(couplingElement,'description').text=coupling.manipulation
+        '''timeProfile'''
+        units=''
+        if coupling.FreqUnits :
+            units=str(coupling.FreqUnits.value)
+        if units!='' or coupling.couplingFreq!=None :
+            tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units})
+            #ET.SubElement(tpElement,'start')
+            #ET.SubElement(tpElement,'end')
+            ET.SubElement(tpElement,'rate').text=str(coupling.couplingFreq)
+        if coupling.inputTechnique :
+            tpElement.append(ET.Comment('input technique :: '+coupling.inputTechnique.value))
+        '''timeLag'''
+        '''spatialRegridding'''
+        if closure.spatialRegrid :
+            ET.SubElement(couplingElement,'spatialRegridding').text=closure.spatialRegrid.value
+            ''' conservativespatialregridding t/f '''
+        '''timeTransformation'''
+        if closure.temporalTransform :
+            ''' timeaverage t/f, timeaccumulation t/f '''
+            ET.SubElement(couplingElement,'timeTransformation').text=closure.temporalTransform.value
+        '''couplingSource'''
+        sourceElement=ET.SubElement(couplingElement,'couplingSource')
+        if closure.target :
+            self.addCIMReference(closure.target,sourceElement)
+        else :
+            try :
+                self.addCIMReference(closure.targetFile,sourceElement)
+            except :
+                sourceElement.append(ET.Comment('error: couplingSource closure has no target and (for ExternalClosures) no targetFile'))
+        '''couplingTarget'''
+        targetElement=ET.SubElement(couplingElement,'couplingTarget')
+        self.addCIMReference(CompInpClass.owner,targetElement)
+        '''priming'''
+
     def addDataRef(self,dataObjectClass,rootElement):
         assert(dataObjectClass,'dataObject should not be null')
         assert(dataObjectClass.container,'dataContainer should not be null')
@@ -1128,32 +1138,63 @@ class Translator:
 
     def addCIMReference(self,rootClass,rootElement):
         if rootClass._meta.module_name=='dataobject' :
-            targetRef=ET.SubElement(rootElement,'reference')
-            targetRef.append(ET.Comment('dataobject references not yet implemented'))
+            # special case as I am not a document
+            try :
+                myURI=rootClass.container.uri
+                myDocumentVersion=rootClass.container.documentVersion
+            except :
+                # datafile not yet implemented as a document
+                myURI='TBAforDataFiles'
+                myDocumentVersion='0'
+            if rootClass.variable!='' :
+                myName=rootClass.variable
+            else :
+                myName='NoneSpecified'
         else :
-            targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''})
-            ''' id '''
-            ET.SubElement(targetRef,'id').text=rootClass.uri
-            ''' name '''
-            ET.SubElement(targetRef,'name').text=rootClass._meta.module_name
-            ''' version '''
-            ET.SubElement(targetRef,'version').text=str(rootClass.documentVersion)
-            ''' description '''
-            ET.SubElement(targetRef,'description').text=rootClass._meta.module_name+' is '+rootClass.abbrev
+            try :
+                myURI=rootClass.uri
+                myDocumentVersion=rootClass.documentVersion
+                myName=rootClass.abbrev
+            except :
+                myURI='TBD'
+                myDocumentVersion='0'
+                myName='TBD'
 
-            #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
+
+        targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#//CIMRecord[id=\''+myURI+'\']'})
+        ''' id '''
+        ET.SubElement(targetRef,'id').text=myURI
+        ''' name '''
+        ET.SubElement(targetRef,'name').text=myName
+        ''' type '''
+        try :
+            targetRef.append(ET.Comment('type: '+rootClass._meta.module_name))
+        except :
+            targetRef.append(ET.Comment('type: ERROR'))
+        ''' version '''
+        ET.SubElement(targetRef,'version').text=str(myDocumentVersion)
+        ''' description '''
+        ET.SubElement(targetRef,'description').text='Reference to a '+rootClass._meta.module_name+' called '+myName
+        #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
 
     def add_dataobject(self,fileClass,rootElement):
 
         if fileClass :
-            doElement=ET.SubElement(rootElement,'dataObject')
+            doElement=ET.SubElement(rootElement,'dataObject',{'dataStatus':'complete'})
             doElement.append(ET.Comment('ABBREVIATION: '+fileClass.abbrev))
             doElement.append(ET.Comment('DESCRIPTION: '+fileClass.description))
             storeElement=ET.SubElement(doElement,'storage')
-            lfElement=ET.SubElement(storeElement,'localFileStorage',{'dataFormat':fileClass.format.value})
+            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.value,'dataLocation':''})
+            ET.SubElement(lfElement,'dataSize').text='0'
+            ET.SubElement(lfElement,'protocol')
+            ET.SubElement(lfElement,'host')
+            ET.SubElement(lfElement,'path').text=fileClass.link
             ET.SubElement(lfElement,'fileName').text=fileClass.name
-            ipElement=ET.SubElement(storeElement,'ipStorage')
-            ET.SubElement(ipElement,'fileName').text=fileClass.link
+
+            distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.value,'distributionAccess':'OnlineFileHTTP'})
+            ET.SubElement(distElement,'distributionFee')
+            ET.SubElement(distElement,'responsibleParty')
+
             self.addReference(fileClass.reference,doElement)
             for variable in DataObject.objects.filter(container=fileClass) :
                 contentElement=ET.SubElement(doElement,'content')
@@ -1163,7 +1204,18 @@ class Translator:
                     contentElement.append(ET.Comment('non-cfname: '+variable.variable))
                 elif variable.variable!='' :
                     ET.SubElement(contentElement,'topic').text=variable.variable
+                unitElement=ET.SubElement(contentElement,'unit',{'value':'other'})
+                vocabElement=ET.SubElement(unitElement,'vocabularyServer')
+                ET.SubElement(vocabElement,'vocabularyName')
+                ET.SubElement(contentElement,'aggregation')
+                ET.SubElement(contentElement,'frequency')
 
                 if variable.reference :
                     contentElement.append(ET.Comment('ARGHHH: there is a reference'))
                 # not used in questionnaire : featureType, drsAddress
+            ''' documentID '''
+            try :
+                ET.SubElement(doElement,'documentID').text=fileClass.uri
+            except :
+                ET.SubElement(doElement,'documentID').text='00000000-0000-0000-0000-000000000000'
+            ET.SubElement(doElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
