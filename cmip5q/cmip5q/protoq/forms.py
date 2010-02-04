@@ -2,6 +2,7 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
+from protoq.dropdown import DropDownWidget, DropDownSingleWidget
 
 from protoq.models import *
 
@@ -11,9 +12,10 @@ from protoq.autocomplete import AutocompleteWidget, ValueAutocompleteField
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
-    q1,q2=ModelMod.objects.all(),Coupling.objects.all()
-    mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=forms.SelectMultiple(attrs={'size':'3'}))
-    coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=forms.SelectMultiple(attrs={'size':'3'}))
+    q1,q2,q3=ModelMod.objects.all(),Coupling.objects.all(),Value.objects.all()
+    mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'3'}))
+    coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=DropDownWidget(attrs={'size':'3'}))
+    ctype=forms.ModelChoiceField(required=False,queryset=q3,widget=DropDownSingleWidget)
     class Meta:
         model=Conformance
         exclude=('simulation') # we know it

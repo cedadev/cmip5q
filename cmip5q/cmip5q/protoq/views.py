@@ -25,6 +25,11 @@ import simplejson
 
 MESSAGE=''
 
+def authorisation(request):
+    m='''Access denied, you don't have appropriate permission to access this resource. Contact
+    badc@rl.ac.uk if you think this is an error. (Please include your openid id in your email.)'''
+    return render_to_response('error.html',{'message':m})
+
 def completionHelper(request,vocabName):
     ''' This method provides support for ajax autocompletion within a specific vocabulary '''
     results = []

@@ -18,6 +18,8 @@ urlpatterns = patterns('',
     (r'^cmip5/centres/$','cmip5q.protoq.views.centres'),
     (r'^cmip5/(?P<centre_id>\d+)/$','cmip5q.protoq.views.centre'),
     # 
+    url(r'^cmip5/authz/$','cmip5q.protoq.views.authorisation',name='security'),
+    #        
     # ajax vocabulary handler
     url(r'^ajax/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper',name='ajax_value'),
     #
