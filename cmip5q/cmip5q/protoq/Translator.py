@@ -12,9 +12,7 @@ class Translator:
 
     ''' Translates a questionnaire Doc class (Simulation, Component or Platform) into a CIM document (as an lxml etree instance) '''
 
-    # we can switch between the old xml simulation output provided in beta2 (CIMXML=False) and the new (more) CIM compliant simulation (CIMXML=True) with the following variable
-    CIMXML=True
-    # only valid CIM will be output if the following is set to true. This means that all information will not be output
+    # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
     CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.4"
@@ -40,6 +38,7 @@ class Translator:
         self.simClass=None
 
     def c2text(self,c):
+        ''' provide a textual (html) view of the status of a component '''
         comp=ET.Element('div')
         
         ET.SubElement(comp,'h1').text='Component details'
@@ -141,14 +140,14 @@ class Translator:
         return comp
 
     def cimRecord(self,rootElement,rootClass) :
-        ''' return the top level cim document invarient structure '''
+        ''' return the top level cim document invarient structure from within a CIMRecordSet'''
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
         try :
             ET.SubElement(cr2,'id').text=rootClass.uri
             ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
         except :
-            cr2.append(ET.Comment('ID TBD for '+rootClass._meta.module_name))
+            cr2.append(ET.Comment('TBD: ID for '+rootClass._meta.module_name))
             ET.SubElement(cr2,'id').text='00000000-0000-0000-0000-000000000000'
             ET.SubElement(cr2,'version').text='0'
         return cr2
@@ -163,12 +162,13 @@ class Translator:
         return root
 
     def cimRecordSetRoot(self):
-        ''' return the top level cim document invarient structure '''
+        ''' return the top level cim document invarient structure for a recordset'''
         root=ET.Element('CIMRecordSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
         # generate a uuid on the fly for a recordset.
         ET.SubElement(root,'id').text=str(uuid.uuid1())
+        # as it is a new uuid it is always version 1
         ET.SubElement(root,'version').text='1'
         return root
 
@@ -181,7 +181,7 @@ class Translator:
         # make a special case for simulation as we output
         # all information associated with a simulation
         # using a CIMRecordSet
-        if method_name=='add_simulation' and self.CIMXML :
+        if method_name=='add_simulation' :
             root=self.cimRecordSetRoot()
             modelElement=self.cimRecord(root,ref.numericalModel)
             self.add_component(ref.numericalModel,modelElement)
@@ -230,7 +230,6 @@ class Translator:
 
     def add_simulation(self,simClass,rootElement):
 
-        if (self.CIMXML):
             #single simulation
             simElement=ET.SubElement(rootElement,'simulationRun',{'CIMVersion':'1.4'})
             ''' responsibleParty [0..inf] '''
@@ -301,12 +300,26 @@ class Translator:
 
             ''' simulationComposite [0..1] '''
             ''' ensemble [0..1] '''
-            if (simClass.ensembleMembers>1 and not(self.VALIDCIMONLY)) :
-                ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
-                ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
-                assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
-                for ensembleClass in ensembleClassSet :
-                    self.addEnsemble(ensembleClass,ensemblesElement)
+            if (simClass.ensembleMembers>1) :
+                if self.VALIDCIMONLY :
+                    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+                    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
+                    for ensembleClass in ensembleClassSet :
+                        simElement.append(ET.Comment('TBD: ensemble information'))
+                        if ensembleClass.etype :
+                            simElement.append(ET.Comment('TBD: value: '+ensembleClass.etype.value))
+                        simElement.append(ET.Comment('TBD: description: '+ensembleClass.description))
+                        ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
+                        for ensMemberClass in ensMemberClassSet :
+                            simElement.append(ET.Comment('TBD: number: '+str(ensMemberClass.memberNumber)))
+                            if ensMemberClass.mod :
+                                simElement.append(ET.Comment('TBD: modification: '+ensMemberClass.mod.mnemonic))
+                else :
+                    ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
+                    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+                    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
+                    for ensembleClass in ensembleClassSet :
+                        self.addEnsemble(ensembleClass,ensemblesElement)
             ''' deployment [0..1] '''
             deployElement=ET.SubElement(simElement,'deployment')
             deployReference=ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
@@ -345,57 +358,18 @@ class Translator:
             ET.SubElement(simElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
             ''' documentGenealogy [0..inf] '''
             ''' quality [0..inf] '''
-            if not(self.VALIDCIMONLY):
+            if self.VALIDCIMONLY :
+                simElement.append(ET.Comment('TBD: AuthorList: '+simClass.authorList))
+            else :
                 ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
 
-        else :
-            #set simClass so that we know to pick up any simulation couplings
-            self.simClass=simClass
-            simElement=ET.SubElement(rootElement,'Q_Simulation')
-            #Simulation isa Doc
-            self.addDoc(simClass,simElement)
-            modelElement=ET.SubElement(simElement,'Q_NumericalModel')
-            self.add_component(simClass.numericalModel,modelElement)
-            ET.SubElement(simElement,'Q_EnsembleCount').text=str(simClass.ensembleMembers)
-            # add ensemble information from Ensemble class
-            # There should be a one to one mapping but we can not be sure here
-            ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
-            ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
-            assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
-            for ensembleClass in ensembleClassSet :
-                self.addEnsemble(ensembleClass,ensemblesElement)
-            self.add_experiment(simClass.experiment,simElement)
-            self.add_platform(simClass.platform,simElement)
-            self.addCentre(simClass.centre,simElement)
-            ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
-            modelModsElement=ET.SubElement(simElement,'Q_ModelMods')
-            for modelModClass in simClass.modelMod.all():
-                self.addModelMod(modelModClass,modelModsElement)
-            inputModsElement=ET.SubElement(simElement,'Q_InputMods')
-            for inputModClass in simClass.inputMod.all():
-                self.addInputMod(inputModClass,inputModsElement)
-            # add any associated files here for the moment
-            filesElement=ET.SubElement(simElement,'Q_Files')
-            # CouplingGroup does not appear to hold a component or simulations files.
-            # returning all datacontainers (files) associated with this centre
-            filesElement.append(ET.Comment("CouplingGroup does not appear to contain files associated with a component or simulation. Returning all datacontainers (files) associated with this centre as a fallback."))
-            dataContainerInstanceSet=DataContainer.objects.filter(centre=simClass.centre)
-            for dataContainerInstance in dataContainerInstanceSet:
-                self.addDataContainer(dataContainerInstance,filesElement)
-        return rootElement
+            return rootElement
 
 
     def addModificationRef(self,modClass,rootElement) :
         if modClass :
             modRefElement=ET.SubElement(rootElement,'Q_ModificationRef')
-            if (self.CIMXML) :
-                modRefElement.append(ET.Comment("WARNING: Modification information still needs to be added."))
-            else :
-                modRefElement.append(ET.Comment("I can not find a simple way to determine whether the modification is of type ModelMod or InputMod so I just store the modification name and type here as a reference. We can look up the details of the actual modification as they are stored with the simulation."))
-
-            ET.SubElement(modRefElement,'Q_Name').text=modClass.mnemonic
-            if modClass.mtype:
-                ET.SubElement(modRefElement,'Q_Type').text=modClass.mtype.value
+            modRefElement.append(ET.Comment("WARNING: Modification information still needs to be added."))
 
     def addModification(self,modClass,rootElement) :
         if modClass :
@@ -459,7 +433,6 @@ class Translator:
 
     def addRequirement(self,reqClass,rootElement):
         if reqClass :
-            if self.CIMXML :
                 if reqClass.ctype :
                     reqElement=ET.SubElement(rootElement,'numericalRequirement',{self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+'type':reqClass.ctype.value})
                 else :
@@ -478,16 +451,6 @@ class Translator:
                     confClassSet=Conformance.objects.filter(requirement=reqClass)
                     for confClass in confClassSet:
                         self.addConformance(confClass,confElement)
-            else :
-                reqElement=ET.SubElement(rootElement,'Q_NumericalRequirement')
-                ET.SubElement(reqElement,'Q_Description').text=reqClass.description
-                ET.SubElement(reqElement,'Q_Name').text=reqClass.name
-                valueElement=ET.SubElement(reqElement,'Q_CtypeValue')
-                self.addValue(reqClass.ctype,valueElement)
-                confElement=ET.SubElement(reqElement,'Q_Conformances')
-                confClassSet=Conformance.objects.filter(requirement=reqClass)
-                for confClass in confClassSet:
-                    self.addConformance(confClass,confElement)
         
     def addConformance(self,confClass,rootElement):
         if confClass :
@@ -504,7 +467,7 @@ class Translator:
             ET.SubElement(confElement,'Q_Description').text=confClass.description
 
     def add_experiment(self,expClass,rootElement):
-        if (self.CIMXML):
+
             expElement=ET.SubElement(rootElement,'numericalExperiment',{'CIMVersion': '1.4'})
             ''' responsibleParty [0..inf] '''
             ''' principleInvestigator [0..inf] '''
@@ -548,22 +511,6 @@ class Translator:
             ET.SubElement(expElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
             ''' documentGenealogy [0..inf] '''
             ''' quality [0..inf] '''
-
-        else :
-            expElement=ET.SubElement(rootElement,'Q_Experiment')
-            ET.SubElement(expElement,'Q_Rationale').text=expClass.rationale
-            ET.SubElement(expElement,'Q_Description').text=expClass.description
-            reqsElement=ET.SubElement(expElement,'Q_NumericalRequirements')
-            for reqClass in expClass.requirements.all():
-                self.addRequirement(reqClass,reqsElement)
-            ET.SubElement(expElement,'Q_DocID').text=expClass.docID
-            ET.SubElement(expElement,'Q_ShortName').text=expClass.shortName
-            ET.SubElement(expElement,'Q_LongName').text=expClass.longName
-            durationElement=ET.SubElement(expElement,'Q_Duration')
-            ET.SubElement(durationElement,'Q_StartDate').text=expClass.startDate
-            ET.SubElement(durationElement,'Q_EndDate').text=expClass.endDate
-            ET.SubElement(durationElement,'Q_length').text=str(expClass.length)
-            ET.SubElement(durationElement,'Q_calendar').text=str(expClass.calendar)
 
     def setComponentOptions(self,recurse,composition):
 
@@ -609,7 +556,6 @@ class Translator:
     def add_platform(self,platClass,rootElement):
 
         if platClass :
-            if (self.CIMXML) :
                 deployElement=ET.SubElement(rootElement,'deployment')
                 if not(self.VALIDCIMONLY):
                     #no funder specified for deployments in the questionnaire
@@ -663,23 +609,6 @@ class Translator:
                 ET.SubElement(deployElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
                 ''' documentGenealogy [0] '''
                 ''' quality [0..inf] '''
-            else :
-                platElement=ET.SubElement(rootElement,'Q_Platform')
-                #Platform isa Doc
-                self.addDoc(platClass,platElement)
-                # add centre info ???
-                ET.SubElement(platElement,'Q_Compiler').text=platClass.compiler
-                ET.SubElement(platElement,'Q_Vendor').text=platClass.vendor
-                ET.SubElement(platElement,'Q_CompilerVersion').text=platClass.compilerVersion
-                ET.SubElement(platElement,'Q_MaxProcessors').text=str(platClass.maxProcessors)
-                ET.SubElement(platElement,'Q_CoresPerProcessor').text=str(platClass.coresPerProcessor)
-                ET.SubElement(platElement,'Q_OperatingSystem').text=platClass.operatingSystem
-                hardwareElement=ET.SubElement(platElement,'Q_HardwareVal')
-                self.addValue(platClass.hardware,hardwareElement)
-                processorElement=ET.SubElement(platElement,'Q_ProcessorVal')
-                self.addValue(platClass.processor,processorElement)
-                interconnectElement=ET.SubElement(platElement,'Q_InterconnectVal')
-                self.addValue(platClass.interconnect,interconnectElement)
         return rootElement
 
     def constraintValid(self,con,constraintSet) :
@@ -756,7 +685,7 @@ class Translator:
         else:
           comp=ET.SubElement(root,'modelComponent')
         '''composition'''
-        self.composition(c,comp)
+        self.addComposition(c,comp)
         if recurse:
             '''childComponent'''
             for child in c.components.all():
@@ -827,11 +756,20 @@ class Translator:
         '''citation'''
         self.addReferences(c.references,comp)
         ''' RF associating genealogy with the component rather than the document '''
-        if (nest<=2 and not(self.VALIDCIMONLY)):
-            genealogy=ET.SubElement(comp,'Q_genealogy')
-            ET.SubElement(genealogy,'Q_yearReleased').text=str(c.yearReleased)
-            ET.SubElement(genealogy,'Q_previousVersion').text=c.otherVersion
-            ET.SubElement(genealogy,'Q_previousVersionImprovements').text=c.geneology
+        if nest<=2 :
+            if self.VALIDCIMONLY :
+                comp.append(ET.Comment('TBD: genealogy'))
+                if c.yearReleased :
+                    comp.append(ET.Comment('TBD: yearReleased: '+str(c.yearReleased)))
+                if c.otherVersion :
+                    comp.append(ET.Comment('TBD: previousVersion: '+c.otherVersion))
+                if c.geneology :
+                    comp.append(ET.Comment('TBD: previousVersionImprovements: '+c.geneology))
+            else :
+                genealogy=ET.SubElement(comp,'Q_genealogy')
+                ET.SubElement(genealogy,'Q_yearReleased').text=str(c.yearReleased)
+                ET.SubElement(genealogy,'Q_previousVersion').text=c.otherVersion
+                ET.SubElement(genealogy,'Q_previousVersionImprovements').text=c.geneology
 
 
         '''activity'''
@@ -873,7 +811,6 @@ class Translator:
 
     def addReference(self,refInstance,rootElement):
         if refInstance :
-            if self.CIMXML :
                 refElement=ET.SubElement(rootElement,'citation')
                 citeElement=ET.SubElement(refElement,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
                 titleElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'title')
@@ -886,13 +823,7 @@ class Translator:
                 ET.SubElement(ociteElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.link
                 ctElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'collectiveTitle')
                 ET.SubElement(ctElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.citation
-            else :
-                refElement=ET.SubElement(rootElement,'Q_reference')
-                ET.SubElement(refElement,'Q_name').text=refInstance.name
-                ET.SubElement(refElement,'Q_citation').text=refInstance.citation
-                ET.SubElement(refElement,'Q_link').text=refInstance.link
-                if refInstance.refValue :
-                    ET.SubElement(refElement,'Q_refType').text=refInstance.refType.value
+
 
     def addSimpleResp(self,respName,rootElement,respType) :
         ciresp=ET.SubElement(rootElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
@@ -904,16 +835,6 @@ class Translator:
 
     def addResp(self,respClass,rootElement,respType):
         if (respClass) :
-            if not(self.CIMXML) :
-
-                respElement=ET.SubElement(rootElement,"Q_responsibleParty",{'type':respType})
-                ET.SubElement(respElement,"Q_name").text=respClass.name
-                ET.SubElement(respElement,"Q_webpage").text=respClass.webpage
-                ET.SubElement(respElement,"Q_abbrev").text=respClass.abbrev
-                ET.SubElement(respElement,"Q_email").text=respClass.email
-                ET.SubElement(respElement,"Q_address").text=respClass.address
-                ET.SubElement(respElement,"Q_uri").text=respClass.uri
-            else :
                 if respClass.name == 'Unknown' : # skip the default respobject
                     rootElement.append(ET.Comment('responsibleParty '+respType+ ' is set to unknown. No CIM output will be generated.'))
                     return
@@ -969,11 +890,11 @@ class Translator:
                 role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')
                 ET.SubElement(role,self.GMD_NAMESPACE_BRACKETS+'CI_RoleCode',{'codeList':'', 'codeListValue':respType})
 
-    def composition(self,c,comp):
+    def addComposition(self,c,comp):
         couplings=[]
         # couplings are all at the esm (root component) level
         if c.isModel:couplings=c.couplings(simulation=self.simClass)
-        if len(couplings)>0 and self.CIMXML :
+        if len(couplings)>0 :
             if self.outputComposition :
                 composeElement=ET.SubElement(comp,'composition')
                 for coupling in couplings:
@@ -985,74 +906,9 @@ class Translator:
                     intclosures=InternalClosure.objects.filter(coupling=coupling)
                     for closure in intclosures :
                         self.addCoupling(coupling,closure,composeElement)
-                ET.SubElement(composeElement,'description').text='Input coupling details for component '+c.abbrev
+                ET.SubElement(composeElement,'description').text='Coupling details for component '+c.abbrev
             else :
                 comp.append(ET.Comment('Coupling information exists but its output has been switched off for this CIM Object'))
-
-        elif len(couplings)>0 :
-            composeElement=ET.SubElement(comp,'composition')
-            for coupling in couplings:
-                CompInpClass=coupling.targetInput
-                assert(CompInpClass,'A Coupling instance must have an associated ComponentInput instance')
-                assert(CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner')
-                assert(CompInpClass.realm,'A Coupling instance must have an associated ComponentInput instance with a valid realm')
-                assert(CompInpClass.ctype,'A Coupling instance must have an associated ComponentInput instance with a valid ctype')
-                couplingElement=ET.SubElement(composeElement,'coupling')
-                ET.SubElement(couplingElement,'Q_sourceComponent').text=CompInpClass.owner.abbrev
-                ET.SubElement(couplingElement,'Q_realmComponent').text=CompInpClass.realm.abbrev
-                ET.SubElement(couplingElement,'Q_inputType').text=CompInpClass.ctype.value
-                ET.SubElement(couplingElement,'Q_inputAbbrev').text=CompInpClass.abbrev
-                ET.SubElement(couplingElement,'Q_inputDescrip').text=CompInpClass.description
-                if CompInpClass.ctype.value=='BoundaryCondition':
-                    if (coupling.ctype):
-                        ET.SubElement(couplingElement,'Q_type').text=coupling.ctype.value
-                    else:
-                        ET.SubElement(couplingElement,'Q_type')
-                    if (coupling.FreqUnits):
-                        ET.SubElement(couplingElement,'Q_freqUnits').text=coupling.FreqUnits.value
-                    else:
-                        ET.SubElement(couplingElement,'Q_freqUnits')
-                    ET.SubElement(couplingElement,'Q_frequency').text=str(coupling.couplingFreq)
-                    ET.SubElement(couplingElement,'Q_manipulation').text=coupling.manipulation
-                iClosures=InternalClosure.objects.filter(coupling=coupling)
-                if len(iClosures)>0:
-                    closures=ET.SubElement(couplingElement,'Q_internalClosures')
-                    for iclos in iClosures:
-                        closure=ET.SubElement(closures,'Q_closure')
-                        if iclos.spatialRegridding:
-                            ET.SubElement(closure,'Q_spatialRegridding').text=iclos.spatialRegridding.value
-                        if iclos.spatialType:
-                            ET.SubElement(closure,'Q_spatialType').text=iclos.spatialType.value
-                        if iclos.temporalRegridding:
-                            ET.SubElement(closure,'Q_temporalRegridding').text=iclos.temporalRegridding.value
-                        ET.SubElement(closure,'Q_inputDescription').text=iclos.inputDescription
-                        if iclos.target:
-                            ET.SubElement(closure,'Q_target').text=iclos.target.abbrev
-                eClosures=ExternalClosure.objects.filter(coupling=coupling)
-                if len(eClosures)>0:
-                    closures=ET.SubElement(couplingElement,'Q_externalClosures')
-                    for ExtClosClass in eClosures:
-                        closure=ET.SubElement(closures,'Q_closure')
-                        ET.SubElement(closure,'Q_spatialRegridding').text=ExtClosClass.spatialRegridding.value
-                        ET.SubElement(closure,'Q_spatialType').text=ExtClosClass.spatialType.value
-                        ET.SubElement(closure,'Q_temporalRegridding').text=ExtClosClass.temporalRegridding.value
-                        ET.SubElement(closure,'Q_inputDescription').text=ExtClosClass.inputDescription
-                        #Data is output separately so reference it at this point
-                        self.addDataRef(ExtClosClass.target,closure)
-                        
-                #coupling=ET.SubElement(composition,'coupling')
-                #ET.SubElement(composition,'description').text='Composition information associated with component '+c.abbrev
-                '''connection'''
-                '''description'''
-                '''timeProfile'''
-                '''timeLag'''
-                '''spatialRegridding'''
-                '''timeTransformation'''
-                '''couplingSource'''
-                #source=ET.SubElement(coupling,'couplingSource',{'purpose':'xxx','fullySpecified':'????'})
-                #sourceRef=ET.SubElement(source,'reference',{'xlinkXXXhref':'AddLocationHere'})
-                '''couplingTarget'''
-                '''priming'''
 
     def addCoupling(self,coupling,closure,composeElement) :
         CompInpClass=coupling.targetInput
@@ -1066,7 +922,12 @@ class Translator:
             couplingType='forcing'
         elif couplingType=='InitialCondition' :
             couplingType='initialForcing'
-        couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+        couplingFramework=''
+        if coupling.inputTechnique and couplingType=='boundaryCondition' :
+            if coupling.inputTechnique.value!='' :
+                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false','type':coupling.inputTechnique.value})
+        else :
+            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
         '''connection'''
         '''description'''
         ET.SubElement(couplingElement,'description').text=coupling.manipulation
@@ -1079,17 +940,24 @@ class Translator:
             #ET.SubElement(tpElement,'start')
             #ET.SubElement(tpElement,'end')
             ET.SubElement(tpElement,'rate').text=str(coupling.couplingFreq)
-        if coupling.inputTechnique :
-            tpElement.append(ET.Comment('input technique :: '+coupling.inputTechnique.value))
         '''timeLag'''
         '''spatialRegridding'''
         if closure.spatialRegrid :
-            ET.SubElement(couplingElement,'spatialRegridding').text=closure.spatialRegrid.value
-            ''' conservativespatialregridding t/f '''
+            regridValue=closure.spatialRegrid.value
+            if regridValue=='Conservative' :
+                ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'true'})
+            elif regridValue=='Non-Conservative' :
+                ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'false'})
+            # else do nothing as the value is 'None'
         '''timeTransformation'''
         if closure.temporalTransform :
-            ''' timeaverage t/f, timeaccumulation t/f '''
-            ET.SubElement(couplingElement,'timeTransformation').text=closure.temporalTransform.value
+            if closure.temporalTransform.value=='TimeAverage' :
+                ET.SubElement(couplingElement,'timeTransformation',{'timeAverage':'true'})
+            elif closure.temporalTransform.value=='TimeAccumulation' :
+                ET.SubElement(couplingElement,'timeTransformation',{'timeAccumulation':'true'})
+            else :
+                # currently no way to capture any other options
+                couplingElement.append(ET.Comment('TBD: timeTransformation: '+closure.temporalTransform.value))
         '''couplingSource'''
         sourceElement=ET.SubElement(couplingElement,'couplingSource')
         if closure.target :
@@ -1099,6 +967,13 @@ class Translator:
                 self.addCIMReference(closure.targetFile,sourceElement)
             except :
                 sourceElement.append(ET.Comment('error: couplingSource closure has no target and (for ExternalClosures) no targetFile'))
+
+        sourceElement.append(ET.Comment('TBD: input abbrev: '+CompInpClass.abbrev))
+        sourceElement.append(ET.Comment('TBD: input description: '+CompInpClass.description))
+        if CompInpClass.cfname :
+            sourceElement.append(ET.Comment('TBD: input cfname: '+CompInpClass.cfname.value))
+        sourceElement.append(ET.Comment('TBD: input units: '+CompInpClass.units))
+        
         '''couplingTarget'''
         targetElement=ET.SubElement(couplingElement,'couplingTarget')
         self.addCIMReference(CompInpClass.owner,targetElement)
@@ -1168,9 +1043,9 @@ class Translator:
         ET.SubElement(targetRef,'name').text=myName
         ''' type '''
         try :
-            targetRef.append(ET.Comment('type: '+rootClass._meta.module_name))
+            targetRef.append(ET.Comment('TBD: type: '+rootClass._meta.module_name))
         except :
-            targetRef.append(ET.Comment('type: ERROR'))
+            targetRef.append(ET.Comment('TBD: type: ERROR'))
         ''' version '''
         ET.SubElement(targetRef,'version').text=str(myDocumentVersion)
         ''' description '''
@@ -1181,8 +1056,8 @@ class Translator:
 
         if fileClass :
             doElement=ET.SubElement(rootElement,'dataObject',{'dataStatus':'complete'})
-            doElement.append(ET.Comment('ABBREVIATION: '+fileClass.abbrev))
-            doElement.append(ET.Comment('DESCRIPTION: '+fileClass.description))
+            doElement.append(ET.Comment('TBD: ABBREVIATION: '+fileClass.abbrev))
+            doElement.append(ET.Comment('TBD: DESCRIPTION: '+fileClass.description))
             storeElement=ET.SubElement(doElement,'storage')
             lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.value,'dataLocation':''})
             ET.SubElement(lfElement,'dataSize').text='0'
@@ -1198,7 +1073,7 @@ class Translator:
             self.addReference(fileClass.reference,doElement)
             for variable in DataObject.objects.filter(container=fileClass) :
                 contentElement=ET.SubElement(doElement,'content')
-                contentElement.append(ET.Comment('DESCRIPTION: '+variable.description))
+                contentElement.append(ET.Comment('TBD: DESCRIPTION: '+variable.description))
                 if variable.cfname :
                     ET.SubElement(contentElement,'topic').text=variable.cfname.value
                     contentElement.append(ET.Comment('non-cfname: '+variable.variable))
@@ -1211,7 +1086,7 @@ class Translator:
                 ET.SubElement(contentElement,'frequency')
 
                 if variable.reference :
-                    contentElement.append(ET.Comment('ARGHHH: there is a reference'))
+                    contentElement.append(ET.Comment('TBD: reference: there is a reference'))
                 # not used in questionnaire : featureType, drsAddress
             ''' documentID '''
             try :
