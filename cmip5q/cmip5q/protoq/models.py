@@ -161,7 +161,7 @@ class Doc(Fundamentals):
     
     uri=models.CharField(max_length=64,unique=True,editable=False)
     title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.CharField(max_length=25)
+    abbrev=models.CharField(max_length=30)
     description=models.TextField(blank=True)
    
     # next two are used to calculate the status bar, and are filled in by the validation software
@@ -701,7 +701,7 @@ class NewParam(models.Model):
     # lives in 
     constraint=models.ForeignKey(ConstraintGroup)
     # should have definition
-    definition=models.CharField(max_length=128,null=True,blank=True)
+    definition=models.CharField(max_length=512,null=True,blank=True)
     # Following used to point to vocabs and their values ...
     # If a vocab is linked, then the value must be from it!
     vocab=models.ForeignKey(Vocab,null=True,blank=True)

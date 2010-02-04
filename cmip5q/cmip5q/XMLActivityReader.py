@@ -171,6 +171,12 @@ class NumericalExperiment(object):
       
         # bypass reading all that nasty gmd party stuff ...
         author=metaAuthor(root.find('{%s}author'%cimv))
+        
+        # do some quick length checking
+        if len(self.abbrev)>25:
+            old=self.abbrev
+            self.abbrev=old[0:25]
+            logging.info('TOOLONG: Truncating abbreviation %s to %s'%(old,self.abbrev))
 
         E=Experiment(rationale=self.rationale,
                      description=self.description,

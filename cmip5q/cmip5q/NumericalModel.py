@@ -206,6 +206,7 @@ class ComponentParser:
                     defn=item.text
                 else:
                     logging.info('Found unexpected tag %s in %s'%(item.tag,paramName))
+            logging.debug('L %s %s '%(paramName,defn))
             p=NewParam(name=paramName,constraint=cg,ptype=choiceType,vocab=v,definition=defn)
             p.save()
         elif choiceType in ['keyboard']:
@@ -243,6 +244,10 @@ class ComponentParser:
                     nameWithSpaces+=' '
             nameWithSpaces+=char
             idx+=1
+        # check length
+        if len(nameWithSpaces)> 29: 
+            logging.debug('TOOLONG: name %s will be abbreviated'%nameWithSpaces)
+            nameWithSpaces=nameWithSpaces[0:29]
         component = Component(
                 title='',
                 scienceType=self.item.attrib['name'],
