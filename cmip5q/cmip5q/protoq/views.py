@@ -107,7 +107,8 @@ def centres(request):
         return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,))) 
     else: 
         logging.info('Viewing centres')
-        return render_to_response('centres.html',{'centreList':p})
+        curl=reverse('cmip5q.protoq.views.centres')
+        return render_to_response('centres.html',{'centreList':p,'curl':curl})
     
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''

@@ -4,7 +4,7 @@
 
 <p>Choose your centre from below:</p>
 
-<form action='/cmip5/centres/' method='post'>
+<form action="{{curl}}" method='post'>
 {% for choice in centreList %}
 <input type="radio" name="choice" id="{{forloop.counter}}"
 value="{{choice.id}}"/>

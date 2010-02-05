@@ -13,7 +13,7 @@ from django.db.models import permalink
 from django.core.files import File
 
 from atom import Feed
-from protoq.cimHandling import *
+from cmip5q.protoq.cimHandling import *
 
 import uuid
 import logging
@@ -196,7 +196,7 @@ class Doc(Fundamentals):
     
     def xmlobject(self):
         ''' Return an lxml object view of me '''
-        from protoq.Translator import Translator  # needs to be deferred down here to avoid circularity
+        from cmip5q.protoq.Translator import Translator  # needs to be deferred down here to avoid circularity
         translator=Translator()
         if self._meta.module_name=='simulation' :
             # composition defaults to false

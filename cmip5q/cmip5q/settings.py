@@ -5,6 +5,10 @@ thisDir = os.path.dirname(__file__)
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# If we need to deploy the ap using a script path, we have to tell it here ... 
+# This is a cmip5 addition to the normal django settings, used by urls.py
+DEPLOYED_SCRIPT_PATH=''
+
 ADMINS = (
     ('Bryan Lawrence', 'bryan.lawrence@stfc.ac.uk'),
     # ('Your Name', 'your_email@domain.com'),

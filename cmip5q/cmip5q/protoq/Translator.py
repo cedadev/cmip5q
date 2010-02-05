@@ -1,5 +1,5 @@
 
-from protoq.models import *
+from cmip5q.protoq.models import *
 
 from lxml import etree as ET
 import uuid

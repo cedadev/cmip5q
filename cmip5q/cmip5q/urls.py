@@ -5,10 +5,12 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
-from protoq.models import DocFeed
+from cmip5q.protoq.models import DocFeed
 
 # this is not actually correct, since strictly we need hexadecimal following this pattern
 uuid='\w\w\w\w\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w\w\w\w\w\w\w\w\w'
+
+script_path=settings.DEPLOYED_SCRIPT_PATH
 
 urlpatterns = patterns('',
     # Example:
@@ -121,7 +123,7 @@ urlpatterns = patterns('',
     #(r'^cmip5/vocab/(?P<docID>\d+)/(?P<valID>\d+)/$','cmip5q.protoq.vocab.list'),
         
     # Atom Feeds
-    (r"^feeds/(.*)/$", "django.contrib.syndication.views.feed", {
+    (r'^feeds/(.*)/$', "django.contrib.syndication.views.feed", {
         "feed_dict": {
             "cmip5": DocFeed,
         }}),
@@ -138,3 +140,7 @@ if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
         (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
     )
+
+# finally if necessary, throw it down a level
+
+urlpatterns=patterns('',(r'^%s'%script_path,include(urlpatterns)))

@@ -1,7 +1,7 @@
 from lxml import etree as ET
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
-from protoq.cimHandling import viewer
+from cmip5q.protoq.cimHandling import viewer
 from django.core.urlresolvers import reverse
 
 def commonURLs(obj,dictionary):

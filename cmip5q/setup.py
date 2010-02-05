@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-"""Distribution Utilities setup program for NDG Security Test Package
+"""Distribution Utilities setup program for Metafor Questionnaire
 
 Metafor Project
 """
-__author__ = "P J Kershaw"
-__date__ = "08/07/07"
+__author__ = "B N Lawrence"
+__date__ = "09/11/17"
 __copyright__ = "(C) 2009 Science and Technology Facilities Council"
 __license__ = "BSD - see LICENSE file in top-level directory"
-__contact__ = "Philip.Kershaw@stfc.ac.uk"
+__contact__ = "Bryan.Lawrence@stfc.ac.uk"
 __revision__ = '$Id$'
 
 # Bootstrap setuptools if necessary.
@@ -43,7 +43,7 @@ Security and should be modified to suit
 
 setup(
     name =                   'cmip5q',
-    version =                '0.1.2',
+    version =                '0.9.2',
     description =            'CMIP5 Questionnaire',
     long_description =       _longDescription,
     author =                 'Bryan Lawrence',
@@ -52,7 +52,7 @@ setup(
     maintainer_email =       'Bryan.Lawrence@stfc.ac.uk',
     url =                    'http://metaforclimate.eu/trac',
     license =                'BSD - See LICENCE file for details',
-    install_requires =       ['django'],
+    install_requires =       ['django','lxml','simplejson'],
     packages =               find_packages(),
     package_data = {
         'cmip5q': [

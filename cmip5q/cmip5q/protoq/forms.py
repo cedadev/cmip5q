@@ -2,12 +2,12 @@ from django import forms
 from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
-from protoq.dropdown import DropDownWidget, DropDownSingleWidget
+from cmip5q.protoq.dropdown import DropDownWidget, DropDownSingleWidget
 
-from protoq.models import *
+from cmip5q.protoq.models import *
 
-from modelUtilities import uniqueness, refLinkField
-from protoq.autocomplete import AutocompleteWidget, ValueAutocompleteField
+from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
+from cmip5q.protoq.autocomplete import AutocompleteWidget, ValueAutocompleteField
 
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
