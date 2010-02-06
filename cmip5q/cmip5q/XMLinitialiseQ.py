@@ -10,16 +10,8 @@ import uuid
 from vocabs.InputTransformations import properties
 from cf import CFtable
 
-#this tuple should provide the PCMDI controlled vocabulary for centre names
-centres=(('NCAS','UK National Centre for Atmospheric Science'),
-         ('NCAR','US National Centre for Atmospheric Research'),
-         ('MOHC','UK Met Office Hadley Centre'),
-         ('GFDL','US Geophysical Fluid Dynamics Laboratory'),
-         ('IPSL','FR Institut Pierre Simon Laplace'),
-         ('MPIM','DE Max Planck Institute for Meteorology'), 
-         ('CMIP5','Dummy Centre used to hold model template'),
-         ('Example','Dummy Centre used to hold examples'),
-     )
+from vocabs.centres import loadCentres 
+
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
 
@@ -134,14 +126,7 @@ def initialise():
     '''This routine initialises the CMIP5 questionaire '''
     
     #start with initialising the centres:
-    for centre in centres:
-        u=str(uuid.uuid1())
-        c=Centre(abbrev=centre[0],name=centre[1],uri=u)
-        c.save()
-        #and give each of them an unknown user to play with
-        rp=ResponsibleParty(name='Unknown',abbrev='Unknown',address='Erehwon',email='u@foo.bar',
-                            uri=str(uuid.uuid1()),centre=c)
-        rp.save()
+    loadCentres()
             
     for k in VocabList: loadvocab(k)
     

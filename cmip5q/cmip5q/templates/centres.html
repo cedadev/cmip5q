@@ -6,9 +6,10 @@
 
 <form action="{{curl}}" method='post'>
 {% for choice in centreList %}
+<p>
 <input type="radio" name="choice" id="{{forloop.counter}}"
 value="{{choice.id}}"/>
-<label for="choice{{forloop.counter}}">{{choice.abbrev}}</label><br/>
+<label for="choice{{forloop.counter}}">{{choice.abbrev}} ({{choice.name}})</label></p>
 {% endfor %}
 <input type="submit" value="Choose"/>
 </form>
