@@ -1,4 +1,5 @@
-import logging
+from django.conf import settings
+logging=settings.LOG
 from cmip5q.protoq.models import *
 from django.core.urlresolvers import reverse
 from django.template import loader

@@ -5,7 +5,8 @@ from django.core.urlresolvers import reverse
 from django import forms
 from cmip5q.protoq.models import *
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
 
 def list(request):
     ''' Returns a list of internal vocabularies '''

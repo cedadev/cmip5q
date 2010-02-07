@@ -3,8 +3,10 @@ from cmip5q.protoq.models import *
 
 from lxml import etree as ET
 import uuid
-import logging
 import datetime
+
+from django.conf import settings
+logging=settings.LOG
 
 
 class Translator:

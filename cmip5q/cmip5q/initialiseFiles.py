@@ -1,6 +1,7 @@
 from protoq.models import *
 import csv
-import logging
+from django.conf import settings
+logging=settings.LOG
 
 def initialiseFiles():
     ''' This routine initialises the database with some obvious files for boundary conditoins etc '''

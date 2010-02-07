@@ -103,8 +103,8 @@ INSTALLED_APPS = (
 import logging
 logging.basicConfig(
     level = logging.DEBUG,
-    format = '%(asctime)s %(levelname)s %(message)s',
+    format = '%(name)s %(module)s %(levelname)s [%(asctime)s] %(message)s',
 )
-log=logging.getLogger('CMIP5')
+LOG=logging.getLogger('CMIP5')
 
 

@@ -10,10 +10,12 @@ from XMLinitialiseQ import VocabList
 #from xml.etree import ElementTree as ET
 from lxml import etree as ET
 import uuid
-import logging
 import unittest
 import os
 import datetime
+
+from django.conf import settings
+logging=settings.LOG
 
 Realms=VocabList['Realms']
 

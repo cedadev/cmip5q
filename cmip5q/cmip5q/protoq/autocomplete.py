@@ -7,7 +7,8 @@ from django.utils.encoding import force_unicode
 from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList, ValidationError
 
-import logging
+from django.conf import settings
+logging=settings.LOG
 
 # See http://docs.jquery.com/Plugins/Autocomplete/autocomplete#url_or_dataoptions for autocomplete options
 CLIENT_CODEJS = """

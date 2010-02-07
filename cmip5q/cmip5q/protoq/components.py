@@ -17,7 +17,8 @@ from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
 
 import os
 # move from ElementTree to lxml.etree

@@ -16,7 +16,8 @@ from atom import Feed
 from cmip5q.protoq.cimHandling import *
 
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
 from django.core.files.base import ContentFile
 
 def soft_delete(obj,simulate=False):

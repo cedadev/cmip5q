@@ -1,4 +1,5 @@
-import logging
+from django.conf import settings
+logging=settings.LOG
 from django.template import Context, loader
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect

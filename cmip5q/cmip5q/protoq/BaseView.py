@@ -7,7 +7,9 @@ from django.template.loader import render_to_string
 from cmip5q.protoq.utilities import tabs
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden,HttpResponseBadRequest
 from cmip5q.protoq.utilities import sublist
-import logging
+
+from django.conf import settings
+logging=settings.LOG
 
 class BaseViewHandler:
     ''' This is a base class to be used by the editors and listers

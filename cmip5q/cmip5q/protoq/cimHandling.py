@@ -1,6 +1,7 @@
 import os,tempfile
 from lxml import etree as ET
-import logging
+from django.conf import settings
+logging=settings.LOG
 import pkg_resources
 
 #http://peak.telecommunity.com/DevCenter/PkgResources#resourcemanager-api

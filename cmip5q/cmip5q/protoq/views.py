@@ -20,7 +20,9 @@ from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound
 from cmip5q.protoq.coupling import couplingHandler
 from django import forms
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
+
 import simplejson
 
 MESSAGE=''

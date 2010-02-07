@@ -6,7 +6,8 @@
 from protoq.models import *
 from xml.etree import ElementTree as ET
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
 from XMLinitialiseQ import realms
 
 class XMLVocabReader:

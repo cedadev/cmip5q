@@ -1,7 +1,8 @@
 from protoq.models import *
 from xml.etree import ElementTree as ET
 import uuid
-import logging
+from django.conf import settings
+logging=settings.LOG
 import unittest
 
 cimv='http://www.metaforclimate.eu/cim/1.1'
