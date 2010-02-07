@@ -31,21 +31,20 @@
     <body class="yui-skin-sam">
         <div id="page">
             <!--<b class="hb0"/><b class="hb1"/><b class="hb2"/><b class="hb3"/><b class="hb4"/>-->
-            <div id="header">
-                <table id="hdricon">
+            <div id="header" class="stfc">
+                <table>
                 <tr>
-                <td width="150px" align="left"><!--<img height="80" src="/css/icons/eu_fw7_logo.jpg"/>--></td>
-                <td width="800px" align="center">
-                    <table><tr><td align="center"><img height="60" src="/css/icons/metafor_logo.png"/></td></tr>
-                    <tr><td align="center"><span id="subtitle"> "finding and understanding simulations of past, present and future climate"</span></td></tr></table></td>
-                <td width="150px" align="right"><!--<img height="80" src="/css/icons/curator.gif"/>--></td>
+                <td width="100px" align="center"><img height="60" src="/css/icons/eu_fw7_logo.jpg"/></td>
+                <td width="900px" align="center">
+                <center><h1>DRAFT CMIP5 Metadata Questionnaire (beta 2)</h1></center>
+                </td>
+                <td width="100px" align="center"><img height="60" src="/css/icons/enes_logo.png"/></td>
                 </tr>
                 </table>
                 
             </div>
             <div id="banner">
-                <center> <p> DRAFT CMIP5 Questionnaire (beta 2)</p>
-                <p class="red"> Please use this version only for testing the latest revisions. Data entered into this version will be trashed. A live version is expected in February 2010. </p>  </center>
+                <center class="red"> Please use this version only for testing the latest revisions. Data entered into this version will be trashed. A live version is expected in February 2010. </center>
             </div>
             <div class="main">
                 <div class="tabnav">
@@ -61,20 +60,19 @@
                     {% endblock %}</p>
                 </div>	 
             </div>
-            <div id="footer">
-                <center>
-                    <!--<table>
-                        <tr><td> Service provided for the</td>
-                            <td align="left" ><img src="/css/icons/badc_logo_h50px.jpg"/></td>
-                            <td>and the </td>
-                            <td align="right" ><img src="/css/icons/nceo_final_h50px.jpg"/></td>
-                            <td> at the </td>
-                            <td align="center" ><img src="/css/icons/RAL-STFC_h50px.jpg"/></td>
-                            <td>&nbsp;&nbsp;</td>
-                        </tr>
-                    </table>-->
-                     <h2>Icon Heaven</h2> 
-                </center>
+            <div id="footer" class="stfc" >
+                <table width="100%"> 
+                    <tr>
+                        <td>Produced by</td><td><img height="60" src="/css/icons/metafor_logo.png"/></td><td> and</td><td><img height="60" src="/css/icons/curator.gif"/></td>
+                        <td><table>
+                        <tr><td>hosted at the</td></tr> 
+                        <tr><td> <a class="blue" href="http://badc.nerc.ac.uk">British Atmospheric Data Centre</a></td></tr></table></td>
+                        <td>for the </td>
+                        <td align="right"><img  src="/css/icons/CEDA_RightButton60.png" /></td>
+                        
+                    </tr> 
+                </table>
+                        
             <!--<b class="hb4"/><b class="hb3"/><b class="hb2"/><b class="hb1"/><b class="hb0"/>-->
             </div>
         </div>

@@ -19,8 +19,8 @@ ul {padding-left:20px;}
     
 /* metafor page layout follows, ie. header and footer */
 /* 5 px margin needed in header if we don't have the nifty corners, otherwise 0 (first one on the margin list */
-#header {text-align:center; padding: 0px 0px 5px 0px;
-margin: 5px 5px 5px 5px;  border-left: 1px solid  #3c78b5; border-right:1px solid  #3c78b5 ; border-bottom:1px solid  #3c78b5;clear:both; background-color:#fff;
+#header {text-align:center; padding: 5px 5px 5px 0px;
+margin: 5px 5px 5px 5px;  border-left: 1px solid  #3c78b5; border-right:1px solid  #3c78b5 ; border-bottom:1px solid  #3c78b5;clear:both; 
 }
 #subtitle {font-size:14px}
 
@@ -29,21 +29,24 @@ background-color:#FFFFFF;}
 #banner p {font-size:14px}
     
 #footer {text-align:center; padding: 0px 0px 0px 0px;
-margin: 5px 5px 0px 5px; clear:both; background-color:#fff;
+margin: 5px 5px 0px 5px; clear:both; 
 /*border-left: 1px solid #3c78b5; border-right: 1px solid #3c78b5; border-top: 1px solid #3c78b5; */
 font-weight:italic;
 }
-#footer td {font-weight:bold;padding: 5px;}
+.stfc {background-color:#003153}    
+.stfc td {color:white;}
+.stfc a.blue:link, a.blue:visited {color:white;border-bottom:0px}
+.stfc a.blue:hover {color:black;}
+.stfc h1 {color:white;}
 
-/* Application Specific */
-#header.hdricon {float:center;}
+#footer td {font-weight:bold;padding: 5px;}
 
 .main {
 background-color:#FFFFFF;
 border:1px solid #3C78B5;
 clear:both;
 margin:5px;
-padding:2px;
+padding:2px 2px 7px 2px;
 }
 
 .inner {
@@ -151,3 +154,4 @@ not for now ...
 .undone .yui-button .first-child {background-color:#F5CF85; }
 .done {background-color:#CCFF99;}
 .undone {background-color:#F5CF85;}
+        

@@ -114,7 +114,6 @@ class simulationHandler(object):
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
             
-       
         # work out what we want to say about couplings
         cset=[]
         if label !='Add': cset=s.numericalModel.couplings(s)
