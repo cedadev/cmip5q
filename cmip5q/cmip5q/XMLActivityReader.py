@@ -153,6 +153,7 @@ class NumericalExperiment(object):
         the numerical requirements in as well'''
         
         etree=ET.parse(filename)
+        txt=open(filename,'r').read()
         logging.debug('Parsing experiment filename %s'%filename)
 	
         root=etree.getroot()
@@ -192,6 +193,18 @@ class NumericalExperiment(object):
         for r in root.findall('{%s}numericalRequirement'%cimv):
             n=numericalRequirement(r)
             E.requirements.add(n)
+            
+        # we can save this most expeditiously, directly, here.
+        keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
+        attrs={}
+        for key in keys: attrs[key]=E.__getattribute__(key)
+        
+        cfile=CIMObject(**attrs)
+        cfile.cimtype=E._meta.module_name
+        cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype,E.uri,E.documentVersion),
+                               ContentFile(txt),save=False)
+        cfile.title='%s (%s)'%(E.abbrev,E.title)
+        cfile.save()   
         
 class TestFunctions(unittest.TestCase): 
     def testExperiment(self):
@@ -200,6 +213,8 @@ class TestFunctions(unittest.TestCase):
         for f in os.listdir(d):
             if f.endswith('.xml'):
                 x=NumericalExperiment(os.path.join(d, f)) 
+               
+
         
         
             

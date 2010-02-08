@@ -132,7 +132,7 @@ class CIMObject (Fundamentals):
     but it's included here, because the questionnaire can return it '''
     uri=models.CharField(max_length=64,editable=False)    
     cimtype=models.CharField(max_length=64,editable=False)
-    xmlfile=models.FileField(upload_to='bnl')
+    xmlfile=models.FileField(upload_to='PersistedXML')
     # These are update by the parent doc, which is why they're not "fundamentals"
     created=models.DateField(editable=False)
     updated=models.DateField(editable=False)
@@ -311,7 +311,7 @@ class SimRelationship(Relationship):
 
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
-    name=models.CharField(max_length=128,blank=True)
+    name=models.CharField(max_length=256,blank=True)
     webpage=models.CharField(max_length=128,blank=True)
     abbrev=models.CharField(max_length=25)
     email=models.EmailField(blank=True)
