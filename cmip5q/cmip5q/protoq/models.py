@@ -162,7 +162,7 @@ class Doc(Fundamentals):
     
     uri=models.CharField(max_length=64,unique=True,editable=False)
     title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.CharField(max_length=30)
+    abbrev=models.CharField(max_length=32)
     description=models.TextField(blank=True)
    
     # next two are used to calculate the status bar, and are filled in by the validation software
@@ -272,6 +272,10 @@ class Doc(Fundamentals):
             self.validErrors=-1   # now force a revalidation before any future document incrementing.
         if 'eventParty' in kwargs:
             self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
+        if not self.uri:
+            uri=str(uuid.uuid1())
+            logging.debug('Missing uri %s assigned for document type %s'%(uri,self._meta.module_name))
+            self.uri=uri
         return Fundamentals.save(self,*args,**kwargs)
     
     def delete(self,*args,**kwargs):
@@ -718,28 +722,25 @@ class NewParam(models.Model):
                       numeric=self.numeric)
         new.save()
     
-class DataContainer(models.Model):
+class DataContainer(Doc):
     ''' This holds multiple data objects. Some might think of this as a file '''
     # a name for drop down file lists (and yes it's short)
-    abbrev=models.CharField(max_length=32)
-    # and a real name for disambiguation, although the link is authorative.
-    name=models.CharField(max_length=128)
+    # use the doc abbrev for the drop down file lists
+    # use the doc title as a real name for disambiguation, although the link is authorative 
+    # use the doc description to tell us what's in the container.
+    # use the doc centre and owner stuff ...
     # a link to the object if possible:
     link=models.URLField(blank=True)
-    # what's in the container
-    description=models.TextField()
     # container format
     format=models.ForeignKey('Value',blank=True,null=True) 
-    # centre that owns this data container
-    centre=models.ForeignKey('Centre',blank=True,null=True)
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
     def __unicode__(self):
         if self.abbrev <> '':
             return self.abbrev
-        else: return self.name[0:31]  # truncation ...
+        else: return self.title[0:31]  # truncation ...
     class Meta:
-        ordering=('centre','name')
+        ordering=('centre','title')
     
 class DataObject(models.Model):
     ''' Holds a variable within a data container '''
@@ -959,13 +960,14 @@ class DocFeed(Feed):
            'simulation':CIMObject.objects.filter(cimtype='simulation'),
            'component':CIMObject.objects.filter(cimtype='component'),
            'experiment':CIMObject.objects.filter(cimtype='experiment'),
+           'files':CIMObject.objects.filter(cimtype='dataContainer'),
            'all':CIMObject.objects.all()}
     def get_object(self,params):
         ''' Used for parameterised feeds '''
         assert params[0] in self.feeds,'Unknown feed request'
         return params[0]
     def feed_id (self,model):
-        return 'http://meta4.ceda.ac.uk/questionnaire/feed/%s'%model
+        return 'http://ceda.ac.uk'+reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%model,))
     def feed_title(self,model):
         return 'CMIP5 model %s metadata'%model
     def feed_subtitle(self,model):
@@ -994,7 +996,6 @@ class DocFeed(Feed):
     def item_content(self,item):
         ''' Return out of line link to the content'''
         return {"type": "application/xml", "src": item.get_absolute_url()},""
-    
 
     
     

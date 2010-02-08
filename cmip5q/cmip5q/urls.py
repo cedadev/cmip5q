@@ -113,7 +113,10 @@ urlpatterns = patterns('',
     (r'^cmip5/(?P<cen_id>\d+)/assign/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.assign'),       
             
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # export files to CMIP5
+    (r'^cmip5/(?P<cen_id>\d+)/exportFiles/$','cmip5q.protoq.views.exportFiles'), 
+        
+            # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
         

@@ -21,14 +21,14 @@ def initialiseFiles():
             logging.info('Ignoring file %s'%name)
             break  # leave the loop
         # find the other things: name, description, link    
-        f=DataContainer(name=name,
+        f=DataContainer(title=name,
                     link=link,
                     description=description,
                     format=format)
         try:
             r=f.save()
-        except:
-            logging.info('Unable to save file %s (%s)'%(name,r))
+        except Exception,e:
+            logging.info('Unable to save file %s (%s)'%(name,e))
     
 if __name__=="__main__":
     

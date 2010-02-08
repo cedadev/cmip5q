@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<h1> CMIP5 Modelling Centres </h1>
+<center><h1> CMIP5 Model Metadata</h1></center>
 
+<table><tr>
+<td valign="top">
+<div><h2>  Model Centre Metadata Entry </h2>
 <p>Choose your centre from below:</p>
-
 <form action="{{curl}}" method='post'>
 {% for choice in centreList %}
 <p>
@@ -13,4 +15,17 @@ value="{{choice.id}}"/>
 {% endfor %}
 <input type="submit" value="Choose"/>
 </form>
+</div></td>
+<td valign="top" width="30%"> 
+<div>
+<h2> Metadata Feeds Available </h2>
+<p> These are atom feeds to the xml documents which have been published from the metadata entry: </p>
+{% for name,url in feeds %}
+<p><a href="{{url}}"><img src="/css/icons/atom.png">&nbsp;{{name}}</a></p>
+{% endfor %}
+</div>
+<div>
+<p> XML documents are not meant for humans. Links to catalogs and portals for CMIP5 data and metadata will appear here when they are available.</p>
+</div>
+</td></tr></table>
 {% endblock %}

@@ -61,41 +61,29 @@ class Validator:
     def xmlAsHtml(self) :
         return self.cimHtml
     
-    def __validateComponent(self,CIMdoc):
-        ''' Validation for a Component '''
-
+    
+    def __validationStep(self,CIMdoc,specificSchematronFile=None):
+        ''' Common validation steps '''
+        
         # perform any common validation
         report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"CommonChecks.sch")
         self.report=report
         self.nChecks=nChecks
         self.nInvalid=nInvalid
-        # perform any component specific validation
-        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"ComponentChecks.sch")
-        # add these results to the existing results
-        reportRoot=self.report.getroot()
-        reportRoot.append(report.getroot())
-        self.nChecks+=nChecks
-        self.nInvalid+=nInvalid
+    
+        if specificSchematronFile:
+            # perform any specific validations
+            report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,specificSchematronFile)
+            
+            # add these results to the existing results
+            reportRoot=self.report.getroot()
+            reportRoot.append(report.getroot())
+            self.nChecks+=nChecks
+            self.nInvalid+=nInvalid
+        
         # calculate any derived state
         self.__updateState()
-
-    def __validateSimulation(self,CIMdoc):
-        ''' Validation for a Simulation '''
-
-        # perform any simulation specific validation
-        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"SimulationChecks.sch")
-        self.report=report
-        self.nChecks=nChecks
-        self.nInvalid=nInvalid
-        # perform any common validation
-        report,nChecks,nInvalid=self.__SchematronValidate(CIMdoc,"CommonChecks.sch")
-        # add these results to the existing results
-        reportRoot=self.report.getroot()
-        reportRoot.append(report.getroot())
-        self.nChecks+=nChecks
-        self.nInvalid+=nInvalid
-        # calculate any derived state
-        self.__updateState()
+    
 
     def __updateState(self):
 
@@ -157,11 +145,12 @@ class Validator:
         if self.contentValidate:
             #validate against schematron checks
             if cimtype=='component':
-                self.__validateComponent(CIMdoc)
+                self.__validationStep(CIMdoc,"ComponentChecks.sch")
             elif cimtype=='simulation':
-                self.__validateSimulation(CIMdoc)
+                self.__validationStep(CIMdoc,"SimulationChecks.sch")
             else:
-                raise ValueError('Invalid validation type found')
+                logging.info('Invalid validation type %s found - calling it valid for now'%cimtype)
+                self.__validationStep(CIMdoc)
 
         # create an html representation of our document
         self.cimHtml=''#self.__CimAsHtml(CIMdoc)

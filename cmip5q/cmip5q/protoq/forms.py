@@ -112,12 +112,12 @@ class ComponentInputForm(forms.ModelForm):
        
 class DataContainerForm(forms.ModelForm):
     ''' This is the form used to edit "files" ... '''
-    name=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
     link=forms.URLField(widget=forms.TextInput(attrs={'size':'45'}),required=False)
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'4'}),required=False)
     class Meta:
         model=DataContainer
-        exclude=('centre','dataObject')
+        exclude=('centre','dataObject','funder','author','contact','metadataMaintainer')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='FileFormats')
@@ -133,7 +133,7 @@ class DataContainerForm(forms.ModelForm):
         return o
     def clean(self):
         ''' Needed to ensure name uniqueness within a centre, and handle the subform '''
-        return uniqueness(self,self.hostCentre,'name')
+        return uniqueness(self,self.hostCentre,'title')
 
 class DataObjectForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)

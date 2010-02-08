@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> {{instance.title}} </h1>
+<table width="100%"><tr><td>
+<h1> {{instance.title}} </h1></td>
+{% if exportFiles %}<td align="right">
+<form action="{{exportFiles}}" method="POST"><input value="Export" type="submit"> Files to CMIP5<form></td>{% endif %}
+</tr></table>
 </div>
 <div class="boxer">
     {% if objects|length_is:0 %}

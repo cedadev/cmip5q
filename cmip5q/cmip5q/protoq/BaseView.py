@@ -57,6 +57,11 @@ class BaseViewHandler:
         
         objects=self.objects()
         
+        # construct a CMIP5 export button
+        if self.resource['type']=='file':
+            exportFiles=reverse('cmip5q.protoq.views.exportFiles',args=(self.cid,))
+        else: exportFiles=None
+        
         if self.target:
 
             # in the case of a list, the target is used to go back ...
@@ -99,7 +104,8 @@ class BaseViewHandler:
                 'editURL':formURL,
                 'instance':self.resource,
                 'snippet_template':'%s_snippet.html'%self.resource['type'],
-                'target':self.target
+                'target':self.target,
+                'exportFiles':exportFiles
                 })
                 
     def edit(self,request,returnType):
@@ -123,6 +129,8 @@ class BaseViewHandler:
         if self.resource['id']<>'0':
             instance=self.resource['class'].objects.get(id=self.resource['id'])
             
+     
+        
         # Now construct a useful submission URL
         args=[self.cid,self.resource['type'],self.resource['id']]
         if self.target:args+=[self.target['type'],self.target['instance'].id]

@@ -33,16 +33,20 @@ margin: 5px 5px 0px 5px; clear:both;
 /*border-left: 1px solid #3c78b5; border-right: 1px solid #3c78b5; border-top: 1px solid #3c78b5; */
 font-weight:italic;
 }
+
+.tabcontent {background-color:#FFFFFF;}
+
 .stfc {background-color:#003153}    
 .stfc td {color:white;}
 .stfc a.blue:link, a.blue:visited {color:white;border-bottom:0px}
 .stfc a.blue:hover {color:black;}
 .stfc h1 {color:white;}
+.stfc p {color:white}
 
 #footer td {font-weight:bold;padding: 5px;}
 
 .main {
-background-color:#FFFFFF;
+background-color:#003153;
 border:1px solid #3C78B5;
 clear:both;
 margin:5px;
@@ -93,15 +97,17 @@ text-align: centre;                            /* left, right or center */
 margin: 0 0 0 0;                                   /* margin */
  /* font type */
 list-style: none;                            /* IMPORTANT */
-padding: 8px 0 3px 10px;                                  /* padding */
+padding: 8px 0px 5px 10px;  /* padding */
+
 }
 .tabnav li { 
+background-color:#FFFFFF;
 font-size: 14px; font-weight: bold; 
-display: inline;                              /* IMPORTANT */
+display: inline;                             /* IMPORTANT */
 border: solid;
-border-width: 1px 1px 0 1px;                  /* BOTTOM HAS TO BE ZERO */
-margin: 0 0.5em 0 0 ;                           /* Second one is spacing */
-padding: 2px 0 3px 0;                           /* nb can't pad down any different from the ul down padding */
+border-width: 1px 1px 0 1px;                 /* BOTTOM HAS TO BE ZERO */
+margin: 0 0.5em 0 0 ;                        /* Second one is spacing */
+padding: 2px 0px 5px 0;                        /* nb can't pad down any different from the ul down padding */
 }
 
 .tabnav a {
@@ -118,13 +124,15 @@ background-color:#FFFACD; /* lemonchiffon, see http://www.somacon.com/p142.php *
 padding: 5px;
 }        /* tabs sit on this div */
 
-.tabnav li a {padding: 0 5px;}                /* padd out the addresses in the tabs */
+
+.tabnav li a {padding: 0 5px 0 5px;}                /* padd out the addresses in the tabs */
 .tabnav .subdue a {color:yellow;}
 .tabnav .subdue li a:hover {background:white;}
 .tabnav .subdue li {border-color: gray; border:dotted;}
 .tabnav .selected {
-padding-bottom: 4px;   /* needs to be one more than the ul down padding */
+padding-bottom: 6px;   /* needs to be one more than the ul down padding */
 background: #FFFACD;  /* needs to be the same as tabcontent */
+border-bottom:0px;
 }
 
 /* following used to have inputs in tables look like underlined links rather than buttons */
@@ -155,3 +163,4 @@ not for now ...
 .done {background-color:#CCFF99;}
 .undone {background-color:#F5CF85;}
         
+a.atom {background-image:url(icons/atom.png);background-repeat:no-repeat;}

@@ -70,7 +70,7 @@ def genericDoc(request,cid,docType,pkid,method):
 
 def persistedDoc(request,docType,uri,version=0):
     ''' persisted document handling'''
-    if docType not in ('platform','experiment','simulation','component'):
+    if docType not in ('platform','experiment','simulation','component','datacontainer'):
             return HttpResponseBadRequest('Invalid document type requests - %s'%docType)
     set=CIMObject.objects.filter(uri=uri)
     if len(set)==0:
@@ -87,6 +87,11 @@ def persistedDoc(request,docType,uri,version=0):
     else:
         obj=set[len(set)-1]
     return HttpResponse(obj.xmlfile.read(),mimetype='application/xml')
+    
+def exportFiles(request,cen_id):
+    ''' Used to export all files to CMIP5 in one go '''
+    objects=DataContainer.objects.filter(centre__id=cen_id)
+    return render_badrequest('error.html',{'message':'Sorry not completely implemented'})
 
 def index(request):
     #find all the centre objects
@@ -110,7 +115,11 @@ def centres(request):
     else: 
         logging.info('Viewing centres')
         curl=reverse('cmip5q.protoq.views.centres')
-        return render_to_response('centres.html',{'centreList':p,'curl':curl})
+        feeds=DocFeed.feeds.keys()
+        feedlist=[]
+        for f in sorted(feeds):
+            feedlist.append((f,reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%f,))))
+        return render_to_response('centres.html',{'centreList':p,'curl':curl,'feeds':feedlist})
     
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''
@@ -459,7 +468,8 @@ class ViewHandler(BaseViewHandler):
         if self.resource['type'] in ['reference','file']:
             #objects=objects.filter(centre__in=[None,self.centre]) doesn't work
             objects=objects.filter(centre=None)|objects.filter(centre=self.centre)
-            objects=objects.order_by('name')
+            oby={'reference':'name','file':'title'}[self.resource['type']]
+            objects=objects.order_by(oby)
         elif self.resource['type']=='modelmod':
             objects=objects.filter(centre=self.centre)
             objects=objects.order_by('mnemonic')

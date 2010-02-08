@@ -988,10 +988,10 @@ class Translator:
         ET.SubElement(dataRefElement,"Q_VariableName").text=dataObjectClass.variable
         ET.SubElement(dataRefElement,"Q_FileName").text=dataObjectClass.container.name
 
-    def addDataContainer(self,dataContainerClass,rootElement):
+    def add_datacontainer(self,dataContainerClass,rootElement):
         if dataContainerClass :
             dataContainerElement=ET.SubElement(rootElement,"Q_dataContainer")
-            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.name
+            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.title
             ET.SubElement(dataContainerElement,"Q_URL").text=dataContainerClass.link
             ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
             formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
@@ -1000,8 +1000,10 @@ class Translator:
             # add any associated data
             dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
             dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
-            for dataObjectInstance in dataObjectInstanceSet:
-                self.addDataObject(dataObjectInstance,dataObjectsElement)
+            logging.info('FIXME: Currently skipping XML conversion for data objects')
+            #for dataObjectInstance in dataObjectInstanceSet:
+            #    self.addDataObject(dataObjectInstance,dataObjectsElement)
+        return rootElement
 
     def addDataObject(self,dataObjectClass,rootElement):
         assert(dataObjectClass,'dataObject should not be null')
