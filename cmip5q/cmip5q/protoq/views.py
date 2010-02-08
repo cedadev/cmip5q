@@ -268,7 +268,6 @@ class MyPlatformForm(PlatformForm):
         for key in self.vocabs:
             self.fields[key].queryset=Value.objects.filter(vocab=self.vocabs[key])
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
-        self.fields['funder'].queryset=qs
         self.fields['contact'].queryset=qs
         
 @gracefulNotFound
