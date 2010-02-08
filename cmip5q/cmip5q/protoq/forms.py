@@ -67,7 +67,7 @@ class ComponentForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
     
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=True)
    
     implemented=forms.BooleanField(required=False)
     yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
