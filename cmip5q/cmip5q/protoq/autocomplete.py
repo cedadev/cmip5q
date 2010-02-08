@@ -19,8 +19,8 @@ CLIENT_CODEJS = """
         $('#%s_text').autocomplete('%s', {
             dataType: 'json',
             minchars: 3,
-            max: 200,
-            cacheLength: 20,
+            max: 500,
+            cacheLength: 40,
             width: 500,
             selectFirst: false,
             parse: function(data) {
