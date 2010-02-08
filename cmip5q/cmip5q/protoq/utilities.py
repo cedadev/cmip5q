@@ -6,13 +6,15 @@ from django.template import loader
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
 
-def render_badrequest(*args, **kwargs):
+def render_badrequest(template,variables):
     """
     Returns a HttpResponseBadRequest whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
-    return HttpResponseBadRequest(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+    
+    httpresponse_kwargs = {'mimetype':'text/html'}
+    
+    return HttpResponseBadRequest(loader.render_to_string(template,variables), **httpresponse_kwargs)
 
 def gracefulNotFound(method):
     ''' Used to decororate view methods to handle not found gracefully '''

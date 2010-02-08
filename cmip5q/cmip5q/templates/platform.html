@@ -8,12 +8,19 @@
 {% endblock %}
 {% block leftcolumn %}
 <div class="boxer">
-    <p> empty </p>
+   <p class="red"> All buttons and links in the tabs and this column navigate away from this page. 
+   Save your work first!</p>
+  
 </div>
+{% if p.id %}
+<div class="boxer">
+    {% include 'docbuttons.html' %}
+</div>
+{% endif %}
 {% endblock %}
 {% block mainpanel %}
     <div class="boxer2">
-    <form action='{{url}}' method='post'>
+    <form action='{{urls.edit}}' method='post'>
         <div class="boxer">
         <table>
         <tr>

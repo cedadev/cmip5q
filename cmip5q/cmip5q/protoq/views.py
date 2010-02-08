@@ -12,7 +12,7 @@ from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.utilities import  tabs, sublist
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
-from cmip5q.protoq.cimHandler import cimHandler
+from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
 from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound
 
@@ -52,20 +52,24 @@ def completionHelper(request,vocabName):
 
 def genericDoc(request,cid,docType,pkid,method):
     ''' Handle the generic documents '''
+    logging.debug('entering generic document handler')
     try:
         klass={'simulation':Simulation,'experiment':Experiment,'component':Component,
-           'platform:':Platform}[docType]
-    except:
-        return render_badrequest('error.html',{'message:':'Document type %s not known'%docType})
+           'platform':Platform}[docType]
+    except Exception,e:
+        return render_badrequest('error.html',{'message':'Document type %s not known (%s)'%(docType,e)})
+    logging.debug('ok initially')
     try:
         obj=klass.objects.get(id=pkid)
     except:
         return render_badrequest('error.html',{'message':'Document id %s not known as %s'%(pkid,docType)})
+    logging.debug('ok thus far')
     c=cimHandler(obj)
     try:
         cmethod=getattr(c,method)
     except:
         return render_badrequest('error.html',{'message':'Method %s not known as a generic document handler'%method})
+    logging.debug('made it')
     return cmethod()
 
 def persistedDoc(request,docType,uri,version=0):
@@ -283,23 +287,26 @@ class MyPlatformForm(PlatformForm):
 def platformEdit(request,centre_id,platform_id=None):
     ''' Handle platform editing '''
     c=Centre.objects.get(id=centre_id)
+    urls={}
     # start by getting a form ...
     if platform_id is None:
-        editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,))
+        urls['edit']=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,))
         if request.method=='GET':
             pform=MyPlatformForm(c)
         elif request.method=='POST':
             pform=MyPlatformForm(c,request.POST)
         p=None
         puri=str(uuid.uuid1())
+       
     else:
-        editURL=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))
+        urls['edit']=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))
         p=Platform.objects.get(id=platform_id)
         puri=p.uri
         if request.method=='GET':
             pform=MyPlatformForm(c,instance=p)
         elif request.method=='POST':
             pform=MyPlatformForm(c,request.POST,instance=p)
+        urls=commonURLs(p,urls)
     # now we've got a form, handle it        
     if request.method=='POST':
         if pform.is_valid():
@@ -311,7 +318,7 @@ def platformEdit(request,centre_id,platform_id=None):
                 reverse('cmip5q.protoq.views.centre',args=(centre_id,)))
     
     return render_to_response('platform.html',
-                {'pform':pform,'url':editURL,'p':p,'c':c,'esgready':1,'cform':pform,
+                {'pform':pform,'urls':urls,'p':p,'c':c,
                 'tabs':tabs(request,centre_id,'Platform')})
                 # point cform at pform too so that the completion html can use a common variable.
         
