@@ -311,6 +311,7 @@ class SimRelationship(Relationship):
 
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
+    isOrganisation=models.BooleanField(default=False)
     name=models.CharField(max_length=256,blank=True)
     webpage=models.CharField(max_length=128,blank=True)
     abbrev=models.CharField(max_length=25)
