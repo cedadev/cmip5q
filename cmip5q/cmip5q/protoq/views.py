@@ -394,31 +394,38 @@ class ViewHandler(BaseViewHandler):
     # (so keys need to be lower case)
     SupportedResources={'modelmod':{'attname':'modelMod',
                             'title':'Model Modifications','tab':'ModelMods',
-                             'class':ModelMod,'form':ModelModForm},
+                             'class':ModelMod,'form':ModelModForm,
+                             'filter':None},
                         'inputmod':{'attname':'inputMod',
                             'title':'Input Modifications','tab':'InputMods',
-                             'class':InputMod,'form':InputModIndex}, 
+                             'class':InputMod,'form':InputModIndex,
+                             'filter':None}, 
                         'file':{'attname':'dataContainer',
                             'title':'Files and Variables','tab':'Files & Vars',
-                            'class':DataContainer,'form':DataHandlingForm},
+                            'class':DataContainer,'form':DataHandlingForm,
+                            'filter':Experiment},
                         'reference':{'attname':'references',
                             'title':'References','tab':'References',
-                            'class':Reference,'form':ReferenceForm},
+                            'class':Reference,'form':ReferenceForm,
+                            'filter':None},
                         'parties':{'attname':'responsibleParty',
                                    'title':'Parties','tab':'Parties',
-                                   'class':ResponsibleParty,'form':ResponsiblePartyForm},
+                                   'class':ResponsibleParty,'form':ResponsiblePartyForm,
+                                   'filter':None},
                         }
     # Note that we don't expect to be able to assign files, since we'll directly
     # attach objects within files as appropriate.
                         
     # Some resources are associated with specific targets, so we need a mapping
     # between how they appear in URLs and the associated django classes
-    # (so keys need to be lower case)                    
+    # (so keys need to be lower case)     
+    # FIXME: all of this could use ._meta.module_name ...               
                         
     SupportedTargets={'simulation':{'class':Simulation,'attname':'simulation'},
                       'centre':{'class':Centre,'attname':'centre'},
                       'component':{'class':Component,'attname':'component'},
                       'ensemble':{'class':Simulation,'attname':'simulation'},
+                      'experiment':{'class':Experiment,'attname':'experiment'},
                      }
                      
     # and for each of those we need to get back to the target view/edit, and for
@@ -429,6 +436,8 @@ class ViewHandler(BaseViewHandler):
                       'centre':'cmip5q.protoq.views.centre',
                       'component':'cmip5q.protoq.views.componentEdit',
                       'ensemble':'cmip5q.protoq.views.ensemble',
+                      # not sure about the following: for files ...
+                      'experiment':'cmip5q.protoq.views.list',
                       }
                         
     # Now the expected usage of this handler is for
@@ -455,8 +464,10 @@ class ViewHandler(BaseViewHandler):
                 # FIXME: Handle this more gracefully
                 raise ValueError('Unable to find resource %s with id %s'%(targetType,target_id))
             # and work out what the url will be to return to this target instance
-            target['url']=reverse(self.SupportedTargetReverseFunctions[targetType],
+            try:
+                target['url']=reverse(self.SupportedTargetReverseFunctions[targetType],
                                   args=[cen_id,target_id])
+            except: target['url']=''
         else: target=None 
         
         resource=self.SupportedResources[resourceType]
@@ -476,6 +487,12 @@ class ViewHandler(BaseViewHandler):
             #objects=objects.filter(centre__in=[None,self.centre]) doesn't work
             objects=objects.filter(centre=None)|objects.filter(centre=self.centre)
             oby={'reference':'name','file':'title'}[self.resource['type']]
+            if self.target:
+                #d={self.target['type']+'__id':str(self.target['instance'].id)}
+                #objects=objects.filter(**d)
+                if self.target['type']=='experiment':
+                    objects=objects.filter(experiments=self.target['instance'].id)
+                    
             objects=objects.order_by(oby)
         elif self.resource['type']=='modelmod':
             objects=objects.filter(centre=self.centre)
@@ -516,9 +533,13 @@ def delete(request,cen_id,resourceType,resource_id,targetType=None,target_id=Non
 
 def list(request,cen_id,resourceType,targetType=None,target_id=None):
     ''' This is the generic simple view lister '''
-
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.list(request)
+
+def filterlist(request,cen_id,resourceType):
+    ''' Receives a list filter post and redirects to list '''
+    h=ViewHandler(cen_id,resourceType,None,None,None)
+    return h.filterlist(request)
 
 def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType

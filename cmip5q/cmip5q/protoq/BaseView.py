@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template.loader import render_to_string
 from cmip5q.protoq.utilities import tabs
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden,HttpResponseBadRequest
-from cmip5q.protoq.utilities import sublist
+from cmip5q.protoq.utilities import sublist, render_badrequest
 
 from django.conf import settings
 logging=settings.LOG
@@ -29,12 +29,12 @@ class BaseViewHandler:
         self.selectHTML='baseviewAssign.html'
         
     def objects(self):
-        ''' We use the superclass method '''
-        return []
+        ''' We use the subclass method '''
+        return 'Not implemented'
     
     def constraints(self):
-        ''' We use the superclass method'''
-        return None
+        ''' We use the subclass method'''
+        return 'Not Implemented'
     
     def _constructForm(self,method,*args,**kwargs):
         ''' Handle form construction '''
@@ -56,6 +56,19 @@ class BaseViewHandler:
         associated with a specific instance of a specific class '''
         
         objects=self.objects()
+        #construct a set of options for filtering to a specific class (if appropriate)
+        ftype=self.resource['filter']
+        if ftype:
+            url=reverse('cmip5q.protoq.views.filterlist',args=(self.cid,self.resource['type'],))
+            ops=ftype.objects.all()
+            try: # if we can filter on centres, we do ...
+                ops.filter(centre__id=self.cid)
+            except AttributeError: pass
+            filterops={'m':'Filter by %s'%ftype._meta.module_name,
+                       'ops':ops,
+                       'url':url,
+                       'klass':ftype._meta.module_name}
+        else: filterops=None
         
         # construct a CMIP5 export button
         if self.resource['type']=='file':
@@ -105,8 +118,18 @@ class BaseViewHandler:
                 'instance':self.resource,
                 'snippet_template':'%s_snippet.html'%self.resource['type'],
                 'target':self.target,
-                'exportFiles':exportFiles
+                'exportFiles':exportFiles,
+                'filter':filterops
                 })
+                
+    def filterlist(self,request):
+        ''' construct a filter based on a posted form and redirect to a targetted list'''
+        if request.method=='POST':
+            logging.debug('Trying to filter on %s'%request.POST)
+            url=reverse('cmip5q.protoq.views.list',args=(self.cid,self.resource['type'],request.POST['klass'],request.POST['id'],))
+            return HttpResponseRedirect(url)
+        else:
+           return render_badrequest('error.html',{'message':'Error, No GET to filterlist'})
                 
     def edit(self,request,returnType):
         ''' We normally see this method called as a GET when it's hyperlinked

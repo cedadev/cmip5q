@@ -47,7 +47,7 @@ VocabList={'Realms':
                         'NUMAlink','SP Switch','Cray Interconnect','Fat Tree','Other'),
     
     #geneology 
-    'relations':('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf'),
+    'relations':('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf','fixedVersionOf'),
 
     #types of conformance, just allow one.
     'ConformanceTypes':('Standard Config','Via Inputs','Via Model Mods', 'Via Combination','Not Conformant'),
@@ -71,7 +71,7 @@ VocabList={'Realms':
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
     
     #simulation relationship types
-    'SimRelationships':('hasControl','extends','other'),
+    'SimRelationships':('hasControlSimulation','extends','other','fixedVersionOf'),
     
     }
     

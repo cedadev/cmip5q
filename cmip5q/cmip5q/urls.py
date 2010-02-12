@@ -109,6 +109,8 @@ urlpatterns = patterns('',
             'cmip5q.protoq.views.list'),
     (r'^cmip5/(?P<cen_id>\d+)/list/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)$',
             'cmip5q.protoq.views.list'),
+    (r'^cmip5/(?P<cen_id>\d+)/filterlist/(?P<resourceType>\D+)$',
+            'cmip5q.protoq.views.filterlist'),
     # ASSIGN            
     (r'^cmip5/(?P<cen_id>\d+)/assign/(?P<resourceType>\D+)/(?P<targetType>\D+)/(?P<target_id>\d+)/$',
             'cmip5q.protoq.views.assign'),       

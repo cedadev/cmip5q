@@ -121,9 +121,13 @@ class DataContainerForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='FileFormats')
+        self.fields['format'].widget=DropDownSingleWidget()
         self.fields['format'].queryset=Value.objects.filter(vocab=v)
+        self.fields['experiments'].widget=DropDownWidget()
+        self.fields['experiments'].queryset=Experiment.objects.all()
         self.hostCentre=None
     def specialise(self,centre):
+        self.fields['reference'].widget=DropDownSingleWidget()
         self.fields['reference'].queryset=Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
     def save(self):
         ''' Need to add the centre, and save the subform too '''
@@ -217,7 +221,7 @@ class EnsembleMemberForm(forms.ModelForm):
             else:
                 qs=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
             self.fields['mod'].queryset=qs  
- 
+
 class ModForm(forms.ModelForm):
     mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
@@ -411,5 +415,26 @@ class SimRelationshipForm(forms.ModelForm):
         s.sfrom=self.simulation
         s.save()
 
-        
+class ControlledAttributeForm(forms.Form):
+    class Meta:
+        exclude=('constraint','ptype','controlled')
+
+class FloatControlledAttributeForm(ControlledAttributeForm):
+    value=forms.FloatField(required=True)
+    
+class StrControlledAttributeForm(ControlledAttributeForm):
+    value=forms.CharField(required=True)
+    
+class XorControlledAttributeForm(ControlledAttributeForm):
+    q1=Value.objects.all()
+    value=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownSingleWidget(attrs={'size':'5'}))
+    
+class OrControlledAttributeForm(ControlledAttributeForm):
+    q1=Value.objects.all()
+    value=forms.ModelChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'5'}))
+  
+class UserAttributeForm(ControlledAttributeForm):
+    name=forms.CharField(required=True)
+    value=forms.CharField(required=True)
+    units=forms.CharField(required=False)
   

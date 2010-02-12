@@ -646,32 +646,36 @@ class Simulation(Doc):
         cg=self.updateCoupling()
         if closures:cg.propagateClosures()
 
-        
-class Vocab(models.Model):
-    ''' Holds the values of a choice list aka vocabulary '''
-    # this is the "name" of the vocab, called a uri because in the 
-    # future I imagine we'll not hold the vocabs internally
-    name=models.CharField(max_length=64)
-    uri=models.CharField(max_length=64)
+class Term(models.Model):
+    #name=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
     version=models.CharField(max_length=64,blank=True)
     definition=models.TextField(blank=True)
+   
+    class Meta:
+        abstract=True
+        #ordering=('name',)
+        ### FIXME after check, move unicode back here, fix names and ordering
+        # and change class names: value to be come TERM, TERM to become AbstractTerm
+        
+class Vocab(Term):
+    ''' Holds the values of a choice list aka vocabulary '''
+    uri=models.CharField(max_length=64)
+    url=models.CharField(max_length=128,blank=True,null=True)
+    name=models.CharField(max_length=64)
+    def recache(self,update=None):
+        '''Obtain a new version from a remote url or the argument and load into database cache'''
+        pass
     def __unicode__(self):
        return self.name
-    class Meta:
-        ordering=('name',)
     
-class Value(models.Model):
+class Value(Term):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
-    value=models.CharField(max_length=128)
     vocab=models.ForeignKey('Vocab')
-    definition=models.TextField(blank=True)
-    version=models.CharField(max_length=64,blank=True)
-    def __unicode__(self):  
-        return self.value
-    class Meta:
-        ordering=('value',)
-
+    value=models.CharField(max_length=64)
+    def __unicode__(self):
+       return self.value
+    
 class PhysicalProperty(Value):
     units=models.ForeignKey(Value,related_name='property_units')
 
@@ -736,6 +740,8 @@ class DataContainer(Doc):
     format=models.ForeignKey('Value',blank=True,null=True) 
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
+    #experiment relationships used to help close down the number of files shown ...
+    experiments=models.ManyToManyField(Experiment,blank=True,null=True)
     def __unicode__(self):
         if self.abbrev <> '':
             return self.abbrev
@@ -940,6 +946,8 @@ class InputClosureMod(models.Model):
     def __unicode__(self):
         return 'Mod to %s %s'%(copuling,targetClosure)
     
+
+    
 class InputMod(Modification):
     ''' Simulation initial condition '''
     # could need a date to override the date in the file for i.c. ensembles.
@@ -998,6 +1006,70 @@ class DocFeed(Feed):
         ''' Return out of line link to the content'''
         return {"type": "application/xml", "src": item.get_absolute_url()},""
 
+class ComponentAttribute(models.Model):
+    '''Base class for all attribute classes '''
+    # lives in 
+    constraint=models.ForeignKey(ConstraintGroup,related_name='%(class)s_constraint')
+    ptype=models.CharField(max_length=12,blank=True,null=True)
+    def copy(self,constraint,instance):
+        for attr in ['constraint','ptype']:instance.__setattr__(attr,self.__getattribute__(attr))
+        return instance
     
+class UserAttribute(ComponentAttribute):
+    name=models.CharField(max_length=128)
+    value=models.CharField(max_length=256)
+    def copy(self):
+        return ComponentAttribute(self,concstraint,UserAttribute(name=self.name,value=self.value))
+    def __unicode__(self):
+        return value 
+    
+class OrControlledAttribute(ComponentAttribute):
+    ''' Attribute with name corresponding to the controlled vocabulary '''
+    # this is the vocabulary from which we will select value(s):
+    name=models.ForeignKey(Vocab,null=True,blank=True)
+    value=models.ManyToManyField(Value,related_name='attrvalues')
+    def __unicode__(self):
+        s=''
+        for i in self.value.objects.all():
+            s+='%s,'%i
+        if s<>'':s=s[0:len(s)-1]
+        return s
+    def copy(self,constraint):
+        new=ComponentAttribute(self,constraint,OrControlledAttribute(name=self.namevocab))
+        for v in self.values.all():
+            new.values.add(v)
+        return new
+       
+class XorControlledAttribute(ComponentAttribute):
+    # this is the key into the name of this attribute 
+    name=models.ForeignKey(Vocab,null=True,blank=True)
+    value=models.ForeignKey(Value,blank=True,null=True,related_name='attrvalue')
+    def __unicode__(self):
+        return self.value
+    def copy(self,constraint):
+        new=ComponentAttribute(self,constraint,
+              XOrControledAttribute(name=self.name,value=self.value))
+    
+class StrControlledAttribute(ComponentAttribute):
+    # this is the key into the name of this attribute 
+    name=models.ForeignKey(Value,null=True,blank=True)
+    value=models.CharField(max_length=256,blank=True,null=True)
+    units=models.CharField(max_length=256,blank=True,null=True)
+    def __unicode__(self):
+        return self.value
+    def copy(self):
+        return ComponentAttribute(self,concstraint,
+                    StrControlledAttribute(name=self.name,value=self.value,units=self.units))
+    
+class FloatControlledAttribute(ComponentAttribute):
+    # this is the key into the name of this attribute 
+    name=models.ForeignKey(Value,null=True,blank=True)
+    value=models.FloatField(blank=True,null=True)
+    units=models.CharField(max_length=256,blank=True,null=True)
+    def __unicode__(self):
+        return self.value
+    def copy(self):
+        return ComponentAttribute(self,constraint,
+                    FloatControlledAttribute(name=self.name,value=self.value,units=self.units))
     
     

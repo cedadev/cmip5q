@@ -98,7 +98,7 @@ class AutocompleteWidget(forms.widgets.TextInput):
             value = ''
         html_id = attrs.get('id', name)
         self.html_id = html_id
-        logging.debug('render value [%s] attributes %s'%(value,attrs))
+        #logging.debug('render value [%s] attributes %s'%(value,attrs))
         if value:
             vv=self.vocab.get(id=value)
         else: vv=''
