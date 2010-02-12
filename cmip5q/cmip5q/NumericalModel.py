@@ -202,7 +202,7 @@ class ComponentParser:
             co,info=None,None
             for item in elem:
                 if item.tag=='value':
-                    value=Value(vocab=v,value=item.attrib['name'])
+                    value=Term(vocab=v,name=item.attrib['name'])
                     value.save()
                 elif item.tag=='definition':
                     defn=item.text

@@ -16,7 +16,7 @@ def initialiseFiles():
         # find out what file type
         #filetype='Other'
         try:
-            format=Value.objects.filter(vocab=v).get(value=filetype)
+            format=Term.objects.filter(vocab=v).get(name=filetype)
         except:
             logging.info('Ignoring file %s'%name)
             break  # leave the loop

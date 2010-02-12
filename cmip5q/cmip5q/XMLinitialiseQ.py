@@ -85,12 +85,12 @@ def loadCF():
      ulist=[]
      for e in cf.names:
          if e.units not in ulist:
-            u=Value(vocab=vu,value=e.units)
+            u=Term(vocab=vu,name=e.units)
             u.save()
             ulist.append(e.units)
          else:
-            u=Value.objects.filter(value=e.units).get(vocab=vu)
-         pp=PhysicalProperty(vocab=v,value=e.name,definition=e.description,units=u)
+            u=Term.objects.filter(name=e.units).get(vocab=vu)
+         pp=PhysicalProperty(vocab=v,name=e.name,definition=e.description,units=u)
          pp.save()
 
 def loadProperties(args):
@@ -101,13 +101,13 @@ def loadProperties(args):
         v=Vocab(uri=str(uuid.uuid1(1)),name=arg,definition=defn)
         v.save()
         for r,d in values:
-            rv=Value(vocab=v,value=r,definition=d)
+            rv=Term(vocab=v,name=r,definition=d)
             rv.save()
 
 def reloadVocab(key):
     ''' Used to reset vocabulariews '''
     vocab=Vocab.objects.get(name=key)
-    for v in Value.objects.filter(vocab=vocab):
+    for v in Term.objects.filter(vocab=vocab):
         v.delete()
     vocab.delete()
     loadvocab(key)
@@ -119,7 +119,7 @@ def loadvocab(key):
     v.save()
     values=VocabList[key]
     for r in values:
-        rv=Value(vocab=v,value=r)
+        rv=Term(vocab=v,name=r)
         rv.save()
 
 def initialise():

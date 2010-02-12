@@ -37,22 +37,22 @@ CLIENT_CODEJS = """
     );
 </script>
 """
-class ValueAutocompleteField(forms.fields.CharField):
+class TermAutocompleteField(forms.fields.CharField):
     """
     Autocomplete form field for Model Model
     """
     model = None
     url = None
     
-    def __init__(self, Vocab, vocabname, Value, size=0, *args, **kwargs):
+    def __init__(self, Vocab, vocabname, Term, size=0, *args, **kwargs):
        
         #self.url=reverse('cmip5q.protoq.views.completionHelper',args=(vocabname,))
         #self.url=reverse('ajax_value',args=(vocabname,))
         #FIXME: I can't work out how to make the above work without circular imports.
         self.url='/ajax/%s'%vocabname
-        self.vocab=Value.objects.filter(vocab=Vocab.objects.get(name=vocabname))
+        self.vocab=Term.objects.filter(vocab=Vocab.objects.get(name=vocabname))
         
-        super(ValueAutocompleteField, self).__init__(
+        super(TermAutocompleteField, self).__init__(
             widget = AutocompleteWidget(self.vocab,lookup_url=self.url,size=size),
             max_length=255,
             *args, **kwargs)

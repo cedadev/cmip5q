@@ -18,7 +18,7 @@ def list(request):
 def show (request,vocabID):
     ''' Returns members of a specific vocabulary '''
     vocab=Vocab.objects.get(id=vocabID)
-    values=Value.objects.filter(vocab=vocab)
+    values=Term.objects.filter(vocab=vocab)
     return render_to_response('vocabvalues.html',{'v':values,'vocab':vocab})
 
 

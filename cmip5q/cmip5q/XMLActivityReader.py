@@ -64,9 +64,9 @@ def numericalRequirement (elem):
         ctype=elem.attrib[typekey]
     else: ctype='NumericalRequirement'
     v=Vocab.objects.get(name='NumReqTypes')
-    ctypeVals=Value.objects.filter(vocab=v)
+    ctypeVals=Term.objects.filter(vocab=v)
     try:
-        ctype=ctypeVals.get(value=ctype)
+        ctype=ctypeVals.get(name=ctype)
     except:
         logging.info('Invalid numerical requirement type [%s] - from %s'%(ctype,args))
         return None
@@ -87,7 +87,7 @@ def numericalRequirement (elem):
             if vv:
                 v=Vocab.objects.get(name=myvocab[a])
                 try:
-                    val=Value.objects.filter(vocab=v).get(value=vv)
+                    val=Term.objects.filter(vocab=v).get(name=vv)
                     args[a]=val
                 except:
                     logging.info('Invalid unit %s not found in vocab %s'%(vv,v))
@@ -133,12 +133,12 @@ def duration(elem,calendar):
     return d
         
 def calendar(elem):
-    cvalues=Value.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
+    cvalues=Term.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
     cnames=[str(i) for i in cvalues]
     if elem:
         cc=elem[0].tag.split('}')[1]
         if cc in cnames:
-            return cvalues.get(value=cc)
+            return cvalues.get(name=cc)
         else:
             logging.info('Did not find calendar type '+cc) 
     else:

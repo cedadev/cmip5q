@@ -150,13 +150,13 @@ class NewPropertyForm:
                 cg.rows=[]
                 for o in cg.orp:
                     o.form={'op':'+='}
-                    o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+                    o.form['values']=[str(i) for i in Term.objects.filter(vocab=o.vocab)]
                     o.form['values'].insert(0,'------')
                     o.key=o.id
                     cg.rows.append(o)
                 for o in cg.xorp:
                     o.form={'op':'='}
-                    o.form['values']=[str(i) for i in Value.objects.filter(vocab=o.vocab)]
+                    o.form['values']=[str(i) for i in Term.objects.filter(vocab=o.vocab)]
                     o.form['values'].insert(0,'------')
                     o.key=o.id
                     cg.rows.append(o)

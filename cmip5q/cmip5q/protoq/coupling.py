@@ -92,18 +92,18 @@ class MyCouplingFormSet:
         self.simulation=simulation
          
         # build up a queryset, chunked into the various types of component inputs
-        ctypes=Value.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
-        bcvalue=ctypes.get(value='BoundaryCondition')  #used for layout on coupling form
-        afvalue=ctypes.get(value='AncillaryFile') #used for layout on closure form
-        icvalue=ctypes.get(value='InitialCondition') # used for layout on closure form
+        ctypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
+        bcvalue=ctypes.get(name='BoundaryCondition')  #used for layout on coupling form
+        afvalue=ctypes.get(name='AncillaryFile') #used for layout on closure form
+        icvalue=ctypes.get(name='InitialCondition') # used for layout on closure form
 
         # setup our vocabularies
-        inputTechnique=Value.objects.filter(vocab=Vocab.objects.get(name='InputTechnique'))
-        FreqUnits=Value.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
+        inputTechnique=Term.objects.filter(vocab=Vocab.objects.get(name='InputTechnique'))
+        FreqUnits=Term.objects.filter(vocab=Vocab.objects.get(name='FreqUnits'))
         
         # for closures
-        spatialRegrid=Value.objects.filter(vocab=Vocab.objects.get(name='SpatialRegrid'))
-        temporalTransform=Value.objects.filter(vocab=Vocab.objects.get(name='TimeTransformation'))
+        spatialRegrid=Term.objects.filter(vocab=Vocab.objects.get(name='SpatialRegrid'))
+        temporalTransform=Term.objects.filter(vocab=Vocab.objects.get(name='TimeTransformation'))
         
         self.couplingVocabs={ 'inputTechnique':inputTechnique,
                 'FreqUnits':FreqUnits}

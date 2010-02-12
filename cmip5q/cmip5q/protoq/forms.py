@@ -7,12 +7,12 @@ from cmip5q.protoq.dropdown import DropDownWidget, DropDownSingleWidget
 from cmip5q.protoq.models import *
 
 from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
-from cmip5q.protoq.autocomplete import AutocompleteWidget, ValueAutocompleteField
+from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
-    q1,q2,q3=ModelMod.objects.all(),Coupling.objects.all(),Value.objects.all()
+    q1,q2,q3=ModelMod.objects.all(),Coupling.objects.all(),Term.objects.all()
     mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'3'}))
     coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=DropDownWidget(attrs={'size':'3'}))
     ctype=forms.ModelChoiceField(required=False,queryset=q3,widget=DropDownSingleWidget)
@@ -31,7 +31,7 @@ class ConformanceForm(forms.ModelForm):
         else:
             self.fields['coupling'].queryset=[]
         v=Vocab.objects.get(name='ConformanceTypes')
-        self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+        self.fields['ctype'].queryset=Term.objects.filter(vocab=v)
         self.showMod=len(self.fields['mod'].queryset)
         self.showCoupling=len(self.fields['coupling'].queryset)
 
@@ -98,7 +98,7 @@ class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
     abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}),required=True)
     units=forms.CharField(widget=forms.TextInput(attrs={'size':'48'}),required=False)
-    cfname=ValueAutocompleteField(Vocab,'CFStandardNames',Value,required=False,size=60)
+    cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False,size=60)
  
     class Meta:
         model=ComponentInput
@@ -106,7 +106,7 @@ class ComponentInputForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):       
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='InputTypes')
-        self.fields['ctype'].queryset=Value.objects.filter(vocab=v)
+        self.fields['ctype'].queryset=Term.objects.filter(vocab=v)
         # this can't go in the attributes section, because of import issues, deferring it works ...
            
        
@@ -122,7 +122,7 @@ class DataContainerForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='FileFormats')
         self.fields['format'].widget=DropDownSingleWidget()
-        self.fields['format'].queryset=Value.objects.filter(vocab=v)
+        self.fields['format'].queryset=Term.objects.filter(vocab=v)
         self.fields['experiments'].widget=DropDownWidget()
         self.fields['experiments'].queryset=Experiment.objects.all()
         self.hostCentre=None
@@ -142,7 +142,7 @@ class DataContainerForm(forms.ModelForm):
 class DataObjectForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
     variable=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
-    cfname=ValueAutocompleteField(Vocab,'CFStandardNames',Value,required=False,size=60)
+    cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False,size=60)
     class Meta:
         model=DataObject
         exclude=('featureType','drsAddress','container')
@@ -202,7 +202,7 @@ class EnsembleForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):
         logging.debug('initialising ensemble form')
         forms.ModelForm.__init__(self,*args,**kwargs)
-        self.fields['etype'].queryset=Value.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
+        self.fields['etype'].queryset=Term.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
 
 class EnsembleMemberForm(forms.ModelForm):
     class Meta:
@@ -215,7 +215,7 @@ class EnsembleMemberForm(forms.ModelForm):
             etype=self.instance.ensemble.etype
             vet=Vocab.objects.get(name='EnsembleTypes')
             # probably don't need the filter, but just to make sure ...
-            pp=Value.objects.filter(vocab=vet).get(value='Perturbed Physics')
+            pp=Term.objects.filter(vocab=vet).get(name='Perturbed Physics')
             if etype==pp:
                 qs=ModelMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
             else:
@@ -258,7 +258,7 @@ class InputModForm(ModForm):
     def __init__(self,*args,**kwargs):
         ModForm.__init__(self,*args,**kwargs)
         self.ivocab=Vocab.objects.get(name='InputTypes')
-        self.ic=Value.objects.filter(vocab=self.ivocab).get(value='InitialCondition')
+        self.ic=Term.objects.filter(vocab=self.ivocab).get(name='InitialCondition')
     def specialise(self,group):
         self.fields['revisedInputs'].queryset=Coupling.objects.filter(parent=group).filter(targetInput__ctype=self.ic)
         self.group=group
@@ -301,7 +301,7 @@ class ModelModForm(ModForm):
     def specialise(self,model):
         self.fields['component'].queryset=Component.objects.filter(model=model)
         ivocab=Vocab.objects.get(name='ModelModTypes')
-        self.fields['mtype'].queryset=Value.objects.filter(vocab=ivocab)
+        self.fields['mtype'].queryset=Term.objects.filter(vocab=ivocab)
 
 
 class PlatformForm(forms.ModelForm):
@@ -322,7 +322,7 @@ class ReferenceForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='ReferenceTypes')
-        self.fields['refType'].queryset=Value.objects.filter(vocab=v)
+        self.fields['refType'].queryset=Term.objects.filter(vocab=v)
         self.hostCentre=None
     def save(self):
         r=forms.ModelForm.save(self,commit=False)
@@ -399,7 +399,7 @@ class SimRelationshipForm(forms.ModelForm):
         self.simulation=simulation
         self.vocab=Vocab.objects.get(name='SimRelationships')
         forms.ModelForm.__init__(self,*args,**kwargs)
-        self.fields['value'].queryset=Value.objects.filter(vocab=self.vocab)
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.vocab)
         self.fields['sto'].queryset=Simulation.objects.filter(centre=self.simulation.centre)
     def clean(self):
         tmp=self.cleaned_data.copy()
@@ -426,11 +426,11 @@ class StrControlledAttributeForm(ControlledAttributeForm):
     value=forms.CharField(required=True)
     
 class XorControlledAttributeForm(ControlledAttributeForm):
-    q1=Value.objects.all()
+    q1=Term.objects.all()
     value=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownSingleWidget(attrs={'size':'5'}))
     
 class OrControlledAttributeForm(ControlledAttributeForm):
-    q1=Value.objects.all()
+    q1=Term.objects.all()
     value=forms.ModelChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'5'}))
   
 class UserAttributeForm(ControlledAttributeForm):

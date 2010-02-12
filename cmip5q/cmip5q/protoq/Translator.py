@@ -126,7 +126,7 @@ class Translator:
                                 ''' I am constrained by vocab '''
                                 ''' find all values associated with this vocab '''
                                 # all values that are part of this vocab
-                                valset=Value.objects.filter(vocab=p.vocab)
+                                valset=Term.objects.filter(vocab=p.vocab)
                                 values=""
                                 counter=0
                                 for v in valset:
@@ -256,11 +256,11 @@ class Translator:
             confClassSet=Conformance.objects.filter(simulation=simClass)
             for confClass in confClassSet:
                 if (confClass.ctype) : # I have a conformance specified
-                    if confClass.ctype.value=='Not Conformant' :
+                    if confClass.ctype.name=='Not Conformant' :
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'false'})
                     else :
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'true'})
-                    confElement.append(ET.Comment("Conformance type "+confClass.ctype.value))
+                    confElement.append(ET.Comment("Conformance type "+confClass.ctype.name))
                     reqElement=ET.SubElement(confElement,'requirement')
                     deployReference=ET.SubElement(reqElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
                     assert(confClass.requirement)
@@ -289,7 +289,7 @@ class Translator:
                         assert(modClass.mtype)
                         ET.SubElement(sourceReference,'description').text=modClass.description
                         sourceReference.append(ET.Comment('source reference mnemonic :: '+modClass.mnemonic))
-                        sourceReference.append(ET.Comment('source reference type :: '+modClass.mtype.value))
+                        sourceReference.append(ET.Comment('source reference type :: '+modClass.mtype.name))
 
                     # for each modelmod modification
                     for couplingClass in confClass.coupling.all():
@@ -309,7 +309,7 @@ class Translator:
                     for ensembleClass in ensembleClassSet :
                         simElement.append(ET.Comment('TBD: ensemble information'))
                         if ensembleClass.etype :
-                            simElement.append(ET.Comment('TBD: value: '+ensembleClass.etype.value))
+                            simElement.append(ET.Comment('TBD: value: '+ensembleClass.etype.name))
                         simElement.append(ET.Comment('TBD: description: '+ensembleClass.description))
                         ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
                         for ensMemberClass in ensMemberClassSet :
@@ -410,7 +410,7 @@ class Translator:
                     ET.SubElement(couplingElement,'Q_RealmName').text=couplingClass.targetInput.realm.abbrev
                 ET.SubElement(couplingElement,'Q_AttrName').text=couplingClass.targetInput.abbrev
                 if couplingClass.targetInput.ctype:
-                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.value
+                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.name
 
     def addCentre(self,centreClass,rootElement):
         if centreClass :
@@ -428,7 +428,7 @@ class Translator:
 
     def addValue(self,valueClass,valueElement):
         if valueClass :
-            ET.SubElement(valueElement,'Q_Value').text=valueClass.value
+            ET.SubElement(valueElement,'Q_Value').text=valueClass.name
             self.addVocab(valueClass.vocab,valueElement)
             ET.SubElement(valueElement,'Q_Definition').text=valueClass.definition
             ET.SubElement(valueElement,'Q_Version').text=valueClass.version
@@ -436,7 +436,7 @@ class Translator:
     def addRequirement(self,reqClass,rootElement):
         if reqClass :
                 if reqClass.ctype :
-                    reqElement=ET.SubElement(rootElement,'numericalRequirement',{self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+'type':reqClass.ctype.value})
+                    reqElement=ET.SubElement(rootElement,'numericalRequirement',{self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+'type':reqClass.ctype.name})
                 else :
                     reqElement=ET.SubElement(rootElement,'numericalRequirement')
                 ''' numericalRequirement [0..inf] '''
@@ -494,7 +494,7 @@ class Translator:
             ''' calendar [1] '''
             calendarElement=ET.SubElement(expElement,'calendar')
             assert(expClass.requiredCalendar)
-            calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.value))
+            calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
             rangeElement=ET.SubElement(calTypeElement,'range')
             ET.SubElement(rangeElement,'closedDateRange')
             ''' requiredDuration [1] '''
@@ -574,28 +574,28 @@ class Translator:
                 # platClass.title is never set
                 ET.SubElement(machineElement,'machineName').text=platClass.abbrev
                 if platClass.hardware :
-                    ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.value
+                    ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.name
                 else:
                     ET.SubElement(machineElement,'machineSystem')
                 #ET.SubElement(machineElement,'machineLibrary')
                 ET.SubElement(machineElement,'machineDescription').text=platClass.description
                 #ET.SubElement(machineElement,'machineLocation')
                 if platClass.operatingSystem :
-                    machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.value})
+                    machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.name})
                     vsEl=ET.SubElement(machOSEl,'vocabularyServer')
                     ET.SubElement(vsEl,'vocabularyName')
                 if platClass.vendor :
-                    ET.SubElement(machineElement,'machineVendor').text=platClass.vendor.value
+                    ET.SubElement(machineElement,'machineVendor').text=platClass.vendor.name
                 if platClass.interconnect :
-                    ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.value
+                    ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.name
                 ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
                 ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
                 if platClass.processor :
-                    ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.value
+                    ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.name
                 ''' compiler [1..inf] '''
                 compilerElement=ET.SubElement(platformElement,'compiler')
                 if platClass.compiler :
-                    ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.value
+                    ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.name
                 ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
                 ET.SubElement(compilerElement,'compilerLanguage')
                 #ET.SubElement(compilerElement,'compilerOptions')
@@ -917,7 +917,7 @@ class Translator:
         assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
         assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
         assert CompInpClass.ctype,'A Coupling instance must have an associated ctype value'
-        couplingType=CompInpClass.ctype.value
+        couplingType=CompInpClass.ctype.name
         if couplingType=='BoundaryCondition' :
             couplingType='boundaryCondition'
         elif couplingType=='AncillaryFile' :
@@ -926,8 +926,8 @@ class Translator:
             couplingType='initialForcing'
         couplingFramework=''
         if coupling.inputTechnique and couplingType=='boundaryCondition' :
-            if coupling.inputTechnique.value!='' :
-                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false','type':coupling.inputTechnique.value})
+            if coupling.inputTechnique.name!='' :
+                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false','type':coupling.inputTechnique.name})
         else :
             couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
         '''connection'''
@@ -936,7 +936,7 @@ class Translator:
         '''timeProfile'''
         units=''
         if coupling.FreqUnits :
-            units=str(coupling.FreqUnits.value)
+            units=str(coupling.FreqUnits.name)
         if units!='' or coupling.couplingFreq!=None :
             tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units})
             #ET.SubElement(tpElement,'start')
@@ -945,7 +945,7 @@ class Translator:
         '''timeLag'''
         '''spatialRegridding'''
         if closure.spatialRegrid :
-            regridValue=closure.spatialRegrid.value
+            regridValue=closure.spatialRegrid.name
             if regridValue=='Conservative' :
                 ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'true'})
             elif regridValue=='Non-Conservative' :
@@ -953,13 +953,13 @@ class Translator:
             # else do nothing as the value is 'None'
         '''timeTransformation'''
         if closure.temporalTransform :
-            if closure.temporalTransform.value=='TimeAverage' :
+            if closure.temporalTransform.name=='TimeAverage' :
                 ET.SubElement(couplingElement,'timeTransformation',{'timeAverage':'true'})
-            elif closure.temporalTransform.value=='TimeAccumulation' :
+            elif closure.temporalTransform.name=='TimeAccumulation' :
                 ET.SubElement(couplingElement,'timeTransformation',{'timeAccumulation':'true'})
             else :
                 # currently no way to capture any other options
-                couplingElement.append(ET.Comment('TBD: timeTransformation: '+closure.temporalTransform.value))
+                couplingElement.append(ET.Comment('TBD: timeTransformation: '+closure.temporalTransform.name))
         '''couplingSource'''
         sourceElement=ET.SubElement(couplingElement,'couplingSource')
         if closure.target :
@@ -973,7 +973,7 @@ class Translator:
         sourceElement.append(ET.Comment('TBD: input abbrev: '+CompInpClass.abbrev))
         sourceElement.append(ET.Comment('TBD: input description: '+CompInpClass.description))
         if CompInpClass.cfname :
-            sourceElement.append(ET.Comment('TBD: input cfname: '+CompInpClass.cfname.value))
+            sourceElement.append(ET.Comment('TBD: input cfname: '+CompInpClass.cfname.name))
         sourceElement.append(ET.Comment('TBD: input units: '+CompInpClass.units))
         
         '''couplingTarget'''
@@ -1063,14 +1063,14 @@ class Translator:
             doElement.append(ET.Comment('TBD: ABBREVIATION: '+fileClass.abbrev))
             doElement.append(ET.Comment('TBD: DESCRIPTION: '+fileClass.description))
             storeElement=ET.SubElement(doElement,'storage')
-            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.value,'dataLocation':''})
+            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.name,'dataLocation':''})
             ET.SubElement(lfElement,'dataSize').text='0'
             ET.SubElement(lfElement,'protocol')
             ET.SubElement(lfElement,'host')
             ET.SubElement(lfElement,'path').text=fileClass.link
             ET.SubElement(lfElement,'fileName').text=fileClass.name
 
-            distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.value,'distributionAccess':'OnlineFileHTTP'})
+            distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
             ET.SubElement(distElement,'distributionFee')
             ET.SubElement(distElement,'responsibleParty')
 
@@ -1079,7 +1079,7 @@ class Translator:
                 contentElement=ET.SubElement(doElement,'content')
                 contentElement.append(ET.Comment('TBD: DESCRIPTION: '+variable.description))
                 if variable.cfname :
-                    ET.SubElement(contentElement,'topic').text=variable.cfname.value
+                    ET.SubElement(contentElement,'topic').text=variable.cfname.name
                     contentElement.append(ET.Comment('non-cfname: '+variable.variable))
                 elif variable.variable!='' :
                     ET.SubElement(contentElement,'topic').text=variable.variable

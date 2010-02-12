@@ -43,7 +43,7 @@ def completionHelper(request,vocabName):
                 try:
                     v=Vocab.objects.get(name=vocabName)
                 except: return HttpResponseBadRequest('Invalid vocab %s'%vocabName)
-                model_results = Value.objects.filter(vocab=v).filter(value__startswith=value)
+                model_results = Term.objects.filter(vocab=v).filter(name__startswith=value)
                 results = [ (x.__unicode__(), x.id) for x in model_results ]
    
         json = simplejson.dumps(results)
@@ -279,7 +279,7 @@ class MyPlatformForm(PlatformForm):
                      'processor':Vocab.objects.get(name='processorType'),
                      'interconnect':Vocab.objects.get(name='interconnectType')}
         for key in self.vocabs:
-            self.fields[key].queryset=Value.objects.filter(vocab=self.vocabs[key])
+            self.fields[key].queryset=Term.objects.filter(vocab=self.vocabs[key])
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
         self.fields['contact'].queryset=qs
         

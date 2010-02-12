@@ -17,7 +17,7 @@ def initialiseRefs():
         # find out what refrence type
         myreftype='Online Refereed'
         try:
-            refType=Value.objects.filter(vocab=v).get(value=myreftype)
+            refType=Term.objects.filter(vocab=v).get(name=myreftype)
         except:
             logging.info('Ignoring reference %s'%', '.join(row))
             break  # leave the loop

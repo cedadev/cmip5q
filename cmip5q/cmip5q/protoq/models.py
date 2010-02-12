@@ -292,7 +292,7 @@ class Relationship(models.Model):
     # if we have a controlled vocab for the relationships, it's this one.
     vocab=models.ForeignKey('Vocab',blank=True,null=True)
     # and it's this member of that vocabulary
-    value=models.ForeignKey('Value',blank=True,null=True)
+    value=models.ForeignKey('Term',blank=True,null=True)
     # but sometimes we can't do it with just a term, so let's have some text too.
     description=models.TextField(blank=True,null=True)
     def __unicode__(self):
@@ -340,7 +340,7 @@ class Reference(models.Model):
     citation=models.TextField(blank=True)
     link=models.URLField(blank=True,null=True)
     refTypes=models.ForeignKey('Vocab',null=True,blank=True,editable=False)
-    refType=models.ForeignKey('Value')
+    refType=models.ForeignKey('Term')
     centre=models.ForeignKey('Centre',blank=True,null=True)
     def __unicode__(self):
         return self.name
@@ -456,7 +456,7 @@ class ComponentInput(models.Model):
     abbrev=models.CharField(max_length=24)
     description=models.TextField(blank=True,null=True)
     #mainly we're going to be interested in boundary condition inputs:
-    ctype=models.ForeignKey('Value')
+    ctype=models.ForeignKey('Term')
     #the component which owns this input (might bubble up from below realm)
     owner=models.ForeignKey(Component,related_name="input_owner")
     #strictly we don't need this, we should be able to get it by parsing
@@ -464,7 +464,7 @@ class ComponentInput(models.Model):
     #it to improve performance:
     realm=models.ForeignKey(Component,related_name="input_realm")
     #constraint=models.ForeignKey('Constraint',null=True,blank=True)
-    cfname=models.ForeignKey('Value',blank=True,null=True,related_name='input_cfname')
+    cfname=models.ForeignKey('Term',blank=True,null=True,related_name='input_cfname')
     units=models.CharField(max_length=64,blank=True)
     
     def __unicode__(self):
@@ -486,12 +486,12 @@ class Platform(Doc):
     compilerVersion=models.CharField(max_length=32)
     maxProcessors=models.IntegerField(null=True,blank=True)
     coresPerProcessor=models.IntegerField(null=True,blank=True)
-    hardware=models.ForeignKey('Value',related_name='hardwareVal',null=True,blank=True)
-    vendor=models.ForeignKey('Value',related_name='vendorVal',null=True,blank=True)
-    compiler=models.ForeignKey('Value',related_name='compilerVal',null=True,blank=True)
-    operatingSystem=models.ForeignKey('Value',related_name='operatingSystemVal',null=True,blank=True)
-    processor=models.ForeignKey('Value',related_name='processorVal',null=True,blank=True)
-    interconnect=models.ForeignKey('Value',related_name='interconnectVal',null=True,blank=True)
+    hardware=models.ForeignKey('Term',related_name='hardwareVal',null=True,blank=True)
+    vendor=models.ForeignKey('Term',related_name='vendorVal',null=True,blank=True)
+    compiler=models.ForeignKey('Term',related_name='compilerVal',null=True,blank=True)
+    operatingSystem=models.ForeignKey('Term',related_name='operatingSystemVal',null=True,blank=True)
+    processor=models.ForeignKey('Term',related_name='processorVal',null=True,blank=True)
+    interconnect=models.ForeignKey('Term',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
 
     
@@ -499,11 +499,11 @@ class Platform(Doc):
 class ClosedDateRange(models.Model):
     ''' Actually this is a DateRange as well '''
     startDate=models.CharField(max_length=32,blank=True,null=True)
-    calendar=models.ForeignKey('Value',blank=True,null=True,related_name='date_calendar')
+    calendar=models.ForeignKey('Term',blank=True,null=True,related_name='date_calendar')
     description=models.TextField() # occasionally it's too hard to fix it.
     endDate=models.CharField(max_length=32,blank=True,null=True)
     length=models.FloatField(blank=True,null=True)  # years
-    lengthUnits=models.ForeignKey('Value',blank=True,null=True,related_name='date_lengthunits')
+    lengthUnits=models.ForeignKey('Term',blank=True,null=True,related_name='date_lengthunits')
     def __unicode__(self):
         d=''
         if self.description:
@@ -520,7 +520,7 @@ class Experiment(Doc):
     rationale=models.TextField(blank=True,null=True)
     requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
     requiredDuration=models.ForeignKey(ClosedDateRange,blank=True,null=True)
-    requiredCalendar=models.ForeignKey('Value',blank=True,null=True,related_name='experiment_calendar')
+    requiredCalendar=models.ForeignKey('Term',blank=True,null=True,related_name='experiment_calendar')
     #used to identify groups of experiments
     memberOf=models.ForeignKey('Experiment',blank=True,null=True)
     def __unicode__(self):
@@ -531,18 +531,18 @@ class NumericalRequirement(models.Model):
     docid=models.CharField(max_length=64)
     description=models.TextField(blank=True,null=True)
     name=models.CharField(max_length=128)
-    ctype=models.ForeignKey('Value',blank=True,null=True)
+    ctype=models.ForeignKey('Term',blank=True,null=True)
     consistsOf=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     def __unicode__(self):
         return self.name
     
 class SpatioTemporalConstraint(NumericalRequirement):
-    frequencyUnits=models.ForeignKey('Value',blank=True,null=True,
+    frequencyUnits=models.ForeignKey('Term',blank=True,null=True,
         related_name='stc_frequencyUnits')
     outputFrequency=models.IntegerField(null=True)
-    spatialResolution=models.ForeignKey('Value',blank=True,null=True,
+    spatialResolution=models.ForeignKey('Term',blank=True,null=True,
         related_name='stc_spatialRes')
-    averagingUnits=models.ForeignKey('Value',blank=True,null=True,
+    averagingUnits=models.ForeignKey('Term',blank=True,null=True,
         related_name='stc_averagingUnits')
     temporalAveraging=models.IntegerField(null=True)
     outputPeriod=models.ForeignKey(ClosedDateRange,blank=True,null=True)
@@ -646,38 +646,31 @@ class Simulation(Doc):
         cg=self.updateCoupling()
         if closures:cg.propagateClosures()
 
-class Term(models.Model):
-    #name=models.CharField(max_length=64)
+class BaseTerm(models.Model):
+    name=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
     version=models.CharField(max_length=64,blank=True)
     definition=models.TextField(blank=True)
-   
+    def __unicode__(self):
+       return self.name
     class Meta:
         abstract=True
-        #ordering=('name',)
-        ### FIXME after check, move unicode back here, fix names and ordering
-        # and change class names: value to be come TERM, TERM to become AbstractTerm
+        ordering=('name',)
         
-class Vocab(Term):
-    ''' Holds the values of a choice list aka vocabulary '''
+class Vocab(BaseTerm):
+    ''' Holds a vocabulary '''
     uri=models.CharField(max_length=64)
     url=models.CharField(max_length=128,blank=True,null=True)
-    name=models.CharField(max_length=64)
     def recache(self,update=None):
         '''Obtain a new version from a remote url or the argument and load into database cache'''
         pass
-    def __unicode__(self):
-       return self.name
     
-class Value(Term):
+class Term(BaseTerm):
     ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
     vocab=models.ForeignKey('Vocab')
-    value=models.CharField(max_length=64)
-    def __unicode__(self):
-       return self.value
-    
-class PhysicalProperty(Value):
-    units=models.ForeignKey(Value,related_name='property_units')
+   
+class PhysicalProperty(Term):
+    units=models.ForeignKey(Term,related_name='property_units')
 
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
@@ -737,7 +730,7 @@ class DataContainer(Doc):
     # a link to the object if possible:
     link=models.URLField(blank=True)
     # container format
-    format=models.ForeignKey('Value',blank=True,null=True) 
+    format=models.ForeignKey('Term',blank=True,null=True) 
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
     #experiment relationships used to help close down the number of files shown ...
@@ -756,11 +749,11 @@ class DataObject(models.Model):
     # if the data object is a variable within a dataset at the target uri, give the variable
     variable=models.CharField(max_length=128,blank=True)
     # and if possible the CF name
-    cfname=models.ForeignKey('Value',blank=True,null=True,related_name='data_cfname')
+    cfname=models.ForeignKey('Term',blank=True,null=True,related_name='data_cfname')
     # references (including web pages)
     reference=models.ForeignKey(Reference,blank=True,null=True)
     # not using this at the moment, but keep for later: csml/science type
-    featureType=models.ForeignKey('Value',blank=True,null=True)
+    featureType=models.ForeignKey('Term',blank=True,null=True)
     # not using this at the moment, but keep for later:
     drsAddress=models.CharField(max_length=256,blank=True)
     def __unicode__(self): return self.variable
@@ -812,8 +805,8 @@ class Coupling(models.Model):
     # coupling for:
     targetInput=models.ForeignKey(ComponentInput)
     # coupling details (common to all closures)
-    inputTechnique=models.ForeignKey('Value',related_name='%(class)s_InputTechnique',blank=True,null=True)
-    FreqUnits=models.ForeignKey('Value',related_name='%(class)s_FreqUnits',blank=True,null=True)
+    inputTechnique=models.ForeignKey('Term',related_name='%(class)s_InputTechnique',blank=True,null=True)
+    FreqUnits=models.ForeignKey('Term',related_name='%(class)s_FreqUnits',blank=True,null=True)
     couplingFreq=models.IntegerField(blank=True,null=True)
     manipulation=models.TextField(blank=True,null=True)
     # original if I'm a copy.
@@ -850,8 +843,8 @@ class CouplingClosure(models.Model):
     # we don't need a closed attribute, since the absence of a target means it's open.
     coupling=models.ForeignKey(Coupling,blank=True,null=True)
     #http://docs.djangoproject.com/en/dev/topics/db/models/#be-careful-with-related-name
-    spatialRegrid=models.ForeignKey('Value',related_name='%(class)s_SpatialRegrid')
-    temporalTransform=models.ForeignKey('Value',related_name='%(class)s_TemporalTransform')
+    spatialRegrid=models.ForeignKey('Term',related_name='%(class)s_SpatialRegrid')
+    temporalTransform=models.ForeignKey('Term',related_name='%(class)s_TemporalTransform')
     class Meta:
         abstract=True
    
@@ -886,7 +879,7 @@ class ExternalClosure(CouplingClosure):
         
 class Ensemble(models.Model):
     description=models.TextField(blank=True,null=True)
-    etype=models.ForeignKey(Value,blank=True,null=True)
+    etype=models.ForeignKey(Term,blank=True,null=True)
     simulation=models.ForeignKey(Simulation)
     def updateMembers(self):
         ''' Make sure we have enough members, this needs to be called if the
@@ -918,7 +911,7 @@ class Conformance(models.Model):
     # simulation owning the requirement 
     simulation=models.ForeignKey(Simulation)
     # conformance type from the controlled vocabulary
-    ctype=models.ForeignKey(Value,blank=True,null=True)
+    ctype=models.ForeignKey(Term,blank=True,null=True)
     #
     mod=models.ManyToManyField('Modification',blank=True,null=True)
     coupling=models.ManyToManyField(Coupling,blank=True,null=True)
@@ -929,7 +922,7 @@ class Conformance(models.Model):
     
 class Modification(models.Model):
     mnemonic=models.SlugField()
-    mtype=models.ForeignKey(Value)
+    mtype=models.ForeignKey(Term)
     description=models.TextField()
     centre=models.ForeignKey(Centre)
     def __unicode__(self):
@@ -1027,7 +1020,7 @@ class OrControlledAttribute(ComponentAttribute):
     ''' Attribute with name corresponding to the controlled vocabulary '''
     # this is the vocabulary from which we will select value(s):
     name=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.ManyToManyField(Value,related_name='attrvalues')
+    value=models.ManyToManyField(Term,related_name='attrvalues')
     def __unicode__(self):
         s=''
         for i in self.value.objects.all():
@@ -1043,7 +1036,7 @@ class OrControlledAttribute(ComponentAttribute):
 class XorControlledAttribute(ComponentAttribute):
     # this is the key into the name of this attribute 
     name=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.ForeignKey(Value,blank=True,null=True,related_name='attrvalue')
+    value=models.ForeignKey(Term,blank=True,null=True,related_name='attrvalue')
     def __unicode__(self):
         return self.value
     def copy(self,constraint):
@@ -1052,7 +1045,7 @@ class XorControlledAttribute(ComponentAttribute):
     
 class StrControlledAttribute(ComponentAttribute):
     # this is the key into the name of this attribute 
-    name=models.ForeignKey(Value,null=True,blank=True)
+    name=models.ForeignKey(Term,null=True,blank=True)
     value=models.CharField(max_length=256,blank=True,null=True)
     units=models.CharField(max_length=256,blank=True,null=True)
     def __unicode__(self):
@@ -1063,7 +1056,7 @@ class StrControlledAttribute(ComponentAttribute):
     
 class FloatControlledAttribute(ComponentAttribute):
     # this is the key into the name of this attribute 
-    name=models.ForeignKey(Value,null=True,blank=True)
+    name=models.ForeignKey(Term,null=True,blank=True)
     value=models.FloatField(blank=True,null=True)
     units=models.CharField(max_length=256,blank=True,null=True)
     def __unicode__(self):
