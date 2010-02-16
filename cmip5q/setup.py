@@ -43,7 +43,7 @@ Security and should be modified to suit
 
 setup(
     name =                   'cmip5q',
-    version =                '0.9.2',
+    version =                '0.9.4',
     description =            'CMIP5 Questionnaire',
     long_description =       _longDescription,
     author =                 'Bryan Lawrence',
