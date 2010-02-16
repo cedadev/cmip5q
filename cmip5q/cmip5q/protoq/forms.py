@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.dropdown import DropDownWidget, DropDownSingleWidget
 
 from cmip5q.protoq.models import *
+from cmip5q.protoq.utilities import atomuri
 
 from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
 from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
@@ -351,7 +352,7 @@ class ResponsiblePartyForm(forms.ModelForm):
     def clean_uri(self):
         ''' On creating a responsible party we need a uri, once we have one, it should stay the same '''
         data=self.cleaned_data['uri']
-        if data == u'': data=str(uuid.uuid1())
+        if data == u'': data=atomuri()
         return data
     def save(self):
         r=forms.ModelForm.save(self,commit=False)

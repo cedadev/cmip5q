@@ -8,7 +8,7 @@ from django.forms.models import modelformset_factory
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser
+from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser,atomuri
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 
@@ -16,7 +16,6 @@ from cmip5q.protoq.Translator import Translator
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
-import uuid
 from django.conf import settings
 logging=settings.LOG
 
@@ -110,7 +109,7 @@ class componentHandler(object):
         #we have instantiated self.component as the parent!
         #ok create a new component
         if request.method=='POST':
-            u=str(uuid.uuid1())
+            u=atomuri()
             c=Component(scienceType='sub',centre=self.component.centre,uri=u,abbrev='new',
                         contact=self.component.contact,author=self.component.author,
                         funder=self.component.funder,

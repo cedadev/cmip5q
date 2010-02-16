@@ -4,7 +4,6 @@ from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django import forms
 from cmip5q.protoq.models import *
-import uuid
 from django.conf import settings
 logging=settings.LOG
 

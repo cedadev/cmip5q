@@ -1,9 +1,9 @@
 from protoq.models import *
 from xml.etree import ElementTree as ET
-import uuid
 from django.conf import settings
 logging=settings.LOG
 import unittest
+from protoq.utilities import atomuri
 
 cimv='http://www.metaforclimate.eu/cim/1.1'
 gmd='http://www.isotc211.org/2005/gmd'
@@ -38,7 +38,7 @@ def metaAuthor(elem):
         n='Charlotte Pascoe'
         c=ResponsibleParty.objects.filter(name=n)
         if len(c)==0:
-            p=ResponsibleParty(name=n,abbrev=n,uri=str(uuid.uuid1()),
+            p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
                                email='Charlotte.Pascoe@stfc.ac.uk')
             p.save()
         else: p=c[0]
@@ -46,7 +46,7 @@ def metaAuthor(elem):
         n='Gerard Devine'
         c=ResponsibleParty.objects.filter(name=n)
         if len(c)==0:
-            p=ResponsibleParty(name=n,abbrev=n,uri=str(uuid.uuid1()),
+            p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
                             email='g.m.devine@reading.ac.uk')
             p.save()
         else: p=c[0]
@@ -182,7 +182,7 @@ class NumericalExperiment(object):
 
         E=Experiment(rationale=self.rationale,
                      description=self.description,
-                     uri=str(uuid.uuid1()),
+                     uri=atomuri(),
                      abbrev=self.abbrev,
                      title=self.title,
                      requiredDuration=self.requiredDuration,

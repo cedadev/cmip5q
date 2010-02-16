@@ -7,11 +7,10 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import tabs
+from cmip5q.protoq.utilities import tabs, atomuri
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
-import uuid
 from django.conf import settings
 logging=settings.LOG
 
@@ -156,7 +155,7 @@ class simulationHandler(object):
             return render_to_response('error.html',{'message':message,'url':url})
         url=reverse('cmip5q.protoq.views.simulationAdd',args=(self.centreid,self.expid,))
        
-        u=str(uuid.uuid1())
+        u=atomuri()
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
         label='Add'

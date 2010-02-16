@@ -5,7 +5,7 @@
 
 from protoq.models import *
 from xml.etree import ElementTree as ET
-import uuid
+from protoq.utilities import atomuri
 from django.conf import settings
 logging=settings.LOG
 from XMLinitialiseQ import realms
@@ -61,7 +61,7 @@ class ComponentParser(Parser):
             logging.debug('For %s found parameter %s with choice %s'%(self.item.attrib['name'],paramName,choiceType))
             if choiceType in ['OR','XOR']:
                 #create and load vocabulary
-                v=Vocab(uri=str(uuid.uuid1()),name=paramName+'Vocab')
+                v=Vocab(uri=atomuri(),name=paramName+'Vocab')
                 v.save()
                 logging.debug('Created vocab %s'%v.name)
                 for item in elem:
@@ -76,7 +76,7 @@ class ComponentParser(Parser):
                 logging.info('Added parameter %s to component %s (%s)'%(paramName,self.component.abbrev,self.component.id))
                
 	def add(self, doSubs, model=None, realm=None):
-                u=str(uuid.uuid1())
+                u=atomuri()
 		component = Component(
                         title='',
 			scienceType=self.item.attrib['name'],

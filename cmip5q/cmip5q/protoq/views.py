@@ -14,12 +14,11 @@ from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
-from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound
+from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri
 
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
 from django import forms
-import uuid
 from django.conf import settings
 logging=settings.LOG
 
@@ -296,7 +295,7 @@ def platformEdit(request,centre_id,platform_id=None):
         elif request.method=='POST':
             pform=MyPlatformForm(c,request.POST)
         p=None
-        puri=str(uuid.uuid1())
+        puri=atomuri()
        
     else:
         urls['edit']=reverse('cmip5q.protoq.views.platformEdit',args=(centre_id,platform_id,))

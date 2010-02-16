@@ -4,12 +4,12 @@
 # and to produce xml instances of the django storage.
 
 from protoq.models import *
+from protoq.utilities import atomuri
 from XMLinitialiseQ import VocabList
 
 # move from ElementTree to lxml.etree
 #from xml.etree import ElementTree as ET
 from lxml import etree as ET
-import uuid
 import unittest
 import os
 import datetime
@@ -73,7 +73,7 @@ class NumericalModel:
         if funder is None: funder=self.joe
         if contact is None: contact=self.joe
         
-        component=Component(scienceType='model',centre=centre,abbrev='',uri=str(uuid.uuid1()),
+        component=Component(scienceType='model',centre=centre,abbrev='',uri=atomuri(),
                             author=author,contact=contact,funder=funder)
         component.isModel=True
         component.isRealm=False
@@ -196,7 +196,7 @@ class ComponentParser:
        
         if choiceType in ['OR','XOR']:
             #create and load vocabulary
-            v=Vocab(uri=str(uuid.uuid1()),name=paramName+'Vocab')
+            v=Vocab(uri=atomuri(),name=paramName+'Vocab')
             v.save()
             logging.debug('Created vocab %s'%v.name)
             co,info=None,None
@@ -235,7 +235,7 @@ class ComponentParser:
         return cg
                
     def add(self, doSubs, realm=None):
-        u=str(uuid.uuid1())
+        u=atomuri()
         # add spaces before any capital letters to make the tree formatting look nicer
         name=self.item.attrib['name']
         nameWithSpaces=''
@@ -302,7 +302,7 @@ class TestFunctions(unittest.TestCase):
         try:
             self.centre=Centre.objects.get(abbrev="CMIP5")
         except: 
-            u=str(uuid.uuid1())
+            u=atomuri()
             c=Centre(abbrev='CMIP5',name='Dummy testing version',
                      uri=u)
             logging.debug('Created dummy centre for testing')

@@ -14,8 +14,8 @@ from django.core.files import File
 
 from atom import Feed
 from cmip5q.protoq.cimHandling import *
+from cmip5q.protoq.utilities import atomuri
 
-import uuid
 from django.conf import settings
 logging=settings.LOG
 from django.core.files.base import ContentFile
@@ -273,7 +273,7 @@ class Doc(Fundamentals):
         if 'eventParty' in kwargs:
             self.editHistory.add(EditHistoryEvent(eventParty=kwargs['eventParty'],eventIdentifier=self.documentVersion))
         if not self.uri:
-            uri=str(uuid.uuid1())
+            uri=atomuri()
             logging.debug('Missing uri %s assigned for document type %s'%(uri,self._meta.module_name))
             self.uri=uri
         return Fundamentals.save(self,*args,**kwargs)
@@ -393,7 +393,7 @@ class Component(Doc):
         if kwargs['isModel']: 
             kwargs['title']=kwargs['title']+' dup'
             kwargs['abbrev']=kwargs['abbrev']+' dup'
-        kwargs['uri']=str(uuid.uuid1())
+        kwargs['uri']=atomuri()
         kwargs['centre']=centre
         
         new=Component(**kwargs)
@@ -605,7 +605,7 @@ class Simulation(Doc):
         s=Simulation(abbrev=self.abbrev+' dup',title='copy', 
                      contact=self.contact, author=self.author, funder=self.funder,
                      description=self.description, authorList=self.authorList,
-                     uri=str(uuid.uuid1()),
+                     uri=atomuri(),
                      experiment=experiment,numericalModel=self.numericalModel,
                      ensembleMembers=1, platform=self.platform, centre=self.centre)
         s.save()
@@ -645,7 +645,7 @@ class Simulation(Doc):
         # now put back the ones from the model
         cg=self.updateCoupling()
         if closures:cg.propagateClosures()
-
+        
 class BaseTerm(models.Model):
     name=models.CharField(max_length=64)
     note=models.CharField(max_length=128,blank=True)
@@ -964,22 +964,28 @@ class DocFeed(Feed):
            'experiment':CIMObject.objects.filter(cimtype='experiment'),
            'files':CIMObject.objects.filter(cimtype='dataContainer'),
            'all':CIMObject.objects.all()}
+    
+    def _myurl(self,model):
+        return 'http://ceda.ac.uk'+reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%model,))
     def get_object(self,params):
         ''' Used for parameterised feeds '''
         assert params[0] in self.feeds,'Unknown feed request'
         return params[0]
     def feed_id (self,model):
-        return 'http://ceda.ac.uk'+reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%model,))
+        return self._myurl(model)
     def feed_title(self,model):
         return 'CMIP5 model %s metadata'%model
     def feed_subtitle(self,model):
         return 'Metafor questionnaire - completed %s documents'%model
     def feed_authors(self,model):
         return [{'name':'The metafor team'}]
+    def feed_links(self,model):
+        u=self._myurl(model)
+        return [{"rel": "self", "href": "%s"%u}]
     def items(self,model):
         return self.feeds[model].order_by('-updated')
     def item_id(self,item):
-        return item.uri
+        return 'urn:uuid:%s'%item.uri
     def item_title(self,item):
         return item.title
     def item_authors(self,item):
@@ -999,70 +1005,3 @@ class DocFeed(Feed):
         ''' Return out of line link to the content'''
         return {"type": "application/xml", "src": item.get_absolute_url()},""
 
-class ComponentAttribute(models.Model):
-    '''Base class for all attribute classes '''
-    # lives in 
-    constraint=models.ForeignKey(ConstraintGroup,related_name='%(class)s_constraint')
-    ptype=models.CharField(max_length=12,blank=True,null=True)
-    def copy(self,constraint,instance):
-        for attr in ['constraint','ptype']:instance.__setattr__(attr,self.__getattribute__(attr))
-        return instance
-    
-class UserAttribute(ComponentAttribute):
-    name=models.CharField(max_length=128)
-    value=models.CharField(max_length=256)
-    def copy(self):
-        return ComponentAttribute(self,concstraint,UserAttribute(name=self.name,value=self.value))
-    def __unicode__(self):
-        return value 
-    
-class OrControlledAttribute(ComponentAttribute):
-    ''' Attribute with name corresponding to the controlled vocabulary '''
-    # this is the vocabulary from which we will select value(s):
-    name=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.ManyToManyField(Term,related_name='attrvalues')
-    def __unicode__(self):
-        s=''
-        for i in self.value.objects.all():
-            s+='%s,'%i
-        if s<>'':s=s[0:len(s)-1]
-        return s
-    def copy(self,constraint):
-        new=ComponentAttribute(self,constraint,OrControlledAttribute(name=self.namevocab))
-        for v in self.values.all():
-            new.values.add(v)
-        return new
-       
-class XorControlledAttribute(ComponentAttribute):
-    # this is the key into the name of this attribute 
-    name=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.ForeignKey(Term,blank=True,null=True,related_name='attrvalue')
-    def __unicode__(self):
-        return self.value
-    def copy(self,constraint):
-        new=ComponentAttribute(self,constraint,
-              XOrControledAttribute(name=self.name,value=self.value))
-    
-class StrControlledAttribute(ComponentAttribute):
-    # this is the key into the name of this attribute 
-    name=models.ForeignKey(Term,null=True,blank=True)
-    value=models.CharField(max_length=256,blank=True,null=True)
-    units=models.CharField(max_length=256,blank=True,null=True)
-    def __unicode__(self):
-        return self.value
-    def copy(self):
-        return ComponentAttribute(self,concstraint,
-                    StrControlledAttribute(name=self.name,value=self.value,units=self.units))
-    
-class FloatControlledAttribute(ComponentAttribute):
-    # this is the key into the name of this attribute 
-    name=models.ForeignKey(Term,null=True,blank=True)
-    value=models.FloatField(blank=True,null=True)
-    units=models.CharField(max_length=256,blank=True,null=True)
-    def __unicode__(self):
-        return self.value
-    def copy(self):
-        return ComponentAttribute(self,constraint,
-                    FloatControlledAttribute(name=self.name,value=self.value,units=self.units))
-    
-    

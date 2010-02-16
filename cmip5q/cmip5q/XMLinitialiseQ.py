@@ -6,7 +6,7 @@
 ##
 
 from protoq.models import *
-import uuid
+from protoq.utilities import atomuri
 from vocabs.InputTransformations import properties
 from cf import CFtable
 
@@ -98,7 +98,7 @@ def loadProperties(args):
     #properties={'abc':(def,[(a,d),(b,d),(c,d),.._,}
     for arg in args:
         defn,values=properties[arg]
-        v=Vocab(uri=str(uuid.uuid1(1)),name=arg,definition=defn)
+        v=Vocab(uri=atomuri(),name=arg,definition=defn)
         v.save()
         for r,d in values:
             rv=Term(vocab=v,name=r,definition=d)
@@ -115,7 +115,7 @@ def reloadVocab(key):
 def loadvocab(key):
     ''' Used to load vocabularies '''
     
-    v=Vocab(uri=str(uuid.uuid1()),name=key)
+    v=Vocab(uri=atomuri(),name=key)
     v.save()
     values=VocabList[key]
     for r in values:

@@ -5,6 +5,11 @@ from django.core.urlresolvers import reverse
 from django.template import loader
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
+import uuid
+
+def atomuri():
+    ''' Return a uri, put here in one place ... just in case '''
+    return '%s'%uuid.uuid1()
 
 def render_badrequest(template,variables):
     """
