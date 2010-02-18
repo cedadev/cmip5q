@@ -4,11 +4,12 @@ from cmip5q.protoq.forms import *
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.loader import render_to_string
-from cmip5q.protoq.utilities import tabs
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden,HttpResponseBadRequest
-from cmip5q.protoq.utilities import sublist, render_badrequest
 
+from cmip5q.protoq.layoutUtilities import tabs
+from cmip5q.protoq.utilities import sublist, render_badrequest
 from django.conf import settings
+
 logging=settings.LOG
 
 class BaseViewHandler:

@@ -1,5 +1,5 @@
 from django.conf import settings
-logging=settings.LOG
+
 from django.template import Context, loader
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect
@@ -10,7 +10,9 @@ from django import forms
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
 
-from cmip5q.protoq.utilities import tabs
+from cmip5q.protoq.layoutUtilities import tabs
+
+logging=settings.LOG
 
 InternalClosureFormSet=modelformset_factory(InternalClosure,can_delete=True,
                                     form=InternalClosureForm,

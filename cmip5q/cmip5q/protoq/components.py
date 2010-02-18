@@ -8,7 +8,8 @@ from django.forms.models import modelformset_factory
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import tabs,NewPropertyForm,RemoteUser,atomuri
+from cmip5q.protoq.utilities import RemoteUser,atomuri
+from cmip5q.protoq.layoutUtilities import tabs
 from cmip5q.NumericalModel import NumericalModel
 from cmip5q.protoq.coupling import MyCouplingFormSet
 

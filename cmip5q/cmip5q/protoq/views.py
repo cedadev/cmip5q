@@ -9,12 +9,12 @@ from cmip5q.protoq.forms import *
 
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.utilities import  tabs, sublist
+from cmip5q.protoq.layoutUtilities import tabs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
-from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri
+from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist
 
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler

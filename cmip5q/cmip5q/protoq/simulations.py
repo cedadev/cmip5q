@@ -7,7 +7,8 @@ from django.core.urlresolvers import reverse
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
-from cmip5q.protoq.utilities import tabs, atomuri
+from cmip5q.protoq.layoutUtilities import tabs
+from cmip5q.protoq.utilities import atomuri
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 
 from django import forms
