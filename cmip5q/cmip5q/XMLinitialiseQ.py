@@ -71,7 +71,7 @@ VocabList={'Realms':
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
     
     #simulation relationship types
-    'SimRelationships':('hasControlSimulation','extends','other','fixedVersionOf'),
+    'SimRelationships':('hasControlSimulation','extends','other','fixedVersionOf','usesSpinup'),
     
     }
     

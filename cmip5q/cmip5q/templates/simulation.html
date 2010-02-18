@@ -69,6 +69,8 @@
             </table>
             </div>
             <div class="boxer">
+            <h4> Duration </h4>
+            {% with cdr as d %} {% include 'closed_date.html' %} {% endwith %}
             <h4> Related Simulation </h4>
             <p> If this simulation has a related control simulation or extends another, please identify it here. {% if ensemble %} (Such relationships may extend between ensembles too.){% endif %} </p>
             <p>Simulation {{s}} {{rform.value}}{{rform.value.errors}} simulation {{rform.sto}}{{rform.sto.errors}}</p>

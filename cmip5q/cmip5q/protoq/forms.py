@@ -10,6 +10,20 @@ from cmip5q.protoq.utilities import atomuri
 from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
 from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 
+
+class ClosedDateRangeForm(forms.ModelForm):
+    ''' Actually this is a DateRange as well '''
+    class Meta:
+        model=ClosedDateRange
+        exclude=('description')
+    def specialise(self):
+        cv=Vocab.objects.get(name='CalendarTypes')
+        self.fields['calendar'].queryset=Term.objects.filter(vocab=cv)
+        lu=Vocab.objects.get(name='FreqUnits')
+        tunits=Term.objects.filter(vocab=lu)
+        self.fields['lengthUnits'].queryset=tunits
+
+            
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
@@ -373,7 +387,7 @@ class SimulationForm(forms.ModelForm):
         #dealt with on other pages. NB: note that if you don't exclude things, then a form
         #will expect them, and set them to None if they don't come back in the post ... a quiet
         #loss of information ...
-        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations')
+        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations','duration')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(

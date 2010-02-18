@@ -514,6 +514,13 @@ class ClosedDateRange(models.Model):
             return d+' to %s (%s%s)'%(self.endDate,self.length,self.lengthUnits)
         else:
             return d+' onwards'
+    def copy(self):
+        d={}
+        for a in ['startDate','calendar','description','endDate','length','lengthUnits']:
+            d[a]=self.__getattribute__(a)
+        new=ClosedDateRange(**d)
+        new.save()
+        return new
 
 class Experiment(Doc):
     ''' A CMIP5 Numerical Experiment '''
@@ -571,6 +578,8 @@ class Simulation(Doc):
     
     # the following to support relationships to ourselves
     relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
+    
+    duration=models.ForeignKey('ClosedDateRange',blank=True,null=True)
         
     def updateCoupling(self):
         ''' Update my couplings, in case the user has added some inputs (and hence couplings)
@@ -610,6 +619,8 @@ class Simulation(Doc):
                      ensembleMembers=1, platform=self.platform, centre=self.centre)
         s.save()
         #now we need to get all the other stuff related to this simulation
+        # every simulation has it's own date range:
+        s.duration=self.duration.copy()
         for mm in self.inputMod.all():s.inputMod.add(mm)
         for mm in self.modelMod.all():s.modelMod.add(mm)
         s.save() # I don't think I need to do this ... but to be sure ...

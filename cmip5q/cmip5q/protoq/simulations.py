@@ -20,7 +20,6 @@ ConformanceFormSet=modelformset_factory(Conformance,
                                         form=ConformanceForm,
                                         exclude=('simulation','requirement'))
 
-
 class MyConformanceFormSet(ConformanceFormSet):
     ''' Mimics the function of a formset for the situation where we want to edit the
     known conformances '''
@@ -102,6 +101,17 @@ class simulationHandler(object):
                 simok=False
                 logging.info('SIMFORM not valid [%s]'%simform.errors)
             relform=SimRelationshipForm(s,request.POST,instance=r,prefix='rel') 
+            print '1',s,s.duration
+            cdrform=ClosedDateRangeForm(request.POST,instance=s.duration,prefix='cdr')
+            print '2',s.duration
+            cdrform.specialise()
+            print cdrform
+            if cdrform.is_valid():
+                r=cdrform.save()
+                logging.debug('3 %s \n%s'%(s.duration,r))
+            else:
+                logging.debug('CDRFORM not valid[%s]'%cdrform.errors)
+                simok=False
             if relform.is_valid():
                 if simok: 
                     r=relform.save()
@@ -113,7 +123,11 @@ class simulationHandler(object):
             relform=SimRelationshipForm(s,instance=r,prefix='rel')
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
-            
+            print s,s.duration
+            cdrform=ClosedDateRangeForm(instance=s.duration,prefix='cdr')
+        
+        cdrform.specialise()
+        print cdrform
         # work out what we want to say about couplings
         cset=[]
         if label !='Add': cset=s.numericalModel.couplings(s)
@@ -126,7 +140,8 @@ class simulationHandler(object):
         return render_to_response('simulation.html',
             {'s':s,'simform':simform,'urls':urls,'label':label,'exp':e,
              'cset':cset,'coset':cs,'ensemble':ensemble,'rform':relform,
-             'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
+             'tabs':tabs(request,self.centreid,'Simulation',s.id or 0),
+             'cdr':cdrform})
             # note that cform points to simform too, to support completion.html
     def edit(self,request):
         ''' Handle providing and receiving edit forms '''
@@ -159,10 +174,11 @@ class simulationHandler(object):
         u=atomuri()
         e=Experiment.objects.get(pk=self.expid)
         s=Simulation(uri=u,experiment=e,centre=self.centre)
+        cdr=ClosedDateRange()
+        cdr.save()
+        s.duration=cdr
         label='Add'
         return self.__handle(request,s,e,url,label)
-        
- 
 
     def list(self,request):
         ''' Return a listing of simulations for a given centre '''
