@@ -154,13 +154,11 @@ class Translator:
             ET.SubElement(cr2,'version').text='0'
         return cr2
     
-    def cimRecordRoot(self,rootClass):
+    def cimRecordRoot(self):
         ''' return the top level cim document invarient structure '''
         root=ET.Element('CIMRecord', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
-        ET.SubElement(root,'id').text=rootClass.uri
-        ET.SubElement(root,'version').text=str(rootClass.documentVersion)
         return root
 
     def cimRecordSetRoot(self):
@@ -206,7 +204,7 @@ class Translator:
                 self.add_dataobject(fileObject,dataObjectElement)
             cimDoc=root
         else :
-            root=self.cimRecordRoot(ref)
+            root=self.cimRecordRoot()
             cimDoc=method(ref,root)
         return cimDoc
         
@@ -680,24 +678,7 @@ class Translator:
     def addChildComponent(self,c,root,nest,recurse=True):
 
       if c.implemented or nest==1:
-        if nest==1:
-          # documentVersion has been removed since CIM1.3 (current is CIM1.4)
-          #comp=ET.SubElement(root,'modelComponent',{'documentVersion': str(c.documentVersion), 'CIMVersion': '1.4'})
-          comp=ET.SubElement(root,'modelComponent',{'CIMVersion': '1.4'})
-        else:
-          comp=ET.SubElement(root,'modelComponent')
-        '''composition'''
-        self.addComposition(c,comp)
-        if recurse:
-            '''childComponent'''
-            for child in c.components.all():
-                if child.implemented:
-                    comp2=ET.SubElement(comp,'childComponent')
-                    self.addChildComponent(child,comp2,nest+1)
-                else :
-                    comp.append(ET.Comment('Component '+child.abbrev+' has implemented set to false'))
-        '''parentComponent'''
-        '''deployment'''
+        comp=ET.SubElement(root,'modelComponent')
         '''shortName'''
         ET.SubElement(comp,'shortName').text=c.abbrev
         '''longName'''
@@ -717,6 +698,10 @@ class Translator:
                     componentProperty=componentProperties
                 else:
                     componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':str(c.implemented).lower()})
+                '''shortName'''
+                ET.SubElement(componentProperty,'shortName').text=pg.name
+                '''longName'''
+                ET.SubElement(componentProperty,'longName').text=pg.name
                 # the internal questionnaire representation is that all parameters
                 # are contained in a constraint group
                 for con in constraintSet:
@@ -739,10 +724,6 @@ class Translator:
                                     ET.SubElement(property,'value').text=stripSpaceValue
                     #ET.SubElement(property,'ptype').text=p.ptype
                     #ET.SubElement(property,'vocab').text=p.vocab
-                '''shortName'''
-                ET.SubElement(componentProperty,'shortName').text=pg.name
-                '''longName'''
-                ET.SubElement(componentProperty,'longName').text=pg.name
                 
         '''numericalProperties'''
         ET.SubElement(comp,'numericalProperties')
@@ -757,6 +738,18 @@ class Translator:
         '''fundingSource'''
         '''citation'''
         self.addReferences(c.references,comp)
+        '''composition'''
+        self.addComposition(c,comp)
+        if recurse:
+            '''childComponent'''
+            for child in c.components.all():
+                if child.implemented:
+                    comp2=ET.SubElement(comp,'childComponent')
+                    self.addChildComponent(child,comp2,nest+1)
+                else :
+                    comp.append(ET.Comment('Component '+child.abbrev+' has implemented set to false'))
+        '''parentComponent'''
+        '''deployment'''
         ''' RF associating genealogy with the component rather than the document '''
         if nest<=2 :
             if self.VALIDCIMONLY :
@@ -789,6 +782,8 @@ class Translator:
         if nest==1:
             '''documentID'''
             ET.SubElement(comp,'documentID').text=c.uri
+            '''documentVersion'''
+            ET.SubElement(comp,'documentVersion').text=str(c.documentVersion)
             '''documentAuthor'''
             #ET.SubElement(comp,'documentAuthor').text=c.contact
             authorElement=ET.SubElement(comp,'documentAuthor')
@@ -853,7 +848,7 @@ class Translator:
                 else: # default to organisation if not a contact or an author
                     name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'organisationName')
                 ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.name
-                name.append(ET.Comment('responsibleParty abbreviation :: '+respClass.abbrev))
+                name.append(ET.Comment('TBD: responsibleParty abbreviation :: '+respClass.abbrev))
         #</gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
