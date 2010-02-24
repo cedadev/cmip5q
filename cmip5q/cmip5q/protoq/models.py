@@ -19,6 +19,8 @@ from cmip5q.protoq.utilities import atomuri
 from django.conf import settings
 logging=settings.LOG
 from django.core.files.base import ContentFile
+from django.db.models.query import QuerySet
+
 
 def soft_delete(obj,simulate=False):
     ''' This method provided to use to override native model deletes to avoid
@@ -96,7 +98,50 @@ def soft_delete(obj,simulate=False):
         if not simulate: delete_objects(on_death_row)
         return True,{}
 
-   
+class ChildQuerySet(QuerySet):
+    ''' Used to support the queryset options on ParentModel'''
+    def iterator(self):
+        for obj in super(ChildQuerySet, self).iterator():
+            yield obj.get_child_object()
+
+class ChildManager(models.Manager):
+    ''' Used to provide a manager for children of a ParentModel '''
+    def get_query_set(self):
+        return ChildQuerySet(self.model)
+
+class ParentModel(models.Model):
+    
+    ''' This abstract class is used to subclasses base classes that we want
+    themselves to work with further subclasses, in such a way that we can
+    get down from a parent instance to a child instance, and have sensible
+    query sets. See http://www.djangosnippets.org/snippets/1037/'''
+    
+    _child_name = models.CharField(max_length=100, editable=False)
+    objects = models.Manager()
+    children = ChildManager()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self._child_name = self.get_child_name()
+        super(ParentModel, self).save(*args, **kwargs)
+
+    def get_child_name(self):
+        if type(self) is self.get_parent_model():
+            return self._child_name
+        return self.get_parent_link().related_query_name()
+
+    def get_child_object(self):
+        return getattr(self, self.get_child_name())
+
+    def get_parent_link(self):
+        return self._meta.parents[self.get_parent_model()]
+
+    def get_parent_model(self):
+        raise NotImplementedError
+
+
 class EditHistoryEvent(models.Model):
     ''' Used for edit history event logging '''
     eventDate=models.DateField(auto_now_add=True,editable=False)
@@ -280,7 +325,7 @@ class Doc(Fundamentals):
     
     def delete(self,*args,**kwargs):
         ''' Avoid deleting documents which have foreign keys to this instance'''
-        soft_delete(self,*args,**kwargs)
+        return soft_delete(self,*args,**kwargs)
         
     @models.permalink
     def edit_url(self):
@@ -372,7 +417,8 @@ class Component(Doc):
     
     # direct children components:
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
-             
+    paramGroup=models.ManyToManyField('ParamGroup')
+    grid=models.ForeignKey('Grid',blank=True,null=True)
              
 #    def status(self):
 #            
@@ -423,8 +469,8 @@ class Component(Doc):
             new.components.add(r)
             logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))
             
-        pset=ParamGroup.objects.filter(component=self)
-        for p in pset: p.copy(new)
+        for p in self.paramGroup.all(): 
+            new.paramGroup.add(p)
         
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
@@ -580,6 +626,9 @@ class Simulation(Doc):
     relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
     
     duration=models.ForeignKey('ClosedDateRange',blank=True,null=True)
+    
+    # not yet used:
+    drsOutput=models.ManyToManyField('DRSOutput')
         
     def updateCoupling(self):
         ''' Update my couplings, in case the user has added some inputs (and hence couplings)
@@ -686,10 +735,10 @@ class PhysicalProperty(Term):
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
-    component=models.ForeignKey(Component)
     def copy(self,newComponent):
-        new=ParamGroup(name=self.name,component=newComponent)
+        new=ParamGroup(name=self.name)
         new.save()
+        newComponent.paramGroup.add(new)
         for constraint in self.constraintgroup_set.all():constraint.copy(new)
     def __unicode__(self):
         return self.name
@@ -730,6 +779,46 @@ class NewParam(models.Model):
                       vocab=self.vocab,value=self.value,definition=self.definition,units=self.units,
                       numeric=self.numeric)
         new.save()
+        
+class BaseParam(ParentModel):
+    ''' Base class for parameters within constraint groups '''
+    # We can't the name of this is a value in vocab, because it might be user generated '''
+    name=models.CharField(max_length=64,blank=False)
+    # lives in 
+    constraint=models.ForeignKey(ConstraintGroup)
+    #strictly we don't need the following attribute, but it simplifies template code
+    controlled=models.BooleanField(default=True)
+    # should have definition
+    definition=models.CharField(max_length=512,null=True,blank=True)
+    #
+    def get_parent_model(self):
+        return BaseParam
+    
+
+class OrParam(BaseParam):
+    value=models.ManyToManyField(Term)
+    vocab=models.ForeignKey(Vocab,blank=True,null=True)
+    def __unicode__(self):
+        s='%s:'%self.name+','.join([a for a in self.value.all()])
+        return s
+
+class XorParam(BaseParam):
+    value=models.ForeignKey(Term,blank=True,null=True)
+    vocab=models.ForeignKey(Vocab,blank=True,null=True)
+    def __unicode__(self):
+        s='%s:%s'%(self.name,self.value)
+        return s
+
+class KeyBoardParam(BaseParam):
+    value=models.CharField(max_length=128,blank=True,null=True)
+    # but it might be a numeric parameter, in which case we have more attributes
+    units=models.CharField(max_length=128,null=True,blank=True)
+    numeric=models.BooleanField(default=False)
+    def __unicode__(self):
+        s='%s:%s'%(self.name,self.value)
+        if self.numeric and self.units: s+='(%s)'%self.units
+        return s
+
     
 class DataContainer(Doc):
     ''' This holds multiple data objects. Some might think of this as a file '''
@@ -931,15 +1020,18 @@ class Conformance(models.Model):
     def __unicode__(self):
         return "%s for %s"%(self.ctype,self.requirement)
     
-class Modification(models.Model):
+class Modification(ParentModel):
     mnemonic=models.SlugField()
     mtype=models.ForeignKey(Term)
     description=models.TextField()
     centre=models.ForeignKey(Centre)
     def __unicode__(self):
         return '%s(%s)'%(self.mnemonic,self.mtype)
+    def get_parent_model(self):
+        return Modifications
     class Meta:
         ordering=('mnemonic',)
+    
     
 class InputClosureMod(models.Model):
     ''' Maps onto a specific closure and identifies the modifications to it '''
@@ -948,9 +1040,7 @@ class InputClosureMod(models.Model):
     targetFile=models.ForeignKey(DataContainer,blank=True,null=True)
     target=models.ForeignKey(DataObject,blank=True,null=True)
     def __unicode__(self):
-        return 'Mod to %s %s'%(copuling,targetClosure)
-    
-
+        return 'Mod to %s %s'%(coupling,targetClosure)
     
 class InputMod(Modification):
     ''' Simulation initial condition '''
@@ -966,6 +1056,21 @@ class ModelMod(Modification):
     #we could try and get to the parameter values as well ...
     component=models.ForeignKey(Component)
     
+class Grid(Doc):
+    properties=models.ManyToManyField(ParamGroup)
+    
+class DRSOutput(models.Model):
+    ''' This is a holding class for how a simulation relates to it's output in the DRS '''
+    activity=models.CharField(max_length=64)
+    product=models.CharField(max_length=64)
+    institute=models.ForeignKey(Centre)
+    model=models.ForeignKey(Component)
+    experiment=models.ForeignKey(Experiment)
+    frequency=models.ForeignKey(Term,blank=True,null=True,related_name='drs_frequency')
+    realm=models.ForeignKey(Term,related_name='drs_realm')
+    grid=models.ForeignKey(Grid)
+    # we don't need to point to simulations, they point to this ...
+
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''
     # See http://code.google.com/p/django-atompub/wiki/UserGuide

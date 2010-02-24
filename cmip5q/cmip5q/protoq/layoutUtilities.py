@@ -43,6 +43,7 @@ class tabs(list):
                  ('Summary','cmip5q.protoq.views.centre',(centre_id,)),
                  ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,)),
                  ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],)),
+                 ('Grids','cmip5q.protoq.views.list',(centre_id,'grid',)),
                  ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],)),
                  ('Files','cmip5q.protoq.views.list',(centre_id,'file',)),
                  ('References','cmip5q.protoq.views.list',(centre_id,'reference',)),

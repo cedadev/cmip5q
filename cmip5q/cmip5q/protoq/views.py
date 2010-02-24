@@ -379,9 +379,9 @@ def ensemble(request,cen_id,sim_id):
                {'s':s,'e':e,'urls':urls,'eform':eform,'eformset':eformset,
                'tabs':tabs(request,cen_id,'Ensemble')})
                
-               
-    
+
 ############ Simple Generic Views ########################
+
 
 class ViewHandler(BaseViewHandler):
     ''' Specialises Base View for the various resource understood as a "simple"
@@ -411,6 +411,8 @@ class ViewHandler(BaseViewHandler):
                                    'title':'Parties','tab':'Parties',
                                    'class':ResponsibleParty,'form':ResponsiblePartyForm,
                                    'filter':None},
+                        'grid':{'attname':'grid','title':'Grid Definition','class':Grid,
+                                'form':GridForm,'filter':None,'tab':'Grids'},
                         }
     # Note that we don't expect to be able to assign files, since we'll directly
     # attach objects within files as appropriate.
@@ -512,7 +514,7 @@ class ViewHandler(BaseViewHandler):
                 return self.target['instance']
             elif self.target['type']=='ensemble':
                 return self.target['instance'].numericalModel
-        if self.resource['type'] in ['reference','file']:
+        if self.resource['type'] in ['reference','file','grid']:
             return self.centre 
         if self.resource['type']=='inputmod':
             if self.target['type']=='ensemble':

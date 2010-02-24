@@ -89,15 +89,17 @@ class ComponentForm(forms.ModelForm):
     otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
     
     controlled=forms.BooleanField(widget=forms.HiddenInput,required=False)
+    
     class Meta:
         model=Component
         exclude=('centre','uri','model','realm','isRealm','isModel','visited',
-                 'references','components')
+                 'references','components','paramGroup')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         #concatenate to allow the centre to be shown as well as the other parties tied to it.
         qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
         for i in ['author','contact','funder']: self.fields[i].queryset=qs
+        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre)
         if self.instance.controlled: 
             # We don't want this to be editable 
             self.fields['scienceType'].widget=forms.HiddenInput()
@@ -387,7 +389,8 @@ class SimulationForm(forms.ModelForm):
         #dealt with on other pages. NB: note that if you don't exclude things, then a form
         #will expect them, and set them to None if they don't come back in the post ... a quiet
         #loss of information ...
-        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations','duration')
+        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations',
+                 'duration','drsOutput')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
@@ -430,6 +433,20 @@ class SimRelationshipForm(forms.ModelForm):
         s.sfrom=self.simulation
         s.save()
         
+class GridForm(forms.ModelForm):
+    class Meta:
+        model=Grid
+        exclude=('centre','author','funder','contact','metadataMaintainer','editHistory','properties')
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        self.hostCentre=None
+    def specialise(self,constraint):
+        pass
+    def save(self):
+        s=forms.ModelForm.save(self,commit=False)
+        s.centre=self.hostCentre
+        s.save()
+        return s
         
 class NewPropertyForm:
     
@@ -440,7 +457,7 @@ class NewPropertyForm:
         
         # filter chaining, see
         # http://docs.djangoproject.com/en/dev/topics/db/queries/#chaining-filters
-        pgset=self.component.paramgroup_set.all()
+        pgset=self.component.paramGroup.all()
         self.keys={}
         self.pgset=[]
         for pg in pgset:

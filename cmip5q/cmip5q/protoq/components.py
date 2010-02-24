@@ -116,6 +116,11 @@ class componentHandler(object):
                         funder=self.component.funder,
                         model=self.component.model,realm=self.component.realm)
             r=c.save()
+            p=ParamGroup()
+            p.save()
+            c.paramGroup.add(p) 
+            cg=ConstraintGroup(constraint='',parentGroup=p)
+            cg.save()
             #print 'Return Value',r
             self.component.components.add(c)
             url=reverse('cmip5q.protoq.views.componentEdit',args=(self.centre_id,c.id,))

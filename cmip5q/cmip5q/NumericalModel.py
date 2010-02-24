@@ -86,8 +86,9 @@ class NumericalModel:
         self.top=component
         logging.debug('Created empty top level model %s'%component)
         # now get a placeholder paramgroup and constraint group
-        p=ParamGroup(component=component)
+        p=ParamGroup()
         p.save() 
+        component.paramGroup.add(p)
         cg=ConstraintGroup(constraint='',parentGroup=p)
         cg.save()
         
@@ -147,8 +148,9 @@ class ComponentParser:
             
     def __handleParamGrp(self,elem):
         ''' Handle the parameter groups consisting of parameters and constraints '''
-        p=ParamGroup(name=elem.attrib['name'],component=self.component)
+        p=ParamGroup(name=elem.attrib['name'])
         p.save()
+        self.component.paramGroup.add(p)
         cg=None
         empty=True
         for item in elem:

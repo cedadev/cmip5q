@@ -84,9 +84,14 @@
         {% endif %}
         <div class="boxer">
         <h4> Component Attributes </h4>
-            <p> In this section enter parameters and attributes associated with this 
+            <p> In this section enter the grid and other parameters and attributes associated with this 
             {% if c.isModel %} model {% endif %}{% if c.isRealm %} realm {% endif %}
             {% if not c.isModel %} component {% endif %}.</p>
+            <div class="boxer">
+            <h4> Grid </h4>
+            <p> Please select an appropriate grid from those you have described using the grid tab </p>
+            <p>Grid: {{cform.grid.errors}}{{cform.grid}}</p>
+            </div>
             <!--include 'component_attributes.html' -->
             {% include 'newcomponent_attributes.html' %}
         </div>
