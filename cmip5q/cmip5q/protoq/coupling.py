@@ -137,7 +137,6 @@ class MyCouplingFormSet:
                                               'cf':cf,'ic':ic,'ec':ec,'iqs':iqs,
                                               'bcv':bcvalue,'afv':afvalue,'icv':icvalue}))
             
-            
     def is_valid(self):
         ok=True
         for f in self.forms:

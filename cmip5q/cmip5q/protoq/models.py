@@ -119,6 +119,7 @@ class ParentModel(models.Model):
     _child_name = models.CharField(max_length=100, editable=False)
     objects = models.Manager()
     children = ChildManager()
+    form=None   # we replace this when we instantiate ...
 
     class Meta:
         abstract = True
@@ -419,11 +420,6 @@ class Component(Doc):
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     paramGroup=models.ManyToManyField('ParamGroup')
     grid=models.ForeignKey('Grid',blank=True,null=True)
-             
-#    def status(self):
-#            
-    
-
 
     def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''
@@ -470,7 +466,7 @@ class Component(Doc):
             logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))
             
         for p in self.paramGroup.all(): 
-            new.paramGroup.add(p)
+            new.paramGroup.add(p.copy())
         
         ### And deal with the component inputs too ..
         inputset=ComponentInput.objects.filter(owner=self)
@@ -735,11 +731,11 @@ class PhysicalProperty(Term):
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
-    def copy(self,newComponent):
+    def copy(self):
         new=ParamGroup(name=self.name)
         new.save()
-        newComponent.paramGroup.add(new)
         for constraint in self.constraintgroup_set.all():constraint.copy(new)
+        return new
     def __unicode__(self):
         return self.name
 
@@ -753,32 +749,7 @@ class ConstraintGroup(models.Model):
     def copy(self,paramgrp):
         new=ConstraintGroup(constraint=self.constraint,parentGroup=paramgrp)
         new.save()
-        for param in self.newparam_set.all(): param.copy(new)
-    
-class NewParam(models.Model):
-    ''' Holds an actual parameter '''
-    # We can't the name of this is a value in vocab, because it might be user generated '''
-    name=models.CharField(max_length=64,blank=False)
-    controlled=models.BooleanField(default=True)
-    ptype=models.SlugField(max_length=12,blank=True)
-    # lives in 
-    constraint=models.ForeignKey(ConstraintGroup)
-    # should have definition
-    definition=models.CharField(max_length=512,null=True,blank=True)
-    # Following used to point to vocabs and their values ...
-    # If a vocab is linked, then the value must be from it!
-    vocab=models.ForeignKey(Vocab,null=True,blank=True)
-    value=models.CharField(max_length=512,blank=True)
-    # but it might be a numeric parameter, in which case we have more attributes
-    units=models.CharField(max_length=128,null=True,blank=True)
-    numeric=models.BooleanField(default=False)
-    def __unicode__(self):
-        return self.name
-    def copy(self,constraint):
-        new=NewParam(name=self.name,constraint=constraint,ptype=self.ptype,controlled=self.controlled,
-                      vocab=self.vocab,value=self.value,definition=self.definition,units=self.units,
-                      numeric=self.numeric)
-        new.save()
+        for param in self.baseparam_set.all(): param.copy(new)
         
 class BaseParam(ParentModel):
     ''' Base class for parameters within constraint groups '''
@@ -787,20 +758,33 @@ class BaseParam(ParentModel):
     # lives in 
     constraint=models.ForeignKey(ConstraintGroup)
     #strictly we don't need the following attribute, but it simplifies template code
-    controlled=models.BooleanField(default=True)
+    controlled=models.BooleanField(default=False)
     # should have definition
     definition=models.CharField(max_length=512,null=True,blank=True)
     #
     def get_parent_model(self):
         return BaseParam
-    
-
+    # The rest to allow copying of base and subclasses
+    def copy(self,constraint):
+        obj=self.get_child_object()
+        attr=['name','controlled','definition','controlled']+obj.cpattr()
+        d={}
+        for a in attr: d[a]=obj.__getattribute__(a)
+        d['constraint']=constraint
+        o=obj.__class__(**d)
+        o.save()
+        if self.get_child_name()=='orparam':
+            for m in obj.value.all(): o.value.add(m)
+        return o
+        
 class OrParam(BaseParam):
     value=models.ManyToManyField(Term)
     vocab=models.ForeignKey(Vocab,blank=True,null=True)
     def __unicode__(self):
         s='%s:'%self.name+','.join([a for a in self.value.all()])
         return s
+    def cpattr(self):
+        return ['vocab']
 
 class XorParam(BaseParam):
     value=models.ForeignKey(Term,blank=True,null=True)
@@ -808,6 +792,8 @@ class XorParam(BaseParam):
     def __unicode__(self):
         s='%s:%s'%(self.name,self.value)
         return s
+    def cpattr(self):
+        return ['value','vocab']
 
 class KeyBoardParam(BaseParam):
     value=models.CharField(max_length=128,blank=True,null=True)
@@ -818,6 +804,8 @@ class KeyBoardParam(BaseParam):
         s='%s:%s'%(self.name,self.value)
         if self.numeric and self.units: s+='(%s)'%self.units
         return s
+    def cpattr(self):
+        return ['value','units','numeric']
 
     
 class DataContainer(Doc):

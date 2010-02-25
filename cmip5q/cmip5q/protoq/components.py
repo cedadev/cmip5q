@@ -170,10 +170,10 @@ class componentHandler(object):
         refs=Reference.objects.filter(component__id=c.id)
         inps=ComponentInput.objects.filter(owner__id=c.id)
         
-        pform=NewPropertyForm(c,prefix='props')
-        
         postOK=True
         if request.method=="POST":
+            pform=ParamGroupForm(c,request.POST,prefix='props')
+            pform.newatt=1
             cform=ComponentForm(request.POST,prefix='gen',instance=c)
             if cform.is_valid():
                 c=cform.save()
@@ -183,7 +183,8 @@ class componentHandler(object):
                 logging.debug('Unable to save characteristics for component %s'%c.id)
                 postOK=False
                 logging.debug(cform.errors)
-            pform.update(request)
+            ok=pform.save()
+            if postOK: postOK=ok  # if not postok, ok value doesn't matter
         
         # We separate the response handling so we can do some navigation in the
         # meanwhile ...
@@ -204,6 +205,9 @@ class componentHandler(object):
         else:
             #get some forms
             cform=ComponentForm(instance=c,prefix='gen')
+            
+            pform=ParamGroupForm(c,prefix='props')
+            pform.newatt=1
         
         if c.isModel:
             #we'd better decide what we want to say about couplings. Same code in simulation!

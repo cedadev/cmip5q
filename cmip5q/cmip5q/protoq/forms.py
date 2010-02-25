@@ -448,116 +448,105 @@ class GridForm(forms.ModelForm):
         s.save()
         return s
         
-class NewPropertyForm:
+class BaseParamForm(forms.ModelForm):
+    class Meta:
+        model=BaseParam
+        exclude=['controlled','definition','constraint']
+    def __init__(self,*args,**kwargs):
+        forms.ModelForm.__init__(self,*args,**kwargs)
+        #self.fields['constraint'].widget=forms.HiddenInput()
+        if self.instance:
+            self.showname={0:False,1:True}[self.instance.controlled]
+        else: self.showname=False
+        if self.showname:
+            self.fields['name'].widget=forms.HiddenInput()
+        else:
+            self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
+
+class OrParamForm(BaseParamForm):
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'64'}))
+    class Meta(BaseParamForm.Meta):
+        model=OrParam
+        exclude=BaseParamForm.Meta.exclude+['vocab']
+    def __init__(self,*args,**kwargs):
+        BaseParamForm.__init__(self,*args,**kwargs)
+        # These always have instances.
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab)
+        self.model='OR'
     
-    def __init__(self,component,prefix=''):
+class XorParamForm(BaseParamForm):
+    #value=forms.ModelChoiceField(queryset=Term.objects.all(),widget=DropDownSingleWidget(attrs={'size':'64'}))
+    class Meta(BaseParamForm.Meta):
+        model=XorParam
+        exclude=BaseParamForm.Meta.exclude+['vocab']
+    def __init__(self,*args,**kwargs):
+        BaseParamForm.__init__(self,*args,**kwargs)
+        # These always have instances
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab)
+        #self.fields['value'].widget=DropDownSingleWidget(attrs={'size':'64'})   
+        self.model='XOR'
         
+class KeyBoardParamForm(BaseParamForm):
+    value=forms.CharField(widget=forms.TextInput(attrs={'size':'64'}))
+    class Meta(BaseParamForm.Meta):
+        model=KeyBoardParam
+        exclude=BaseParamForm.Meta.exclude+['numeric','units']
+    def __init__(self,*args,**kwargs):
+        BaseParamForm.__init__(self,*args,**kwargs)
+        self.model='Keyboard'
+    
+    
+class ParamGroupForm:
+    ''' This is an aggregation form for handling the multiple forms that will appear
+    on a component layout page '''
+    UserFormSet=modelformset_factory(KeyBoardParam,form=KeyBoardParamForm,can_delete=True)
+    def __init__(self,component,POST=None,prefix=''):
         self.prefix=prefix
         self.component=component
-        
-        # filter chaining, see
-        # http://docs.djangoproject.com/en/dev/topics/db/queries/#chaining-filters
-        pgset=self.component.paramGroup.all()
-        self.keys={}
-        self.pgset=[]
-        for pg in pgset:
-            pg.cgset=[]            
+        self.pgset=self.component.paramGroup.all()
+        fid=0 # a form id, so we get unique forms for each parameter 
+        for pg in self.pgset:
+            pg.cgset=[]
             for cg in pg.constraintgroup_set.all():
-                params=cg.newparam_set.all()
-                cg.orp=params.filter(ptype='OR')
-                cg.xorp=params.filter(ptype='XOR')
-                cg.other=params.exclude(ptype='XOR').exclude(ptype='OR')
-                cg.controlled=params.exclude(ptype='User')
-                cg.rows=[]
-                for o in cg.orp:
-                    o.form={'op':'+='}
-                    o.form['values']=[str(i) for i in Term.objects.filter(vocab=o.vocab)]
-                    o.form['values'].insert(0,'------')
-                    o.key=o.id
-                    cg.rows.append(o)
-                for o in cg.xorp:
-                    o.form={'op':'='}
-                    o.form['values']=[str(i) for i in Term.objects.filter(vocab=o.vocab)]
-                    o.form['values'].insert(0,'------')
-                    o.key=o.id
-                    cg.rows.append(o)
-                for o in cg.other:
-                    o.form=None
-                    o.key=o.id
-                    cg.rows.append(o)
                 pg.cgset.append(cg)
-            self.pgset.append(pg)
-            
-    def update(self,request):
-        ''' take an incoming form and load it into the database '''
-        qdict=request.POST
-        
-        lenprefix=len(self.prefix)
-        deleted=[]
-        
-        for key in qdict.keys():
-            # only handle those which belong here:
-            if key[0:lenprefix]==self.prefix:
-                mykey=key[lenprefix+1:]
-                myids=mykey.split('/') 
-                # four cases, new params and values, deletions, and controlled values
-                if 'newparamval' in mykey:
-                    #ignore, handled below
-                    pass
-                elif 'newparam' in mykey:
-                    id=mykey[0:mykey.find('newparam')-1]
-                    name=qdict[key]
-                    if qdict[key]<>'':
-                        nvalkey='%s-%s-newparamval'%(self.prefix,id)
-                        if nvalkey not in qdict:
-                            logging.info('New param value expected, nothing added(%s)'%qdict)
-                        else:
-                            try:
-                                cg=ConstraintGroup.objects.get(id=id)
-                                new=NewParam(name=name,value=qdict[nvalkey],ptype='User',constraint=cg)
-                                new.save()
-                            except:
-                                logging.info('Unable to load new parameter %s into %s'%(name,id))
-                elif mykey[0:3] == 'del':
-                    # we can only delete user defined things ...
-                    id=mykey[4:]
-                    try:
-                        p=NewParam.objects.get(id=id)
-                        p.delete()
-                        deleted.append(id)
-                        logging.info('Deleted parameter %s from %s'%(id,self.component))
-                    except:
-                        logging.info(
-                          'Attempt to delete parameter %s for component %s failed '%(id,self.component))
-                else:
-                    if mykey not in deleted:
-                        try:
-                            p=NewParam.objects.get(id=mykey)
-                            p.value=qdict[key]
-                            p.save()
-                        except:
-                            logging.info('Unable to load (new)parameter value for %s (val %s)'%(mykey,qdict[key]))
-
-class ControlledAttributeForm(forms.Form):
-    class Meta:
-        exclude=('constraint','ptype','controlled')
-
-class FloatControlledAttributeForm(ControlledAttributeForm):
-    value=forms.FloatField(required=True)
-    
-class StrControlledAttributeForm(ControlledAttributeForm):
-    value=forms.CharField(required=True)
-    
-class XorControlledAttributeForm(ControlledAttributeForm):
-    q1=Term.objects.all()
-    value=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownSingleWidget(attrs={'size':'5'}))
-    
-class OrControlledAttributeForm(ControlledAttributeForm):
-    q1=Term.objects.all()
-    value=forms.ModelChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'5'}))
-  
-class UserAttributeForm(ControlledAttributeForm):
-    name=forms.CharField(required=True)
-    value=forms.CharField(required=True)
-    units=forms.CharField(required=False)
-  
+                cg.forms=[]
+                for p in cg.baseparam_set.filter(controlled=True):
+                    fid+=1
+                    n=p.get_child_name() # kill this line when we know it works
+                    f={'orparam':OrParamForm,'xorparam':XorParamForm,'keyboardparam':KeyBoardParamForm}[p.get_child_name()]
+                    cg.forms.append(f(POST,instance=p.get_child_object(),prefix='%s-%s'%(prefix,fid)))
+            # Get direct to uncontrolled keyboards for the last constraint group in a param group
+            q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False)
+            logging.debug('Userparams for %s in %s'%(cg.id,pg))
+            cg.userforms=self.UserFormSet(POST,queryset=q,prefix='%s-uf-%s'%(prefix,cg.id))  
+                 
+    def save(self):
+        ''' Try and save what we can, return status, and return form for reuse '''
+        logging.debug('BNL saving')
+        ok=True
+        for pg in self.pgset:
+            for cg in pg.cgset:
+                for p in cg.forms:
+                    pok=p.is_valid()
+                    if pok:
+                        p.save()
+                    else:
+                        logging.debug('%s:\n%s'%(p,p.errors))
+                        ok=False
+            # The last one has a userforms parameter set
+            logging.debug('And now the userform for %s'%pg)
+            if cg.userforms.is_valid():
+                instances=cg.userforms.save(commit=False)
+                for uf in instances:
+                    uf.constraint=cg
+                    uf.save()
+                # now build a new userform in case the overarching form is not ok, to avoid sending the
+                # same userform formset over and over again (and multiply entering the same stuff).
+                logging.debug('OK %s '%pg.id)
+                q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False)
+                cg.userforms=self.UserFormSet(queryset=q,prefix='%s-uf-%s'%(self.prefix,cg.id))
+            else: 
+                ok=False
+                logging.debug('%s'%cg.userforms.errors)
+        return ok
+                
