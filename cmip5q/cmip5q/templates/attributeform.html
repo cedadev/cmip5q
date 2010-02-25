@@ -22,7 +22,7 @@
                 {% ifequal r.model 'OR' %} Choose one or more of: {% endifequal %}
                 {% ifequal r.model 'XOR' %} Choose one of: {% endifequal %} 
             </td><td>
-                {{r.value.errors}}{{r.value}}{%for h in r.hidden_fields %} {{h}} {%endfor%}
+                {{r.value.errors}}{{r.value}}
             </td>
         </tr>
     {% endfor %}
@@ -43,7 +43,6 @@
     <tr><td>{{f.name.errors}}{{f.name}}</td><td>{{f.value.errors}}{{f.value}}</td>
     <td>Delete{{f.DELETE}}?{%for h in f.hidden_fields %} {{h}} {%endfor%}</td></tr>
     {% endfor %}
-    <!--{{cg.userforms}}--> 
     </table>
     {% endif %}
 {% endfor %}

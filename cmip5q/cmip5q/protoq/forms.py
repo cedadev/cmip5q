@@ -464,7 +464,7 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'width':'64'}))
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'48'}))
     class Meta(BaseParamForm.Meta):
         model=OrParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
@@ -475,15 +475,14 @@ class OrParamForm(BaseParamForm):
         self.model='OR'
     
 class XorParamForm(BaseParamForm):
-    #value=forms.ModelChoiceField(queryset=Term.objects.all(),widget=DropDownSingleWidget(attrs={'size':'64'}))
+    value=forms.ModelChoiceField(queryset=Term.objects.all(),widget=DropDownSingleWidget())
     class Meta(BaseParamForm.Meta):
         model=XorParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
     def __init__(self,*args,**kwargs):
         BaseParamForm.__init__(self,*args,**kwargs)
         # These always have instances
-        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab)
-        #self.fields['value'].widget=DropDownSingleWidget(attrs={'width':'64'})   
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab) 
         self.model='XOR'
         
 class KeyBoardParamForm(BaseParamForm):
