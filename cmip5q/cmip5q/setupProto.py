@@ -7,10 +7,8 @@ os.environ['DJANGO_SETTINGS_MODULE']='settings'
 from protoq.models import *
 from XMLinitialiseQ import initialise
 from XMLActivityReader import NumericalExperiment
-if NEWAT:
-    from ControlledModel import *
-else:
-    from NumericalModel import *
+from ControlledModel import *
+
 from initialiseRefs import *
 from initialiseFiles import *
 from initialiseVars import *

@@ -92,11 +92,7 @@
             <p> Please select an appropriate grid from those you have described using the grid tab </p>
             <p>Grid: {{cform.grid.errors}}{{cform.grid}}</p>
             </div>
-            {% if pform.newatt %}
-                {% include 'attributeform.html' %}
-            {% else %}
-                {% include 'newcomponent_attributes.html' %}
-            {% endif %}
+            {% include 'attributeform.html' %}
         </div>
        
         <div class="boxer"> 

@@ -464,7 +464,7 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'64'}))
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'width':'64'}))
     class Meta(BaseParamForm.Meta):
         model=OrParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
@@ -483,7 +483,7 @@ class XorParamForm(BaseParamForm):
         BaseParamForm.__init__(self,*args,**kwargs)
         # These always have instances
         self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab)
-        #self.fields['value'].widget=DropDownSingleWidget(attrs={'size':'64'})   
+        #self.fields['value'].widget=DropDownSingleWidget(attrs={'width':'64'})   
         self.model='XOR'
         
 class KeyBoardParamForm(BaseParamForm):
@@ -522,7 +522,6 @@ class ParamGroupForm:
                  
     def save(self):
         ''' Try and save what we can, return status, and return form for reuse '''
-        logging.debug('BNL saving')
         ok=True
         for pg in self.pgset:
             for cg in pg.cgset:
@@ -534,7 +533,6 @@ class ParamGroupForm:
                         logging.debug('%s:\n%s'%(p,p.errors))
                         ok=False
             # The last one has a userforms parameter set
-            logging.debug('And now the userform for %s'%pg)
             if cg.userforms.is_valid():
                 instances=cg.userforms.save(commit=False)
                 for uf in instances:
@@ -542,11 +540,9 @@ class ParamGroupForm:
                     uf.save()
                 # now build a new userform in case the overarching form is not ok, to avoid sending the
                 # same userform formset over and over again (and multiply entering the same stuff).
-                logging.debug('OK %s '%pg.id)
                 q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False)
                 cg.userforms=self.UserFormSet(queryset=q,prefix='%s-uf-%s'%(self.prefix,cg.id))
             else: 
                 ok=False
-                logging.debug('%s'%cg.userforms.errors)
         return ok
                 
