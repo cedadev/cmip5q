@@ -81,8 +81,7 @@ class Translator:
         ET.SubElement(titleRow,'td').text='Options'
         ET.SubElement(titleRow,'td').text='Value'
 
-        pgset=ParamGroup.objects.filter(component=c)
-        for pg in pgset:
+        for pg in c.paramGroup.all():
             constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
             pset=NewParam.objects.filter(constraint=constraintSet[0])
             if len(pset)>0:
@@ -93,7 +92,7 @@ class Translator:
                 for con in constraintSet:
                     # we want to always output options with contraints in case people change their minds
                     # if self.constraintValid(con,constraintSet) :
-                    if True :
+                    if True : # always output
                         pset=NewParam.objects.filter(constraint=con)
                         for p in pset:
                             row=ET.SubElement(table,'tr')
@@ -132,7 +131,7 @@ class Translator:
                                 for v in valset:
                                     '''name'''
                                     counter+=1
-                                    values=values+v.value
+                                    values=values+v.name
                                     if counter != len(valset) :
                                         values=values+", "
                                 ET.SubElement(row,'td').text=values
@@ -141,17 +140,10 @@ class Translator:
                             ET.SubElement(row,'td').text=p.value
         return comp
 
-    def cimRecord(self,rootElement,rootClass) :
+    def cimRecord(self,rootElement) :
         ''' return the top level cim document invarient structure from within a CIMRecordSet'''
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
-        try :
-            ET.SubElement(cr2,'id').text=rootClass.uri
-            ET.SubElement(cr2,'version').text=str(rootClass.documentVersion)
-        except :
-            cr2.append(ET.Comment('TBD: ID for '+rootClass._meta.module_name))
-            ET.SubElement(cr2,'id').text='00000000-0000-0000-0000-000000000000'
-            ET.SubElement(cr2,'version').text='0'
         return cr2
     
     def cimRecordRoot(self):
@@ -166,10 +158,6 @@ class Translator:
         root=ET.Element('CIMRecordSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
-        # generate a uuid on the fly for a recordset.
-        ET.SubElement(root,'id').text=str(uuid.uuid1())
-        # as it is a new uuid it is always version 1
-        ET.SubElement(root,'version').text='1'
         return root
 
     def q2cim(self,ref,docType):
@@ -183,13 +171,13 @@ class Translator:
         # using a CIMRecordSet
         if method_name=='add_simulation' :
             root=self.cimRecordSetRoot()
-            modelElement=self.cimRecord(root,ref.numericalModel)
+            modelElement=self.cimRecord(root)
             self.add_component(ref.numericalModel,modelElement)
-            simulationElement=self.cimRecord(root,ref)
+            simulationElement=self.cimRecord(root)
             self.add_simulation(ref,simulationElement)
-            experimentElement=self.cimRecord(root,ref.experiment)
+            experimentElement=self.cimRecord(root)
             self.add_experiment(ref.experiment,experimentElement)
-            platformElement=self.cimRecord(root,ref.platform)
+            platformElement=self.cimRecord(root)
             self.add_platform(ref.platform,platformElement)
 
             uniqueFileList=[]
@@ -200,7 +188,7 @@ class Translator:
                     if externalClosure.targetFile not in uniqueFileList :
                         uniqueFileList.append(externalClosure.targetFile)
             for fileObject in uniqueFileList :
-                dataObjectElement=self.cimRecord(root,fileObject)
+                dataObjectElement=self.cimRecord(root)
                 self.add_dataobject(fileObject,dataObjectElement)
             cimDoc=root
         else :
@@ -231,7 +219,7 @@ class Translator:
     def add_simulation(self,simClass,rootElement):
 
             #single simulation
-            simElement=ET.SubElement(rootElement,'simulationRun',{'CIMVersion':'1.4'})
+            simElement=ET.SubElement(rootElement,'simulationRun')
             ''' responsibleParty [0..inf] '''
             self.addResp(simClass.contact,simElement,'contact')
             self.addResp(simClass.author,simElement,'author')
@@ -241,13 +229,13 @@ class Translator:
             ''' fundingSource [0..inf] '''
             ''' rationale [1..inf] '''
             ET.SubElement(simElement,'rationale').text=simClass.description
-            ''' supports [1..inf] '''
-            experimentElement=ET.SubElement(simElement,'supports')
-            self.addCIMReference(simClass.experiment,experimentElement)
             ''' shortName [1] '''
             ET.SubElement(simElement,'shortName').text=simClass.abbrev
             ''' longName [1] '''
             ET.SubElement(simElement,'longName').text=simClass.title
+            ''' supports [1..inf] '''
+            experimentElement=ET.SubElement(simElement,'supports')
+            self.addCIMReference(simClass.experiment,experimentElement)
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
@@ -320,13 +308,6 @@ class Translator:
                     assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
                     for ensembleClass in ensembleClassSet :
                         self.addEnsemble(ensembleClass,ensemblesElement)
-            ''' deployment [0..1] '''
-            deployElement=ET.SubElement(simElement,'deployment')
-            deployReference=ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
-            ET.SubElement(deployReference,'id').text=simClass.platform.uri
-            #ET.SubElement(deployReference,'name').text=
-            #ET.SubElement(deployReference,'version').text=
-            ET.SubElement(deployReference,'description').text='The resources(deployment) on which this simulation ran'
             ''' input [0..inf] ???COUPLING??? '''
             ''' Duration [1] '''
             durationElement=ET.SubElement(simElement,'Duration')
@@ -334,8 +315,23 @@ class Translator:
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
             ''' spinup [0..1] '''
+            ''' deployment [0..1] '''
+            deployElement=ET.SubElement(simElement,'deployment')
+            deployReference=ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
+            ET.SubElement(deployReference,'id').text=simClass.platform.uri
+            #ET.SubElement(deployReference,'name').text=
+            #ET.SubElement(deployReference,'version').text=
+            ET.SubElement(deployReference,'description').text='The resources(deployment) on which this simulation ran'
+
             ''' previousSimulation [0..1] '''
             ''' simulationID [0..1] '''
+
+            ''' startPoint [1] '''
+            startElement=ET.SubElement(simElement,'startPoint')
+            ''' startPoint element has an optional start date and an option end date '''
+            ''' endPoint [1] '''
+            endElement=ET.SubElement(simElement,'endPoint')
+            ''' endPoint element has an optional start date and an option end date '''
             ''' model [1] '''
             modelElement=ET.SubElement(simElement,'model')
             modelReference=ET.SubElement(modelElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
@@ -343,14 +339,11 @@ class Translator:
             #ET.SubElement(modelReference,'name').text=
             #ET.SubElement(modelReference,'version').text=
             ET.SubElement(modelReference,'description').text='The numerical model which this simulation used'
-            ''' startPoint [1] '''
-            startElement=ET.SubElement(simElement,'startPoint')
-            ''' startPoint element has an optional start date and an option end date '''
-            ''' endPoint [1] '''
-            endElement=ET.SubElement(simElement,'endPoint')
-            ''' endPoint element has an optional start date and an option end date '''
+
             ''' documentID [1] '''
             ET.SubElement(simElement,'documentID').text=simClass.uri
+            ''' documentVersion [1] '''
+            ET.SubElement(simElement,'documentVersion').text=str(simClass.documentVersion)
             ''' documentAuthor [0..inf] '''
             authorElement=ET.SubElement(simElement,'documentAuthor')
             self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
@@ -468,7 +461,7 @@ class Translator:
 
     def add_experiment(self,expClass,rootElement):
 
-            expElement=ET.SubElement(rootElement,'numericalExperiment',{'CIMVersion': '1.4'})
+            expElement=ET.SubElement(rootElement,'numericalExperiment')
             ''' responsibleParty [0..inf] '''
             ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
@@ -688,8 +681,7 @@ class Translator:
         '''license'''
         '''componentProperties'''
         componentProperties=ET.SubElement(comp,'componentProperties')
-        pgset=ParamGroup.objects.filter(component=c)
-        for pg in pgset:
+        for pg in c.paramGroup.all():
             constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
             pset=NewParam.objects.filter(constraint=constraintSet[0])
             if len(pset)>0:
@@ -942,19 +934,16 @@ class Translator:
         if closure.spatialRegrid :
             regridValue=closure.spatialRegrid.name
             if regridValue=='Conservative' :
-                ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'true'})
+                sr=ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'true'})
+                ET.SubElement(sr,'spatialRegriddingOrder').text='TBD'
             elif regridValue=='Non-Conservative' :
-                ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'false'})
+                sr=ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'false'})
+                ET.SubElement(sr,'spatialRegriddingOrder').text='TBD'
             # else do nothing as the value is 'None'
         '''timeTransformation'''
         if closure.temporalTransform :
-            if closure.temporalTransform.name=='TimeAverage' :
-                ET.SubElement(couplingElement,'timeTransformation',{'timeAverage':'true'})
-            elif closure.temporalTransform.name=='TimeAccumulation' :
-                ET.SubElement(couplingElement,'timeTransformation',{'timeAccumulation':'true'})
-            else :
-                # currently no way to capture any other options
-                couplingElement.append(ET.Comment('TBD: timeTransformation: '+closure.temporalTransform.name))
+            tt=ET.SubElement(couplingElement,'timeTransformation')
+            ET.SubElement(tt,'timeMapping',{'value': closure.temporalTransform.name})
         '''couplingSource'''
         sourceElement=ET.SubElement(couplingElement,'couplingSource')
         if closure.target :
