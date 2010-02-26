@@ -83,61 +83,105 @@ class Translator:
 
         for pg in c.paramGroup.all():
             constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
-            pset=NewParam.objects.filter(constraint=constraintSet[0])
-            if len(pset)>0:
-                '''name'''
-                # ET.SubElement(comp,'p').text='name (pg) : '+pg.name
-                # the internal questionnaire representation is that all parameters
-                # are contained in a constraint group
-                for con in constraintSet:
-                    # we want to always output options with contraints in case people change their minds
-                    # if self.constraintValid(con,constraintSet) :
-                    if True : # always output
-                        pset=NewParam.objects.filter(constraint=con)
-                        for p in pset:
-                            row=ET.SubElement(table,'tr')
-                            if con.constraint!='' :
-                                ET.SubElement(row,'td').text=pg.name+':['+con.constraint+']'+p.name
-                            else :
-                                ET.SubElement(row,'td').text=pg.name+':'+p.name
-                            '''definition'''
-                            ET.SubElement(row,'td').text=p.definition
-                            '''controlled vocab does not work as expected '''
-                            # ET.SubElement(comp,'p').text='Controlled Vocabulary : '+str(p.controlled)
-                            '''value'''
-                            if p.ptype=='XOR' :
-                                ET.SubElement(row,'td').text='One value from list'
-                            elif p.ptype=='OR' :
-                                ET.SubElement(row,'td').text='One or more values from list'
-                            else :
-                                myUnits=""
-                                if p.units :
-                                    myUnits=p.units
-                                ValueType=""
-                                if p.numeric :
-                                    ValueType="numeric"
-                                else :
-                                    ValueType="string"
-                                myType=""
-                                ET.SubElement(row,'td').text='Unrestricted (units="'+myUnits+'") (type="'+ValueType+'")'
+            for con in constraintSet:
+                # we need to keep the parameters in the same order
+                # as they are in the questionnaire. Therefore we can
+                # not treat XOR, then OR, then KeyBoard. I don't know
+                # how to determine a derived class from a base class.
+                # So here is a rubbish solution that works!
+                BaseParamSet=BaseParam.objects.filter(constraint=con)
+                XorParamSet=XorParam.objects.filter(constraint=con)
+                OrParamSet=OrParam.objects.filter(constraint=con)
+                KeyBoardParamSet=KeyBoardParam.objects.filter(constraint=con)
+                XorIDX=0
+                OrIDX=0
+                KeyBoardIDX=0
+                for bp in BaseParamSet:
+                    found=False
+                    if not(found) and XorIDX<XorParamSet.count() :
+                        if bp.name == XorParamSet[XorIDX].name :
+                            found=True
+                            p=XorParamSet[XorIDX]
+                            XorIDX+=1
+                            ptype="XOR"
+                    if not(found) and OrIDX<OrParamSet.count() :
+                        if bp.name == OrParamSet[OrIDX].name :
+                            found=True
+                            p=OrParamSet[OrIDX]
+                            OrIDX+=1
+                            ptype="OR"
+                    if not(found) and KeyBoardIDX<KeyBoardParamSet.count() :
+                        if bp.name == KeyBoardParamSet[KeyBoardIDX].name :
+                            found=True
+                            p=KeyBoardParamSet[KeyBoardIDX]
+                            KeyBoardIDX+=1
+                            ptype="KeyBoard"
+                    assert found, "Found must be true at this point"
+                    row=ET.SubElement(table,'tr')
+                    if con.constraint!='' :
+                        ET.SubElement(row,'td').text=pg.name+':['+con.constraint+']'+p.name
+                    else :
+                        ET.SubElement(row,'td').text=pg.name+':'+p.name
+                    '''definition'''
+                    ET.SubElement(row,'td').text=p.definition
+                    '''value'''
+                    if ptype=='XOR' :
+                        ET.SubElement(row,'td').text='One value from list'
+                    elif ptype=='OR' :
+                        ET.SubElement(row,'td').text='One or more values from list'
+                    elif ptype=='KeyBoard' :
+                        myUnits=""
+                        if p.units :
+                            myUnits=p.units
+                        ValueType=""
+                        if p.numeric :
+                            ValueType="numeric"
+                        else :
+                            ValueType="string"
+                        myType=""
+                        ET.SubElement(row,'td').text='Unrestricted (units="'+myUnits+'") (type="'+ValueType+'")'
+                    else :
+                        assert False, "Unrecognised type"
 
-                            if p.vocab :
-                                ''' I am constrained by vocab '''
-                                ''' find all values associated with this vocab '''
-                                # all values that are part of this vocab
-                                valset=Term.objects.filter(vocab=p.vocab)
-                                values=""
-                                counter=0
-                                for v in valset:
-                                    '''name'''
-                                    counter+=1
-                                    values=values+v.name
-                                    if counter != len(valset) :
-                                        values=values+", "
-                                ET.SubElement(row,'td').text=values
-                            else :
-                                ET.SubElement(row,'td').text='n/a'
-                            ET.SubElement(row,'td').text=p.value
+                    if ptype=='XOR' or ptype=='OR' :
+                        ''' I should be constrained by vocab '''
+                        assert p.vocab, 'I should have a vocabulary'
+                        ''' find all values associated with this vocab '''
+                        # all values that are part of this vocab
+                        valset=Term.objects.filter(vocab=p.vocab)
+                        vocabValues=""
+                        counter=0
+                        for v in valset:
+                            '''name'''
+                            counter+=1
+                            vocabValues+=v.name
+                            if counter != len(valset) :
+                                vocabValues+=", "
+                        ET.SubElement(row,'td').text=vocabValues
+                    elif ptype=='KeyBoard':
+                        ET.SubElement(row,'td').text='n/a'
+                    else :
+                        assert False, "Unrecognised type"
+
+                    values=''
+                    if ptype=='KeyBoard':
+                        values=p.value
+                    elif ptype=='XOR':
+                        if p.value :
+                            values=p.value.name
+                    elif ptype=='OR':
+                        if p.value :
+                            valset=p.value.all()
+                            counter=0
+                            for value in valset :
+                                counter+=1
+                                values+=value.name
+                                if counter != len(valset) :
+                                    values+=", "
+                    else:
+                        assert False, "Unrecognised type"
+                    ET.SubElement(row,'td').text=values
+
         return comp
 
     def cimRecord(self,rootElement) :
@@ -236,6 +280,11 @@ class Translator:
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
             self.addCIMReference(simClass.experiment,experimentElement)
+
+            ''' Duration [1] '''
+            durationElement=ET.SubElement(simElement,'Duration')
+            ''' duration element has an optional start date and an option end date '''
+
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
@@ -309,9 +358,6 @@ class Translator:
                     for ensembleClass in ensembleClassSet :
                         self.addEnsemble(ensembleClass,ensemblesElement)
             ''' input [0..inf] ???COUPLING??? '''
-            ''' Duration [1] '''
-            durationElement=ET.SubElement(simElement,'Duration')
-            ''' duration element has an optional start date and an option end date '''
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
             ''' spinup [0..1] '''
@@ -472,9 +518,6 @@ class Translator:
             ''' generates [0..inf] '''
             ''' experimentID [0..1] '''
             ''' duration [0..1] '''
-            ''' numericalRequirement [1..inf] '''
-            for reqClass in expClass.requirements.all():
-                self.addRequirement(reqClass,expElement)
             ''' supports [0..inf] '''
             ''' shortName [1] '''
             ET.SubElement(expElement,'shortName').text=expClass.abbrev
@@ -495,8 +538,13 @@ class Translator:
             ET.SubElement(durationElement,'endDate').text=expClass.requiredDuration.endDate
             if not(self.VALIDCIMONLY) :
                 ET.SubElement(expElement,'Q_lengthYears').text=str(expClass.requiredDuration.length)
+            ''' numericalRequirement [1..inf] '''
+            for reqClass in expClass.requirements.all():
+                self.addRequirement(reqClass,expElement)
             ''' documentID [1] '''
             ET.SubElement(expElement,'documentID').text=expClass.uri
+            ''' documentVersion [1] '''
+            ET.SubElement(expElement,'documentVersion').text=str(expClass.documentVersion)
             ''' documentAuthor [0..inf] '''
             authorElement=ET.SubElement(expElement,'documentAuthor')
             self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
@@ -646,17 +694,40 @@ class Translator:
             refValue=''
             for con in constraintSet:
                 if not(found):
-                    pset=NewParam.objects.filter(constraint=con)
+                    # see if it is a Xor
+                    pset=XorParam.objects.filter(constraint=con)
                     for p in pset:
                         if (p.name==paramName) :
                             found=True
-                            refValue=p.value
+                            if p.value:
+                                refValue=p.value.name
+                    if not found:
+                        # see if it is an or
+                        pset=OrParam.objects.filter(constraint=con)
+                        for p in pset:
+                            if (p.name==paramName) :
+                                found=True
+                                if p.value:
+                                    valset=p.value.all()
+                                    counter=0
+                                    for value in valset :
+                                        counter+=1
+                                        refValue+=value.name
+                                        if counter != len(valset) :
+                                            refValue+=", "
+                    if not found:
+                        # see if it is a keyboard value
+                        pset=KeyBoardParam.objects.filter(constraint=con)
+                        for p in pset:
+                            if (p.name==paramName) :
+                                found=True
+                                refValue=p.value
             assert(found,'Error, can not find property that is referenced by constraint')
             #ET.SubElement(conElement,'Q_Constraint_RefValues').text=refValue
             if refValue=='' : # the reference parameter does not have any values set
                 return True # output constraint parameters if the reference parameter is not set. This is an arbitrary decision, I could have chosen not to.
             match=False
-            for value in refValue.split('|'):
+            for value in refValue.split(','):
                 if not(match) :
                     stripSpaceValue=value.strip()
                     if stripSpaceValue != '' :
@@ -682,38 +753,73 @@ class Translator:
         '''componentProperties'''
         componentProperties=ET.SubElement(comp,'componentProperties')
         for pg in c.paramGroup.all():
+            componentProperty={}
+            if pg.name=="Component Attributes":
+                componentProperty=componentProperties
+            else:
+                componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':str(c.implemented).lower()})
+
+            '''shortName'''
+            ET.SubElement(componentProperty,'shortName').text=pg.name
+            '''longName'''
+            ET.SubElement(componentProperty,'longName').text=pg.name
+
+            # the internal questionnaire representation is that all parameters
+            # are contained in a constraint group
             constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
-            pset=NewParam.objects.filter(constraint=constraintSet[0])
-            if len(pset)>0:
-                componentProperty={}
-                if pg.name=="Component Attributes":
-                    componentProperty=componentProperties
-                else:
-                    componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':str(c.implemented).lower()})
-                '''shortName'''
-                ET.SubElement(componentProperty,'shortName').text=pg.name
-                '''longName'''
-                ET.SubElement(componentProperty,'longName').text=pg.name
-                # the internal questionnaire representation is that all parameters
-                # are contained in a constraint group
-                for con in constraintSet:
-                    if con.constraint!='' :
-                        componentProperty.append(ET.Comment('Constraint : '+con.constraint))
-                    if self.constraintValid(con,constraintSet) :
-                        pset=NewParam.objects.filter(constraint=con)
-                        for p in pset:
-                            property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
-                            '''shortName'''
-                            ET.SubElement(property,'shortName').text=p.name
-                            '''longName'''
-                            ET.SubElement(property,'longName').text=p.name
-                            '''description'''
-                            '''value'''
-                    # extract all value elements (separated by "|"
-                            for value in p.value.split('|'):
-                                stripSpaceValue=value.strip()
-                                if stripSpaceValue!='':
-                                    ET.SubElement(property,'value').text=stripSpaceValue
+            for con in constraintSet:
+                if con.constraint!='' :
+                    componentProperty.append(ET.Comment('Constraint : '+con.constraint))
+                if self.constraintValid(con,constraintSet) :
+                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    XorParamSet=XorParam.objects.filter(constraint=con)
+                    OrParamSet=OrParam.objects.filter(constraint=con)
+                    KeyBoardParamSet=KeyBoardParam.objects.filter(constraint=con)
+                    XorIDX=0
+                    OrIDX=0
+                    KeyBoardIDX=0
+                    for bp in BaseParamSet:
+                        found=False
+                        if not(found) and XorIDX<XorParamSet.count() :
+                            if bp.name == XorParamSet[XorIDX].name :
+                                found=True
+                                p=XorParamSet[XorIDX]
+                                XorIDX+=1
+                                ptype="XOR"
+                        if not(found) and OrIDX<OrParamSet.count() :
+                            if bp.name == OrParamSet[OrIDX].name :
+                                found=True
+                                p=OrParamSet[OrIDX]
+                                OrIDX+=1
+                                ptype="OR"
+                        if not(found) and KeyBoardIDX<KeyBoardParamSet.count() :
+                            if bp.name == KeyBoardParamSet[KeyBoardIDX].name :
+                                found=True
+                                p=KeyBoardParamSet[KeyBoardIDX]
+                                KeyBoardIDX+=1
+                                ptype="KeyBoard"
+                        assert found, "Found must be true at this point"
+
+                        property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
+                        '''shortName'''
+                        ET.SubElement(property,'shortName').text=p.name
+                        '''longName'''
+                        ET.SubElement(property,'longName').text=p.name
+                        '''description'''
+                        '''value'''
+                        if ptype=='KeyBoard':
+                            ET.SubElement(property,'value').text=p.value
+                        elif ptype=='XOR':
+                            value=''
+                            if p.value:
+                                value=p.value.name
+                            ET.SubElement(property,'value').text=value
+                        elif ptype=='OR':
+                            if p.value :
+                                valset=p.value.all()
+                                for value in valset :
+                                    ET.SubElement(property,'value').text=value.name
+
                     #ET.SubElement(property,'ptype').text=p.ptype
                     #ET.SubElement(property,'vocab').text=p.vocab
                 
@@ -1052,7 +1158,7 @@ class Translator:
             ET.SubElement(lfElement,'protocol')
             ET.SubElement(lfElement,'host')
             ET.SubElement(lfElement,'path').text=fileClass.link
-            ET.SubElement(lfElement,'fileName').text=fileClass.name
+            ET.SubElement(lfElement,'fileName').text=fileClass.title
 
             distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
             ET.SubElement(distElement,'distributionFee')
@@ -1077,8 +1183,7 @@ class Translator:
                     contentElement.append(ET.Comment('TBD: reference: there is a reference'))
                 # not used in questionnaire : featureType, drsAddress
             ''' documentID '''
-            try :
-                ET.SubElement(doElement,'documentID').text=fileClass.uri
-            except :
-                ET.SubElement(doElement,'documentID').text='00000000-0000-0000-0000-000000000000'
+            ET.SubElement(doElement,'documentID').text=fileClass.uri
+            ''' documentVersion '''
+            ET.SubElement(doElement,'documentVersion').text=str(fileClass.documentVersion)
             ET.SubElement(doElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
