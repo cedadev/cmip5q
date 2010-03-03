@@ -464,7 +464,7 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'48'}))
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'48'}),required=False)
     class Meta(BaseParamForm.Meta):
         model=OrParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
@@ -475,7 +475,7 @@ class OrParamForm(BaseParamForm):
         self.model='OR'
     
 class XorParamForm(BaseParamForm):
-    value=forms.ModelChoiceField(queryset=Term.objects.all(),widget=DropDownSingleWidget())
+    value=forms.ModelChoiceField(queryset=Term.objects.all(),widget=DropDownSingleWidget(),required=False)
     class Meta(BaseParamForm.Meta):
         model=XorParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
@@ -486,7 +486,7 @@ class XorParamForm(BaseParamForm):
         self.model='XOR'
         
 class KeyBoardParamForm(BaseParamForm):
-    value=forms.CharField(widget=forms.TextInput(attrs={'size':'64'}))
+    value=forms.CharField(widget=forms.TextInput(attrs={'size':'64'}),required=False)
     class Meta(BaseParamForm.Meta):
         model=KeyBoardParam
         exclude=BaseParamForm.Meta.exclude+['numeric','units']
