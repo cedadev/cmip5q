@@ -703,8 +703,8 @@ class Simulation(Doc):
         if closures:cg.propagateClosures()
         
 class BaseTerm(models.Model):
-    name=models.CharField(max_length=64)
-    note=models.CharField(max_length=128,blank=True)
+    name=models.CharField(max_length=256)
+    note=models.CharField(max_length=256,blank=True)
     version=models.CharField(max_length=64,blank=True)
     definition=models.TextField(blank=True)
     def __unicode__(self):
