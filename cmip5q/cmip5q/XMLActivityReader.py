@@ -177,7 +177,7 @@ class NumericalExperiment(object):
         # do some quick length checking
         if len(self.abbrev)>25:
             old=self.abbrev
-            self.abbrev=old[0:25]
+            self.abbrev=old[0:24]
             logging.info('TOOLONG: Truncating abbreviation %s to %s'%(old,self.abbrev))
 
         E=Experiment(rationale=self.rationale,
