@@ -150,6 +150,7 @@ class componentHandler(object):
                     c.delete()
                     return HttpResponseRedirect(url)
         
+                
         # find my own urls ...
         urls={}
         urls['form']=self.url
@@ -190,6 +191,12 @@ class componentHandler(object):
         # meanwhile ...
         navtree=yuiTree2(c.id,baseURL,template=template)
         
+        
+        # Handle a request to copy responsible details downwards to subcomponents
+        if request.method=='POST':
+            if 'filterdown' in request.POST:
+                c.filterdown()
+        
         #OK, we have three cases to handle:
         
         #FIXME; we'll need to put this in the right places with instances:
@@ -225,6 +232,7 @@ class componentHandler(object):
                 'cset':cset,
                 'tabs':tabs(request,self.centre_id,'Model',self.component.model.id),
                 'notAjax':not request.is_ajax()})
+            
             
     def manageRefs(self,request):      
         ''' Handle references for a specific component '''

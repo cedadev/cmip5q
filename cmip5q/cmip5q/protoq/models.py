@@ -491,7 +491,26 @@ class Component(Doc):
         Doc.save(self,*args,**kwargs)
         if cgload:
             cg=CouplingGroup(component=self)
-            cg.save()
+            cg.save() 
+        
+    def filterdown(self):
+        ''' To filter responsible party details downwards to subcomponents '''
+        for x in self.components.all():
+            x.funder_id=self.funder_id
+            x.contact_id=self.contact_id
+            x.author_id=self.author_id
+            if x.components:
+                x.filterdown()
+            x.save()
+            
+            #q = Component.objects.get(id=x.id)
+            #q.author_id=x.author_id
+            #q.contact_id=x.contact_id
+            #q.funder_id=x.funder_id
+            #if q.components:
+            #    q.filterdown()
+            #q.save()           
+            
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
