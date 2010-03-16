@@ -621,8 +621,6 @@ class Translator:
                 #ET.SubElement(machineElement,'machineLocation')
                 if platClass.operatingSystem :
                     machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.name})
-                    vsEl=ET.SubElement(machOSEl,'vocabularyServer')
-                    ET.SubElement(vsEl,'vocabularyName')
                 if platClass.vendor :
                     ET.SubElement(machineElement,'machineVendor').text=platClass.vendor.name
                 if platClass.interconnect :
@@ -652,42 +650,47 @@ class Translator:
                 ''' quality [0..inf] '''
         return rootElement
 
-    def constraintValid(self,con,constraintSet) :
+    def constraintValid(self,con,constraintSet,root) :
         if con.constraint=='' : # there is no constraint
             return True
         else : # need to check the constraint
             # constraint format is : if <ParamName> [is|has] [not]* "<Value>"[ or "<Value>"]*
-            #ET.SubElement(conElement,'Q_Constraint').text=con.constraint
+            #ET.SubElement(root,"DEBUG_Constraint").text=str(con.constraint)
             parsed=con.constraint.split()
             assert(parsed[0]=='if','Error in constraint format')
             assert(parsed[2]=='is' or parsed[2]=='has','Error in constraint format')
             paramName=parsed[1]
-            #ET.SubElement(conElement,'Q_Constraint_Param').text=paramName
+            #ET.SubElement(root,"DEBUG_Constraint_parameter").text=paramName
             if parsed[2]=='is' :
                 singleValueExpected=True
             else:
                 singleValueExpected=False
-            #ET.SubElement(conElement,'Q_Constraint_SingleValuedParam').text=str(singleValueExpected)
+            #ET.SubElement(root,"DEBUG_Constraint_single_valued_parameter").text=str(singleValueExpected)
             if parsed[3]=='not' :
                 negation=True
                 idx=4
             else :
                 negation=False
                 idx=3
-            #ET.SubElement(conElement,'Q_Constraint_Negation').text=str(negation)
+            #ET.SubElement(root,"DEBUG_Constraint_negation").text=str(negation)
             nValues=0
             valueArray=[]
-            while idx<len(parsed) :
-                valueArray.append(parsed[idx].strip('"'))
+            parsedQuote=con.constraint.split('"')
+            #ET.SubElement(root,"DEBUG_Constraint_String_NSplit").text=str(len(parsedQuote))
+            #for name in parsedQuote :
+            #    ET.SubElement(root,"DEBUG_Constraint_String_Split").text=name
+            idx2=2 # ignore the first load of text
+            while idx2<len(parsedQuote) :
+                #ET.SubElement(root,"DEBUG_Adding").text=parsedQuote[idx2-1]
+                valueArray.append(parsedQuote[idx2-1])
                 nValues+=1
-                if (idx+1)<len(parsed) :
-                    assert(parsed[idx+1]=='or','Error in constraint format')
-                idx+=2
+                if (idx2+1)<len(parsedQuote) :
+                    assert(parsed[idx2+1]=='or','Error in constraint format')
+                idx2+=2
             assert(nValues>0)
-            #ET.SubElement(conElement,'Q_Constraint_nValues').text=str(nValues)
+            #ET.SubElement(root,"DEBUG_Constraint_nvalues").text=str(nValues)
             #for value in valueArray :
-            #    ET.SubElement(conElement,'Q_Constraint_value').text=value
-
+            #    ET.SubElement(root,"DEBUG_Constraint_value").text=value
             # now check if the constraint is valid or not
             # first find the value(s) of the parameter that is referenced
             found=False
@@ -723,7 +726,7 @@ class Translator:
                                 found=True
                                 refValue=p.value
             assert(found,'Error, can not find property that is referenced by constraint')
-            #ET.SubElement(conElement,'Q_Constraint_RefValues').text=refValue
+            #ET.SubElement(root,"DEBUG_Constraint_refvalues").text=refValue
             if refValue=='' : # the reference parameter does not have any values set
                 return True # output constraint parameters if the reference parameter is not set. This is an arbitrary decision, I could have chosen not to.
             match=False
@@ -733,7 +736,7 @@ class Translator:
                     if stripSpaceValue != '' :
                         if stripSpaceValue in valueArray :
                             match=True
-            #ET.SubElement(conElement,'Q_Constraint_Match').text=str(match)
+            #ET.SubElement(root,"DEBUG_Constraint_match").text=str(match)
             if negation :
                 match=not(match)
             return match
@@ -757,7 +760,7 @@ class Translator:
             if pg.name=="Component Attributes":
                 componentProperty=componentProperties
             else:
-                componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':str(c.implemented).lower()})
+                componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'true'})
 
             '''shortName'''
             ET.SubElement(componentProperty,'shortName').text=pg.name
@@ -769,8 +772,10 @@ class Translator:
             constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
             for con in constraintSet:
                 if con.constraint!='' :
-                    componentProperty.append(ET.Comment('Constraint : '+con.constraint))
-                if self.constraintValid(con,constraintSet) :
+                    componentProperty.append(ET.Comment('Constraint start: '+con.constraint))
+                if not(self.constraintValid(con,constraintSet,componentProperty)) :
+                    componentProperty.append(ET.Comment('Constraint is invalid'))
+                else :
                     BaseParamSet=BaseParam.objects.filter(constraint=con)
                     XorParamSet=XorParam.objects.filter(constraint=con)
                     OrParamSet=OrParam.objects.filter(constraint=con)
@@ -800,39 +805,47 @@ class Translator:
                                 ptype="KeyBoard"
                         assert found, "Found must be true at this point"
 
-                        property=ET.SubElement(componentProperty,'componentProperty',{'represented':str(c.implemented).lower()})
-                        '''shortName'''
-                        ET.SubElement(property,'shortName').text=p.name
-                        '''longName'''
-                        ET.SubElement(property,'longName').text=p.name
-                        '''description'''
-                        '''value'''
-                        if ptype=='KeyBoard':
-                            ET.SubElement(property,'value').text=p.value
-                        elif ptype=='XOR':
-                            value=''
-                            if p.value:
-                                value=p.value.name
-                            ET.SubElement(property,'value').text=value
-                        elif ptype=='OR':
-                            if p.value :
-                                valset=p.value.all()
-                                for value in valset :
-                                    ET.SubElement(property,'value').text=value.name
+                        # skip CV output if the value is "n/a" for XOR or OR and if (for OR) there is only one value chosen. The validation step will flag the existence of N/A with other values
+                        if (ptype=='XOR' and p.value and p.value.name=='N/A') :
+                            componentProperty.append(ET.Comment('Value of XOR property called '+p.name+' is N/A so skipping'))
+                        elif (ptype=='OR' and p.value and len(p.value.all())==1 and ('N/A' in str(p.value.all()))) : # last clause is messy as we turn the value into a string in a nasty way but I don't know how to do it another way
+                            componentProperty.append(ET.Comment('Value of OR property called '+p.name+' is N/A so skipping'))
+                        else :
+                            property=ET.SubElement(componentProperty,'componentProperty',{'represented': 'true'})
+                            '''shortName'''
+                            ET.SubElement(property,'shortName').text=p.name
+                            '''longName'''
+                            ET.SubElement(property,'longName').text=p.name
+                            '''description'''
+                            '''value'''
+                            if ptype=='KeyBoard':
+                                ET.SubElement(property,'value').text=p.value
+                            elif ptype=='XOR':
+                                value=''
+                                if p.value:
+                                    value=p.value.name
+                                ET.SubElement(property,'value').text=value
+                            elif ptype=='OR':
+                                if p.value :
+                                    valset=p.value.all()
+                                    for value in valset :
+                                        ET.SubElement(property,'value').text=value.name
+                if con.constraint!='' :
+                    componentProperty.append(ET.Comment('Constraint end: '+con.constraint))
 
-                    #ET.SubElement(property,'ptype').text=p.ptype
-                    #ET.SubElement(property,'vocab').text=p.vocab
-                
         '''numericalProperties'''
         ET.SubElement(comp,'numericalProperties')
         '''scientificProperties'''
         ET.SubElement(comp,'scientificProperties')
         '''grid'''
-        '''responsibleParty'''
+        '''responsibleParty [0..inf]'''
         self.addResp(c.author,comp,'author')
         self.addResp(c.funder,comp,'funder')
         self.addResp(c.contact,comp,'contact')
         self.addResp(c.centre.party,comp,'centre')
+        '''releaseDate [0..1] type:dateTime'''
+        if c.yearReleased :
+            ET.SubElement(comp,'releaseDate').text=str(c.yearReleased)
         '''fundingSource'''
         '''citation'''
         self.addReferences(c.references,comp)
@@ -848,53 +861,35 @@ class Translator:
                     comp.append(ET.Comment('Component '+child.abbrev+' has implemented set to false'))
         '''parentComponent'''
         '''deployment'''
-        ''' RF associating genealogy with the component rather than the document '''
-        if nest<=2 :
-            if self.VALIDCIMONLY :
-                comp.append(ET.Comment('TBD: genealogy'))
-                if c.yearReleased :
-                    comp.append(ET.Comment('TBD: yearReleased: '+str(c.yearReleased)))
-                if c.otherVersion :
-                    comp.append(ET.Comment('TBD: previousVersion: '+c.otherVersion))
-                if c.geneology :
-                    comp.append(ET.Comment('TBD: previousVersionImprovements: '+c.geneology))
-            else :
-                genealogy=ET.SubElement(comp,'Q_genealogy')
-                ET.SubElement(genealogy,'Q_yearReleased').text=str(c.yearReleased)
-                ET.SubElement(genealogy,'Q_previousVersion').text=c.otherVersion
-                ET.SubElement(genealogy,'Q_previousVersionImprovements').text=c.geneology
-
-
         '''activity'''
         '''type'''
         #comp.append(ET.Comment("value attribute in element type should have value "+c.scienceType+" but this fails the cim validation at the moment"))
         #ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
         typeElement=ET.SubElement(comp,'type',{'value':c.scienceType})
-        #CIM1.4 requires at least one server subelement for validation even if it is empty i.e. does nothing
-        vsElement=ET.SubElement(typeElement,'vocabularyServer')
-        ET.SubElement(vsElement,'vocabularyName')
         '''component timestep info not explicitely supplied in questionnaire'''
-        #if nest==2:
-                #timing=ET.SubElement(comp,'timing',{'units':'units'})
-                #ET.SubElement(timing,'rate').text='rate'
-        if nest==1:
-            '''documentID'''
-            ET.SubElement(comp,'documentID').text=c.uri
-            '''documentVersion'''
-            ET.SubElement(comp,'documentVersion').text=str(c.documentVersion)
-            '''documentAuthor'''
-            #ET.SubElement(comp,'documentAuthor').text=c.contact
-            authorElement=ET.SubElement(comp,'documentAuthor')
-            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
-            '''documentCreationDate'''
-            #ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
-            ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
-            '''documentGenealogy'''
-            # component genealogy is provided in the questionnaire
-            '''quality'''
-            # no quality information in the questionnaire at the moment
-          
-
+        '''documentID'''
+        ET.SubElement(comp,'documentID').text=c.uri
+        '''documentVersion'''
+        ET.SubElement(comp,'documentVersion').text=str(c.documentVersion)
+        '''documentAuthor'''
+        #ET.SubElement(comp,'documentAuthor').text=c.contact
+        authorElement=ET.SubElement(comp,'documentAuthor')
+        self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
+        '''documentCreationDate [1] '''
+        #ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
+        ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+        '''documentGenealogy [0..1] '''
+        if c.otherVersion or c.geneology :
+            GenEl=ET.SubElement(comp,'documentGenealogy')
+            RelEl=ET.SubElement(GenEl,'relationship')
+            DocEl=ET.SubElement(RelEl,'documentRelationship',{'type' : 'previousVersion'})
+            if c.geneology :
+                ET.SubElement(DocEl,'description').text=c.geneology
+            TargEl=ET.SubElement(DocEl,'target')
+            RefEl=ET.SubElement(TargEl,'reference')
+            if c.otherVersion :
+                ET.SubElement(RefEl,'version').text=c.otherVersion
+        '''quality [0..inf] '''
       else:
           root.append(ET.Comment('Component '+c.abbrev+' has implemented set to false'))
         #logging.debug("component "+c.abbrev+" has implemented set to false")
@@ -941,12 +936,11 @@ class Translator:
         # <gmd:individualName>
         #name=ET.SubElement(resp,'gmd:individualName')
         #ET.SubElement(name,'gco:CharacterString').text=c.contact
-                if respType=='author' or respType=='contact' :
-                    name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
-                else: # default to organisation if not a contact or an author
+                if respClass.isOrganisation :
                     name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'organisationName')
+                else :
+                    name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
                 ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respClass.name
-                name.append(ET.Comment('TBD: responsibleParty abbreviation :: '+respClass.abbrev))
         #</gmd:individualName/>
         # <gmd:organisationName/>
         # <gmd:positionName/>
@@ -984,6 +978,8 @@ class Translator:
         # <gmd:role/>
                 role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')
                 ET.SubElement(role,self.GMD_NAMESPACE_BRACKETS+'CI_RoleCode',{'codeList':'', 'codeListValue':respType})
+                if respClass.abbrev :
+                    ET.SubElement(respElement,'abbreviation').text=respClass.abbrev
 
     def addComposition(self,c,comp):
         couplings=[]
@@ -1174,8 +1170,6 @@ class Translator:
                 elif variable.variable!='' :
                     ET.SubElement(contentElement,'topic').text=variable.variable
                 unitElement=ET.SubElement(contentElement,'unit',{'value':'other'})
-                vocabElement=ET.SubElement(unitElement,'vocabularyServer')
-                ET.SubElement(vocabElement,'vocabularyName')
                 ET.SubElement(contentElement,'aggregation')
                 ET.SubElement(contentElement,'frequency')
 
