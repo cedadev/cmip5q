@@ -471,7 +471,7 @@ class OrParamForm(BaseParamForm):
     def __init__(self,*args,**kwargs):
         BaseParamForm.__init__(self,*args,**kwargs)
         # These always have instances.
-        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab)
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab).order_by('id')
         self.model='OR'
     
 class XorParamForm(BaseParamForm):
@@ -482,7 +482,7 @@ class XorParamForm(BaseParamForm):
     def __init__(self,*args,**kwargs):
         BaseParamForm.__init__(self,*args,**kwargs)
         # These always have instances
-        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab) 
+        self.fields['value'].queryset=Term.objects.filter(vocab=self.instance.vocab).order_by('id')
         self.model='XOR'
         
 class KeyBoardParamForm(BaseParamForm):
