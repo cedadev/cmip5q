@@ -345,7 +345,8 @@ class Translator:
                         simElement.append(ET.Comment('TBD: ensemble information'))
                         if ensembleClass.etype :
                             simElement.append(ET.Comment('TBD: value: '+ensembleClass.etype.name))
-                        simElement.append(ET.Comment('TBD: description: '+ensembleClass.description))
+                        if ensembleClass.description :
+                            simElement.append(ET.Comment('TBD: description: '+ensembleClass.description))
                         ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
                         for ensMemberClass in ensMemberClassSet :
                             simElement.append(ET.Comment('TBD: number: '+str(ensMemberClass.memberNumber)))
