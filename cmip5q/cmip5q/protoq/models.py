@@ -1035,7 +1035,7 @@ class Modification(ParentModel):
     def __unicode__(self):
         return '%s(%s)'%(self.mnemonic,self.mtype)
     def get_parent_model(self):
-        return Modifications
+        return Modification
     class Meta:
         ordering=('mnemonic',)
     
