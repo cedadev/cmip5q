@@ -411,7 +411,7 @@ class ViewHandler(BaseViewHandler):
                                    'title':'Parties','tab':'Parties',
                                    'class':ResponsibleParty,'form':ResponsiblePartyForm,
                                    'filter':None},
-                        'grid':{'attname':'grid','title':'Grid Definition','class':Grid,
+                        'grid':{'attname':'grid','title':'Grid Definitions','class':Grid,
                                 'form':GridForm,'filter':None,'tab':'Grids'},
                         }
     # Note that we don't expect to be able to assign files, since we'll directly
