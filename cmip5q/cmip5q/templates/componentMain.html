@@ -45,7 +45,7 @@
         <div class="boxer">    
             <table>
                 <tr><td class="inputH1">Short Name:&nbsp;{{cform.abbrev.errors}}</td>
-                <td colspan="3">
+                <td colspan="4">
                   {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
                 </td></tr>
                 {% if cform.showImplemented %}
@@ -64,6 +64,10 @@
                 <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>
                              <td>Principal Investigator:&nbsp;{{cform.author.errors}}{{cform.author}}</td>
                              <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td>
+                             {% if isModel %}
+                             {% else %}
+                             <td>Copy Parties to sub-components <input type="checkbox" name="filterdown"/> </td>
+                             {% endif %}
                 </tr>
                 
             </table>
