@@ -363,12 +363,11 @@ class Translator:
             ''' restart [0..inf] '''
             ''' spinup [0..1] '''
             ''' deployment [0..1] '''
-            deployElement=ET.SubElement(simElement,'deployment')
-            deployReference=ET.SubElement(deployElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
-            ET.SubElement(deployReference,'id').text=simClass.platform.uri
-            #ET.SubElement(deployReference,'name').text=
-            #ET.SubElement(deployReference,'version').text=
-            ET.SubElement(deployReference,'description').text='The resources(deployment) on which this simulation ran'
+            dep1Element=ET.SubElement(simElement,'deployment')
+            dep2Element=ET.SubElement(dep1Element,'deployment')
+            ET.SubElement(dep2Element,'description').text='The resources(deployment) on which this simulation ran'
+            platElement=ET.SubElement(dep2Element,'platform')
+            self.addCIMReference(simClass.platform,platElement)
 
             ''' previousSimulation [0..1] '''
             ''' simulationID [0..1] '''
@@ -381,21 +380,10 @@ class Translator:
             ''' endPoint element has an optional start date and an option end date '''
             ''' model [1] '''
             modelElement=ET.SubElement(simElement,'model')
-            modelReference=ET.SubElement(modelElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
-            ET.SubElement(modelReference,'id').text=simClass.numericalModel.uri
-            #ET.SubElement(modelReference,'name').text=
-            #ET.SubElement(modelReference,'version').text=
-            ET.SubElement(modelReference,'description').text='The numerical model which this simulation used'
+            self.addCIMReference(simClass.numericalModel,modelElement)
 
-            ''' documentID [1] '''
-            ET.SubElement(simElement,'documentID').text=simClass.uri
-            ''' documentVersion [1] '''
-            ET.SubElement(simElement,'documentVersion').text=str(simClass.documentVersion)
-            ''' documentAuthor [0..inf] '''
-            authorElement=ET.SubElement(simElement,'documentAuthor')
-            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
-            ''' documentCreationDate [1] '''
-            ET.SubElement(simElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+            self.addDocumentInfo(simClass,simElement)
+
             ''' documentGenealogy [0..inf] '''
             ''' quality [0..inf] '''
             if self.VALIDCIMONLY :
@@ -404,7 +392,6 @@ class Translator:
                 ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
 
             return rootElement
-
 
     def addModificationRef(self,modClass,rootElement) :
         if modClass :
@@ -542,15 +529,8 @@ class Translator:
             ''' numericalRequirement [1..inf] '''
             for reqClass in expClass.requirements.all():
                 self.addRequirement(reqClass,expElement)
-            ''' documentID [1] '''
-            ET.SubElement(expElement,'documentID').text=expClass.uri
-            ''' documentVersion [1] '''
-            ET.SubElement(expElement,'documentVersion').text=str(expClass.documentVersion)
-            ''' documentAuthor [0..inf] '''
-            authorElement=ET.SubElement(expElement,'documentAuthor')
-            self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
-            ''' documentCreationDate [1] '''
-            ET.SubElement(expElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+
+            self.addDocumentInfo(expClass,expElement)
             ''' documentGenealogy [0..inf] '''
             ''' quality [0..inf] '''
 
@@ -598,58 +578,75 @@ class Translator:
     def add_platform(self,platClass,rootElement):
 
         if platClass :
-                deployElement=ET.SubElement(rootElement,'deployment')
-                if not(self.VALIDCIMONLY):
-                    #no funder specified for deployments in the questionnaire
-                    #self.addResp(docClass.author,docElement,'author')
-                    self.addResp(platClass.funder,deployElement,'funder')
-                    self.addResp(platClass.contact,deployElement,'contact')
-                ''' deploymentDate [1] '''
-                # deploymentDate is now optional
-                #ET.SubElement(deployElement,'deploymentDate').text='0001-01-01T00:00:00'
-                ''' description [0..1] '''
-                ''' platform [1] '''
-                platformElement=ET.SubElement(deployElement,'platform')
-                machineElement=ET.SubElement(platformElement,'machine')
-                # platClass.title is never set
-                ET.SubElement(machineElement,'machineName').text=platClass.abbrev
-                if platClass.hardware :
-                    ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.name
-                else:
-                    ET.SubElement(machineElement,'machineSystem')
-                #ET.SubElement(machineElement,'machineLibrary')
-                ET.SubElement(machineElement,'machineDescription').text=platClass.description
-                #ET.SubElement(machineElement,'machineLocation')
-                if platClass.operatingSystem :
-                    machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.name})
-                if platClass.vendor :
-                    ET.SubElement(machineElement,'machineVendor').text=platClass.vendor.name
-                if platClass.interconnect :
-                    ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.name
-                ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
-                ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
-                if platClass.processor :
-                    ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.name
-                ''' compiler [1..inf] '''
-                compilerElement=ET.SubElement(platformElement,'compiler')
-                if platClass.compiler :
-                    ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.name
-                ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
-                ET.SubElement(compilerElement,'compilerLanguage')
-                #ET.SubElement(compilerElement,'compilerOptions')
-                #ET.SubElement(compilerElement,'compilerEnvironmentVariables')
-                #ET.SubElement(compilerElement,'compilerLibrary')
-                ''' documentID [1] '''
-                ET.SubElement(deployElement,'documentID').text=platClass.uri
-                ''' documentAuthor [0] '''
-                #ET.SubElement(comp,'documentAuthor').text=c.contact
-                authorElement=ET.SubElement(deployElement,'documentAuthor')
-                self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
-                ''' documentCreationDate [1] '''
-                ET.SubElement(deployElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
-                ''' documentGenealogy [0] '''
-                ''' quality [0..inf] '''
+            platformElement=ET.SubElement(rootElement,'platform')
+            ''' shortName '''
+            ET.SubElement(platformElement,'shortName').text=platClass.abbrev
+            ''' longName '''
+            ET.SubElement(platformElement,'longName').text=platClass.abbrev
+            ''' description '''
+            if platClass.description :
+                ET.SubElement(platformElement,'description').text=platClass.description
+            ''' machine '''
+            machineElement=ET.SubElement(platformElement,'machine')
+            '''     machineName '''
+            ET.SubElement(machineElement,'machineName').text=platClass.abbrev
+            '''     machineSystem '''
+            if platClass.hardware :
+                ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.name
+            else:
+                ET.SubElement(machineElement,'machineSystem')
+            '''     machineLibrary '''
+            '''     machineDescription '''
+            #ET.SubElement(machineElement,'machineDescription').text=platClass.description
+            '''     machineLocation '''
+            '''     machineOperatingSystem '''
+            if platClass.operatingSystem :
+                machOSEl=ET.SubElement(machineElement,'machineOperatingSystem',{'value':platClass.operatingSystem.name})
+            '''     machineVendor '''
+            if platClass.vendor :
+                ET.SubElement(machineElement,'machineVendor',{'value':platClass.vendor.name})
+            '''     machineInterconnect '''
+            if platClass.interconnect :
+                ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.name
+            '''     machineMaximumProcessors '''
+            ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
+            '''     machineCoresPerProcessor '''
+            ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
+            '''     machineProcessorType '''
+            if platClass.processor :
+                ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.name
+            ''' compiler '''
+            compilerElement=ET.SubElement(platformElement,'compiler')
+            '''     compilerName '''
+            if platClass.compiler :
+                ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.name
+            '''     compilerVersion '''
+            ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
+            '''     compilerLanguage '''
+            ET.SubElement(compilerElement,'compilerLanguage')
+            '''     compilerOptions '''
+            '''     compilerEnvironmentVariables '''
+            '''     contact '''
+            self.addResp(platClass.contact,platformElement,'contact','contact')
+            self.addDocumentInfo(platClass,platformElement)
+            ''' documentGenealogy [0] '''
+            ''' quality [0..inf] '''
         return rootElement
+
+    def addDocumentInfo(self,rootClass,rootElement) :
+        ''' documentID [1] '''
+        ET.SubElement(rootElement,'documentID').text=rootClass.uri
+        ''' documentVersion [1] '''
+        ET.SubElement(rootElement,'documentVersion').text=str(rootClass.documentVersion)
+        ''' documentInternalVersion '''
+        ''' metadataID '''
+        ''' metadataVersion '''
+        ''' documentAuthor [0..1] '''
+        authorElement=ET.SubElement(rootElement,'documentAuthor')
+        self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
+        ''' documentCreationDate [1] '''
+        ET.SubElement(rootElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+
 
     def constraintValid(self,con,constraintSet,root) :
         if con.constraint=='' : # there is no constraint
@@ -868,17 +865,7 @@ class Translator:
         #ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
         typeElement=ET.SubElement(comp,'type',{'value':c.scienceType})
         '''component timestep info not explicitely supplied in questionnaire'''
-        '''documentID'''
-        ET.SubElement(comp,'documentID').text=c.uri
-        '''documentVersion'''
-        ET.SubElement(comp,'documentVersion').text=str(c.documentVersion)
-        '''documentAuthor'''
-        #ET.SubElement(comp,'documentAuthor').text=c.contact
-        authorElement=ET.SubElement(comp,'documentAuthor')
-        self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
-        '''documentCreationDate [1] '''
-        #ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())
-        ET.SubElement(comp,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+        self.addDocumentInfo(c,comp)
         '''documentGenealogy [0..1] '''
         if c.otherVersion or c.geneology :
             GenEl=ET.SubElement(comp,'documentGenealogy')
@@ -889,7 +876,7 @@ class Translator:
             TargEl=ET.SubElement(DocEl,'target')
             RefEl=ET.SubElement(TargEl,'reference')
             if c.otherVersion :
-                ET.SubElement(RefEl,'version').text=c.otherVersion
+                ET.SubElement(RefEl,'name').text=c.otherVersion
         '''quality [0..inf] '''
       else:
           root.append(ET.Comment('Component '+c.abbrev+' has implemented set to false'))
@@ -924,12 +911,12 @@ class Translator:
         ET.SubElement(role,self.GMD_NAMESPACE_BRACKETS+'CI_RoleCode',{'codeList':'', 'codeListValue':respType})
 
 
-    def addResp(self,respClass,rootElement,respType):
+    def addResp(self,respClass,rootElement,respType,parentElement='responsibleParty'):
         if (respClass) :
                 if respClass.name == 'Unknown' : # skip the default respobject
                     rootElement.append(ET.Comment('responsibleParty '+respType+ ' is set to unknown. No CIM output will be generated.'))
                     return
-                respElement=ET.SubElement(rootElement,'responsibleParty')
+                respElement=ET.SubElement(rootElement,parentElement)
                 respElement.append(ET.Comment('responsibleParty uri :: '+respClass.uri))
                 ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
         #http://www.isotc211.org/2005/gmd
@@ -983,10 +970,22 @@ class Translator:
                     ET.SubElement(respElement,'abbreviation').text=respClass.abbrev
 
     def addComposition(self,c,comp):
-        couplings=[]
         # couplings are all at the esm (root component) level
-        if c.isModel:couplings=c.couplings(simulation=self.simClass)
+        couplings=[]
+        if c.isModel:
+            couplings=c.couplings(simulation=self.simClass)
+        # see if I have any couplings. For some reason we can have couplings
+        # without internal or external closures so need to check for closures
+        coupled=False
         if len(couplings)>0 :
+            for coupling in couplings :
+                extclosures=ExternalClosure.objects.filter(coupling=coupling)
+                if len(extclosures)>0 :
+                    coupled=True
+                intclosures=InternalClosure.objects.filter(coupling=coupling)
+                if len(intclosures)>0 :
+                    coupled=True
+        if coupled :
             if self.outputComposition :
                 composeElement=ET.SubElement(comp,'composition')
                 for coupling in couplings:
@@ -1011,9 +1010,9 @@ class Translator:
         if couplingType=='BoundaryCondition' :
             couplingType='boundaryCondition'
         elif couplingType=='AncillaryFile' :
-            couplingType='forcing'
+            couplingType='ancillaryFile'
         elif couplingType=='InitialCondition' :
-            couplingType='initialForcing'
+            couplingType='initialCondition'
         couplingFramework=''
         if coupling.inputTechnique and couplingType=='boundaryCondition' :
             if coupling.inputTechnique.name!='' :
@@ -1103,45 +1102,26 @@ class Translator:
         # dataClass.drsAddress is unused at the moment
 
     def addCIMReference(self,rootClass,rootElement):
-        if rootClass._meta.module_name=='dataobject' :
-            # special case as I am not a document
-            try :
-                myURI=rootClass.container.uri
-                myDocumentVersion=rootClass.container.documentVersion
-            except :
-                # datafile not yet implemented as a document
-                myURI='TBAforDataFiles'
-                myDocumentVersion='0'
-            if rootClass.variable!='' :
-                myName=rootClass.variable
-            else :
-                myName='NoneSpecified'
-        else :
-            try :
-                myURI=rootClass.uri
-                myDocumentVersion=rootClass.documentVersion
-                myName=rootClass.abbrev
-            except :
-                myURI='TBD'
-                myDocumentVersion='0'
-                myName='TBD'
 
+        try :
+            myURI=rootClass.uri
+            myDocumentVersion=rootClass.documentVersion
+            myName=rootClass.abbrev
+            myType=rootClass._meta.module_name
+        except :
+            assert False, "Document is not of type Doc"
 
-        targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#//CIMRecord[id=\''+myURI+'\']'})
+        targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#//CIMRecord/'+myType+'[id=\''+myURI+'\']'})
         ''' id '''
         ET.SubElement(targetRef,'id').text=myURI
         ''' name '''
         ET.SubElement(targetRef,'name').text=myName
         ''' type '''
-        try :
-            targetRef.append(ET.Comment('TBD: type: '+rootClass._meta.module_name))
-        except :
-            targetRef.append(ET.Comment('TBD: type: ERROR'))
+        ET.SubElement(targetRef,'type').text=myType
         ''' version '''
         ET.SubElement(targetRef,'version').text=str(myDocumentVersion)
         ''' description '''
-        ET.SubElement(targetRef,'description').text='Reference to a '+rootClass._meta.module_name+' called '+myName
-        #ET.SubElement(expReference,'description').text='The experiment to which this simulation conforms'
+        ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
 
     def add_dataobject(self,fileClass,rootElement):
 
@@ -1177,8 +1157,4 @@ class Translator:
                 if variable.reference :
                     contentElement.append(ET.Comment('TBD: reference: there is a reference'))
                 # not used in questionnaire : featureType, drsAddress
-            ''' documentID '''
-            ET.SubElement(doElement,'documentID').text=fileClass.uri
-            ''' documentVersion '''
-            ET.SubElement(doElement,'documentVersion').text=str(fileClass.documentVersion)
-            ET.SubElement(doElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+            self.addDocumentInfo(fileClass,doElement)
