@@ -214,6 +214,8 @@ class Translator:
         # all information associated with a simulation
         # using a CIMRecordSet
         if method_name=='add_simulation' :
+            # save our simulation instance so the composition can pick it up
+            self.simClass=ref
             root=self.cimRecordSetRoot()
             modelElement=self.cimRecord(root)
             self.add_component(ref.numericalModel,modelElement)
@@ -1045,16 +1047,20 @@ class Translator:
         '''timeTransformation'''
         if closure.temporalTransform :
             tt=ET.SubElement(couplingElement,'timeTransformation')
-            ET.SubElement(tt,'timeMapping',{'value': closure.temporalTransform.name})
+            ET.SubElement(tt,'mappingType',{'value': closure.temporalTransform.name})
         '''couplingSource'''
         sourceElement=ET.SubElement(couplingElement,'couplingSource')
-        if closure.target :
+        if closure.ctype=='internal' and closure.target :
+            # reference to component
             self.addCIMReference(closure.target,sourceElement)
+        elif closure.ctype=='external' and closure.target :
+            # reference to a field in a file
+            self.addCIMReference(closure.targetFile,sourceElement,argName=closure.target.variable,argType='fileVariable')
+        elif closure.ctype=='external' and closure.targetFile :
+            # reference directly to a file
+            self.addCIMReference(closure.targetFile,sourceElement)
         else :
-            try :
-                self.addCIMReference(closure.targetFile,sourceElement)
-            except :
-                sourceElement.append(ET.Comment('error: couplingSource closure has no target and (for ExternalClosures) no targetFile'))
+            sourceElement.append(ET.Comment('error: couplingSource closure has no target and (for ExternalClosures) no targetFile'))
 
         sourceElement.append(ET.Comment('TBD: input abbrev: '+CompInpClass.abbrev))
         sourceElement.append(ET.Comment('TBD: input description: '+CompInpClass.description))
@@ -1101,13 +1107,25 @@ class Translator:
         # dataClass.featureType is unused at the moment
         # dataClass.drsAddress is unused at the moment
 
-    def addCIMReference(self,rootClass,rootElement):
+    def addCIMReference(self,rootClass,rootElement,argName='',argType=''):
 
+        if argName!='' :
+            assert argType!='', 'If argName is specified then argType must also be specified'
+        if argType!='' :
+            assert argName!='', 'If argType is specified then argName must also be specified'
         try :
             myURI=rootClass.uri
             myDocumentVersion=rootClass.documentVersion
             myName=rootClass.abbrev
             myType=rootClass._meta.module_name
+            if myType=='datacontainer' :
+                 myType='dataObject'
+                 # hack as pre-loaded files do not have an abbreviation
+                 if myName=='' :
+                     myName=rootClass.title
+            elif myType=='component' :
+                myType='modelComponent'
+
         except :
             assert False, "Document is not of type Doc"
 
@@ -1115,13 +1133,22 @@ class Translator:
         ''' id '''
         ET.SubElement(targetRef,'id').text=myURI
         ''' name '''
-        ET.SubElement(targetRef,'name').text=myName
+        if argName!='' :
+            ET.SubElement(targetRef,'name').text=argName
+        else :
+            ET.SubElement(targetRef,'name').text=myName
         ''' type '''
-        ET.SubElement(targetRef,'type').text=myType
+        if argType!='' :
+            ET.SubElement(targetRef,'type').text=argType
+        else :
+            ET.SubElement(targetRef,'type').text=myType
         ''' version '''
         ET.SubElement(targetRef,'version').text=str(myDocumentVersion)
         ''' description '''
-        ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
+        if argType!='' and argName!='' :
+            ET.SubElement(targetRef,'description').text='Reference to a '+argType+' called '+argName+' in a '+myType+' called '+myName
+        else :
+            ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
 
     def add_dataobject(self,fileClass,rootElement):
 
@@ -1130,14 +1157,20 @@ class Translator:
             doElement.append(ET.Comment('TBD: ABBREVIATION: '+fileClass.abbrev))
             doElement.append(ET.Comment('TBD: DESCRIPTION: '+fileClass.description))
             storeElement=ET.SubElement(doElement,'storage')
-            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.name,'dataLocation':''})
+            if fileClass.format :
+                lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.name,'dataLocation':''})
+            else :
+                lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':'','dataLocation':''})
             ET.SubElement(lfElement,'dataSize').text='0'
             ET.SubElement(lfElement,'protocol')
             ET.SubElement(lfElement,'host')
             ET.SubElement(lfElement,'path').text=fileClass.link
             ET.SubElement(lfElement,'fileName').text=fileClass.title
 
-            distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
+            if fileClass.format :
+                distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
+            else :
+                distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':'','distributionAccess':'OnlineFileHTTP'})
             ET.SubElement(distElement,'distributionFee')
             ET.SubElement(distElement,'responsibleParty')
 
