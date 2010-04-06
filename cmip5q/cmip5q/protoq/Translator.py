@@ -284,9 +284,15 @@ class Translator:
             self.addCIMReference(simClass.experiment,experimentElement)
 
             ''' Duration [1] '''
-            durationElement=ET.SubElement(simElement,'Duration')
-            ''' duration element has an optional start date and an option end date '''
-
+            durationElement=ET.SubElement(simElement,'duration')
+            ''' CIM : daily-360, realCalendar, perpetualPeriod '''
+            if simClass.duration :
+                calElement=ET.SubElement(durationElement,str(simClass.duration.calendar),{'units':str(simClass.duration.lengthUnits)})
+                rangeElement=ET.SubElement(calElement,'range')
+                dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
+                ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
+                ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
+            ''' length and lengthUnits ???? '''
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
@@ -833,6 +839,23 @@ class Translator:
                 if con.constraint!='' :
                     componentProperty.append(ET.Comment('Constraint end: '+con.constraint))
 
+        # Add any coupling inputs that have been defined for this component
+        Inputs=ComponentInput.objects.filter(owner=c)
+        for CompInpClass in Inputs :
+            cp=ET.SubElement(componentProperties,'componentProperty',{'represented':'true'})
+            '''shortName'''
+            ET.SubElement(cp,'shortName').text=CompInpClass.abbrev
+            '''longName'''
+            ET.SubElement(cp,'longName').text=CompInpClass.abbrev
+            '''description'''
+            if CompInpClass.description :
+                ET.SubElement(cp,'description').text=CompInpClass.description
+            '''units'''
+            if CompInpClass.units :
+                ET.SubElement(cp,'units',{'value' : CompInpClass.units})
+            '''cfname'''
+            if CompInpClass.cfname :
+                ET.SubElement(cp,'cfName').text=CompInpClass.cfname.name
         '''numericalProperties'''
         ET.SubElement(comp,'numericalProperties')
         '''scientificProperties'''
@@ -995,15 +1018,15 @@ class Translator:
                     # about transformations on a link by link basis
                     extclosures=ExternalClosure.objects.filter(coupling=coupling)
                     for closure in extclosures :
-                        self.addCoupling(coupling,closure,composeElement)
+                        self.addCoupling(coupling,closure,composeElement,comp)
                     intclosures=InternalClosure.objects.filter(coupling=coupling)
                     for closure in intclosures :
-                        self.addCoupling(coupling,closure,composeElement)
+                        self.addCoupling(coupling,closure,composeElement,comp)
                 ET.SubElement(composeElement,'description').text='Coupling details for component '+c.abbrev
             else :
                 comp.append(ET.Comment('Coupling information exists but its output has been switched off for this CIM Object'))
 
-    def addCoupling(self,coupling,closure,composeElement) :
+    def addCoupling(self,coupling,closure,composeElement,componentElement) :
         CompInpClass=coupling.targetInput
         assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
         assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
@@ -1062,15 +1085,9 @@ class Translator:
         else :
             sourceElement.append(ET.Comment('error: couplingSource closure has no target and (for ExternalClosures) no targetFile'))
 
-        sourceElement.append(ET.Comment('TBD: input abbrev: '+CompInpClass.abbrev))
-        sourceElement.append(ET.Comment('TBD: input description: '+CompInpClass.description))
-        if CompInpClass.cfname :
-            sourceElement.append(ET.Comment('TBD: input cfname: '+CompInpClass.cfname.name))
-        sourceElement.append(ET.Comment('TBD: input units: '+CompInpClass.units))
-        
-        '''couplingTarget'''
+        '''couplingTarget'''          
         targetElement=ET.SubElement(couplingElement,'couplingTarget')
-        self.addCIMReference(CompInpClass.owner,targetElement)
+        self.addCIMReference(CompInpClass.owner,targetElement,argName=CompInpClass.abbrev,argType='componentProperty')
         '''priming'''
 
     def addDataRef(self,dataObjectClass,rootElement):
@@ -1154,8 +1171,18 @@ class Translator:
 
         if fileClass :
             doElement=ET.SubElement(rootElement,'dataObject',{'dataStatus':'complete'})
-            doElement.append(ET.Comment('TBD: ABBREVIATION: '+fileClass.abbrev))
-            doElement.append(ET.Comment('TBD: DESCRIPTION: '+fileClass.description))
+            ''' acronym [0..1]'''
+            if fileClass.abbrev!='' :
+                ET.SubElement(doElement,'acronym').text=fileClass.abbrev
+            ''' description [0..1]'''
+            if fileClass.description!='' :
+                ET.SubElement(doElement,'description').text=fileClass.description
+            ''' hierarchyLevelName [0..1]'''
+            ''' hierarchyLevelValue [0..1]'''
+            ''' keyword [0..1]'''
+            ''' geometryModel [0..1]'''
+            ''' restriction [0..inf]'''
+            ''' storage [0..1]'''
             storeElement=ET.SubElement(doElement,'storage')
             if fileClass.format :
                 lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.name,'dataLocation':''})
@@ -1166,28 +1193,41 @@ class Translator:
             ET.SubElement(lfElement,'host')
             ET.SubElement(lfElement,'path').text=fileClass.link
             ET.SubElement(lfElement,'fileName').text=fileClass.title
-
+            ''' distribution [1] '''
             if fileClass.format :
                 distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
+                #distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name})
             else :
                 distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':'','distributionAccess':'OnlineFileHTTP'})
-            ET.SubElement(distElement,'distributionFee')
+                #distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':''})
             ET.SubElement(distElement,'responsibleParty')
-
+            ''' childObject [0..inf]'''
+            ''' parentObject [0..1]'''
+            ''' citation [0..inf]'''
             self.addReference(fileClass.reference,doElement)
+            ''' content [0..inf]'''
             for variable in DataObject.objects.filter(container=fileClass) :
                 contentElement=ET.SubElement(doElement,'content')
-                contentElement.append(ET.Comment('TBD: DESCRIPTION: '+variable.description))
+                ''' topic [1] '''
+                topicElement=ET.SubElement(contentElement,'topic')
+                '''    name [1] '''
+                if variable.variable!='' :
+                    ET.SubElement(topicElement,'name').text=variable.variable
+                '''    standardName [0..1] '''
                 if variable.cfname :
-                    ET.SubElement(contentElement,'topic').text=variable.cfname.name
-                    contentElement.append(ET.Comment('non-cfname: '+variable.variable))
-                elif variable.variable!='' :
-                    ET.SubElement(contentElement,'topic').text=variable.variable
-                unitElement=ET.SubElement(contentElement,'unit',{'value':'other'})
+                    ET.SubElement(topicElement,'standardName',{'standard':'CF'}).text=variable.cfname.name
+                '''    description [0..1] '''
+                if variable.description :
+                    ET.SubElement(topicElement,'description').text=variable.description
+                '''    unit [0..1] '''
+                ''' aggregation [1] '''
                 ET.SubElement(contentElement,'aggregation')
+                ''' frequency [1] '''
                 ET.SubElement(contentElement,'frequency')
-
-                if variable.reference :
-                    contentElement.append(ET.Comment('TBD: reference: there is a reference'))
-                # not used in questionnaire : featureType, drsAddress
+                ''' citation [0..inf] '''
+                self.addReference(variable.reference,contentElement)
+            ''' extent [0..1]'''
+            ''' generic document elements '''
             self.addDocumentInfo(fileClass,doElement)
+            ''' documentGenealogy [0..1] '''
+            ''' quality [0..1] '''
