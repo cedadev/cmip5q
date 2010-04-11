@@ -303,44 +303,39 @@ class Translator:
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'false'})
                     else :
                         confElement=ET.SubElement(simElement,'conformance',{'conformant':'true'})
-                    confElement.append(ET.Comment("Conformance type "+confClass.ctype.name))
                     reqElement=ET.SubElement(confElement,'requirement')
-                    deployReference=ET.SubElement(reqElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
-                    assert(confClass.requirement)
-                    ET.SubElement(deployReference,'id').text=confClass.requirement.name
-                    #ET.SubElement(deployReference,'name').text=
-                    #ET.SubElement(deployReference,'version').text=
-                    ET.SubElement(deployReference,'description').text='The numerical requirement to which this conformance relates. This numerical requirement is specified in the experiment to which the simulation that contains this conformance relates.'
+                    # get experiment class as the reference
+                    ExperimentSet=Experiment.objects.filter(requirements=confClass.requirement)
+                    assert len(ExperimentSet)==1, 'A requirement should have one and only one parent experiment.'
+                    experiment=ExperimentSet[0]
+                    assert confClass.requirement, 'There should be a requirement associated with a conformance'
+                    self.addCIMReference(experiment,reqElement,argName=confClass.requirement.name,argType='NumericalRequirement')
                     # for each modelmod modification
                     for modClass in confClass.mod.all():
                         sourceElement=ET.SubElement(confElement,'source')
-                        sourceReference=ET.SubElement(sourceElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':''}) # a blank href means the same document
                         im=None
                         mm=None
                         try:
-                            im=modClass.inputmod
-                        except:
                             mm=modClass.modelmod
-                        if im:
-                            ET.SubElement(sourceReference,'id').text='TBD'
-                        elif mm:
-                            ET.SubElement(sourceReference,'id').text=modClass.modelmod.component.uri
+                        except:
+                            im=modClass.inputmod
+                        if mm:
+                            # add a reference with the associated modification
+                            self.addCIMReference(mm.component,sourceElement,mod=mm)
+                        elif im:
+                            assert False, 'for some reason, modclass is never an input mod so I should not be called.'
                         else:
-                            assert(False) # error
-                        #ET.SubElement(courceReference,'name').text=
-                        #ET.SubElement(sourceReference,'version').text=
-                        assert(modClass.mtype)
-                        ET.SubElement(sourceReference,'description').text=modClass.description
-                        sourceReference.append(ET.Comment('source reference mnemonic :: '+modClass.mnemonic))
-                        sourceReference.append(ET.Comment('source reference type :: '+modClass.mtype.name))
+                            assert False, 'modelmod must be an inputmod or a modelmod'  # error
 
                     # for each modelmod modification
+                    # for some reason this is where we get the external couplings
                     for couplingClass in confClass.coupling.all():
                         sourceElement=ET.SubElement(confElement,'source')
                         assert couplingClass.targetInput, 'Error, couplingclass should have a targetinput'
-                        targetInput=couplingClass.targetInput
-                        sourceReference=ET.SubElement(sourceElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#'+targetInput.abbrev}) # a blank href means the same document
+                        self.addCIMReference(couplingClass.targetInput.owner,sourceElement,argName=couplingClass.targetInput.abbrev,argType="componentProperty")
 
+                    #ET.SubElement(confElement,'description').text='Conformance type: "'+confClass.ctype.name+'". Notes: "'+confClass.description+'".'
+                    confElement.append(ET.Comment('Conformance type : '+confClass.ctype.name))
                     ET.SubElement(confElement,'description').text=confClass.description
 
             ''' simulationComposite [0..1] '''
@@ -371,8 +366,7 @@ class Translator:
             ''' restart [0..inf] '''
             ''' spinup [0..1] '''
             ''' deployment [0..1] '''
-            dep1Element=ET.SubElement(simElement,'deployment')
-            dep2Element=ET.SubElement(dep1Element,'deployment')
+            dep2Element=ET.SubElement(simElement,'deployment')
             ET.SubElement(dep2Element,'description').text='The resources(deployment) on which this simulation ran'
             platElement=ET.SubElement(dep2Element,'platform')
             self.addCIMReference(simClass.platform,platElement)
@@ -1039,14 +1033,14 @@ class Translator:
         elif couplingType=='InitialCondition' :
             couplingType='initialCondition'
         couplingFramework=''
-        if coupling.inputTechnique and couplingType=='boundaryCondition' :
-            if coupling.inputTechnique.name!='' :
-                couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false','type':coupling.inputTechnique.name})
-        else :
-            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+        couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
         '''connection'''
         '''description'''
         ET.SubElement(couplingElement,'description').text=coupling.manipulation
+        '''type [0..1] '''
+        if coupling.inputTechnique and couplingType=='boundaryCondition' :
+            if coupling.inputTechnique.name!='' :
+                ET.SubElement(couplingElement,'type',{'value':coupling.inputTechnique.name})
         '''timeProfile'''
         units=''
         if coupling.FreqUnits :
@@ -1124,7 +1118,7 @@ class Translator:
         # dataClass.featureType is unused at the moment
         # dataClass.drsAddress is unused at the moment
 
-    def addCIMReference(self,rootClass,rootElement,argName='',argType=''):
+    def addCIMReference(self,rootClass,rootElement,argName='',argType='',mod=None):
 
         if argName!='' :
             assert argType!='', 'If argName is specified then argType must also be specified'
@@ -1166,6 +1160,13 @@ class Translator:
             ET.SubElement(targetRef,'description').text='Reference to a '+argType+' called '+argName+' in a '+myType+' called '+myName
         else :
             ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
+        if mod :
+            modElement=ET.SubElement(targetRef,'change')
+            detailElement=ET.SubElement(modElement,'detail',{'type':mod.mtype.name})
+            # id is currently mandatory in the CIM
+            ET.SubElement(detailElement,'id')
+            detailElement.append(ET.Comment('Mnemonic : '+mod.mnemonic))
+            ET.SubElement(detailElement,'description').text=mod.description
 
     def add_dataobject(self,fileClass,rootElement):
 
@@ -1184,22 +1185,22 @@ class Translator:
             ''' restriction [0..inf]'''
             ''' storage [0..1]'''
             storeElement=ET.SubElement(doElement,'storage')
-            if fileClass.format :
-                lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':fileClass.format.name,'dataLocation':''})
-            else :
-                lfElement=ET.SubElement(storeElement,'ipStorage',{'dataFormat':'','dataLocation':''})
+            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataLocation':''})
             ET.SubElement(lfElement,'dataSize').text='0'
+            if fileClass.format :
+                ET.SubElement(lfElement,'dataFormat',{'value':fileClass.format.name})
+            else :
+                ET.SubElement(lfElement,'dataFormat',{'value':''})
             ET.SubElement(lfElement,'protocol')
             ET.SubElement(lfElement,'host')
             ET.SubElement(lfElement,'path').text=fileClass.link
             ET.SubElement(lfElement,'fileName').text=fileClass.title
             ''' distribution [1] '''
+            distElement=ET.SubElement(doElement,'distribution',{'distributionAccess':'OnlineFileHTTP'})
             if fileClass.format :
-                distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name,'distributionAccess':'OnlineFileHTTP'})
-                #distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':fileClass.format.name})
+                ET.SubElement(distElement,'distributionFormat',{'value':fileClass.format.name})
             else :
-                distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':'','distributionAccess':'OnlineFileHTTP'})
-                #distElement=ET.SubElement(doElement,'distribution',{'distributionFormat':''})
+                ET.SubElement(distElement,'distributionFormat',{'value':''})
             ET.SubElement(distElement,'responsibleParty')
             ''' childObject [0..inf]'''
             ''' parentObject [0..1]'''
