@@ -109,9 +109,9 @@
 		3.3 AMIP
 	</longName>
     
-    <Calendar>
+    <calendar>
         <realCalendar/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1979-01-01T00:00:00Z</startDate>
         <endDate>2008-12-30T00:00:00Z</endDate>

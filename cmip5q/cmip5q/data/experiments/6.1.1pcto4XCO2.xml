@@ -35,9 +35,9 @@
     <shortName> 6.1 1pctCo2 </shortName>
     <longName> 6.1 1 percent per year CO2 </longName>
 
-    <Calendar>
+    <calendar>
         <realCalendar/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1990-30-12T00:00:00Z</endDate>

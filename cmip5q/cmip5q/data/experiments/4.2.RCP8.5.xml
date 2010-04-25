@@ -83,9 +83,9 @@
     <shortName>4.2 rcp85</shortName>
     <longName>4.2 RCP8.5</longName>
     
-    <Calendar>
+    <calendar>
         <realCalendar/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>2006-01-01T00:00:00Z</startDate>
         <endDate>2100-01-01T00:00:00Z</endDate>

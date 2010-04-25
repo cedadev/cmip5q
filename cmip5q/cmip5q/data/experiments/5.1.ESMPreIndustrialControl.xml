@@ -69,9 +69,9 @@
 		5.1 ESM pre-industrial control
 	</longName>
     
-    <Calendar>
+    <calendar>
         <perpetualPeriod/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-30-12T00:00:00Z</endDate>

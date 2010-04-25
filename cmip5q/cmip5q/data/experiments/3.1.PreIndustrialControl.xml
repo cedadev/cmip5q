@@ -79,9 +79,9 @@
 		3.1 Pre-Industrial Control
 	</longName>
 
-    <Calendar>
+    <calendar>
         <perpetualPeriod/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-12-30T24:59:59Z</endDate>

@@ -77,9 +77,9 @@
     <shortName> 6.2a sstClim </shortName>
     <longName> 6.2a Control SST Climatology </longName>
 
-    <Calendar>
+    <calendar>
         <PerpetualPeriod/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-30-12T00:00:00Z</endDate>

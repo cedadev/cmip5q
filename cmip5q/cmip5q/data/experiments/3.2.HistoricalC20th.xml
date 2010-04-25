@@ -112,9 +112,9 @@
 		3.2 Historical
 	</longName>
     
-    <Calendar>
+    <calendar>
         <realCalendar/>
-    </Calendar>
+    </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>2006-01-01T00:00:00Z</endDate>
