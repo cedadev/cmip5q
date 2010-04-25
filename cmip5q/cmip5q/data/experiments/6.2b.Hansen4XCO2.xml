@@ -62,7 +62,7 @@
 	</longName>
     
     <calendar>
-        <PerpetualPeriod/>
+        <perpetualPeriod/>
     </calendar>
     <requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
