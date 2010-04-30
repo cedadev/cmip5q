@@ -601,6 +601,14 @@ class NumericalRequirement(models.Model):
     name=models.CharField(max_length=128)
     ctype=models.ForeignKey('Term',blank=True,null=True)
     consistsOf=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
+    options=models.ManyToManyField('reqOption',blank=True,null=True)
+    def __unicode__(self):
+        return self.name
+
+class reqOption(models.Model):
+    ''' a numerical requirement option '''
+    description=models.TextField(blank=True,null=True)
+    name=models.CharField(max_length=128)
     def __unicode__(self):
         return self.name
     

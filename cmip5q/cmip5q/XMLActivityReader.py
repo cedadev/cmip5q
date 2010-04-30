@@ -55,6 +55,14 @@ def metaAuthor(elem):
     return p
 
 
+def getreqOptions(elem):
+    name=getTextN(elem,'name')
+    desc=getTextN(elem,'description')
+    a=reqOption(name=name,description=desc)
+    a.save()
+     
+    return a
+
 def numericalRequirement (elem):
     
     args={'docid':getText(elem,'id')}
@@ -100,6 +108,12 @@ def numericalRequirement (elem):
     for r in elem.findall('{%s}numericalRequirement'%cimv):
         nn=numericalRequirement(r)
         if nn: n.consistsOf.add(nn)
+    
+    for r in elem.findall('{%s}requirementOption'%cimv):
+        nn=getreqOptions(r)
+        if nn: 
+            n.options.add(nn)
+    
 
     # Now make sure we return the numerical requirement not any subclasses
     # Not sure I need to do this, but just in case ...
