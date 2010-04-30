@@ -42,8 +42,8 @@
 		be prescribed as in the historical run (expt. 3.2) and the RCP4.5 scenario (expt. 4.1) of the long-term suite of experiments.
 		Ocean initial conditions should be in some way representative of the observed anomalies or full fields for the start date. 
 		Land, sea-ice and atmosphere initial conditions are left to the discretion of each group.</description>
-	
 <!-- Initial Conditions are specific to each start date of the ensemble so a requirementSet is used to define the "realisation axis" -->
+<!--
 	<numericalRequirement xsi:type="RequirementSet">
 		<id xsi:type="Identifier">ic.11_oc</id>
 		<name>1.1.ic.ocean</name>
@@ -99,7 +99,7 @@
 			<description>Ocean 2005</description>
 		</numericalRequirement>			
 	</numericalRequirement>
-	
+	-->
 	
 <!-- Boundary Conditions are specified for the entire duration of the staggered start ensemble. -->
 <!-- The boundary condition information relevant to an ensemble member can be inferred from its start date and duration. -->
