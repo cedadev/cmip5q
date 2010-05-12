@@ -17,7 +17,7 @@ class Translator:
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
-    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.4"
+    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.5"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = "cim.xsd"
