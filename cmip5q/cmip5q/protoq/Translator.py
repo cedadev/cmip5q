@@ -757,15 +757,15 @@ class Translator:
         componentProperties=ET.SubElement(comp,'componentProperties')
         for pg in c.paramGroup.all():
             componentProperty={}
-            if pg.name=="Component Attributes":
+            if pg.name=="General Attributes" or pg.name=="Attributes": # skip general attributes as this is just a container for grouping properties in the Questionnaire. The Attributes test is due to "top level" components using this for some reason. I've created a ticket (716) for this.
                 componentProperty=componentProperties
             else:
                 componentProperty=ET.SubElement(componentProperties,'componentProperty',{'represented':'true'})
 
-            '''shortName'''
-            ET.SubElement(componentProperty,'shortName').text=pg.name
-            '''longName'''
-            ET.SubElement(componentProperty,'longName').text=pg.name
+                '''shortName'''
+                ET.SubElement(componentProperty,'shortName').text=pg.name
+                '''longName'''
+                ET.SubElement(componentProperty,'longName').text=pg.name
 
             # the internal questionnaire representation is that all parameters
             # are contained in a constraint group
@@ -1033,8 +1033,11 @@ class Translator:
         elif couplingType=='InitialCondition' :
             couplingType='initialCondition'
         couplingFramework=''
-        couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
-        '''connection'''
+        # fully specified is true if we are referencing data in a file, otherwise it is not fully specified (as we are either referencing a file or a component)
+        if closure.ctype=='external' and closure.target :
+            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'true'})
+        else :
+            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
         '''description'''
         ET.SubElement(couplingElement,'description').text=coupling.manipulation
         '''type [0..1] '''
@@ -1072,7 +1075,8 @@ class Translator:
             self.addCIMReference(closure.target,sourceElement)
         elif closure.ctype=='external' and closure.target :
             # reference to a field in a file
-            self.addCIMReference(closure.targetFile,sourceElement,argName=closure.target.variable,argType='fileVariable')
+            # we reference the file here and the field in the "connection"
+            self.addCIMReference(closure.targetFile,sourceElement)
         elif closure.ctype=='external' and closure.targetFile :
             # reference directly to a file
             self.addCIMReference(closure.targetFile,sourceElement)
@@ -1081,8 +1085,21 @@ class Translator:
 
         '''couplingTarget'''          
         targetElement=ET.SubElement(couplingElement,'couplingTarget')
-        self.addCIMReference(CompInpClass.owner,targetElement,argName=CompInpClass.abbrev,argType='componentProperty')
+        self.addCIMReference(CompInpClass.owner,targetElement)
         '''priming'''
+        '''connection'''
+        connectionElement=ET.SubElement(couplingElement,'connection')
+        if closure.ctype=='external' and closure.target :
+            # we are referencing data in a file
+            sourceElement=ET.SubElement(connectionElement,'connectionSource')
+            self.addCIMReference(closure.targetFile,sourceElement,argName=closure.target.variable,argType='fileVariable')
+        else :
+            connectionElement.append(ET.Comment('this coupling has no connection source specified'))
+        # we know that we always have a connectionTarget as we create it
+        # we know that we never have a connectionSource as there is no such concept in the Questionnaire
+        targetElement=ET.SubElement(connectionElement,'connectionTarget')
+        self.addCIMReference(CompInpClass.owner,targetElement,argName=CompInpClass.abbrev,argType='componentProperty')
+
 
     def addDataRef(self,dataObjectClass,rootElement):
         assert(dataObjectClass,'dataObject should not be null')
