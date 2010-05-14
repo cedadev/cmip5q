@@ -20,7 +20,7 @@ class Translator:
     CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.5"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
-    CIM_URL = "cim.xsd"
+    CIM_URL = CIM_NAMESPACE+"/"+"cim.xsd"
     GMD_NAMESPACE = "http://www.isotc211.org/2005/gmd"
     GMD_NAMESPACE_BRACKETS="{"+GMD_NAMESPACE+"}"
     GCO_NAMESPACE = "http://www.isotc211.org/2005/gco"
@@ -242,26 +242,6 @@ class Translator:
             cimDoc=method(ref,root)
         return cimDoc
         
-    def addEnsemble(self,ensembleClass,rootElement):
-
-        if ensembleClass :
-            ensembleElement=ET.SubElement(rootElement,'Q_Ensemble')
-            ET.SubElement(ensembleElement,'Q_Description').text=ensembleClass.description
-            etypeValueElement=ET.SubElement(ensembleElement,'Q_EtypeValue')
-            self.addValue(ensembleClass.etype,etypeValueElement)
-            ensMembersElement=ET.SubElement(ensembleElement,'Q_EnsembleMembers')
-            ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
-            for ensMemberClass in ensMemberClassSet :
-                self.addEnsMember(ensMemberClass,ensMembersElement)
-
-    def addEnsMember(self,ensMemberClass,rootElement):
-
-        if ensMemberClass :
-            ensMemberElement=ET.SubElement(rootElement,'Q_EnsembleMember')
-            ET.SubElement(ensMemberElement,'Q_Number').text=str(ensMemberClass.memberNumber)
-            # reference the modification here to avoid replication as it is stored as part of the simulation
-            self.addModificationRef(ensMemberClass.mod,ensMemberElement)
-
     def add_simulation(self,simClass,rootElement):
 
             #single simulation
@@ -286,13 +266,21 @@ class Translator:
             ''' Duration [1] '''
             durationElement=ET.SubElement(simElement,'duration')
             ''' CIM : daily-360, realCalendar, perpetualPeriod '''
-            if simClass.duration :
+            if simClass.duration and simClass.duration.calendar :
                 calElement=ET.SubElement(durationElement,str(simClass.duration.calendar),{'units':str(simClass.duration.lengthUnits)})
+                if simClass.duration.length :
+                    ET.SubElement(calElement,'length').text=simClass.duration.length
                 rangeElement=ET.SubElement(calElement,'range')
-                dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
-                ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
-                ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
-            ''' length and lengthUnits ???? '''
+                if simClass.duration.startDate!='' and simClass.duration.endDate!='':
+                    # if both start and end are supplied it is a closed date
+                    dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
+                    ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
+                else :
+                    dateRangeElement=ET.SubElement(rangeElement,'openDateRange')
+                    if simClass.duration.startDate!='' :
+                        ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
+                    if simClass.duration.endDate!='' :
+                        ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
@@ -395,71 +383,6 @@ class Translator:
 
             return rootElement
 
-    def addModificationRef(self,modClass,rootElement) :
-        if modClass :
-            modRefElement=ET.SubElement(rootElement,'Q_ModificationRef')
-            modRefElement.append(ET.Comment("WARNING: Modification information still needs to be added."))
-
-    def addModification(self,modClass,rootElement) :
-        if modClass :
-            modElement=ET.SubElement(rootElement,'Q_Modification')
-            ET.SubElement(modElement,'Q_Mnemonic').text=modClass.mnemonic
-            mtypeValueElement=ET.SubElement(modElement,'Q_MtypeValue')
-            self.addValue(modClass.mtype,mtypeValueElement)
-            ET.SubElement(modElement,'Q_Description').text=modClass.description
-
-    def addModelMod(self,modelModClass,rootElement) :
-        if modelModClass :
-            modelModElement=ET.SubElement(rootElement,'Q_ModelMod')
-            # ModelMod isa Modification
-            self.addModification(modelModClass,modelModElement)
-            if modelModClass.component :
-                compElement=ET.SubElement(modelModElement,'Q_ComponentRef')
-                ET.SubElement(compElement,'Q_ComponentName').text=modelModClass.component.abbrev
-
-    def addInputMod(self,inputModClass,rootElement) :
-        if inputModClass :
-            inputModElement=ET.SubElement(rootElement,'Q_InputMod')
-            # InputMod isa Modification
-            self.addModification(inputModClass,inputModElement)
-            ET.SubElement(inputModElement,'Q_Date').text=str(inputModClass.date)
-            couplingsElement=ET.SubElement(inputModElement,'Q_Couplings')
-            for couplingClass in inputModClass.inputs.all():
-                self.addCouplingRef(couplingClass,couplingsElement)
-
-    def addCouplingRef(self,couplingClass,rootElement):
-        if couplingClass :
-            couplingElement=ET.SubElement(rootElement,'Q_CouplingRef')
-            if couplingClass.targetInput:
-                if couplingClass.targetInput.owner:
-                    ET.SubElement(couplingElement,'Q_ComponentName').text=couplingClass.targetInput.owner.abbrev
-                if couplingClass.targetInput.realm:
-                    ET.SubElement(couplingElement,'Q_RealmName').text=couplingClass.targetInput.realm.abbrev
-                ET.SubElement(couplingElement,'Q_AttrName').text=couplingClass.targetInput.abbrev
-                if couplingClass.targetInput.ctype:
-                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.name
-
-    def addCentre(self,centreClass,rootElement):
-        if centreClass :
-            centreElement=ET.SubElement(rootElement,'Q_Centre')
-            #centreClass is a ResponsibleParty
-            self.addResp(centreClass.party,centreElement,'centre')
-
-    def addVocab(self,vocabClass,rootElement):
-        if vocabClass :
-            vocabElement=ET.SubElement(rootElement,'Q_Vocab')
-            ET.SubElement(vocabElement,'Q_Name').text=vocabClass.name
-            ET.SubElement(vocabElement,'Q_URI').text=vocabClass.uri
-            ET.SubElement(vocabElement,'Q_Note').text=vocabClass.note
-            ET.SubElement(vocabElement,'Q_Version').text=vocabClass.version
-
-    def addValue(self,valueClass,valueElement):
-        if valueClass :
-            ET.SubElement(valueElement,'Q_Value').text=valueClass.name
-            self.addVocab(valueClass.vocab,valueElement)
-            ET.SubElement(valueElement,'Q_Definition').text=valueClass.definition
-            ET.SubElement(valueElement,'Q_Version').text=valueClass.version
-
     def addRequirement(self,reqClass,rootElement):
         if reqClass :
                 if reqClass.ctype :
@@ -467,8 +390,7 @@ class Translator:
                 else :
                     reqElement=ET.SubElement(rootElement,'numericalRequirement')
                 ''' numericalRequirement [0..inf] '''
-                ''' id [1] '''
-                ET.SubElement(reqElement,'id').text='[TBD]'                
+                ''' id [0..1] '''
                 ''' name [1] '''
                 ET.SubElement(reqElement,'name').text=reqClass.name
                 ''' description [0,1] '''
@@ -481,20 +403,6 @@ class Translator:
                     for confClass in confClassSet:
                         self.addConformance(confClass,confElement)
         
-    def addConformance(self,confClass,rootElement):
-        if confClass :
-            confElement=ET.SubElement(rootElement,'Q_Conformance')
-            valueElement=ET.SubElement(confElement,'Q_CtypeValue')
-            self.addValue(confClass.ctype,valueElement)
-            modsElement=ET.SubElement(confElement,'Q_ModelModifications')
-            for modClass in confClass.mod.all():
-                # reference the code modification here to avoid replication as it is stored as part of the simulation
-                self.addModificationRef(modClass,modsElement)
-            coupElement=ET.SubElement(confElement,'Q_InputBindings')
-            for coupClass in confClass.coupling.all():
-                self.addCouplingRef(coupClass,coupElement)
-            ET.SubElement(confElement,'Q_Description').text=confClass.description
-
     def add_experiment(self,expClass,rootElement):
 
             expElement=ET.SubElement(rootElement,'numericalExperiment')
@@ -548,58 +456,33 @@ class Translator:
             self.addChildComponent(compClass,rootElement,1,self.recurse)
         return rootElement
 
-    def addComponentDoc(self,docClass,rootElement):
-
-        if docClass :
-            docElement=ET.SubElement(rootElement,'Q_Doc')
-            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
-            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
-            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
-            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
-            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
-
-
-    def addDoc(self,docClass,rootElement):
-
-        if docClass :
-            docElement=ET.SubElement(rootElement,'Q_Doc')
-            ET.SubElement(docElement,'Q_Title').text=docClass.title
-            ET.SubElement(docElement,'Q_Abbrev').text=docClass.abbrev
-            self.addResp(docClass.author,docElement,'author')
-            self.addResp(docClass.funder,docElement,'funder')
-            self.addResp(docClass.contact,docElement,'contact')
-            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
-            ET.SubElement(docElement,'Q_Description').text=docClass.description
-            ET.SubElement(docElement,'Q_URI').text=docClass.uri
-            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
-            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
-            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
-            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
-        
-
     def add_platform(self,platClass,rootElement):
 
         if platClass :
             platformElement=ET.SubElement(rootElement,'platform')
-            ''' shortName '''
-            ET.SubElement(platformElement,'shortName').text=platClass.abbrev
+            if platClass.compiler :
+                shortName=platClass.abbrev+platClass.compiler.name
+                longName="Machine "+platClass.abbrev+" and compiler "+platClass.compiler.name
+            else :
+                shortName=platClass.abbrev+"CompilerUnspecified"
+                longName="Machine "+platClass.abbrev+" and an unspecified compiler"
+
+            ''' shortName [1] '''
+            ET.SubElement(platformElement,'shortName').text=shortName
             ''' longName '''
-            ET.SubElement(platformElement,'longName').text=platClass.abbrev
+            ET.SubElement(platformElement,'longName').text=longName
             ''' description '''
             if platClass.description :
                 ET.SubElement(platformElement,'description').text=platClass.description
             ''' machine '''
             machineElement=ET.SubElement(platformElement,'machine')
-            '''     machineName '''
+            '''     machineName [1] '''
             ET.SubElement(machineElement,'machineName').text=platClass.abbrev
             '''     machineSystem '''
-            if platClass.hardware :
+            if platClass.hardware:
                 ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.name
-            else:
-                ET.SubElement(machineElement,'machineSystem')
             '''     machineLibrary '''
             '''     machineDescription '''
-            #ET.SubElement(machineElement,'machineDescription').text=platClass.description
             '''     machineLocation '''
             '''     machineOperatingSystem '''
             if platClass.operatingSystem :
@@ -611,21 +494,28 @@ class Translator:
             if platClass.interconnect :
                 ET.SubElement(machineElement,'machineInterconnect').text=platClass.interconnect.name
             '''     machineMaximumProcessors '''
-            ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
+            if platClass.maxProcessors :
+                ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
             '''     machineCoresPerProcessor '''
-            ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
+            if platClass.coresPerProcessor :
+                ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
             '''     machineProcessorType '''
             if platClass.processor :
                 ET.SubElement(machineElement,'machineProcessorType').text=platClass.processor.name
             ''' compiler '''
             compilerElement=ET.SubElement(platformElement,'compiler')
             '''     compilerName '''
+            # mandatory in the CIM
             if platClass.compiler :
                 ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.name
+            else :
+                ET.SubElement(compilerElement,'compilerName').text='unspecified'
             '''     compilerVersion '''
-            ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
+            if platClass.compilerVersion :
+                ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
+            else :
+               ET.SubElement(compilerElement,'compilerVersion').text='unspecified' 
             '''     compilerLanguage '''
-            ET.SubElement(compilerElement,'compilerLanguage')
             '''     compilerOptions '''
             '''     compilerEnvironmentVariables '''
             '''     contact '''
@@ -880,9 +770,26 @@ class Translator:
         '''deployment'''
         '''activity'''
         '''type'''
-        #comp.append(ET.Comment("value attribute in element type should have value "+c.scienceType+" but this fails the cim validation at the moment"))
-        #ET.SubElement(comp,'type',{'value':'other'}) # c.scienceType
-        typeElement=ET.SubElement(comp,'type',{'value':c.scienceType})
+        # map questionnaire realm names to drs realm names
+        if c.scienceType=='Atmosphere' :
+            type='atmos'
+        elif c.scienceType=='Ocean' :
+            type='ocean'
+        elif c.scienceType=='LandSurface' :
+            type='land'
+        elif c.scienceType=='LandIce' :
+            type='landIce'
+        elif c.scienceType=='SeaIce' :
+            type='seaIce'
+        elif c.scienceType=='OceanBiogeoChemistry' :
+            type='ocnBgchem'
+        elif c.scienceType=='AtmosphericChemistry' :
+            type='atmosChem'
+        elif c.scienceType=='Aerosols' :
+            type='aerosol'
+        else :
+            type=c.scienceType
+        typeElement=ET.SubElement(comp,'type',{'value':type})
         '''component timestep info not explicitely supplied in questionnaire'''
         self.addDocumentInfo(c,comp)
         '''documentGenealogy [0..1] '''
@@ -1101,40 +1008,6 @@ class Translator:
         self.addCIMReference(CompInpClass.owner,targetElement,argName=CompInpClass.abbrev,argType='componentProperty')
 
 
-    def addDataRef(self,dataObjectClass,rootElement):
-        assert(dataObjectClass,'dataObject should not be null')
-        assert(dataObjectClass.container,'dataContainer should not be null')
-        dataRefElement=ET.SubElement(rootElement,"Q_DataRef")
-        ET.SubElement(dataRefElement,"Q_VariableName").text=dataObjectClass.variable
-        ET.SubElement(dataRefElement,"Q_FileName").text=dataObjectClass.container.name
-
-    def add_datacontainer(self,dataContainerClass,rootElement):
-        if dataContainerClass :
-            dataContainerElement=ET.SubElement(rootElement,"Q_dataContainer")
-            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.title
-            ET.SubElement(dataContainerElement,"Q_URL").text=dataContainerClass.link
-            ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
-            formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
-            self.addValue(dataContainerClass.format,formatElement)
-            self.addReference(dataContainerClass.reference,dataContainerElement)
-            # add any associated data
-            dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
-            dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
-            logging.info('FIXME: Currently skipping XML conversion for data objects')
-            #for dataObjectInstance in dataObjectInstanceSet:
-            #    self.addDataObject(dataObjectInstance,dataObjectsElement)
-        return rootElement
-
-    def addDataObject(self,dataObjectClass,rootElement):
-        assert(dataObjectClass,'dataObject should not be null')
-        dataElement=ET.SubElement(rootElement,"Q_DataObject")
-        ET.SubElement(dataElement,"Q_description").text=dataObjectClass.description
-        ET.SubElement(dataElement,"Q_variable").text=dataObjectClass.variable
-        ET.SubElement(dataElement,"Q_cfname").text=dataObjectClass.cftype
-        self.addReference(dataObjectClass.reference,dataElement)
-        # dataClass.featureType is unused at the moment
-        # dataClass.drsAddress is unused at the moment
-
     def addCIMReference(self,rootClass,rootElement,argName='',argType='',mod=None):
 
         if argName!='' :
@@ -1189,9 +1062,8 @@ class Translator:
 
         if fileClass :
             doElement=ET.SubElement(rootElement,'dataObject',{'dataStatus':'complete'})
-            ''' acronym [0..1]'''
-            if fileClass.abbrev!='' :
-                ET.SubElement(doElement,'acronym').text=fileClass.abbrev
+            ''' acronym [1]'''
+            ET.SubElement(doElement,'acronym').text=fileClass.abbrev
             ''' description [0..1]'''
             if fileClass.description!='' :
                 ET.SubElement(doElement,'description').text=fileClass.description
@@ -1202,23 +1074,30 @@ class Translator:
             ''' restriction [0..inf]'''
             ''' storage [0..1]'''
             storeElement=ET.SubElement(doElement,'storage')
-            lfElement=ET.SubElement(storeElement,'ipStorage',{'dataLocation':''})
-            ET.SubElement(lfElement,'dataSize').text='0'
+            lfElement=ET.SubElement(storeElement,'ipStorage')
+            #ET.SubElement(lfElement,'dataSize').text='0'
             if fileClass.format :
-                ET.SubElement(lfElement,'dataFormat',{'value':fileClass.format.name})
-            else :
-                ET.SubElement(lfElement,'dataFormat',{'value':''})
-            ET.SubElement(lfElement,'protocol')
-            ET.SubElement(lfElement,'host')
-            ET.SubElement(lfElement,'path').text=fileClass.link
+                if fileClass.format.name=='Text' :
+                    name='ASCII'
+                else :
+                    name=fileClass.format.name
+                ET.SubElement(lfElement,'dataFormat',{'value':name})
+            ''' protocol [0..1] '''
+            #ET.SubElement(lfElement,'protocol')
+            ''' host [0..1] '''
+            #ET.SubElement(lfElement,'host')
+            if fileClass.link :
+                ET.SubElement(lfElement,'path').text=fileClass.link
+            ''' fileName [1]'''
             ET.SubElement(lfElement,'fileName').text=fileClass.title
             ''' distribution [1] '''
-            distElement=ET.SubElement(doElement,'distribution',{'distributionAccess':'OnlineFileHTTP'})
+            distElement=ET.SubElement(doElement,'distribution')
             if fileClass.format :
-                ET.SubElement(distElement,'distributionFormat',{'value':fileClass.format.name})
-            else :
-                ET.SubElement(distElement,'distributionFormat',{'value':''})
-            ET.SubElement(distElement,'responsibleParty')
+                if fileClass.format.name=='Text' :
+                    name='ASCII'
+                else :
+                    name=fileClass.format.name
+                ET.SubElement(distElement,'distributionFormat',{'value':name})
             ''' childObject [0..inf]'''
             ''' parentObject [0..1]'''
             ''' citation [0..inf]'''
@@ -1249,3 +1128,166 @@ class Translator:
             self.addDocumentInfo(fileClass,doElement)
             ''' documentGenealogy [0..1] '''
             ''' quality [0..1] '''
+
+    # the following methods are no longer used and have had XXX added to the start of them
+
+    def XXXaddDataRef(self,dataObjectClass,rootElement):
+        assert(dataObjectClass,'dataObject should not be null')
+        assert(dataObjectClass.container,'dataContainer should not be null')
+        dataRefElement=ET.SubElement(rootElement,"Q_DataRef")
+        ET.SubElement(dataRefElement,"Q_VariableName").text=dataObjectClass.variable
+        ET.SubElement(dataRefElement,"Q_FileName").text=dataObjectClass.container.name
+
+    def XXXadd_datacontainer(self,dataContainerClass,rootElement):
+        if dataContainerClass :
+            dataContainerElement=ET.SubElement(rootElement,"Q_dataContainer")
+            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.title
+            ET.SubElement(dataContainerElement,"Q_URL").text=dataContainerClass.link
+            ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
+            formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
+            self.addValue(dataContainerClass.format,formatElement)
+            self.addReference(dataContainerClass.reference,dataContainerElement)
+            # add any associated data
+            dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
+            dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
+            logging.info('FIXME: Currently skipping XML conversion for data objects')
+            #for dataObjectInstance in dataObjectInstanceSet:
+            #    self.addDataObject(dataObjectInstance,dataObjectsElement)
+        return rootElement
+
+    def XXXaddDataObject(self,dataObjectClass,rootElement):
+        assert(dataObjectClass,'dataObject should not be null')
+        dataElement=ET.SubElement(rootElement,"Q_DataObject")
+        ET.SubElement(dataElement,"Q_description").text=dataObjectClass.description
+        ET.SubElement(dataElement,"Q_variable").text=dataObjectClass.variable
+        ET.SubElement(dataElement,"Q_cfname").text=dataObjectClass.cftype
+        self.addReference(dataObjectClass.reference,dataElement)
+        # dataClass.featureType is unused at the moment
+        # dataClass.drsAddress is unused at the moment
+
+    def XXXaddEnsemble(self,ensembleClass,rootElement):
+
+        if ensembleClass :
+            ensembleElement=ET.SubElement(rootElement,'Q_Ensemble')
+            ET.SubElement(ensembleElement,'Q_Description').text=ensembleClass.description
+            etypeValueElement=ET.SubElement(ensembleElement,'Q_EtypeValue')
+            self.addValue(ensembleClass.etype,etypeValueElement)
+            ensMembersElement=ET.SubElement(ensembleElement,'Q_EnsembleMembers')
+            ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
+            for ensMemberClass in ensMemberClassSet :
+                self.addEnsMember(ensMemberClass,ensMembersElement)
+
+    def XXXaddEnsMember(self,ensMemberClass,rootElement):
+
+        if ensMemberClass :
+            ensMemberElement=ET.SubElement(rootElement,'Q_EnsembleMember')
+            ET.SubElement(ensMemberElement,'Q_Number').text=str(ensMemberClass.memberNumber)
+            # reference the modification here to avoid replication as it is stored as part of the simulation
+            self.addModificationRef(ensMemberClass.mod,ensMemberElement)
+
+    def XXXaddModificationRef(self,modClass,rootElement) :
+        if modClass :
+            modRefElement=ET.SubElement(rootElement,'Q_ModificationRef')
+            modRefElement.append(ET.Comment("WARNING: Modification information still needs to be added."))
+
+    def XXXaddModification(self,modClass,rootElement) :
+        if modClass :
+            modElement=ET.SubElement(rootElement,'Q_Modification')
+            ET.SubElement(modElement,'Q_Mnemonic').text=modClass.mnemonic
+            mtypeValueElement=ET.SubElement(modElement,'Q_MtypeValue')
+            self.addValue(modClass.mtype,mtypeValueElement)
+            ET.SubElement(modElement,'Q_Description').text=modClass.description
+
+    def XXXaddModelMod(self,modelModClass,rootElement) :
+        if modelModClass :
+            modelModElement=ET.SubElement(rootElement,'Q_ModelMod')
+            # ModelMod isa Modification
+            self.addModification(modelModClass,modelModElement)
+            if modelModClass.component :
+                compElement=ET.SubElement(modelModElement,'Q_ComponentRef')
+                ET.SubElement(compElement,'Q_ComponentName').text=modelModClass.component.abbrev
+
+    def XXXaddInputMod(self,inputModClass,rootElement) :
+        if inputModClass :
+            inputModElement=ET.SubElement(rootElement,'Q_InputMod')
+            # InputMod isa Modification
+            self.addModification(inputModClass,inputModElement)
+            ET.SubElement(inputModElement,'Q_Date').text=str(inputModClass.date)
+            couplingsElement=ET.SubElement(inputModElement,'Q_Couplings')
+            for couplingClass in inputModClass.inputs.all():
+                self.addCouplingRef(couplingClass,couplingsElement)
+
+    def XXXaddCouplingRef(self,couplingClass,rootElement):
+        if couplingClass :
+            couplingElement=ET.SubElement(rootElement,'Q_CouplingRef')
+            if couplingClass.targetInput:
+                if couplingClass.targetInput.owner:
+                    ET.SubElement(couplingElement,'Q_ComponentName').text=couplingClass.targetInput.owner.abbrev
+                if couplingClass.targetInput.realm:
+                    ET.SubElement(couplingElement,'Q_RealmName').text=couplingClass.targetInput.realm.abbrev
+                ET.SubElement(couplingElement,'Q_AttrName').text=couplingClass.targetInput.abbrev
+                if couplingClass.targetInput.ctype:
+                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.name
+
+    def XXXaddCentre(self,centreClass,rootElement):
+        if centreClass :
+            centreElement=ET.SubElement(rootElement,'Q_Centre')
+            #centreClass is a ResponsibleParty
+            self.addResp(centreClass.party,centreElement,'centre')
+
+    def XXXaddVocab(self,vocabClass,rootElement):
+        if vocabClass :
+            vocabElement=ET.SubElement(rootElement,'Q_Vocab')
+            ET.SubElement(vocabElement,'Q_Name').text=vocabClass.name
+            ET.SubElement(vocabElement,'Q_URI').text=vocabClass.uri
+            ET.SubElement(vocabElement,'Q_Note').text=vocabClass.note
+            ET.SubElement(vocabElement,'Q_Version').text=vocabClass.version
+
+    def XXXaddValue(self,valueClass,valueElement):
+        if valueClass :
+            ET.SubElement(valueElement,'Q_Value').text=valueClass.name
+            self.addVocab(valueClass.vocab,valueElement)
+            ET.SubElement(valueElement,'Q_Definition').text=valueClass.definition
+            ET.SubElement(valueElement,'Q_Version').text=valueClass.version
+
+    def XXXaddConformance(self,confClass,rootElement):
+        if confClass :
+            confElement=ET.SubElement(rootElement,'Q_Conformance')
+            valueElement=ET.SubElement(confElement,'Q_CtypeValue')
+            self.addValue(confClass.ctype,valueElement)
+            modsElement=ET.SubElement(confElement,'Q_ModelModifications')
+            for modClass in confClass.mod.all():
+                # reference the code modification here to avoid replication as it is stored as part of the simulation
+                self.addModificationRef(modClass,modsElement)
+            coupElement=ET.SubElement(confElement,'Q_InputBindings')
+            for coupClass in confClass.coupling.all():
+                self.addCouplingRef(coupClass,coupElement)
+            ET.SubElement(confElement,'Q_Description').text=confClass.description
+
+    def XXXaddComponentDoc(self,docClass,rootElement):
+
+        if docClass :
+            docElement=ET.SubElement(rootElement,'Q_Doc')
+            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
+            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
+            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
+            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
+            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
+
+
+    def XXXaddDoc(self,docClass,rootElement):
+
+        if docClass :
+            docElement=ET.SubElement(rootElement,'Q_Doc')
+            ET.SubElement(docElement,'Q_Title').text=docClass.title
+            ET.SubElement(docElement,'Q_Abbrev').text=docClass.abbrev
+            self.addResp(docClass.author,docElement,'author')
+            self.addResp(docClass.funder,docElement,'funder')
+            self.addResp(docClass.contact,docElement,'contact')
+            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
+            ET.SubElement(docElement,'Q_Description').text=docClass.description
+            ET.SubElement(docElement,'Q_URI').text=docClass.uri
+            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
+            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
+            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
+            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
