@@ -17,7 +17,7 @@ class Translator:
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
-    CIM_NAMESPACE = "http://www.metaforclimate.eu/cim/1.5"
+    CIM_NAMESPACE = "http://www.metaforclimate.eu/schema/cim/1.5"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = CIM_NAMESPACE+"/"+"cim.xsd"
@@ -269,11 +269,12 @@ class Translator:
             if simClass.duration and simClass.duration.calendar :
                 calElement=ET.SubElement(durationElement,str(simClass.duration.calendar),{'units':str(simClass.duration.lengthUnits)})
                 if simClass.duration.length :
-                    ET.SubElement(calElement,'length').text=simClass.duration.length
+                    ET.SubElement(calElement,'length').text=str(simClass.duration.length)
                 rangeElement=ET.SubElement(calElement,'range')
                 if simClass.duration.startDate!='' and simClass.duration.endDate!='':
                     # if both start and end are supplied it is a closed date
                     dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
+                    ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
                     ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
                 else :
                     dateRangeElement=ET.SubElement(rangeElement,'openDateRange')
@@ -427,8 +428,6 @@ class Translator:
             calendarElement=ET.SubElement(expElement,'calendar')
             assert(expClass.requiredCalendar)
             calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
-            rangeElement=ET.SubElement(calTypeElement,'range')
-            ET.SubElement(rangeElement,'closedDateRange')
             ''' requiredDuration [1] '''
             assert(expClass.requiredDuration)
             durationElement=ET.SubElement(expElement,'requiredDuration')
@@ -770,7 +769,9 @@ class Translator:
         '''deployment'''
         '''activity'''
         '''type'''
-        # map questionnaire realm names to drs realm names
+        # always output the metafor sciencetype
+        ET.SubElement(comp,'type',{'value':c.scienceType})
+        # if it is a realm type then output the relevant drs realm type as well
         if c.scienceType=='Atmosphere' :
             type='atmos'
         elif c.scienceType=='Ocean' :
@@ -788,8 +789,9 @@ class Translator:
         elif c.scienceType=='Aerosols' :
             type='aerosol'
         else :
-            type=c.scienceType
-        typeElement=ET.SubElement(comp,'type',{'value':type})
+            type=''
+        if not type=='' :
+            ET.SubElement(comp,'type',{'value':type})
         '''component timestep info not explicitely supplied in questionnaire'''
         self.addDocumentInfo(c,comp)
         '''documentGenealogy [0..1] '''
@@ -1052,10 +1054,8 @@ class Translator:
             ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
         if mod :
             modElement=ET.SubElement(targetRef,'change')
+            ET.SubElement(modElement,'name').text=mod.mnemonic
             detailElement=ET.SubElement(modElement,'detail',{'type':mod.mtype.name})
-            # id is currently mandatory in the CIM
-            ET.SubElement(detailElement,'id')
-            detailElement.append(ET.Comment('Mnemonic : '+mod.mnemonic))
             ET.SubElement(detailElement,'description').text=mod.description
 
     def add_dataobject(self,fileClass,rootElement):
