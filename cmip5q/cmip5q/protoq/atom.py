@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # 
 # django-atompub by James Tauber <http://jtauber.com/>
 # http://code.google.com/p/django-atompub/
@@ -76,10 +77,9 @@ class Feed(object):
     VALIDATE = True
     
     
-    def __init__(self, slug, feed_url):
+    def __init__(self, slug, request):
         # @@@ slug and feed_url are not used yet
-        pass
-    
+        self.request=request
     
     def __get_dynamic_attr(self, attname, obj, default=None):
         try:

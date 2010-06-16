@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 NEWAT=1
 import os
 
@@ -6,7 +7,6 @@ os.environ['DJANGO_SETTINGS_MODULE']='settings'
 
 from protoq.models import *
 from XMLinitialiseQ import initialise
-from XMLActivityReader import NumericalExperiment
 from ControlledModel import *
 
 from initialiseRefs import *
@@ -30,7 +30,7 @@ initialiseRefs()
 experimentDir = './data/experiments'
 for f in os.listdir(experimentDir):
     if f.endswith('.xml'):
-	    x=NumericalExperiment(os.path.join(experimentDir, f)) 
+	    x=Experiment.fromXML(os.path.join(experimentDir, f))
 
 # initialise a model template
 initialiseModel()

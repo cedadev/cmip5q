@@ -83,6 +83,7 @@ td.space {background-color:#FFFFFF;}
 div.guidance {font-size:small; margin-left:20px; margin-right:20px;}
 .cmip5q{font-size:small; margin-left:20px; margin-right:20px;color:green}
 a.button {text-decoration:None;padding:1px 3px 1px 3px;border:1px solid black; background-color:#E1E1E1;}
+
     
 /* support for tables */
 .row1 {background-color:#FFF8DC } /* cornsilk see http://www.somacon.com/p142.php */
@@ -158,8 +159,8 @@ not for now ...
     definition of these styles adjusted to match your background. */
     
 /* Following used to mark CMIP5 completed simulations on the simulation list */    
-.done .yui-button .first-child {background-color:#CCFF99; }
-.undone .yui-button .first-child {background-color:#F5CF85; }
+/*.done .yui-button button {background-color:#CCFF99; }
+.undone .yui-button button {background-color:#F5CF85; } */
 .done {background-color:#CCFF99;}
 .undone {background-color:#F5CF85;}
         

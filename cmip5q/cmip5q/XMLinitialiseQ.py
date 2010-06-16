@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 ##
 ## This file for all the initialisation that SHOULD come from XML but currently
@@ -60,12 +61,12 @@ VocabList={'Realms':
     'ModelModTypes':('ParameterChange','CodeChange'),
 
     # types of numerical requirement 
-    'NumReqTypes':('NumericalRequirement','BoundaryCondition','InitialCondition','SpatioTemporalConstraint'),
+    'NumReqTypes':('NumericalRequirement','BoundaryCondition','InitialCondition','SpatioTemporalConstraint','RequirementSet','OutputRequirement'),
     # should be used in spatio temporal constraints
     'SpatialResolutionTypes':('',),
     
     #ensembleTypes
-    'EnsembleTypes':('Initial Condition','Perturbed Physics','Perturbed Boundary Conditions'),
+    'EnsembleTypes':('Experiment Driven','Initial Condition','Perturbed Physics','Perturbed Boundary Conditions','Mixed'),
     
     #calendarTypes
     'CalendarTypes':('perpetualPeriod','realCalendar','daily-360'),
@@ -73,6 +74,8 @@ VocabList={'Realms':
     #simulation relationship types
     'SimRelationships':('hasControlSimulation','extends','other','fixedVersionOf','usesSpinup'),
     
+    #data relationship types
+    'dataRelationships':('using','usingModifiedVersionOf'),
     }
     
 def loadCF():

@@ -57,9 +57,14 @@
     </numericalRequirement>
     <numericalRequirement xsi:type="SpatioTemporalConstraint">
         <id xsi:type="Identifier">tbd</id>
-        <name xsi:type="Identifier">tbd</name>
-        <outputPeriod>for one year between year 0 and year 25</outputPeriod>
-        <frequencyUnits>months</frequencyUnits>
+        <name xsi:type="Identifier">Physics change part way through run</name>
+        <description> Actually this experiment description is broken, currently
+        code doesn't read sub requirements and it's not actually a stc </description>
+        <outputPeriod>
+            <startDate>0000-01-01T00:00:00Z</startDate>
+            <length units="years">1</length>
+            <description>For one year between year 0 and year 25</description>
+        </outputPeriod>
         <numericalRequirement xsi:type="BoundaryCondition">
             <id xsi:type="Identifier">bc.055</id>
             <name xsi:type="Identifier">6.2a.bc.4XCO2.conc</name>
@@ -73,6 +78,11 @@
                 scheme</description>
         </numericalRequirement>
     </numericalRequirement>
+    <numericalRequirement xsi:type="OutputRequirement">
+        <name xsi:type="Identifier">Duration</name>
+        <id xsi:type="Identifier">tbd</id>
+      <frequencyUnits>months</frequencyUnits>
+    </numericalRequirement>
 
     <shortName> 6.2a sstClim </shortName>
     <longName> 6.2a Control SST Climatology </longName>
@@ -80,11 +90,15 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
+    <numericalRequirement xsi:type="SpatioTemporalConstraint">
+    <name xsi:type="Identifier">tbd</name>
+        <id xsi:type="Identifier">tbd</id>
     <requiredDuration xsi:type="ClosedDateRange">
+        
         <startDate>1850-01-01T00:00:00Z</startDate>
-        <endDate>1850-30-12T00:00:00Z</endDate>
-        <lengthYears>30</lengthYears>
-    </requiredDuration>
+        <endDate>1850-12-30T00:00:00Z</endDate>
+        <length units="years">30</length>
+    </requiredDuration></numericalRequirement>
     <author>
         <gmd:CI_ResponsibleParty>
             <gmd:individualName>

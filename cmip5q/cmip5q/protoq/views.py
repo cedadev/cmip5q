@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Create your views here.
 
 from django.shortcuts import get_object_or_404, render_to_response
@@ -110,11 +111,11 @@ def centres(request):
         #yep we've selected something
         try:
             selected_centre=p.get(id=request.POST['choice'])
+            return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,))) 
         except KeyError:
-            #redisplay form
-            return render_to_response('centres.html',
-                {'centreList':p})
-        return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,))) 
+            m='Unable to select requested centre %s'%request.POST['choice']
+            logging.info('ERROR on centres page: Unable to select requested centre %s'%request.POST['choice'])
+            return render_badrequest('error.html',{'message':m})
     else: 
         logging.info('Viewing centres')
         curl=reverse('cmip5q.protoq.views.centres')
@@ -348,7 +349,9 @@ def ensemble(request,cen_id,sim_id):
     e.updateMembers()  # in case members were deleted via their code mods or ics.
     members=e.ensemblemember_set.all()
         
-    EnsembleMemberFormset=modelformset_factory(EnsembleMember,form=EnsembleMemberForm,extra=0,exclude=('ensemble','memberNumber'))
+    EnsembleMemberFormset=modelformset_factory(EnsembleMember,form=EnsembleMemberForm,
+                                               formset=BaseEnsembleMemberFormSet,
+                                               extra=0,exclude=('ensemble','memberNumber'))
     
     urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
           'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
@@ -375,6 +378,8 @@ def ensemble(request,cen_id,sim_id):
             else: ok=False
         logging.debug('POST to ensemble is ok - %s'%ok)
         if ok: return HttpResponseRedirect(urls['self'])
+    for f in eformset.forms: f.specialise(s.experiment.requirementSet)
+    eform.rset=(s.experiment.requirementSet is not None)
     return render_to_response('ensemble.html',
                {'s':s,'e':e,'urls':urls,'eform':eform,'eformset':eformset,
                'tabs':tabs(request,cen_id,'Ensemble')})
@@ -391,9 +396,9 @@ class ViewHandler(BaseViewHandler):
     # as it will appear in a URL, the name it is used when an attribute, 
     # the resource class and the resource class form
     # (so keys need to be lower case)
-    SupportedResources={'modelmod':{'attname':'modelMod',
+    SupportedResources={'modelmod':{'attname':'codeMod',
                             'title':'Model Modifications','tab':'ModelMods',
-                             'class':ModelMod,'form':ModelModForm,
+                             'class':CodeMod,'form':CodeModForm,
                              'filter':None},
                         'inputmod':{'attname':'inputMod',
                             'title':'Input Modifications','tab':'InputMods',

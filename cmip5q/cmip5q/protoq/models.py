@@ -1,25 +1,40 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django import forms
-from django.forms.models import modelformset_factory
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.db.models.query import CollectedObjects, delete_objects
 from django.db.models.fields.related import ForeignKey
+from django.contrib.sites.models import Site, RequestSite
+
 from lxml import etree as ET
+
+from django.core import exceptions
+from django.utils.translation import ugettext_lazy, ugettext as _
 
 from django.db.models import permalink
 from django.core.files import File
 
 from atom import Feed
 from cmip5q.protoq.cimHandling import *
-from cmip5q.protoq.utilities import atomuri
+from cmip5q.protoq.utilities import atomuri,HTMLdate
+from cmip5q.XMLutilities import *
+from cmip5q.protoq.fields import *
+from cmip5q.protoq.dropdown import TimeLengthWidget
 
 from django.conf import settings
 logging=settings.LOG
 from django.core.files.base import ContentFile
 from django.db.models.query import QuerySet
+import types
+
+cimv='http://www.metaforclimate.eu/cim/1.1'
+gmd='http://www.isotc211.org/2005/gmd'
+gco="http://www.isotc211.org/2005/gco"
+
+
 
 
 def soft_delete(obj,simulate=False):
@@ -56,6 +71,19 @@ def soft_delete(obj,simulate=False):
     n=0  # number of objects to be deleted
     for k in on_death_row.unordered_keys():
         n+=len(on_death_row[k]) 
+    # before we go following the foreign keys, let's just make sure some of these
+    # objects are not simply parent objects in a non abstract class heirarchy.
+    # we should allow those to be deleted happily.
+    if hasattr(obj,'get_parent_model'):
+        # then we know we have at least one parent object to get rid of, and if it's the only one,
+        # delete with impunity.
+        parent=obj.get_parent_model()
+        if len(on_death_row[parent])==1: 
+            n=1
+        else:
+            logging.info('This case not coded for ... sorry ')
+            raise NotImplementedError
+        
     if n<>1:
         #delve into the metadata to find out what managers point at this model,
         #then use all those to filter out direct relationships to this one.
@@ -94,9 +122,12 @@ def soft_delete(obj,simulate=False):
                         if mname not in linkdict: linkdict[mname]=[] 
                         linkdict[mname].append(referer)
         return False,linkdict
-    else:
-        if not simulate: delete_objects(on_death_row)
-        return True,{}
+    
+    if not simulate: delete_objects(on_death_row)
+    return True,{}
+        
+
+        
 
 class ChildQuerySet(QuerySet):
     ''' Used to support the queryset options on ParentModel'''
@@ -354,7 +385,6 @@ class SimRelationship(Relationship):
     sfrom=models.ForeignKey('Simulation',related_name='related_from')
     sto=models.ForeignKey('Simulation',related_name='related_to',blank=True,null=True)
 
-
 class ResponsibleParty(models.Model):
     ''' So we have the flexibility to use this in future versions '''
     isOrganisation=models.BooleanField(default=False)
@@ -371,7 +401,32 @@ class ResponsibleParty(models.Model):
         return soft_delete(self,*args,**kwargs)
     class Meta:
         ordering=['abbrev','name','email']
-    
+    @staticmethod
+    def fromXML(elem):
+        ''' This is an interface class to return either an existing resonsible party instance
+        or create a new one from XML '''
+        # FIXME
+        s=ET.tostring(elem)
+        if s.find('Charlotte')>-1: 
+            n='Charlotte Pascoe'
+            c=ResponsibleParty.objects.filter(name=n)
+            if len(c)==0:
+                p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
+                                email='Charlotte.Pascoe@stfc.ac.uk')
+                p.save()
+            else: p=c[0]
+        elif s.find('Gerard')>1:
+            n='Gerard Devine'
+            c=ResponsibleParty.objects.filter(name=n)
+            if len(c)==0:
+                p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
+                                email='g.m.devine@reading.ac.uk')
+                p.save()
+            else: p=c[0]
+        else: p=None
+        logging.debug('Metadata maintainer: %s'%p)
+        return p
+
 class Centre(ResponsibleParty):
     ''' A CMIP5 modelling centre '''
     # It's such an important entity it gets it's own sub class ...
@@ -379,6 +434,30 @@ class Centre(ResponsibleParty):
     party=models.OneToOneField(ResponsibleParty,parent_link=True,related_name='party')
     def __init__(self,*args,**kwargs):
         ResponsibleParty.__init__(self,*args,**kwargs)
+        
+class BaseTerm(models.Model):
+    name=models.CharField(max_length=256)
+    note=models.CharField(max_length=256,blank=True)
+    version=models.CharField(max_length=64,blank=True)
+    definition=models.TextField(blank=True)
+    def __unicode__(self):
+       return self.name
+    class Meta:
+        abstract=True
+        ordering=('name',)
+        
+class Vocab(BaseTerm):
+    ''' Holds a vocabulary '''
+    uri=models.CharField(max_length=64)
+    url=models.CharField(max_length=128,blank=True,null=True)
+    def recache(self,update=None):
+        '''Obtain a new version from a remote url or the argument and load into database cache'''
+        pass
+    
+class Term(BaseTerm):
+    ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
+    vocab=models.ForeignKey('Vocab') 
+        
         
 class Reference(models.Model):
     ''' An academic Reference '''
@@ -555,74 +634,238 @@ class Platform(Doc):
     interconnect=models.ForeignKey('Term',related_name='interconnectVal',null=True,blank=True)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
 
-    
-    
-class ClosedDateRange(models.Model):
-    ''' Actually this is a DateRange as well '''
-    startDate=models.CharField(max_length=32,blank=True,null=True)
-    calendar=models.ForeignKey('Term',blank=True,null=True,related_name='date_calendar')
-    description=models.TextField() # occasionally it's too hard to fix it.
-    endDate=models.CharField(max_length=32,blank=True,null=True)
-    length=models.FloatField(blank=True,null=True)  # years
-    lengthUnits=models.ForeignKey('Term',blank=True,null=True,related_name='date_lengthunits')
-    def __unicode__(self):
-        d=''
-        if self.description:
-            d='%s: '%self.description
-        if self.startDate:
-            d+=self.startDate
-        if self.endDate:
-            return d+' to %s (%s%s)'%(self.endDate,self.length,self.lengthUnits)
-        else:
-            return d+' onwards'
-    def copy(self):
-        d={}
-        for a in ['startDate','calendar','description','endDate','length','lengthUnits']:
-            d[a]=self.__getattribute__(a)
-        new=ClosedDateRange(**d)
-        new.save()
-        return new
+def Calendar(elem):
+    ''' Retrieve a calendar term and add a toXML instance method. Behaves like a subclass of Term '''
+    def toXML(self,parent='calendar'):
+        e=ET.Element(parent)
+        e.text=self.name
+        return e
+    cv=Term.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
+    try:
+        tag=elem[0].tag.split('}')[1]
+        r=cv.get(name=tag)
+    except Exception,e:
+        raise ValueError('Invalid calendar type "%s" (%s)'%(elem.tag,e))
+    f=types.MethodType(toXML,r,Term)
+    r.toXML=f
+    return r
 
 class Experiment(Doc):
-    ''' A CMIP5 Numerical Experiment '''
+    ''' A CMIP5 ***Numerical*** Experiment '''
     rationale=models.TextField(blank=True,null=True)
-    requirements=models.ManyToManyField('NumericalRequirement',blank=True,null=True)
-    requiredDuration=models.ForeignKey(ClosedDateRange,blank=True,null=True)
+    requirements=models.ManyToManyField('GenericNumericalRequirement',blank=True,null=True)
+    requiredDuration=DateRangeField(blank=True,null=True)
     requiredCalendar=models.ForeignKey('Term',blank=True,null=True,related_name='experiment_calendar')
     #used to identify groups of experiments
     memberOf=models.ForeignKey('Experiment',blank=True,null=True)
+    requirementSet=models.ForeignKey('RequirementSet',blank=True,null=True,related_name='ensembleRequirements')
     def __unicode__(self):
         return self.abbrev
+   
+    @staticmethod   
+    def fromXML(filename):
+        '''Experiments are defined in XML files, so need to be loaded into django, and
+        a copy loaded into the document database as well '''
+        
+        E=Experiment()
+       
+        etree=ET.parse(filename)
+        txt=open(filename,'r').read()
+        logging.debug('Parsing experiment filename %s'%filename)
+        root=etree.getroot()
+        getter=etTxt(root)
+        #basic document stuff, note q'naire doc not identical to experiment bits ...
+        doc={'description':'description','shortName':'abbrev','longName':'title'}
+        for key in doc:
+            E.__setattr__(doc[key],getter.get(root,key))
+        
+        #FIXME handle calendars before date
+        E.rationale=getter.get(root,key)
+       
+        # bypass reading all that nasty gmd party stuff ...
+        E.metadataMaintainer=ResponsibleParty.fromXML(root.find('{%s}author'%cimv))
+        
+        # do some quick length checking
+        if len(E.abbrev)>25:
+            old=E.abbrev
+            E.abbrev=old[0:24]
+            logging.info('TOOLONG: Truncating abbreviation %s to %s'%(old,E.abbrev))
 
-class NumericalRequirement(models.Model):
-    ''' A numerical Requirement '''
+        E.uri=atomuri()
+        E.save()
+        
+        for r in root.findall('{%s}numericalRequirement'%cimv):
+            #pass the constructor me and the element tree element
+            n=instantiateNumericalRequirement(E,r)
+            if n is not None: # n should only be None for a RequirementSet
+                n.save()
+                E.requirements.add(n)
+      
+        # we can save this most expeditiously, directly, here.
+        keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
+        attrs={}
+        for key in keys: attrs[key]=E.__getattribute__(key)
+        
+        cfile=CIMObject(**attrs)
+        cfile.cimtype=E._meta.module_name
+        cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype,E.uri,E.documentVersion),
+                               ContentFile(txt),save=False)
+        cfile.title='%s (%s)'%(E.abbrev,E.title)
+        cfile.save()
+        
+def instantiateNumericalRequirement(experiment,elem):
+    ''' This provides an interface to return any sort of numerical requirement, given
+    an element '''
+    typekey='{http://www.w3.org/2001/XMLSchema-instance}type'
+    if typekey in elem.attrib.keys():
+        ctype=elem.attrib[typekey]
+    else: ctype='NumericalRequirement'
+    v=Vocab.objects.get(name='NumReqTypes')
+    ctypeVals=Term.objects.filter(vocab=v)
+    try:
+        ctype=ctypeVals.get(name=ctype)
+    except:
+        raise ValueError('Invalid numerical requirement type [%s]'%ctype)
+    if ctype.name in ['NumericalRequirement','InitialCondition','BoundaryCondition']:
+        return NumericalRequirement.fromXML(experiment,elem,ctype)
+    elif ctype.name=='SpatioTemporalConstraint':
+        return SpatioTemporalConstraint.fromXML(experiment,elem,ctype)
+    elif ctype.name=='RequirementSet':
+        if experiment.requirementSet:
+            raise ValueError('Questionnaire only supports one requirement set per expt')
+        experiment.requirementSet=RequirementSet.fromXML(experiment,elem,ctype)
+        experiment.save()
+        return None
+    elif ctype.name=='OutputRequirement':
+        logging.info('Output Requirements Not Implmented')
+    else:
+        raise ValueError('%s not yet implemented'%ctype.name)
+    
+class GenericNumericalRequirement(ParentModel):
+    ''' We use this generic base class, since we want to find all
+    numeric requirements in one go from experiments '''
     docid=models.CharField(max_length=64)
     description=models.TextField(blank=True,null=True)
     name=models.CharField(max_length=128)
     ctype=models.ForeignKey('Term',blank=True,null=True)
-    consistsOf=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
-    options=models.ManyToManyField('reqOption',blank=True,null=True)
+    options=models.ManyToManyField('RequirementOption',blank=True,null=True) 
+    def get_parent_model(self):
+        return GenericNumericalRequirement
     def __unicode__(self):
         return self.name
+    def gfromXML(self,experiment,elem):
+        ''' Initialised with an appropriate experiment, and an element tree Element '''
+        getter=etTxt(elem)
+        self.docid=getter.get(elem,'id')
+        for a in ['description','name']:self.__setattr__(a,getter.getN(elem,a))
+        for e in elem.findall('{%s}requirementOption'%cimv):
+            ro=RequirementOption()
+            ro.fromXML(e)
+            ro.save()
+            self.options.add(ro)
+        print experiment,self.id,self.name
 
-class reqOption(models.Model):
-    ''' a numerical requirement option '''
-    description=models.TextField(blank=True,null=True)
-    name=models.CharField(max_length=128)
-    def __unicode__(self):
-        return self.name
+class RequirementOption(models.Model):
+    ''' A numerical requirement option ''' 
+    description=models.TextField(blank=True,null=True) 
+    name=models.CharField(max_length=128) 
+    def __unicode__(self):    
+        return self.name 
+    def fromXML(self,elem):
+        getter=eTxt(elem)
+        name=eTxt.get(elem,'name')
+        description=eTxt.get(elem,'description')
+        return RequirementOption(name=name,description=description)
+
+class NumericalRequirement(GenericNumericalRequirement):
+    ''' A Numerical Requirement '''
+    @staticmethod
+    def fromXML(experiment,elem,ctype):
+        ''' Initialised with an appropriate experiment, and an element tree Element. All
+        numerical requirements are initialised through this interface '''
+        nr=NumericalRequirement(ctype=ctype)
+        nr.gfromXML(experiment,elem)
+        nr.save()
+        return nr
+        
+class SpatioTemporalConstraint(GenericNumericalRequirement):
+    requiredDuration=DateRangeField(blank=True,null=True)
+    spatialResolution=models.ForeignKey('SpatialResolution',blank=True,null=True)
+    @staticmethod
+    def fromXML(experiment,elem,ctype):
+        nr=SpatioTemporalConstraint(ctype=ctype)
+        nr.gfromXML(experiment,elem)
+        op=elem.find('{%s}requiredDuration'%cimv)
+        print 'duration element ',op
+        if op is not None: nr.requiredDuration=DateRange.fromXML(op)
+        op=elem.find('{%s}spatialResolution'%cimv)
+        if op is not None:
+            raise ValueError('NO CODE TO READ spatialResolution in SpatioTemporalConstraint')
+        nr.save()
+        return nr
+
+class RequirementSet(GenericNumericalRequirement):
+    members=models.ManyToManyField(GenericNumericalRequirement,blank=True,null=True,symmetrical=False,related_name='members')
+    @staticmethod
+    def fromXML(experiment,elem,ctype):
+        nr=RequirementSet(ctype=ctype)
+        nr.gfromXML(experiment,elem)
+        nr.save()
+        for r in elem.findall('{%s}numericalRequirement'%cimv):
+            #pass the constructor the experiment and the element tree element
+            n=instantiateNumericalRequirement(experiment,r)
+            if n is None:
+                raise ValueError('Cannot embed RequirementSets')
+            else:
+                n.save()
+                nr.members.add(n)
+        return nr
     
-class SpatioTemporalConstraint(NumericalRequirement):
-    frequencyUnits=models.ForeignKey('Term',blank=True,null=True,
-        related_name='stc_frequencyUnits')
+class OutputRequirement(GenericNumericalRequirement):
     outputFrequency=models.IntegerField(null=True)
-    spatialResolution=models.ForeignKey('Term',blank=True,null=True,
-        related_name='stc_spatialRes')
-    averagingUnits=models.ForeignKey('Term',blank=True,null=True,
-        related_name='stc_averagingUnits')
-    temporalAveraging=models.IntegerField(null=True)
-    outputPeriod=models.ForeignKey(ClosedDateRange,blank=True,null=True)
+    frequencyUnits=models.ForeignKey('Term',blank=True,null=True,
+        related_name='out_frequencyUnits')
+    outputPeriod=DateRangeField(blank=True,null=True)
+    temporalAveraging=models.ForeignKey('TimeAverage',blank=True,null=True)
+    def __init__(self,experiment,elem,ctype):
+        self.ctype=ctype
+        raise ValueError('Code for output requirements has yet to be completed')
+        # the code that follows is a hangover from previously and needs rewriting. 
+        myvocab={'frequencyUnits':'FreqUnits',
+                 'averagingUnits':'FreqUnits',
+                 'spatialResolutionUnits':'SpatialResolutionTypes'}
+        for a in ['temporalAveraging','outputFrequency']:
+            self.__setattr__(a,getTextN(elem,a))
+        for a in ['frequencyUnits','averagingUnits','spatialResolution']:
+            vv=getTextN(elem,a)
+            if vv:
+                v=Vocab.objects.get(name=myvocab[a])
+                try:
+                    val=Term.objects.filter(vocab=v).get(name=vv)
+                    self.__setattr__(a,val)
+                except:
+                    logging.info('Invalid unit %s not found in vocab %s'%(vv,v))
+    
+    
+class SpatialResolution(models.Model):
+    '''FIXME: This is currently unused and untested '''
+    units=models.ForeignKey('Term',blank=True,null=True,related_name='sr_units')
+    value=models.ForeignKey('Term',blank=True,null=True,related_name='sr_value')
+    def __unicode__(self):
+        return '%s %s'%(value,units)
 
+class TimeAverage(models.Model):
+    units=models.ForeignKey('Term')
+    period=models.FloatField()
+    def __unicode__(self):
+        return '%s %s'%(self.period,self.units)
+    def toXML(self,parent='TimeAverage'):
+        ''' Serialise to XML '''
+        e=ET.Element(parent)
+        ET.SubElement(e,'period').text=self.period
+        ET.SubElement(e,'units').text=self.units
+        return e
+        
 class Simulation(Doc):
     ''' A CMIP5 Simulation '''
     # models may be used for multiple simulations
@@ -640,7 +883,7 @@ class Simulation(Doc):
     authorList=models.TextField()
     
     # allow some minor mods to match the criteria, how else would it be described?
-    modelMod=models.ManyToManyField('ModelMod',blank=True,null=True)
+    codeMod=models.ManyToManyField('CodeMod',blank=True,null=True)
     
     # this next is here in case we need it later, but I think we shouldn't
     inputMod=models.ManyToManyField('InputMod',blank=True,null=True)
@@ -648,11 +891,63 @@ class Simulation(Doc):
     # the following to support relationships to ourselves
     relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
     
-    duration=models.ForeignKey('ClosedDateRange',blank=True,null=True)
+    duration=DateRangeField(blank=True,null=True)
     
     # not yet used:
     drsOutput=models.ManyToManyField('DRSOutput')
         
+    # I/O datasets
+    # only modified by resetIO and updateIO
+    # the idea being that these are convenience bundles of *files* to create *dataset* which can
+    # be represented as *CIM dataobjects* and which couplings can point into ...
+    # So, the xml seraialisation will have to take an external closure, work out which datasett it 
+    # appears in, and point to the file within it via an xpath expression which uses the dataset uri
+    # and a pointer to the file described within it and then the variable with that.
+    # But this way we have a sensible number of datasets associatd with a simulation:
+    #   - the input data, the ancillary data, the boundary conditoins, and (eventually) the
+    #     actual output. The first three of these should appear in the atom feed. # FIXME
+    #   - and if it's an ensemble, we may have another two of these associated with
+    #     each ensemble member (one output and one input change). However, these ensemble 
+    #     datasets are *NOT* pointed to here, you will need to get to those via the ensemble 
+    #     member's inputmod.
+    datasets=models.ManyToManyField('Dataset')    
+    
+    def copy(self,experiment):
+        ''' Copy this simulation into a new experiment '''
+        s=Simulation(abbrev=self.abbrev+' dup',title='copy', 
+                     contact=self.contact, author=self.author, funder=self.funder,
+                     description=self.description, authorList=self.authorList,
+                     uri=atomuri(),
+                     experiment=experiment,numericalModel=self.numericalModel,
+                     ensembleMembers=1, platform=self.platform, centre=self.centre)
+        s.save()
+        #now we need to get all the other stuff related to this simulation
+        # every simulation has it's own date range:
+        s.duration=self.duration.copy()
+        for mm in self.inputMod.all():s.inputMod.add(mm)
+        for mm in self.codeMod.all():s.codeMod.add(mm)
+        s.save() # I don't think I need to do this ... but to be sure ...
+        #couplings:
+        myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self)
+        for m in myCouplings:
+            r=m.duplicate4sim(s)
+        # conformance:
+        # we can't duplicate that, since we don't know the conformance are the same unless we 
+        # have a mapping page somewhere ... so we reset
+        s.resetConformances()
+        return s
+    
+    def resetConformances(self):
+        ''' We need to set up the conformances or reset them from time to time '''
+        existingConformances=Conformance.objects.filter(simulation=self)
+        for c in existingConformances:c.delete()
+        ctypes=Vocab.objects.get(name='ConformanceTypes')
+        defaultConformance=None#Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
+        reqs=self.experiment.requirements.all()
+        for r in reqs:
+            c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
+            c.save()
+            
     def updateCoupling(self):
         ''' Update my couplings, in case the user has added some inputs (and hence couplings)
         in the numerical model, but note that updates to existing input couplings in
@@ -679,79 +974,60 @@ class Simulation(Doc):
             else:
                 cgs=mcgs.get(simulation=None)
                 cgs=cgs.duplicate4sim(self)
+        # having updated the couplings, we'll now find any new files (if any)
+        self._updateIO()
         return cgs  # it's quite useful to get this back (e.g. for resetclosures etc)
 
-    def copy(self,experiment):
-        ''' Copy this simulation into a new experiment '''
-        s=Simulation(abbrev=self.abbrev+' dup',title='copy', 
-                     contact=self.contact, author=self.author, funder=self.funder,
-                     description=self.description, authorList=self.authorList,
-                     uri=atomuri(),
-                     experiment=experiment,numericalModel=self.numericalModel,
-                     ensembleMembers=1, platform=self.platform, centre=self.centre)
-        s.save()
-        #now we need to get all the other stuff related to this simulation
-        # every simulation has it's own date range:
-        s.duration=self.duration.copy()
-        for mm in self.inputMod.all():s.inputMod.add(mm)
-        for mm in self.modelMod.all():s.modelMod.add(mm)
-        s.save() # I don't think I need to do this ... but to be sure ...
-        #couplings:
-        myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self)
-        for m in myCouplings:
-            r=m.duplicate4sim(s)
-        # conformance:
-        # we can't duplicate that, since we don't know the conformance are the same unless we 
-        # have a mapping page somewhere ... so we reset
-        s.resetConformances()
-        return s
-        
-    def resetConformances(self):
-        # we need to set up the conformances or reset them.
-        existingConformances=Conformance.objects.filter(simulation=self)
-        for c in existingConformances:c.delete()
-        ctypes=Vocab.objects.get(name='ConformanceTypes')
-        defaultConformance=None#Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
-        reqs=self.experiment.requirements.all()
-        for r in reqs:
-            c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
-            c.save()
-    
     def resetCoupling(self,closures=False):
-        # we had some couplings, but we need to get rid of them for some reason
-        # (usually because we've just change model)
+        '''We had some couplings, but we need to get rid of them for some reason
+        (usually because we've just changed model) '''
+        self._resetIO()
         cgs=self.couplinggroup_set.all()
         if len(cgs)<>0:
-            assert(len(cgs)==1,'Expect only one coupling group for simulation %s'%self)
+            assert len(cgs)==1,'Expect only one coupling group for simulation %s'%self
             cg=cgs[0]
             cg.delete()
         # now put back the ones from the model
         cg=self.updateCoupling()
         if closures:cg.propagateClosures()
         
-class BaseTerm(models.Model):
-    name=models.CharField(max_length=256)
-    note=models.CharField(max_length=256,blank=True)
-    version=models.CharField(max_length=64,blank=True)
-    definition=models.TextField(blank=True)
-    def __unicode__(self):
-       return self.name
-    class Meta:
-        abstract=True
-        ordering=('name',)
-        
-class Vocab(BaseTerm):
-    ''' Holds a vocabulary '''
-    uri=models.CharField(max_length=64)
-    url=models.CharField(max_length=128,blank=True,null=True)
-    def recache(self,update=None):
-        '''Obtain a new version from a remote url or the argument and load into database cache'''
-        pass
-    
-class Term(BaseTerm):
-    ''' Vocabulary Values, loaded by script, never prompted for via the questionairre '''
-    vocab=models.ForeignKey('Vocab')
-   
+    def _resetIO(self):
+        ''' create or replace the default datasets for this simulation, usually to be
+        called by resetCoupling '''
+        # see updateIO for documentation of what we're doing here.
+        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
+        existing=self.datasets.all()
+        for e in existing:e.delete()
+        for itype in itypes:
+            d=Dataset(usage=itype)
+            d.save()
+            self.datasets.add(d)
+            
+    def _updateIO(self):
+        ''' To be called as an aid for serialisation for display, checks
+        the external closures associated with each input type and aggregates
+        the files into the datasets associated with this simulation. We
+        expect this to be called after a simulation has updated couplings'''
+        # first get the list of input types (so these'll be the datasets):
+        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
+        # now these are my datasets corresponding to those types (we hope):
+        existing=self.datasets.all()
+        assert len(existing)==len(itypes),'Unexpected condition on entry to simulation method updateIO for %s'%self
+        # all my couplings:
+        myCouplings=self.numericalModel.couplings(self)
+        for itype in itypes:
+            # one dataset at a time
+            d=existing.get(usage=itype)
+            # now restrict our external closures to just those relevant to this dataset
+            # we want couplings that are to target inputs which (themselves componentinputs)
+            # have attribute ctype equal to itype.
+            theseCouplings=myCouplings.filter(targetInput__ctype=itype)
+            # now get all the external closures in my couplings (aka files)
+            # avoid an extra database query to get to the files ...
+            ecset=ExternalClosure.objects.select_related('targetFile').filter(coupling__in=theseCouplings)
+            for e in ecset:
+                if e.targetFile not in d.children.all(): d.children.add(e.targetFile)
+                
 class PhysicalProperty(Term):
     units=models.ForeignKey(Term,related_name='property_units')
 
@@ -834,7 +1110,7 @@ class KeyBoardParam(BaseParam):
     def cpattr(self):
         return ['value','units','numeric']
 
-    
+
 class DataContainer(Doc):
     ''' This holds multiple data objects. Some might think of this as a file '''
     # a name for drop down file lists (and yes it's short)
@@ -856,7 +1132,7 @@ class DataContainer(Doc):
         else: return self.title[0:31]  # truncation ...
     class Meta:
         ordering=('centre','title')
-    
+            
 class DataObject(models.Model):
     ''' Holds a variable within a data container '''
     container=models.ForeignKey(DataContainer)
@@ -875,6 +1151,17 @@ class DataObject(models.Model):
     class Meta:
         ordering=('variable',)
     
+class Dataset(Doc):
+    ''' Used to aggregate data containers together in the questionnaire.
+    It's a convenience class, not a full map into a CIM dataset '''
+    # Expect to use this to aggregate the various files needed by a 
+    # simulation into the number of datasets 
+    children=models.ManyToManyField(DataContainer)
+    # The following is not serialised, but helps discriminate internal to the questionnaire
+    usage=models.ForeignKey(Term)
+    # Either the dataset is associated with a simulation or an EnsembleMember, but
+    # they know that, the dataset is agnostic
+
 class CouplingGroup(models.Model):
     ''' This class is used to help manage the couplings in terms of presentation and
     their copying between simulations '''
@@ -1012,17 +1299,80 @@ class Ensemble(models.Model):
     
 class EnsembleMember(models.Model):
     ensemble=models.ForeignKey(Ensemble,blank=True,null=True)
-    memberNumber=models.IntegerField()
-    mod=models.ForeignKey('Modification',blank=True,null=True)
+    memberNumber=models.IntegerField() # realisation
+    cmod=models.ForeignKey('CodeMod',blank=True,null=True)
+    imod=models.ForeignKey('InputMod',blank=True,null=True)
+    drsMember=models.CharField(max_length=10,blank=True,null=True)
+    requirement=models.ForeignKey(GenericNumericalRequirement,blank=True,null=True)
     def __unicode__(self):
         return '%s ensemble member %s'%(self.ensemble.simulation,self.memberNumber)
     class Meta:
         ordering=('memberNumber',)
     
+    
+# Consider an ensemble with a staggered start.
+# Consider an ensemble with a range of realisations reflecting different initialisatoin strategies
+# Consider a perturbed physics ensemble.
+# We also have modifications used to simplify having to enter model after model for minor mod # changes.
+
+class realKVP(models.Model):
+    ''' Simply used to hold a key value pair '''
+    k=models.CharField(max_length=64,blank=True,null=True)
+    v=models.FloatField(blank=True,null=True)
+
+class Modification(ParentModel):
+    ''' Base class for all modifications -  note not abstract, so we can get at all modifications
+    regardless of their type '''
+    mnemonic=models.SlugField()
+    description=models.TextField()
+    centre=models.ForeignKey(Centre)
+    def __unicode__(self):
+        return '%s(%s)'%(self.mnemonic,self.get_child_name())
+    def get_parent_model(self):
+        return Modification
+    class Meta:
+        ordering=('mnemonic',)
+    def delete(self,*args,**kwargs):
+        ''' Avoid deleting documents which have foreign keys to this instance'''
+        return soft_delete(self,*args,**kwargs)
+
+class CodeMod(Modification):
+    '''This is a modification to some code. The description describes what has been done.
+    We can imagine that the code mod is either a change to the physics or a component value somewhere '''
+    # This is the component which has been modified.
+    component=models.ForeignKey(Component)
+    # Type of change: parameter change or code change ...
+    mtype=models.ForeignKey(Term,blank=True,null=True)
+    # Optionally, we might want some real values associated with a named parameter so we can 
+    # order some ensemble members (e.g. ClimatePrediction.net wanting to find all the 
+    # realisations with a particular value of dropsize). Unfortuantely, they may have
+    # perturbed a number of things each time.
+    mods=models.ManyToManyField(realKVP)
+    # but we only support one for now (so as to make the form handling easier 
+    k=models.CharField(max_length=64,blank=True,null=True)
+    v=models.FloatField(blank=True,null=True)
+
+class InputMod(Modification):
+    ''' There are (currently) three types of inputs, any of which might have been modified to create the 
+    ensemble members. In many cases we're interested in changing the date of the data from files, or
+    changing the date of the integration itself. So, we have two interesting cases as to what might have 
+    been done with the inputs. We might read them from different files, or we might select different
+    members of the files. In either case we're probably not interested in redefining all the inputs, 
+    but we'd better allow the user to do so if they so wish '''
+    inputTypeModified=models.ForeignKey(Term,related_name='usage') # so this keys into the input types vocabulary
+    memberStartDate=SimDateTimeField(blank=True,null=True)
+    # if the files are not modified then we don't need to describe the changed files.
+    # if they are changed, we either change the files, or we create a file modification
+    # description ...
+    dataset=models.ForeignKey('Dataset',blank=True,null=True)
+    # if we've been lazy and this isn't the actual dataset used, then we need to serialise this
+    # as a related dataset and not the dataset itself. So we'd need to describe the relationship.
+    dataRelationship=models.ForeignKey(Term,related_name='relationship',blank=True,null=True)
+
 class Conformance(models.Model):
     ''' This relates a numerical requirement to an actual solution in the simulation '''
     # the identifier of the numerical requirement:
-    requirement=models.ForeignKey(NumericalRequirement)
+    requirement=models.ForeignKey(GenericNumericalRequirement)
     # simulation owning the requirement 
     simulation=models.ForeignKey(Simulation)
     # conformance type from the controlled vocabulary
@@ -1030,46 +1380,11 @@ class Conformance(models.Model):
     #
     mod=models.ManyToManyField('Modification',blank=True,null=True)
     coupling=models.ManyToManyField(Coupling,blank=True,null=True)
+    option=models.ForeignKey(RequirementOption,blank=True,null=True)
     # notes
     description=models.TextField(blank=True,null=True)
     def __unicode__(self):
-        return "%s for %s"%(self.ctype,self.requirement)
-    
-class Modification(ParentModel):
-    mnemonic=models.SlugField()
-    mtype=models.ForeignKey(Term)
-    description=models.TextField()
-    centre=models.ForeignKey(Centre)
-    def __unicode__(self):
-        return '%s(%s)'%(self.mnemonic,self.mtype)
-    def get_parent_model(self):
-        return Modification
-    class Meta:
-        ordering=('mnemonic',)
-    
-    
-class InputClosureMod(models.Model):
-    ''' Maps onto a specific closure and identifies the modifications to it '''
-    coupling=models.ForeignKey(Coupling)
-    targetClosure=models.ForeignKey(ExternalClosure)
-    targetFile=models.ForeignKey(DataContainer,blank=True,null=True)
-    target=models.ForeignKey(DataObject,blank=True,null=True)
-    def __unicode__(self):
-        return 'Mod to %s %s'%(coupling,targetClosure)
-    
-class InputMod(Modification):
-    ''' Simulation initial condition '''
-    # could need a date to override the date in the file for i.c. ensembles.
-    # So we use this when the date we want in the model overrides the one in the file.
-    revisedDate=models.DateField(blank=True,null=True) # watch out, model calendars
-    # could be to multiple inputs ... otherwise it'd get untidy
-    revisedInputs=models.ManyToManyField(Coupling,blank=True,null=True)
-    # always set these based on the revisedInputs
-    revisedClosures=models.ManyToManyField(InputClosureMod,blank=True,null=True)
-         
-class ModelMod(Modification):
-    #we could try and get to the parameter values as well ...
-    component=models.ForeignKey(Component)
+        return "%s for %s"%(self.ctype,self.requirement) 
     
 class Grid(Doc):
     properties=models.ManyToManyField(ParamGroup)
@@ -1083,8 +1398,9 @@ class DRSOutput(models.Model):
     experiment=models.ForeignKey(Experiment)
     frequency=models.ForeignKey(Term,blank=True,null=True,related_name='drs_frequency')
     realm=models.ForeignKey(Term,related_name='drs_realm')
-    grid=models.ForeignKey(Grid)
     # we don't need to point to simulations, they point to this ...
+    def __unicode__(self):
+	return '%s/%s/%s/%s/%s/%s/%s/'%(activity,product,institute,model,experiment,frequency,realm)
 
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''
@@ -1095,9 +1411,13 @@ class DocFeed(Feed):
            'experiment':CIMObject.objects.filter(cimtype='experiment'),
            'files':CIMObject.objects.filter(cimtype='dataContainer'),
            'all':CIMObject.objects.all()}
-    
+    def _mydomain(self):
+        # the request object has been passed to the constructor for the Feed base class,
+        # so we have access to the protocol, port, etc
+        current_site = RequestSite(self.request)
+        return 'http://%s/'%current_site.domain
     def _myurl(self,model):
-        return 'http://ceda.ac.uk'+reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%model,))
+        return self._mydomain()+reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%model,))
     def get_object(self,params):
         ''' Used for parameterised feeds '''
         assert params[0] in self.feeds,'Unknown feed request'
@@ -1113,6 +1433,8 @@ class DocFeed(Feed):
     def feed_links(self,model):
         u=self._myurl(model)
         return [{"rel": "self", "href": "%s"%u}]
+    def feed_extra_attrs(self,model):
+        return {'xml:base':self._mydomain()}
     def items(self,model):
         return self.feeds[model].order_by('-updated')
     def item_id(self,item):
@@ -1127,6 +1449,8 @@ class DocFeed(Feed):
         return item.updated
     def item_published(self,item):
         return item.created
+    def item_links(self,item):
+        return [{'href':item.get_absolute_url(),'rel':'via','type':'application/xml'}]
     def item_summary(self,item):
         if item.description:
             return item.description
@@ -1134,5 +1458,5 @@ class DocFeed(Feed):
             return '%s:%s'%(item.cimtype,item.title)
     def item_content(self,item):
         ''' Return out of line link to the content'''
-        return {"type": "application/xml", "src": item.get_absolute_url()},""
+        return {"type": "application/xml", "src":item.get_absolute_url()},""
 

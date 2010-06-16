@@ -1,8 +1,16 @@
+# -*- coding: utf-8 -*-
+import re
 from django import forms
-from django.forms.models import modelformset_factory
+from django.forms.models import modelformset_factory, BaseModelFormSet
+
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
-from cmip5q.protoq.dropdown import DropDownWidget, DropDownSingleWidget
+from django.forms.models import inlineformset_factory
+from django.forms import ValidationError
+
+
+from cmip5q.protoq.dropdown import *
+from cmip5q.protoq.fields import *
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.utilities import atomuri
@@ -11,33 +19,20 @@ from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
 from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 
 
-class ClosedDateRangeForm(forms.ModelForm):
-    ''' Actually this is a DateRange as well '''
-    class Meta:
-        model=ClosedDateRange
-        exclude=('description')
-    def specialise(self):
-        cv=Vocab.objects.get(name='CalendarTypes')
-        self.fields['calendar'].queryset=Term.objects.filter(vocab=cv)
-        lu=Vocab.objects.get(name='FreqUnits')
-        tunits=Term.objects.filter(vocab=lu)
-        self.fields['lengthUnits'].queryset=tunits
-
-            
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
-    q1,q2,q3=ModelMod.objects.all(),Coupling.objects.all(),Term.objects.all()
+    q1,q2,q3=CodeMod.objects.all(),Coupling.objects.all(),Term.objects.all()
     mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'3'}))
     coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=DropDownWidget(attrs={'size':'3'}))
     ctype=forms.ModelChoiceField(required=False,queryset=q3,widget=DropDownSingleWidget)
     class Meta:
         model=Conformance
-        exclude=('simulation') # we know it
+        exclude=('simulation','requirementOption') # sim: we know it, reqopt: not ready for it
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
-        self.fields['mod'].queryset=simulation.modelMod.all()
+        self.fields['mod'].queryset=simulation.codeMod.all()
         groups=CouplingGroup.objects.filter(simulation=simulation)  # we only expect one
         #it's possible we might end up trying to add conformances with no inputs ....
         if len(groups)<>0:
@@ -71,7 +66,6 @@ class ExternalClosureForm(forms.ModelForm):
      def specialise(self):
          if self.instance.targetFile:
             self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
-                        
 
 
 class ComponentForm(forms.ModelForm):
@@ -231,13 +225,37 @@ class EnsembleMemberForm(forms.ModelForm):
             # find the set of modifications which are appropriate for the current centre
             etype=self.instance.ensemble.etype
             vet=Vocab.objects.get(name='EnsembleTypes')
-            # probably don't need the filter, but just to make sure ...
-            pp=Term.objects.filter(vocab=vet).get(name='Perturbed Physics')
-            if etype==pp:
-                qs=ModelMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
-            else:
-                qs=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
-            self.fields['mod'].queryset=qs  
+            self.fields['cmod'].queryset=CodeMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
+            self.fields['imod'].queryset=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
+    def clean_drsMember(self):
+        # needs to parse into DRS member format
+        value=self.cleaned_data['drsMember']
+        p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
+        try:
+            m=p.search(value)
+            [r,i,p]=map(int,[m.group('r'),m.group('i'),m.group('p')])
+            return value
+        except:
+            raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
+    def specialise(self,requirementset):
+        ''' Limit the numerical requirements to only those within the requirement set '''
+        if requirementset:
+            self.fields['requirement'].queryset=requirementset.members.all()
+
+class BaseEnsembleMemberFormSet(BaseModelFormSet):
+    def clean(self):
+        ''' Checks that no two ensemble members have the same drs string '''
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on its own
+            return
+        drsnums = []
+        for i in range(0, self.total_form_count()):
+            form = self.forms[i]
+            drsn = form.cleaned_data['drsMember']
+            print i
+            if drsn in drsnums:
+                raise ValidationError('Ensemble members must have distinct drs numbers')
+            drsnums.append(drsn)
 
 class ModForm(forms.ModelForm):
     mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
@@ -257,29 +275,29 @@ class ModForm(forms.ModelForm):
         return uniqueness(self,self.hostCentre,'mnemonic')
         
 
-class InputClosureModForm(forms.ModelForm):
-    class Meta:
-        model=InputClosureMod
-        exclude='targetClosure'  # that's set by the input modd
-    def specialise(self):
-         if self.instance.targetFile:
-            self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
+#class InputClosureModForm(forms.ModelForm):
+#    class Meta:
+#        model=InputClosureMod
+#        exclude='targetClosure'  # that's set by the input modd
+#    def specialise(self):
+#         if self.instance.targetFile:
+#            self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
                  
 class InputModForm(ModForm):
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
-    revisedDate=forms.DateField(required=False)
-    #revisedClosures=forms.ModelMultipleChoiceField(widget=forms.HiddenInput(),required=True)
+    #memberStartDate=SimDateTimeFieldForm2()
     class Meta:
         model=InputMod
-        exclude=('centre','mtype')
+        exclude=('centre','dataset','dataRelationship')
+        #we're not using datasets at the moment
     def __init__(self,*args,**kwargs):
         ModForm.__init__(self,*args,**kwargs)
         self.ivocab=Vocab.objects.get(name='InputTypes')
         self.ic=Term.objects.filter(vocab=self.ivocab).get(name='InitialCondition')
     def specialise(self,group):
-        self.fields['revisedInputs'].queryset=Coupling.objects.filter(parent=group).filter(targetInput__ctype=self.ic)
         self.group=group
         self.simulation=group.simulation
+        self.fields['inputTypeModified'].queryset=Term.objects.filter(vocab=self.ivocab)
+        self.fields['memberStartDate'].initial=self.simulation.duration.startDate
     def save(self):
         f=ModForm.save(self,attr=('mtype',self.ic))
         self.save_m2m()
@@ -287,7 +305,7 @@ class InputModForm(ModForm):
     
 class InputModIndex(object):
     ''' Used to bundle the form and child formsets together to help base view '''
-    closureforms=modelformset_factory(InputClosureMod,form=InputClosureModForm,can_delete=True)
+    #closureforms=modelformset_factory(InputClosureMod,form=InputClosureModForm,can_delete=True)
    
     def __init__(self,postData=None,instance=None):
         self.master=InputModForm(postData,instance=instance,prefix='mform')
@@ -310,16 +328,15 @@ class InputModIndex(object):
      
     errors=property(handleError,None)
     hostCentre=property(getCentre,setCentre)  
-      
-class ModelModForm(ModForm):
+ 
+class CodeModForm(ModForm):
     class Meta:
-        model=ModelMod
-        exclude=('centre')
+        model=CodeMod
+        exclude=('centre','mods')  # ignoring mods for now ...
     def specialise(self,model):
         self.fields['component'].queryset=Component.objects.filter(model=model)
         ivocab=Vocab.objects.get(name='ModelModTypes')
         self.fields['mtype'].queryset=Term.objects.filter(vocab=ivocab)
-
 
 class PlatformForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'class':'optin','cols':"80",'rows':"4"}),required=False)
@@ -383,20 +400,23 @@ class SimulationForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
+    #duration=forms.CharField(widget=forms.TextInput())
+    #duration=DateRangeFieldForm(widget=DateRangeWidget())
+    duration=DateRangeFieldForm2()
     class Meta:
         model=Simulation
         #the first three are enforced by the workflow leading to the form, the second two are
         #dealt with on other pages. NB: note that if you don't exclude things, then a form
         #will expect them, and set them to None if they don't come back in the post ... a quiet
         #loss of information ...
-        exclude=('centre','experiment','uri','modelMod','inputMod','relatedSimulations',
-                 'duration','drsOutput')
+        exclude=('centre','experiment','uri','codeMod','inputMod','relatedSimulations',
+                 'drsOutput','datasets')
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
                             scienceType='model').filter(centre=centre)
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
-        for i in ['author','funder','contact']: self.fields[i].queryset=qs                  
+        for i in ['author','funder','contact']: self.fields[i].queryset=qs
     def save(self):
         s=forms.ModelForm.save(self)
         try:

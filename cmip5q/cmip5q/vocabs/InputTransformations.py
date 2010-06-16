@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # This file contains the textural values for the coupling vocabularies
 # Note that not all these vocabs need to be actually used.
@@ -51,6 +52,7 @@ properties={
         [('Exact','The two grids used common timesteps'),
          ('TimeAverage','Some temporal average of source grid data was used'),
          ('TimeAccumulation','Source grid data was averaged over time'),
+         ('FirstAvailable','The first available source grid data was used (typically for ensemble initial conditions overwriting file date and times'),
          ('LastAvailable','The last available source grid data was used'),
          ('TimeInterpolation','Source grid data was interpolated to the target grid time'),
          ('Other','Some other temporal transformation was used'),

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.forms.util import ErrorList
 from django.forms.fields import URLField
 
@@ -39,3 +40,4 @@ class refLinkField(URLField):
             return value
         else:
             return URLField.clean(self,value)
+            

@@ -183,11 +183,11 @@
     <calendar>
     	<realCalendar></realCalendar>
 	</calendar>
-	<requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 2005-09-01T00:00:00Z</startDate>
 		<endDate> 2016-01-01T00:00:00Z </endDate>
-		<lengthYears>10.25</lengthYears>
-	</requiredDuration>
+		<length units="years">10.25</length>
+	</requiredDuration></numericalRequirement>
 	<author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>

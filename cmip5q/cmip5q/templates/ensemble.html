@@ -9,21 +9,31 @@
         <form action={{urls.self}} method="POST">
             <table>
                 <tr><td width="20%">Ensemble Type:{{eform.etype.errors}}</td>
-                    <td>{{eform.etype}}&nbsp;</td></tr>
+                    <td colspan="4">{{eform.etype}}&nbsp;</td></tr>
                 <tr><td>General notes about the ensemble:{{eform.description.errors}}</td>
-                    <td>{{eform.description}}</td></tr>
+                    <td colspan="4">{{eform.description}}</td></tr>
                 <tr><td>&nbsp;</td><td></td></tr>
-                    <tr><td colspan="2"> Now enter the details which explain how the ensemble members differ.
+                    <tr><td colspan="5"> Now enter the details which explain how the ensemble members differ.
                     </td></tr>
                 {% if eform.instance.etype %}
                     {{eformset.management_form}}
+                    <tr><td colspan="5">{{eformset.non_form_errors}}</td></tr>
+                    <tr><th></th><th> Code Mod </th><th>Input Mod</th>
+                        <th>{% if eform.rset %} Requirement {% endif %}</th>
+                        <th><a href="http://FIXME">DRS</a> member name </th>
+                    </tr>
                     {% for form in eformset.forms %}
-                    <tr><td>Member {{forloop.counter}} uses {{form.mod.errors}}</td><td>{{form.mod}} </td></tr>
-                    {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
+                        <tr><td>Member {{forloop.counter}} uses </td>
+                            <td>{{form.cmod.errors}}{{form.cmod}}&nbsp;and/or&nbsp;</td>
+                            <td>{{form.imod.errors}}{{form.imod}} </td>
+                            <td>{% if eform.rset %} conforms to {{form.requirement.errors}}{{form.requirement}} {% endif %}</td>
+                            <td>and is known as {{form.drsMember.errors}} {{form.drsMember}}</td>
+                        </tr>
+                        {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
                     {% endfor %}
                     {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
                 {% else %}
-                    <tr><td colspan="2"> You need to save the form before you can assign details to
+                    <tr><td colspan="5"> You need to save the form before you can assign details to
                     initial ensemble members. </td></tr>
                 {% endif %}
             </table>

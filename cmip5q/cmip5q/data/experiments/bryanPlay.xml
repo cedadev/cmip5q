@@ -7,12 +7,35 @@
         forcing of 6 W m-2 at year 2100, relative to pre-industrial conditions. </description>
 	
 	<!-- Initial Conditions -->
+	
+	<numericalRequirement xsi:type="RequirementSet">
+        <id xsi:type="Identifier">rs.bnl.play.001</id>
+        <name> TAMIP example 4 bnl </name>
+        <description> To test how to do requirement sets </description>
+        <numericalRequirement xsi:type="SpatioTemporalConstraint">
+        <name xsi:type="Identifier">tbd</name>
+        <id xsi:type="Identifier">tbd</id>
+            <requiredDuration xsi:type="ClosedDateRange">
+                <startDate>2006-01-01T00:00:00Z</startDate>
+                <length units="years">5</length>
+            </requiredDuration>
+        </numericalRequirement>
+        <numericalRequirement xsi:type="SpatioTemporalConstraint">
+        <name xsi:type="Identifier">tbd</name>
+        <id xsi:type="Identifier">tbd</id>
+            <requiredDuration xsi:type="ClosedDateRange">
+                <startDate>2011-01-01T00:00:00Z</startDate>
+                <length units="years">5</length>
+            </requiredDuration>
+        </numericalRequirement>
+    </numericalRequirement>
+    
 	<numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.004</id>
         <name>4.4.ic</name>
         <description> Initial conditions are from the end of experiment 3.2_historical </description>
     </numericalRequirement>
-    
+        
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.085</id>
@@ -66,20 +89,15 @@
     </numericalRequirement>
     
     <shortName>
-		4.4 rcp60
+		bnl
 	</shortName>
     <longName> 
-		4.4 RCP6
+		bnl
 	</longName>
     
     <calendar>
         <realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
-		<startDate>2006-01-01T00:00:00Z</startDate>
-        <endDate>2100-01-01T00:00:00Z</endDate>
-	    <length units="years">94</length>
-	</requiredDuration></numericalRequirement>
 	
 	<author>
 		<gmd:CI_ResponsibleParty>
@@ -111,7 +129,7 @@
 			</gmd:role>
 		</gmd:CI_ResponsibleParty>
 	</author>
-	<documentID xsi:type="Identifier">
+	<documentID xsi:type="Identifier">bnl
 	</documentID>
 	<creationDate>
 		2009-06-23T15:00:00Z

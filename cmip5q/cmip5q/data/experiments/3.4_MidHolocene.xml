@@ -42,12 +42,12 @@
     <calendar>
     	<perpetualPeriod/>
 	</calendar>
-	<requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
 		<!--Dates to reflect 100 yrs of simulation 6k yrs ago - to be verified -->
 		<startDate> -4000-01-01T00:00:00Z</startDate>
 		<endDate> -4000-01-01T00:00:00Z </endDate>
-		<lengthYears>100</lengthYears>
-	</requiredDuration>
+		<length units="years">100</length>
+	</requiredDuration></numericalRequirement>
 	<author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>

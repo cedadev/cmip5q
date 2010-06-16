@@ -70,7 +70,12 @@
             </div>
             <div class="boxer">
             <h4> Duration </h4>
-            {% with cdr as d %} {% include 'closed_date.html' %} {% endwith %}
+            <p class="guidance"> Enter Start date/time and <i>either</i> End date/time <b>or</b> duration, where format is Year-Month-Date 00:00:00 </p>
+            {{simform.duration.errors}}{{simform.duration}}
+            {% comment %}
+            {% with simform.duration as d  %} {% include 'closed_date.html' %} {% endwith %}
+            {% endcomment %}
+            <br/>
             <h4> Related Simulation </h4>
             <p> If this simulation has a related control simulation or extends another, please identify it here. {% if ensemble %} (Such relationships may extend between ensembles too.){% endif %} </p>
             <p>Simulation {{s}} {{rform.value}}{{rform.value.errors}} simulation {{rform.sto}}{{rform.sto.errors}}</p>
@@ -80,7 +85,8 @@
             <div class="boxer">
             <h4> Authorship </h4>
             <center>
-            <p>Please enter the list of authors you wish to appear in a DOI for this simulation
+            <p>Please enter the list of authors you wish to appear in a DOI for this simulation.<br/>
+            (The lead author should be indicated using the "parties" tab and the "lead author" drop down list above.)
             {{simform.authorList.errors}}:</p><p>{{simform.authorList}}</p>
             </center>
             </div>
@@ -121,7 +127,7 @@
         <p>Description:{{ensemble.set.description}}</p>
         <table>
         {% for m in ensemble.members %}
-        <tr class="{%cycle  'row2' 'row1'%}"><td>Member {{m.memberNumber}} has modification: {{m.mod}}</td></tr>
+        <tr class="{%cycle  'row2' 'row1'%}"><td>Member {{m.memberNumber}} ({{m.drsMember}}) uses code modification: {{m.cmod}} and input modification {{m.imod}}</td></tr>
         {% endfor %}
         </table>
         <p> (You can modify these Ensemble Characteristics using the "Describe Ensemble" button on the left hand menu.)

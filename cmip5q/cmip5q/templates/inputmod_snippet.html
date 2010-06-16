@@ -3,13 +3,13 @@
 <table>
 {% with form.master as f %}
 <tr><td> Mnemonic {{f.mnemonic.errors}}</td><td>{{f.mnemonic}}
-
 for inputs to simulation {{f.simulation}}</td></tr>
+<tr><td>Input type modified {{f.inputTypeModified.errors}}</td><td>{{f.inputTypeModified}}</td></tr>
+<tr><td> Enter realisation start date {{f.memberStartDate.errors}}</td><td>{{f.memberStartDate}}
 <tr> <td> Describe what has been done in this modification {{f.description.errors}}</td>
 <td>{{f.description}}</td></tr> 
-<td> Select which input bindings have been modified.
-{{f.revisedInputs.errors}}.
-(Hold down "Control", or "Command" on a Mac, to select more than one. To "unselect" you can shift click on a selected value.)</td><td>{{f.revisedInputs}}</td></tr>
+
+
 </table>
 {% endwith %}
 </td><td>

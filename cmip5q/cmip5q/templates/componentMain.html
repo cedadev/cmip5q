@@ -1,19 +1,21 @@
 {% extends "twopanel.html" %}
 
 {% block titlerow %}
-<table  width="100%" class="{{c.qstatus}}"><tr>
-<td><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> <td>
+<table  width="100%"  class="{{c.qstatus}}">
+<tr >
+<td ><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> 
     {% if c.controlled %} 
-        {% if c.isComplete %} 
+       <td> {% if c.isComplete %} 
             Complete and Submitted 
-        {% else %} Validation Status: {{c.status}} {% endif%}
+        {% else %} Validation Status: {{c.status}} {% endif%}</td>
     {% else %}
+        <td>
         <form action="{{urls.form}}" method="POST">&nbsp;&nbsp;
             <input type="hidden" name="deleteMe" value="1"/>
-            <input id="deleteButton" type="submit" value="Delete"/>
-        </form>
+            <input id="deleteButton" type="submit" value="Delete">
+        </form></td>
     {% endif %}
-    </td></tr></table>
+    </tr></table>
 {% endblock %}
 
 {% block leftcolumn %}
@@ -167,7 +169,7 @@
         var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
         var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
         var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
-        var deleteButton1 = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
+        var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
 </script>
 <!-- end of button javascript -->
 

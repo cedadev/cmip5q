@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 
 from django.template import Context, loader
@@ -169,6 +170,10 @@ class MyCouplingFormSet:
             # now the external closures formset ...
             instances=f.ec.save()
             instances=f.ic.save()
+        
+        if self.simulation: 
+            # aggregate up the files in our closures
+            self.simulation._updateIO()
             
 class couplingHandler:
     ''' Handles couplings for models and simuations '''

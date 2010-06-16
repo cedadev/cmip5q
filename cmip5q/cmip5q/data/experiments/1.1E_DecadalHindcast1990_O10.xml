@@ -172,11 +172,11 @@
      <calendar>
      	<realCalendar></realCalendar>
 	</calendar>
-	<requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1990-09-01T00:00:00Z</startDate>
 		<endDate> 2000-12-31T23:59:59Z </endDate>
-		<lengthYears>10</lengthYears>
-	</requiredDuration>
+		<length units="years">10</length>
+	</requiredDuration></numericalRequirement>
 	<author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>

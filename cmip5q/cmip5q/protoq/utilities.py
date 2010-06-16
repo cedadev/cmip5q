@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 
 from django.core.urlresolvers import reverse
@@ -8,6 +9,35 @@ import uuid
 
 logging=settings.LOG
 
+class HTMLdate:
+    ''' Handle an HTML date and convert h,m,d into seconds. Used as a mixin class to aid
+    serialisation etc, and usable in other applications too '''
+    def __init__(self):
+        pass
+    def fromstr(self,string):
+        '''Load from an HTML encoded string'''
+        #1960-09-01T00:00:00Z
+        # or -19000-01-01T00:00:00Z
+        try:
+            d,t=string.strip().split('T')
+            bits=d.split('-')
+            if len(bits)==3:
+                self.yyyy,self.mm,self.dd=bits
+            else: 
+                self.yyyy,self.mm,self.dd=bits[1:]
+                self.yyyy='-'+self.yyyy
+            h,m,s=t.split(':')
+            ss=int(h)*3600+int(m)*60+int(s[0:-1])# get rid of trailing Z
+        except Exception,e:
+            raise ValueError('Not a valid HTML time date "%s" (%s)'%(string,e))
+    def tostr(self):
+        '''Serialise to an HTML encoded string '''
+        h=self.ss/3600
+        hs=h*3600
+        m=(self.ss-hs)/60
+        s=self.ss-(hs+m*60)
+        return '%s-%s-%sT%s-%s-%sZ'%(self.yyyy,self.mm,self.dd,h,m,s)
+       
 def atomuri():
     ''' Return a uri, put here in one place ... just in case '''
     return '%s'%uuid.uuid1()
