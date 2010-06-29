@@ -1387,7 +1387,56 @@ class Conformance(models.Model):
         return "%s for %s"%(self.ctype,self.requirement) 
     
 class Grid(Doc):
-    properties=models.ManyToManyField(ParamGroup)
+    topGrid=models.ForeignKey('self',blank=True,null=True,related_name="parent_grid")    
+    istopGrid=models.BooleanField(default=False)
+    
+    # direct children components:
+    grids=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
+    paramGroup=models.ManyToManyField('ParamGroup')
+    references=models.ManyToManyField(Reference,blank=True,null=True)
+    
+    
+    def copy(self,centre,topGrid=None):
+        ''' Carry out a deep copy of a grid '''
+        # currently don't copys here ...
+        if centre.__class__!=Centre:
+            raise ValueError('Invalid centre passed to grid copy')
+        
+        attrs=['title','abbrev','description',
+               'istopGrid','author','contact','funder']
+        kwargs={}
+        for i in attrs: kwargs[i]=self.__getattribute__(i)
+        if kwargs['istopGrid']: 
+            kwargs['title']=kwargs['title']+' dup'
+            kwargs['abbrev']=kwargs['abbrev']+' dup'
+        kwargs['uri']=atomuri()
+        kwargs['centre']=centre
+        
+        new=Grid(**kwargs)
+        new.save() # we want an id, even though we might have one already ... 
+        #if new.isModel: print '2',new.couplinggroup_set.all()
+       
+        if topGrid is None:
+            if self.istopGrid:
+                topGrid=new
+            else:
+                raise ValueError('Deep copy called with invalid grid arguments: %s'%self)
+        
+        new.topGrid=topGrid
+       
+        for c in self.grids.all():
+            logging.debug('About to add a sub-grid to grid %s (in centre %s, grid %s)'%(new,centre, topGrid))
+            r=c.copy(centre,topGrid=topGrid)
+            new.grids.add(r)
+            logging.debug('Added new grid %s to grid %s (in centre %s, grid %s)'%(r,new,centre, topGrid))
+            
+        for p in self.paramGroup.all(): 
+            new.paramGroup.add(p.copy())
+       
+        new.save()        
+        return new
+   
+    
     
 class DRSOutput(models.Model):
     ''' This is a holding class for how a simulation relates to it's output in the DRS '''

@@ -8,6 +8,7 @@ os.environ['DJANGO_SETTINGS_MODULE']='settings'
 from protoq.models import *
 from XMLinitialiseQ import initialise
 from ControlledModel import *
+from ControlledGrid import *
 
 from initialiseRefs import *
 from initialiseFiles import *
@@ -34,3 +35,6 @@ for f in os.listdir(experimentDir):
 
 # initialise a model template
 initialiseModel()
+
+# initialise a grid template
+initialiseGrid()

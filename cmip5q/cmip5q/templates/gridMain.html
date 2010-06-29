@@ -1,0 +1,100 @@
+{% extends "twopanel.html" %}
+
+{% block titlerow %}
+<table  width="100%"  class="{{c.qstatus}}">
+	<tr >
+		<td >
+			<h1> 
+				Grid {{c.abbrev }} 
+			</h1> 
+		</td> 
+	</tr>
+</table>
+{% endblock %}
+
+{% block leftcolumn %}
+    <div class="boxer">
+        <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
+        <div class="boxer"><h4> Available Grids </h4><div id="treeDiv"> {{navtree|safe}}</div>
+        <h4>Grid {{c.abbrev}}</h4>
+    </div>
+{% endblock %}
+
+{% block mainpanel %}
+    <div class="boxer2">
+    <form action="{{urls.form}}" method='post'>
+        <div class="boxer">    
+            <table>
+                <tr>
+                	<td class="inputH1">
+                		Short Name:&nbsp;{{cform.abbrev.errors}}
+                	</td>
+                	<td colspan="4">
+                  		{{cform.abbrev}}
+                	</td>
+                </tr>
+                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr>                 
+            </table>
+            <!-- Following is hidden -->
+            {{cform.controlled}} 
+        </div>
+        
+        <div class="boxer">
+        <h4> Grid Attributes </h4>
+            <p> In this section enter parameters and attributes associated with this grid.</p>
+            {% include 'attributeform.html' %}
+        </div>
+       
+        <div class="boxer"> 
+            <h4> Additional Information</h4>
+            <center>
+            <p class="guidance">Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
+            <p>{{cform.description}}</p> 
+            </center> 
+        </div>
+        <center><input id="updateButton1" type="submit" value="Save"/>
+        </center>
+    </form>
+    </div><!-- boxer2 div -->
+   
+<!-- button specific javascript follows -->
+<script  type="text/javascript"> 
+        var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
+        var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
+        var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+        var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
+        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
+        var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
+        var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
+</script>
+<!-- end of button javascript -->
+
+<!-- YUI treeview stuff for body -->
+<script type="text/javascript">
+
+//create our own namespace object
+YAHOO.namespace("protoq.tree");
+	                 
+//define the initTree function
+YAHOO.protoq.tree.initTree = function() {
+
+    //create a TreeView object
+    var tree = new YAHOO.widget.TreeView("treeDiv");
+
+    //Fix for non-activation of href link on single-clicking node label (YUI bug?):
+    //Subscribe to the "dblClickEvent" and do nothing.
+    tree.subscribe("dblClickEvent", function(node) {
+    }); 
+
+	// Draw the tree
+    tree.draw();
+  
+};
+ 
+ //Add an onDOMReady handler to build the tree when the document is ready
+YAHOO.util.Event.onDOMReady(YAHOO.protoq.tree.initTree);
+ 
+</script>
+<!-- End of YUI treeview stuff for body -->
+
+{% endblock %}

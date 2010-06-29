@@ -35,15 +35,19 @@ class tabs(list):
             request.session['Model']=object_id
         elif page=='Simulation':
             request.session['Simulation']=object_id
+        elif page=='Grid':
+            request.session['Grid']=object_id
+            
         # need to allow for the case when neither have yet been viewed
         if 'Simulation' not in request.session:request.session['Simulation']=0
         if 'Model' not in request.session:request.session['Model']=0
+        if 'Grid' not in request.session:request.session['Grid']=0
         #This is the list of tabs '''
         self.tablist=[#('Intro','cmip5q.protoq.views.intro',(centre_id,)),
                  ('Summary','cmip5q.protoq.views.centre',(centre_id,)),
                  ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,)),
                  ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],)),
-                 ('Grids','cmip5q.protoq.views.list',(centre_id,'grid',)),
+                 ('Grid','cmip5q.protoq.views.gridEdit',(centre_id,request.session['Grid'],)),
                  ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],)),
                  ('Files','cmip5q.protoq.views.list',(centre_id,'file',)),
                  ('References','cmip5q.protoq.views.list',(centre_id,'reference',)),
@@ -57,7 +61,7 @@ class tabs(list):
         self.history(request,page)
             
     def tabify(self,item,page):
-        if item[0] not in ['Simulation','Model']:
+        if item[0] not in ['Simulation','Model','Grid']:
             #it's easy:
             return tab(item[0],reverse(item[1],args=item[2]),page==item[0])
         else:
@@ -65,11 +69,11 @@ class tabs(list):
                 return tab(item[0],'',-1)
             else: 
                 try:
-                    obj={'Model':Component,'Simulation':Simulation}[item[0]].objects.get(id=item[2][1])
+                    obj={'Model':Component,'Simulation':Simulation,'Grid':Grid}[item[0]].objects.get(id=item[2][1])
                 except:
-                    logging.info('Attempt to access deleted component or simulation %s,%s'%(item[0],item[2][1]))
+                    logging.info('Attempt to access deleted component, simulation or grid %s,%s'%(item[0],item[2][1]))
                     return tab(item[0],'',-1)
-                return tab('%s:%s'%(item[0][0:3],obj),
+                return tab('%s:%s'%(item[0][0:5],obj),
                            reverse(item[1],args=item[2]),
                            page==item[0])
             

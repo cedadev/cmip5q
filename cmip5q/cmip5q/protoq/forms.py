@@ -454,19 +454,20 @@ class SimRelationshipForm(forms.ModelForm):
         s.save()
         
 class GridForm(forms.ModelForm):
+    
+    abbrev=forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
+    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=True)
+    
     class Meta:
         model=Grid
-        exclude=('centre','author','funder','contact','metadataMaintainer','editHistory','properties')
+        exclude=('centre','uri','topGrid','istopGrid','references','grids','paramGroup')   
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
-        self.hostCentre=None
-    def specialise(self,constraint):
-        pass
-    def save(self):
-        s=forms.ModelForm.save(self,commit=False)
-        s.centre=self.hostCentre
-        s.save()
-        return s
+        #concatenate to allow the centre to be shown as well as the other parties tied to it.
+        qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
+        for i in ['author','contact','funder']: self.fields[i].queryset=qs
+
         
 class BaseParamForm(forms.ModelForm):
     class Meta:

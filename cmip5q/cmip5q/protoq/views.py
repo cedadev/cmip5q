@@ -12,6 +12,7 @@ from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
 from cmip5q.protoq.layoutUtilities import tabs
 from cmip5q.protoq.components import componentHandler
+from cmip5q.protoq.grids import gridHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
@@ -140,10 +141,16 @@ def centre(request,centre_id):
     sims=Simulation.objects.filter(centre=c.id)
     for s in sims:
         s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id))
+    grids=Grid.objects.filter(centre=c.id).filter(istopGrid=True) 
+    for g in grids:
+        g.url=reverse('cmip5q.protoq.views.gridEdit',args=(c.id,g.id))
+        g.cpURL=reverse('cmip5q.protoq.views.gridCopy',args=(c.id,g.id))
     
     newmodURL=reverse('cmip5q.protoq.views.componentAdd',args=(c.id,))
     newplatURL=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,))
     viewsimURL=reverse('cmip5q.protoq.views.simulationList',args=(c.id,))
+    newgridURL=reverse('cmip5q.protoq.views.gridAdd',args=(c.id,))
+    
     
     refs=Reference.objects.filter(centre=c)
     files=DataContainer.objects.filter(centre=c)
@@ -152,13 +159,13 @@ def centre(request,centre_id):
     logging.info('Viewing %s'%c.id)
     return render_to_response('centre.html',
         {'centre':c,'models':models,'platforms':platforms,
-         'refs':refs,'files':files,'parties':parties,
-        'newmod':newmodURL,'newplat':newplatURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
+         'grids':grids,'refs':refs,'files':files,'parties':parties,
+        'newmod':newmodURL,'newplat':newplatURL,'newgrid':newgridURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
         'tabs':tabs(request,c.id,'Summary'),'notAjax':not request.is_ajax()})
       
 #### COMPONENT HANDLING ###########################################################
 
-# Provide a vew interface to the component object 
+# Provide a view interface to the component object 
 def componentAdd(request,centre_id):
     ''' Add a component '''
     c=componentHandler(centre_id)
@@ -202,9 +209,30 @@ def componentInp(request,centre_id,component_id):
 
 @gracefulNotFound
 def componentCopy(request,centre_id,component_id):
-   c=componentHandler(centre_id,component_id)
-   return c.copy(request)
+    c=componentHandler(centre_id,component_id)
+    return c.copy(request)
    
+
+#### GRID HANDLING ###########################################################
+
+# Provide a vew interface to the grid object 
+def gridAdd(request,centre_id):
+    ''' Add a grid '''
+    g=gridHandler(centre_id)
+    return g.edit(request)
+
+@gracefulNotFound
+def gridEdit(request,centre_id,grid_id):
+    ''' Edit a grid '''
+    g=gridHandler(centre_id,grid_id)
+    return g.edit(request)
+
+@gracefulNotFound
+def gridCopy(request,centre_id,grid_id):
+    c=gridHandler(centre_id,grid_id)
+    return c.copy(request)
+   
+
 ###### REFERENCE HANDLING ######################################################
 #   
 #def referenceList(request,centre_id=None):

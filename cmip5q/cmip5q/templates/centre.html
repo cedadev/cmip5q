@@ -85,6 +85,32 @@ conformed to the numerical requirements of the experiment via the <em> conforman
     </div>
 </td>
 <td>
+	<div  class="boxer">
+    <table width="100%">
+        <thead>
+            <tr><th colspan="4"> Grids associated with {{centre.abbrev}}</th></tr>
+        </thead>
+        <tbody> 
+        {% for g in grids %}
+        <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="45%">{{g.abbrev}}</td>
+            <td><span class="{{g.qstatus}}"> <a id="edGridButton{{forloop.counter}}" href="{{g.url}}">Edit</a></span></td>
+        </tr>
+        <script type="text/javascript">
+            var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edGridButton{{forloop.counter}}");
+            var oSubButtom{{forloop.counter}}= new YAHOO.widget.Button("copySubmit{{forloop.counter}}",
+                  {value:"copySubmit{{forloop.counter}}value"});
+        </script>    
+        {% endfor %} 
+        <tr class="row3"><td><a id="newGridButton" href="{{newgrid}}">Add a new grid</a></td></tr>
+        </tbody>
+    </table>
+   
+    <script type="text/javascript">
+        var newmodButton = new YAHOO.widget.Button("newGridButton");
+    </script>
+    </div>
+    
     <div class="boxer">
     <table width="100%">
         <thead>
