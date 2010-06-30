@@ -196,6 +196,8 @@ class componentHandler(object):
         if request.method=='POST':
             if 'filterdown' in request.POST:
                 c.filterdown()
+            if 'filterdowngrid' in request.POST:
+                c.filterdowngrid()
         
         #OK, we have three cases to handle:
         

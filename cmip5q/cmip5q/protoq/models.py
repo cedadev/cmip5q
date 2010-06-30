@@ -580,15 +580,15 @@ class Component(Doc):
             x.author_id=self.author_id
             if x.components:
                 x.filterdown()
-            x.save()
+            x.save()  
             
-            #q = Component.objects.get(id=x.id)
-            #q.author_id=x.author_id
-            #q.contact_id=x.contact_id
-            #q.funder_id=x.funder_id
-            #if q.components:
-            #    q.filterdown()
-            #q.save()           
+    def filterdowngrid(self):
+        ''' To filter grid details downwards to subcomponents '''
+        for x in self.components.all():
+            x.grid_id=self.grid_id
+            if x.components:
+                x.filterdown()
+            x.save()         
             
     
 class ComponentInput(models.Model):

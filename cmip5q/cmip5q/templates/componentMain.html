@@ -96,7 +96,9 @@
             <div class="boxer">
             <h4> Grid </h4>
             <p> Please select an appropriate grid from those you have described using the grid tab </p>
-            <p>Grid: {{cform.grid.errors}}{{cform.grid}}</p>
+            <p>Grid: {{cform.grid.errors}}{{cform.grid}}
+            Copy Grid to sub-components <input type="checkbox" name="filterdowngrid"/>
+            </p>
             </div>
             {% include 'attributeform.html' %}
         </div>

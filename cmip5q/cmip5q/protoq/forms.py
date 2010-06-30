@@ -93,7 +93,7 @@ class ComponentForm(forms.ModelForm):
         #concatenate to allow the centre to be shown as well as the other parties tied to it.
         qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
         for i in ['author','contact','funder']: self.fields[i].queryset=qs
-        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre)
+        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre).filter(istopGrid=True)
         if self.instance.controlled: 
             # We don't want this to be editable 
             self.fields['scienceType'].widget=forms.HiddenInput()

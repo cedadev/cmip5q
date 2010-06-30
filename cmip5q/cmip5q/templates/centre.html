@@ -43,8 +43,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         <tr class="{% cycle 'row2' 'row1'%}">
             <td width="45%">{{m.abbrev}}</td>
             <td><span class="{{m.qstatus}}"> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></span></td>
-            <td>
-             <form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+            <td><form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
             <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td>
         </tr>
         <script type="text/javascript">
@@ -63,6 +62,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
     <p class="guidance"> The status column provides an indication of how much of the model description has
     been completed. <!--CopyAsNew should be used to describe variants of already described models.--></p>
     </div>
+    <p></p>
     <div class="boxer">
     <table width="100%">
         <thead>
@@ -83,8 +83,7 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         var newplatButton = new YAHOO.widget.Button("newPlatButton"); 
     </script>
     </div>
-</td>
-<td>
+    <p></p>
 	<div  class="boxer">
     <table width="100%">
         <thead>
@@ -95,11 +94,12 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         <tr class="{% cycle 'row2' 'row1'%}">
             <td width="45%">{{g.abbrev}}</td>
             <td><span class="{{g.qstatus}}"> <a id="edGridButton{{forloop.counter}}" href="{{g.url}}">Edit</a></span></td>
+            <td><form action="{{g.cpURL}}" method="POST"><input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
         </tr>
         <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edGridButton{{forloop.counter}}");
-            var oSubButtom{{forloop.counter}}= new YAHOO.widget.Button("copySubmit{{forloop.counter}}",
-                  {value:"copySubmit{{forloop.counter}}value"});
+            var ogridSubButtom{{forloop.counter}}= new YAHOO.widget.Button("gridcopySubmit{{forloop.counter}}",
+                    {value:"gridcopySubmit{{forloop.counter}}value"});
         </script>    
         {% endfor %} 
         <tr class="row3"><td><a id="newGridButton" href="{{newgrid}}">Add a new grid</a></td></tr>
@@ -110,6 +110,8 @@ conformed to the numerical requirements of the experiment via the <em> conforman
         var newmodButton = new YAHOO.widget.Button("newGridButton");
     </script>
     </div>
+</td>
+<td>
     
     <div class="boxer">
     <table width="100%">
