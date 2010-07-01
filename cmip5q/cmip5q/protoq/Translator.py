@@ -264,24 +264,25 @@ class Translator:
             self.addCIMReference(simClass.experiment,experimentElement)
 
             ''' Duration [1] '''
-            durationElement=ET.SubElement(simElement,'duration')
-            ''' CIM : daily-360, realCalendar, perpetualPeriod '''
-            if simClass.duration and simClass.duration.calendar :
-                calElement=ET.SubElement(durationElement,str(simClass.duration.calendar),{'units':str(simClass.duration.lengthUnits)})
-                if simClass.duration.length :
-                    ET.SubElement(calElement,'length').text=str(simClass.duration.length)
-                rangeElement=ET.SubElement(calElement,'range')
-                if simClass.duration.startDate!='' and simClass.duration.endDate!='':
+            if simClass.duration :
+                ''' CIM : daily-360, realCalendar, perpetualPeriod '''
+                simElement.append(simClass.duration.xml('duration'))
+            #if simClass.duration and simClass.duration.calendar :
+            #    calElement=ET.SubElement(durationElement,str(simClass.duration.calendar),{'units':str(simClass.duration.lengthUnits)})
+            #    if simClass.duration.length :
+            #        ET.SubElement(calElement,'length').text=str(simClass.duration.length)
+            #    rangeElement=ET.SubElement(calElement,'range')
+            #    if simClass.duration.startDate!='' and simClass.duration.endDate!='':
                     # if both start and end are supplied it is a closed date
-                    dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
-                    ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
-                    ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
-                else :
-                    dateRangeElement=ET.SubElement(rangeElement,'openDateRange')
-                    if simClass.duration.startDate!='' :
-                        ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
-                    if simClass.duration.endDate!='' :
-                        ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
+            #        dateRangeElement=ET.SubElement(rangeElement,'closedDateRange')
+            #        ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
+            #        ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
+            #    else :
+            #        dateRangeElement=ET.SubElement(rangeElement,'openDateRange')
+            #        if simClass.duration.startDate!='' :
+            #            ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
+            #        if simClass.duration.endDate!='' :
+            #            ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
             ''' description [0..1] '''
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
@@ -300,21 +301,17 @@ class Translator:
                     assert confClass.requirement, 'There should be a requirement associated with a conformance'
                     self.addCIMReference(experiment,reqElement,argName=confClass.requirement.name,argType='NumericalRequirement')
                     # for each modelmod modification
-                    for modClass in confClass.mod.all():
+                    for modClassBase in confClass.mod.all() :
+                        modClass=modClassBase.get_child_object()
+                        assert modClass._child_name=='codemod','Found a class type other than codemod'
                         sourceElement=ET.SubElement(confElement,'source')
-                        im=None
-                        mm=None
-                        try:
-                            mm=modClass.modelmod
-                        except:
-                            im=modClass.inputmod
-                        if mm:
+                        if modClass._child_name=='codemod' :
                             # add a reference with the associated modification
-                            self.addCIMReference(mm.component,sourceElement,mod=mm)
-                        elif im:
-                            assert False, 'for some reason, modclass is never an input mod so I should not be called.'
-                        else:
-                            assert False, 'modelmod must be an inputmod or a modelmod'  # error
+                            self.addCIMReference(modClass.component,sourceElement,mod=modClass)
+                        #    #elif im:
+                        #    #    assert False, 'for some reason, modclass is never an input mod so I should not be called.'
+                        #else:
+                        #    assert False, 'modelmod must be an inputmod or a modelmod'  # error
 
                     # for each modelmod modification
                     # for some reason this is where we get the external couplings
@@ -425,14 +422,17 @@ class Translator:
             ''' description [0..1] '''
             ET.SubElement(expElement,'description').text=expClass.description
             ''' calendar [1] '''
-            calendarElement=ET.SubElement(expElement,'calendar')
-            assert(expClass.requiredCalendar)
-            calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
+            if expClass.requiredCalendar :
+                calendarElement=ET.SubElement(expElement,'calendar')
+                calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
             ''' requiredDuration [1] '''
-            assert(expClass.requiredDuration)
-            durationElement=ET.SubElement(expElement,'requiredDuration')
-            ET.SubElement(durationElement,'startDate').text=expClass.requiredDuration.startDate
-            ET.SubElement(durationElement,'endDate').text=expClass.requiredDuration.endDate
+            #expClass.requiredDuration does not appear to be used in this version
+            # of the questionnaire. Instead it is associated with a particular
+            # type of requirement (a SpatioTemporalConstraint)
+            #expElement.append(expClass.requiredDuration.xml('requiredDuration'))
+            #durationElement=ET.SubElement(expElement,'requiredDuration')
+            #ET.SubElement(durationElement,'startDate').text=expClass.requiredDuration.startDate
+            #ET.SubElement(durationElement,'endDate').text=expClass.requiredDuration.endDate
             if not(self.VALIDCIMONLY) :
                 ET.SubElement(expElement,'Q_lengthYears').text=str(expClass.requiredDuration.length)
             ''' numericalRequirement [1..inf] '''
