@@ -55,6 +55,14 @@ class SimDateTime(object):
             if 'T' not in d[2]: d[2]+='T00:00:00'
             b=d[2].split(':')
             d[2],b[0]=b[0].split('T')
+
+            # re-format our input string to make sure it has
+            # the correct number of leading 0's 
+            d[0]=d[0].zfill(4)
+            d[1]=d[1].zfill(2)    
+            d[2]=d[2].zfill(2)
+            self.s='-'.join(d)+'T'+':'.join(b)
+
             self.year,self.mon,self.day=map(int,d)
             self.year=self.year*neg
             b[2]=b[2].strip('Z')
@@ -353,7 +361,3 @@ class DateRangeFieldForm2(forms.MultiValueField):
         else:
             d=DateRange(startDate=data_list[0],endDate=data_list[1],length=data_list[2])
         return d
-
-    
-        
-        

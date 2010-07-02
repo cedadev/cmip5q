@@ -221,6 +221,9 @@ class Translator:
             self.add_component(ref.numericalModel,modelElement)
             simulationElement=self.cimRecord(root)
             self.add_simulation(ref,simulationElement)
+            ensembleElement=self.cimRecord(root)
+            if ref.ensembleMembers>1 :
+                self.add_ensemble(ref,ensembleElement)
             experimentElement=self.cimRecord(root)
             self.add_experiment(ref.experiment,experimentElement)
             platformElement=self.cimRecord(root)
@@ -242,6 +245,95 @@ class Translator:
             cimDoc=method(ref,root)
         return cimDoc
         
+    def add_ensemble(self,simClass,rootElement):
+
+        ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+        assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
+        ensembleClass=ensembleClassSet[0]
+
+        ensembleElement=ET.SubElement(rootElement,'ensemble')
+        ''' responsibleParty [0..inf] '''
+        ''' fundingSource [0..inf] '''
+        ''' rationale [1..inf] '''
+        ET.SubElement(ensembleElement,'rationale').text=ensembleClass.description
+        ''' project [0->inf] '''
+        ''' shortName [1] '''
+        ET.SubElement(ensembleElement,'shortName').text="ensemble for simulation "+simClass.abbrev
+        ''' longName [1] '''
+        ET.SubElement(ensembleElement,'longName').text="ensemble for simulation "+simClass.title
+        ''' description [0..1] '''
+        ''' dataHolder [0..inf] '''
+        ''' supports [1..inf] '''
+        supportsElement=ET.SubElement(ensembleElement,'supports')
+        self.addCIMReference(simClass.experiment,supportsElement)
+        ''' output [0..inf] '''
+        ''' ensembleType [1..inf] '''
+        if ensembleClass.etype :
+            typeElement=ET.SubElement(ensembleElement,'ensembleType',{'value':ensembleClass.etype.name})
+        else :
+            typeElement=ET.SubElement(ensembleElement,'ensembleType',{'value':''})
+        ''' ensembleMember [2..inf] '''    
+        ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
+        assert(len(ensembleClassSet)>1,'Ensemble %s should have at least two ensemble members'%ensembleClass)
+        for ensMemberClass in ensMemberClassSet :
+            if ensMemberClass.drsMember :
+                ensMemberElement=ET.SubElement(ensembleElement,'ensembleMember')
+                simulationElement=ET.SubElement(ensMemberElement,'simulation')
+                refElement=self.addCIMReference(simClass,simulationElement)
+                if ensMemberClass.cmod :
+                    self.addModelMod(ensMemberClass.cmod,refElement)
+                if ensMemberClass.imod :
+                    self.addInputMod(ensMemberClass.imod,refElement)
+                extIDElement=ET.SubElement(ensMemberElement,'externalID')
+                ET.SubElement(extIDElement,'name').text=ensMemberClass.drsMember
+                ET.SubElement(extIDElement,'standard',{'value':'DRS'})
+                
+        self.addDocumentInfo(ensembleClass,ensembleElement)
+        
+    def addModelMod(self,modClass,rootElement):
+        changeElement=ET.SubElement(rootElement,"change",{'type':modClass.mtype.name})
+        ET.SubElement(changeElement,'name').text=modClass.mnemonic
+        if modClass.component :
+            targetElement=ET.SubElement(changeElement,"changeTarget")
+            # if we define a property (parameter) in this modification
+            # and this property already exists in the associated
+            # component then reference the property, otherwise reference
+            # the component. Note, we do a case insensitive search.
+            componentClass=modClass.component
+            found=False
+            for pg in componentClass.paramGroup.all() :
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                for con in constraintSet:
+                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    for bp in BaseParamSet:
+                        #ET.SubElement(targetElement,"DEBUG_PARAM_NAME").text=bp.name
+                        # perform a case insensitive search
+                        if bp.name.lower()==modClass.k.lower() :
+                            found=True
+                            break
+                        if found : break
+                    if found : break
+                if found : break
+            if found :
+                self.addCIMReference(modClass.component,targetElement,argName=modClass.k,argType='componentProperty')
+            else :
+                self.addCIMReference(modClass.component,targetElement)
+
+        detailElement=ET.SubElement(changeElement,'detail')
+        if modClass.v :
+            ET.SubElement(detailElement,'value').text=str(modClass.v)
+        if modClass.k :
+            ET.SubElement(detailElement,'name').text=modClass.k
+        ET.SubElement(detailElement,'description').text=modClass.description
+
+    def addInputMod(self,modClass,rootElement):
+        changeElement=ET.SubElement(rootElement,"change",{'type':modClass.inputTypeModified.name})
+        ET.SubElement(changeElement,'name').text=modClass.mnemonic
+        if modClass.memberStartDate :
+            changeElement.append(modClass.memberStartDate.xml('changeDate'))
+        detailElement=ET.SubElement(changeElement,'detail')
+        ET.SubElement(detailElement,'description').text=modClass.description
+
     def add_simulation(self,simClass,rootElement):
 
             #single simulation
@@ -325,28 +417,14 @@ class Translator:
                     ET.SubElement(confElement,'description').text=confClass.description
 
             ''' simulationComposite [0..1] '''
-            ''' ensemble [0..1] '''
-            if (simClass.ensembleMembers>1) :
-                if self.VALIDCIMONLY :
-                    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
-                    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
-                    for ensembleClass in ensembleClassSet :
-                        simElement.append(ET.Comment('TBD: ensemble information'))
-                        if ensembleClass.etype :
-                            simElement.append(ET.Comment('TBD: value: '+ensembleClass.etype.name))
-                        if ensembleClass.description :
-                            simElement.append(ET.Comment('TBD: description: '+ensembleClass.description))
-                        ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
-                        for ensMemberClass in ensMemberClassSet :
-                            simElement.append(ET.Comment('TBD: number: '+str(ensMemberClass.memberNumber)))
-                            if ensMemberClass.mod :
-                                simElement.append(ET.Comment('TBD: modification: '+ensMemberClass.mod.mnemonic))
-                else :
-                    ensemblesElement=ET.SubElement(simElement,'Q_Ensembles')
-                    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
-                    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
-                    for ensembleClass in ensembleClassSet :
-                        self.addEnsemble(ensembleClass,ensemblesElement)
+            # removed by Allyn in the latest version
+            #''' ensemble [0..1] '''
+            #if (simClass.ensembleMembers>1) :
+            #    ensembleElement=ET.SubElement(simElement,'ensemble')
+            #    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
+            #    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
+            #    ensembleClass=ensembleClassSet[0]
+            #    self.addCIMReference(ensembleClass,ensembleElement)
             ''' input [0..inf] ???COUPLING??? '''
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
@@ -525,10 +603,16 @@ class Translator:
         return rootElement
 
     def addDocumentInfo(self,rootClass,rootElement) :
-        ''' documentID [1] '''
-        ET.SubElement(rootElement,'documentID').text=rootClass.uri
-        ''' documentVersion [1] '''
-        ET.SubElement(rootElement,'documentVersion').text=str(rootClass.documentVersion)
+        try :
+            ''' documentID [1] '''
+            ET.SubElement(rootElement,'documentID').text=rootClass.uri
+            ''' documentVersion [1] '''
+            ET.SubElement(rootElement,'documentVersion').text=str(rootClass.documentVersion)
+        except :
+            #assert False, "Document is not of type Doc"
+            ET.SubElement(rootElement,'documentID').text='[TBD]'
+            ET.SubElement(rootElement,'documentVersion').text='[TBD]'
+
         ''' documentInternalVersion '''
         ''' metadataID '''
         ''' metadataVersion '''
@@ -1030,7 +1114,12 @@ class Translator:
                 myType='modelComponent'
 
         except :
-            assert False, "Document is not of type Doc"
+            # temporary hack before we make the ensemble class a doc
+            #assert False, "Document is not of type Doc"
+            myURI="[TBD]"
+            myDocumentVersion="[TBD]"
+            myName="[TBD]"
+            myType="[TBD]"
 
         targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#//CIMRecord/'+myType+'[id=\''+myURI+'\']'})
         ''' id '''
@@ -1057,6 +1146,7 @@ class Translator:
             ET.SubElement(modElement,'name').text=mod.mnemonic
             detailElement=ET.SubElement(modElement,'detail',{'type':mod.mtype.name})
             ET.SubElement(detailElement,'description').text=mod.description
+        return targetRef
 
     def add_dataobject(self,fileClass,rootElement):
 
