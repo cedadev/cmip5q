@@ -255,13 +255,14 @@ class Translator:
         ''' responsibleParty [0..inf] '''
         ''' fundingSource [0..inf] '''
         ''' rationale [1..inf] '''
-        ET.SubElement(ensembleElement,'rationale').text=ensembleClass.description
+        ET.SubElement(ensembleElement,'rationale')
         ''' project [0->inf] '''
         ''' shortName [1] '''
         ET.SubElement(ensembleElement,'shortName').text="ensemble for simulation "+simClass.abbrev
         ''' longName [1] '''
         ET.SubElement(ensembleElement,'longName').text="ensemble for simulation "+simClass.title
         ''' description [0..1] '''
+        ET.SubElement(ensembleElement,'description').text=ensembleClass.description
         ''' dataHolder [0..inf] '''
         ''' supports [1..inf] '''
         supportsElement=ET.SubElement(ensembleElement,'supports')
@@ -346,7 +347,7 @@ class Translator:
             ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
             ''' rationale [1..inf] '''
-            ET.SubElement(simElement,'rationale').text=simClass.description
+            ET.SubElement(simElement,'rationale')
             ''' shortName [1] '''
             ET.SubElement(simElement,'shortName').text=simClass.abbrev
             ''' longName [1] '''
@@ -376,6 +377,7 @@ class Translator:
             #        if simClass.duration.endDate!='' :
             #            ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
             ''' description [0..1] '''
+            ET.SubElement(simElement,'description').text=simClass.description
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
             confClassSet=Conformance.objects.filter(simulation=simClass)
