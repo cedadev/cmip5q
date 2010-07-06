@@ -18,6 +18,10 @@
         <div class="boxer"><h4> Available Grids </h4><div id="treeDiv"> {{navtree|safe}}</div>
         <h4>Grid {{c.abbrev}}</h4>
     </div>
+    <div class="boxer"> 
+    	<p> The button(s) in this box navigate to pages which further describe this <b>grid</b>.</p>
+        <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
+    </div>
 {% endblock %}
 
 {% block mainpanel %}
@@ -56,6 +60,22 @@
         </center>
     </form>
     </div><!-- boxer2 div -->
+    
+    <div class="boxer">
+        <h4> References (associated with this grid) </h4>
+        {% if refs|length_is:0 %} 
+        <p class="guidance"> No references are yet associated with this grid. Use the "References" button (left menu) to add references.</p>
+        {% else %}
+        <p class="guidance"> Update this list using the reference button.</p>
+        <table width="100%" class="backgrey">
+            <tr><th> Citation</th><th>Source</th></tr>
+            {% for r in refs%}
+            <tr><td >{{r.citation}}</td><td width="10%">(<a href="{{r.link}}">link</a>)</td></tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+    
    
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 

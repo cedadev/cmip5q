@@ -228,6 +228,12 @@ def gridEdit(request,centre_id,grid_id):
     return g.edit(request)
 
 @gracefulNotFound
+def gridRefs(request,centre_id,grid_id):
+    ''' Manage the references associated with a grid '''
+    c=gridHandler(centre_id,grid_id)
+    return c.manageRefs(request)
+
+@gracefulNotFound
 def gridCopy(request,centre_id,grid_id):
     c=gridHandler(centre_id,grid_id)
     return c.copy(request)
@@ -444,8 +450,8 @@ class ViewHandler(BaseViewHandler):
                                    'title':'Parties','tab':'Parties',
                                    'class':ResponsibleParty,'form':ResponsiblePartyForm,
                                    'filter':None},
-                        'grid':{'attname':'grid','title':'Grid Definitions','class':Grid,
-                                'form':GridForm,'filter':None,'tab':'Grids'},
+                        #'grid':{'attname':'grid','title':'Grid Definitions','class':Grid,
+                         #       'form':GridForm,'filter':None,'tab':'Grids'},
                         }
     # Note that we don't expect to be able to assign files, since we'll directly
     # attach objects within files as appropriate.
@@ -460,6 +466,7 @@ class ViewHandler(BaseViewHandler):
                       'component':{'class':Component,'attname':'component'},
                       'ensemble':{'class':Simulation,'attname':'simulation'},
                       'experiment':{'class':Experiment,'attname':'experiment'},
+                      'grid':{'class':Grid,'attname':'grid'},
                      }
                      
     # and for each of those we need to get back to the target view/edit, and for
@@ -469,6 +476,7 @@ class ViewHandler(BaseViewHandler):
                       'simulation':'cmip5q.protoq.views.simulationEdit',
                       'centre':'cmip5q.protoq.views.centre',
                       'component':'cmip5q.protoq.views.componentEdit',
+                      'grid':'cmip5q.protoq.views.gridEdit',
                       'ensemble':'cmip5q.protoq.views.ensemble',
                       # not sure about the following: for files ...
                       'experiment':'cmip5q.protoq.views.list',

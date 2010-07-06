@@ -65,7 +65,8 @@ urlpatterns = patterns('',
     #   
     (r'^cmip5/(?P<centre_id>\d+)/grid/add/$','cmip5q.protoq.views.gridAdd'),
     (r'^cmip5/(?P<centre_id>\d+)/grid/(?P<grid_id>\d+)/copy/$','cmip5q.protoq.views.gridCopy'),
-    (r'^cmip5/(?P<centre_id>\d+)/grid/(?P<grid_id>\d+)/edit/$','cmip5q.protoq.views.gridEdit'),             
+    (r'^cmip5/(?P<centre_id>\d+)/grid/(?P<grid_id>\d+)/edit/$','cmip5q.protoq.views.gridEdit'),
+    (r'^cmip5/(?P<centre_id>\d+)/grid/(?P<grid_id>\d+)/refs/$','cmip5q.protoq.views.gridRefs'),             
     #           
     # platforms/add/centre_id
     # platforms/edit/platform_id

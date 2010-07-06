@@ -61,12 +61,15 @@ class gridHandler(object):
         # find my own urls ...
         urls={}
         urls['form']=self.url
-        
+        urls['refs']=reverse('cmip5q.protoq.views.assign',args=(self.centre_id,'reference',
+                             'grid',c.id,))
         #urls=commonURLs(c.grid,urls)
         
         baseURL=reverse('cmip5q.protoq.views.gridAdd',args=(self.centre_id,))
         template='+EDID+'
         baseURL=baseURL.replace('add/','%s/edit'%template)
+        
+        refs=Reference.objects.filter(grid__id=c.id)
             
         postOK=True
         if request.method=="POST":
@@ -109,10 +112,28 @@ class gridHandler(object):
         logging.debug('Finished handling %s to grid %s'%(request.method,c.id))
         return render_to_response('gridMain.html',
                 {'c':c,'cform':cform,'pform':pform,
-                'navtree':navtree.html,
+                'navtree':navtree.html,'refs':refs,
                 'urls':urls,
                 'tabs':tabs(request,self.centre_id,'Grid',self.grid.topGrid.id),
                 'notAjax':not request.is_ajax()})
+        
+    def manageRefs(self,request):      
+        ''' Handle references for a specific grid '''
+        refs=Reference.objects.filter(grid__id=self.grid.id)
+        allrefs=Reference.objects.all()
+        available=[]
+        c=self.grid
+        for r in allrefs: 
+            if r not in refs:available.append(r) 
+        rform=ReferenceForm()
+        refu=reverse('cmip5q.protoq.views.addReference',args=(self.centre_id,c.id,))
+        baseURLa=reverse('cmip5q.protoq.views.assignReference',args=(1,1,))[0:-4]
+        baseURLr=reverse('cmip5q.protoq.views.remReference',args=(1,1,))[0:-4]
+        return render_to_response('gridRefs.html',
+            {'refs':refs,'available':available,'rform':rform,'c':c,
+            'refu':refu,'baseURLa':baseURLa,'baseURLr':baseURLr,
+            'tabs':tabs(request,self.centre_id,'References for %s'%c),
+            'notAjax':not request.is_ajax()})
         
         
     def copy(self,request):
