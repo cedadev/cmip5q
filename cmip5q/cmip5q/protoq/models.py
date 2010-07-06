@@ -1278,11 +1278,18 @@ class ExternalClosure(CouplingClosure):
             kw[key]=self.__getattribute__(key)
         new=self.__class__(**kw)
         new.save()
-        
+
+class EnsembleDoc(Doc):
+    ''' This class is only used to create an ensemble doc by the makeDoc method of an Ensemble '''
+    # we have both classes as a hack to avoid problems saving forms and because the ensemble
+    # properties mostly come from the simulation.
+    etype=models.ForeignKey(Term,blank=True,null=True)
+
 class Ensemble(models.Model):
     description=models.TextField(blank=True,null=True)
     etype=models.ForeignKey(Term,blank=True,null=True)
     simulation=models.ForeignKey(Simulation)
+    doc=models.ForeignKey(EnsembleDoc,blank=True,null=True)
     def updateMembers(self):
         ''' Make sure we have enough members, this needs to be called if the
         simulation changes it's mind over the number of members '''
@@ -1296,6 +1303,21 @@ class Ensemble(models.Model):
             elif ndif < 0:
                 e=EnsembleMember(ensemble=self,memberNumber=n+i+1)
                 e.save()
+    def makeDoc(self):
+        ''' Returns an EnsembleDoc instance of self, which can be used to validate etc '''
+        if self.doc: 
+            # I don't believe it's possible for the ensemble to be associated with a different simulation
+            # since last time we came.
+            ed=self.doc
+        else: 
+            ed=EnsembleDoc(uri=atomuri())
+        ed.etype=self.etype
+        # we can't assume that none of the simulation characteristics have not been changed, so
+        # let's just copy them lock stock and barrel.
+        for a in (centre,author,funder,contact,metadtaMaintainer,title,abbrev,description):
+            ed.__setattribute__(a,self.description.__getattribute__(a))
+        # is that enough of a shell?
+        return ed.save()
     
 class EnsembleMember(models.Model):
     ensemble=models.ForeignKey(Ensemble,blank=True,null=True)
