@@ -587,7 +587,7 @@ class Component(Doc):
         for x in self.components.all():
             x.grid_id=self.grid_id
             if x.components:
-                x.filterdown()
+                x.filterdowngrid()
             x.save()         
             
     
@@ -1129,7 +1129,7 @@ class DataContainer(Doc):
     def __unicode__(self):
         if self.abbrev <> '':
             return self.abbrev
-        else: return self.title[0:31]  # truncation ...
+        else: return self.title[0:44]  # truncation ...
     class Meta:
         ordering=('centre','title')
             
