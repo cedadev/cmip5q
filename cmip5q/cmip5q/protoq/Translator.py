@@ -12,7 +12,7 @@ logging=settings.LOG
 class Translator:
 
 
-    ''' Translates a questionnaire Doc class (Simulation, Component or Platform) into a CIM document (as an lxml etree instance) '''
+    ''' Translates a questionnaire Doc class (Simulation, Component, (Ensemble) or Platform) into a CIM document (as an lxml etree instance) '''
 
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
@@ -221,8 +221,8 @@ class Translator:
             self.add_component(ref.numericalModel,modelElement)
             simulationElement=self.cimRecord(root)
             self.add_simulation(ref,simulationElement)
-            ensembleElement=self.cimRecord(root)
             if ref.ensembleMembers>1 :
+                ensembleElement=self.cimRecord(root)
                 self.add_ensemble(ref,ensembleElement)
             experimentElement=self.cimRecord(root)
             self.add_experiment(ref.experiment,experimentElement)
@@ -239,12 +239,113 @@ class Translator:
             for fileObject in uniqueFileList :
                 dataObjectElement=self.cimRecord(root)
                 self.add_dataobject(fileObject,dataObjectElement)
+
+            # find all unique grid references in our model
+            uniqueGridList=[]
+            myModel=ref.numericalModel
+            self.componentWalk(myModel,uniqueGridList)
+            for gridObject in uniqueGridList :
+                gridObjectElement=self.cimRecord(root)
+                self.add_gridobject(gridObject,gridObjectElement)
             cimDoc=root
         else :
             root=self.cimRecordRoot()
             cimDoc=method(ref,root)
         return cimDoc
         
+    def componentWalk(self,c,uniqueGridList) :
+        if c.implemented :
+            if c.grid :
+                if c.grid not in uniqueGridList :
+                    uniqueGridList.append(c.grid)
+            for child in c.components.all():
+                self.componentWalk(child,uniqueGridList)
+
+    def add_gridobject(self,gridObject,rootElement) :
+
+        # temporary change to grid parent before Gerry fixes the questionnaire
+        childGridList=gridObject.grids.all()
+        assert len(childGridList)==1, "top level grid should only have one child"
+        gridObject=childGridList[0]
+        # end temporary change to grid parent
+
+        # get our horizontal and vertical grid properties
+        # assume they are in this order
+        childList=gridObject.grids.all()
+        assert len(childList)==2, "expecting 2 grid subcomponents (horizontal and vertical properties) but found "+len(childGridList)
+        horizontalPropertiesObject=childList[0]
+        verticalPropertiesObject=childList[1]
+
+        HorizGridDiscretization=""
+        HorizGridType=""
+        # extract our horizontal properties
+        for pg in horizontalPropertiesObject.paramGroup.all():
+            #if pg.name :
+            #    ET.SubElement(esmModelGridElement,"PROPERTIES",{"name":pg.name})
+            if pg.name=="HorizontalCoordinateSystem" :
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                for con in constraintSet:
+                    #rootElement.append(ET.Comment('constraint : '+con.constraint))
+                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    for bp in BaseParamSet :
+                        p=bp.get_child_object()
+                        if con.constraint=="" :
+                            # first set of values have no constraint
+                            if bp.name=="GridDiscretization" :
+                                HorizGridDiscretization=str(p.value)
+                            if bp.name=="GridResolution" :
+                                HorizGridResolution=p.value
+                            if bp.name=="GridRefinementScheme" :
+                                HorizGridRefinement=p.value
+                        # rf need a better check below
+                        elif str(con.constraint).find(HorizGridDiscretization)!=-1 :
+                            #rootElement.append(ET.Comment('constraint : '+con.constraint))
+                            #rootElement.append(ET.Comment('HorizGridDiscretization : '+HorizGridDiscretization))
+                            #rootElement.append(ET.Comment('GridType : '+str(p.value)))
+                            if bp.name=="GridType" :
+                                HorizGridType=str(p.value)
+
+        VertGridDiscretization=""
+        VertGridType=""
+        # extract our vertical properties
+        for pg in verticalPropertiesObject.paramGroup.all():
+            #if pg.name :
+            #    ET.SubElement(esmModelGridElement,"PROPERTIES",{"name":pg.name})
+            if pg.name=="VerticalCoordinateSystem" :
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                for con in constraintSet:
+                    #rootElement.append(ET.Comment('constraint : '+con.constraint))
+                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    for bp in BaseParamSet :
+                        p=bp.get_child_object()
+                        if con.constraint=="" :
+                            # first set of values have no constraint
+                            if bp.name=="VerticalCoordinateType" :
+                                VertGridDiscretization=str(p.value)
+                        # rf need a better check below
+                        elif str(con.constraint).find(VertGridDiscretization)!=-1 :
+                            #rootElement.append(ET.Comment('constraint : '+con.constraint))
+                            #rootElement.append(ET.Comment('VertGridDiscretization : '+HorizGridDiscretization))
+                            #rootElement.append(ET.Comment('GridType : '+str(p.value)))
+                            if bp.name=="VerticalCoordinate" :
+                                VertGridType=str(p.value)
+
+        
+        gridElement=ET.SubElement(rootElement,'gridSpec')
+        esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'horizontalGridType':HorizGridType,'verticalGridType':VertGridType})
+        if gridObject.abbrev :
+            ET.SubElement(esmModelGridElement,'shortName').text=gridObject.abbrev
+        if gridObject.title :
+            ET.SubElement(esmModelGridElement,'longName').text=gridObject.title
+        if gridObject.description :
+            ET.SubElement(esmModelGridElement,'description').text=gridObject.description
+        #reference list TBA when Gerry adds in references
+        #ET.SubElement(gridElement,'referenceList')
+
+        gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"horizontalGridDiscretization":str(HorizGridDiscretization),"verticalGridDiscretization":str(VertGridDiscretization)})
+
+        self.addDocumentInfo(gridObject,gridElement)
+
     def add_ensemble(self,simClass,rootElement):
 
         ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
@@ -258,9 +359,9 @@ class Translator:
         ET.SubElement(ensembleElement,'rationale')
         ''' project [0->inf] '''
         ''' shortName [1] '''
-        ET.SubElement(ensembleElement,'shortName').text="ensemble for simulation "+simClass.abbrev
+        ET.SubElement(ensembleElement,'shortName').text=simClass.abbrev
         ''' longName [1] '''
-        ET.SubElement(ensembleElement,'longName').text="ensemble for simulation "+simClass.title
+        ET.SubElement(ensembleElement,'longName').text=simClass.title
         ''' description [0..1] '''
         ET.SubElement(ensembleElement,'description').text=ensembleClass.description
         ''' dataHolder [0..inf] '''
@@ -346,12 +447,18 @@ class Translator:
             self.addResp(simClass.centre.party,simElement,'centre')
             ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
-            ''' rationale [1..inf] '''
-            ET.SubElement(simElement,'rationale')
-            ''' shortName [1] '''
-            ET.SubElement(simElement,'shortName').text=simClass.abbrev
-            ''' longName [1] '''
-            ET.SubElement(simElement,'longName').text=simClass.title
+            ''' rationale [0..inf] '''
+            if simClass.ensembleMembers>1 :
+                # our simulation is really the base simulation of an ensemble
+                ''' shortName [1] '''
+                ET.SubElement(simElement,'shortName').text=simClass.abbrev+"BaseSimulation"
+                ''' longName [1] '''
+                ET.SubElement(simElement,'longName').text='Base Simulation of Ensemble'+simClass.title
+            else :
+                ''' shortName [1] '''
+                ET.SubElement(simElement,'shortName').text=simClass.abbrev
+                ''' longName [1] '''
+                ET.SubElement(simElement,'longName').text=simClass.title
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
             self.addCIMReference(simClass.experiment,experimentElement)
@@ -418,6 +525,9 @@ class Translator:
                     confElement.append(ET.Comment('Conformance type : '+confClass.ctype.name))
                     ET.SubElement(confElement,'description').text=confClass.description
 
+                elif (confClass.description and confClass.description!='') or len(confClass.mod.all())>0 or len(confClass.coupling.all())>0 :
+                    # confClass.ctype is mot mandatory in the CIM but is required for a conformance so output something purely for validation purposes if other fields have been set without confClass.ctype being set
+                    ET.SubElement(simElement,"conformance",{'type':'invalid'})
             ''' simulationComposite [0..1] '''
             # removed by Allyn in the latest version
             #''' ensemble [0..1] '''
