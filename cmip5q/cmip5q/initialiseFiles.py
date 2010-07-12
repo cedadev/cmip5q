@@ -11,7 +11,7 @@ def initialiseFiles():
     # loop over all references in spreadsheet
     for row in FilesCSVinfo:
         # format is being read into the tuple only for convenience at the moment but is overwritten
-        name,link,filetype,description=tuple(row)
+        abbrev,name,link,filetype,description=tuple(row)
         logging.debug(name+filetype)
         # find out what file type
         #filetype='Other'
@@ -21,7 +21,9 @@ def initialiseFiles():
             logging.info('Ignoring file %s'%name)
             break  # leave the loop
         # find the other things: name, description, link    
-        f=DataContainer(title=name,
+        f=DataContainer(
+                    abbrev=abbrev,
+                    title=name,
                     link=link,
                     description=description,
                     format=format)
