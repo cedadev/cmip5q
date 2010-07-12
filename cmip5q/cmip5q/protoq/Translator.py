@@ -565,14 +565,15 @@ class Translator:
             ''' documentGenealogy [0..inf] '''
             #relatedSimulations=simClass.relatedSimulations.all()
             relatedSimulations=SimRelationship.objects.filter(sfrom=simClass)
-            if len(relatedSimulations)>0 :
+            assert len(relatedSimulations)==1, "Expecting related simulations to be of size 1"
+            relatedSimulation=relatedSimulations[0]
+            if relatedSimulation.value :
                 docGenElement=ET.SubElement(simElement,'documentGenealogy')
-                for relatedSimulation in relatedSimulations :
-                    relationshipElement=ET.SubElement(docGenElement,'relationship')
-                    simRelationshipElement=ET.SubElement(relationshipElement,'simulationRelationship',{'type':str(relatedSimulation.value)})
-                    ET.SubElement(simRelationshipElement,"description").text=relatedSimulation.description
-                    targetElement=ET.SubElement(simRelationshipElement,"target")
-                    self.addCIMReference(relatedSimulation.sto,targetElement)
+                relationshipElement=ET.SubElement(docGenElement,'relationship')
+                simRelationshipElement=ET.SubElement(relationshipElement,'simulationRelationship',{'type':str(relatedSimulation.value)})
+                ET.SubElement(simRelationshipElement,"description").text=relatedSimulation.description
+                targetElement=ET.SubElement(simRelationshipElement,"target")
+                self.addCIMReference(relatedSimulation.sto,targetElement)
             ''' quality [0..inf] '''
             if self.VALIDCIMONLY :
                 simElement.append(ET.Comment('TBD: AuthorList: '+simClass.authorList))
