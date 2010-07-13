@@ -208,6 +208,12 @@ class ComponentParser:
             co,info=None,None
             for item in elem:
                 if item.tag=='value':
+                    # RF append any value definitions to the parameter definition
+                    assert len(item)==0 or len(item)==1, "Parse error: a value should have 0 or 1 children"
+                    if len(item)==1 :
+                        assert item[0].tag=='definition', "Parse error, the child of a value must be a definition element"
+                        defn+=" "+item.attrib['name']+": "+item[0].text
+                    # RF end append
                     value=Term(vocab=v,name=item.attrib['name'])
                     value.save()
                 elif item.tag=='definition':
