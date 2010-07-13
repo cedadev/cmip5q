@@ -760,9 +760,8 @@ class GenericNumericalRequirement(ParentModel):
         for a in ['description','name']:self.__setattr__(a,getter.getN(elem,a))
         for e in elem.findall('{%s}requirementOption'%cimv):
             ro=RequirementOption()
-            ro.fromXML(e)
-            ro.save()
-            self.options.add(ro)
+            a = ro.fromXML(e)
+            self.options.add(a)
         print experiment,self.id,self.name
 
 class RequirementOption(models.Model):
@@ -772,11 +771,13 @@ class RequirementOption(models.Model):
     def __unicode__(self):    
         return self.name 
     def fromXML(self,elem):
-        getter=eTxt(elem)
-        name=eTxt.get(elem,'name')
-        description=eTxt.get(elem,'description')
-        return RequirementOption(name=name,description=description)
-
+        getter=etTxt(elem)
+        name=getter.get(elem,'name')
+        description=getter.get(elem,'description')
+        a = RequirementOption(name=name,description=description)
+        a.save()
+        return a
+    
 class NumericalRequirement(GenericNumericalRequirement):
     ''' A Numerical Requirement '''
     @staticmethod
@@ -784,6 +785,7 @@ class NumericalRequirement(GenericNumericalRequirement):
         ''' Initialised with an appropriate experiment, and an element tree Element. All
         numerical requirements are initialised through this interface '''
         nr=NumericalRequirement(ctype=ctype)
+        nr.save()
         nr.gfromXML(experiment,elem)
         nr.save()
         return nr
