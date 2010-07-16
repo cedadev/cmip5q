@@ -796,6 +796,7 @@ class SpatioTemporalConstraint(GenericNumericalRequirement):
     @staticmethod
     def fromXML(experiment,elem,ctype):
         nr=SpatioTemporalConstraint(ctype=ctype)
+        nr.save()
         nr.gfromXML(experiment,elem)
         op=elem.find('{%s}requiredDuration'%cimv)
         print 'duration element ',op
