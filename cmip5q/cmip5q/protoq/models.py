@@ -1037,8 +1037,9 @@ class PhysicalProperty(Term):
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
+    componentView=models.BooleanField(default=False)
     def copy(self):
-        new=ParamGroup(name=self.name)
+        new=ParamGroup(name=self.name,componentView=self.componentView)
         new.save()
         for constraint in self.constraintgroup_set.all():constraint.copy(new)
         return new
