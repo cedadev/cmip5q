@@ -21,7 +21,7 @@
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.075</id>
-        <name>3.6.bc.volcaer</name>
+        <name>3.6.bc.volc_aer</name>
         <description>Impose evolving volcanic aerosols consistant with PMIP requirements</description>
     </numericalRequirement>
    
@@ -35,7 +35,7 @@
     <calendar>
     	<realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">3.6.stc.0850_1000yr</name><id xsi:type="Identifier">stc.035</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 0850-01-01T00:00:00Z</startDate>
 		<endDate> 1851-01-01T00:00:00Z </endDate>
 		<length units="years">1000</length>

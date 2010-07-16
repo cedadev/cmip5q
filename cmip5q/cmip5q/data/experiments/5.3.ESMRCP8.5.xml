@@ -29,37 +29,37 @@
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.039</id>
-        <name xsi:type="Identifier">5.3.bc.wmg.em</name>
+        <name xsi:type="Identifier">5.3.bc.wmg_em</name>
         <description>Imposed changing emissions of RCP8.5 well mixed gases, including CO2</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.040</id>
-        <name xsi:type="Identifier">5.3.bc.sls.em</name>
+        <name xsi:type="Identifier">5.3.bc.sls_em</name>
         <description>Imposed changing emissions of RCP8.5 short lived gas species </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.041</id>
-        <name xsi:type="Identifier">5.3.bc.aer.em</name>
+        <name xsi:type="Identifier">5.3.bc.aer_em</name>
         <description>Imposed changing emissions of RCP8.5 aerosols </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.042</id>
-        <name xsi:type="Identifier">5.3.bc.aer_pre.em</name>
+        <name xsi:type="Identifier">5.3.bc.aer_pre_em</name>
         <description>Imposed changing emissions of RCP8.5 aerosol precursors </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.043</id>
-        <name xsi:type="Identifier">5.3.bc.LandUse</name>
+        <name xsi:type="Identifier">5.3.bc.LU</name>
         <description>Imposed changing RCP8.5 land use </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.034</id>
-        <name xsi:type="Identifier">5.3.bc.aer_volc.conc</name>
+        <name xsi:type="Identifier">5.3.bc.volc_aer_conc</name>
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
     </numericalRequirement>
     
     <shortName>
-		5.3 esmRcp85
+		5.3 esmrcp85
 	</shortName>
     <longName>
 		5.3 ESM RCP8.5
@@ -68,7 +68,7 @@
     <calendar>
         <realCalendar/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.3.stc.2006_94yr</name><id xsi:type="Identifier">stc.030</id><requiredDuration xsi:type="ClosedDateRange">
         <startDate>2006-01-01T00:00:00Z</startDate>
         <endDate>2100-01-01T00:00:00Z</endDate>
         <length units="years">94</length>

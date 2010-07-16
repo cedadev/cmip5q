@@ -29,13 +29,13 @@
 
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.072</id>
-		<name>3.5.bc.LGMwmg</name>
+		<name>3.5.bc.LGM_wmg</name>
 		<description>Impose last glacial maximum conditions of well-mixed gases</description>
 	</numericalRequirement>
 
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.073</id>
-		<name>3.5.bc.LGMice</name>
+		<name>3.5.bc.LGM_ice</name>
 		<description>Impose last glacial maximum ice sheet conditions supplied by PMIP (requiring
 			changes to surface elevation, land surface type, and land fraction)</description>
 	</numericalRequirement>
@@ -47,12 +47,16 @@
 	<calendar>
 		<perpetualPeriod/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint">
+		<name xsi:type="Identifier">3.5.stc.-19000_100yr</name>
+		<id xsi:type="Identifier">stc.029</id>
+		<requiredDuration xsi:type="ClosedDateRange">
 		<!--Dates to reflect 100 yrs of simulation 21K yrs ago - to be verified -->
 		<startDate> -19000-01-01T00:00:00Z</startDate>
 		<endDate> -19000-01-01T00:00:00Z </endDate>
 		<length units="years">100</length>
-	</requiredDuration></numericalRequirement>
+		</requiredDuration>
+	</numericalRequirement>
 	<author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>

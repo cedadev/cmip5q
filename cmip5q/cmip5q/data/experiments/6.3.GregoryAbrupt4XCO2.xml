@@ -35,7 +35,7 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.056</id>
-        <name xsi:type="Identifier">6.3.bc.4XCO2.conc</name>
+        <name xsi:type="Identifier">6.3.bc.4X_CO2_conc</name>
         <description>Prescribed concentration of well mixed Gas: CO2 
                      is quadruple of 3.1_piControl concentration</description>
     </numericalRequirement> 
@@ -50,7 +50,7 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.3.stc.1850_150yr</name><id xsi:type="Identifier">stc.037</id><requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-12-30T00:00:00Z</endDate>
         <length units="years">150</length>

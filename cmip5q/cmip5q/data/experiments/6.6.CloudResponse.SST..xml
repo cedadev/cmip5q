@@ -6,94 +6,103 @@
     <description>Consistent with CFMIP requirements, add a patterned SST perturbation to the AMIP SSTs of expt. 3.3 (which is the “control” for this run).</description>
 	
 	<!-- Initial Conditions -->
-	<numericalRequirement xsi:type="InitialCondition">
+    <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.003</id>
-        <name>6.6.ic</name>
+        <name xsi:type="Identifier">6.6.ic</name>
         <description> Initial conditions are from year 1979 of experiment 3.2_historical. </description>
     </numericalRequirement>
 	
 	<!-- Boundary/Forcing Conditions -->
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.011</id>
-        <name>6.6.bc.wmg_anth.conc</name>
+        <name xsi:type="Identifier">6.6.bc.ant_wmg_conc</name>
         <description>Imposed changing concentrations of historical anthropogenic well mixed gases, including CO2</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.012</id>
-        <name>6.6.bc.wmg_volc.conc</name>
+        <name xsi:type="Identifier">6.6.bc.volc_wmg_conc</name>
         <description>Imposed changing concentrations of historical volcanic well mixed gases, including CO2</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.013</id>
-        <name>6.6.bc.sls.conc</name>
-        <description>Imposed changing concentrations of historical short lived gas species</description>
+        <name xsi:type="Identifier">6.6.bc.sls</name>
+        <description>Imposed changing concentrations or emissions of historical short lived gas species</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.013</id>
+            <name xsi:type="Identifier">6.6.bc.sls_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.018</id>
+            <name xsi:type="Identifier">6.6.bc.sls_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.014</id>
-        <name>6.6.bc.aer_nat.conc</name>
-        <description>Imposed changing concentrations of historical natural aerosols</description>
+        <name xsi:type="Identifier">6.6.bc.nat_aer</name>
+        <description>Imposed changing concentrations or emissions of historical natural aerosols</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.014</id>
+            <name xsi:type="Identifier">6.6.bc.nat_aer_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.019</id>
+            <name xsi:type="Identifier">6.6.bc.nat_aer_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
-    
+
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.015</id>
-        <name>6.6.bc.aer_anth.conc</name>
-        <description>Imposed changing concentrations of historical anthropogenic aerosols</description>
+        <name xsi:type="Identifier">6.6.bc.ant_aer</name>
+        <description>Imposed changing concentrations or emissions of historical anthropogenic aerosols</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.015</id>
+            <name xsi:type="Identifier">6.6.bc.ant_aer_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.020</id>
+            <name xsi:type="Identifier">6.6.bc.ant_aer_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.016</id>
-        <name>6.6.bc.aer_pre_nat.conc</name>
+        <name xsi:type="Identifier">6.6.bc.nat_aer_pre_conc</name>
         <description>Imposed changing concentrations of historical natural aerosol precursors</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.017</id>
-        <name>6.6.bc.aer_pre_anth.conc</name>
+        <name xsi:type="Identifier">6.6.bc.ant_aer_pre_conc</name>
         <description>Imposed changing concentrations of historical anthropogenic aerosol precursors</description>
     </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.018</id>
-        <name>6.6.bc.sls.em</name>
-        <description>Imposed changing emissions of historical short lived gas species</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.019</id>
-        <name>6.6.bc.aer_nat.em</name>
-        <description>Imposed changing emissions of historical natural aerosols </description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.020</id>
-        <name>6.6.bc.aer_anth.em</name>
-        <description>Imposed changing emissions of historical anthropogenic aerosols</description>
-    </numericalRequirement>
-    
+
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.021</id>
-        <name>6.6.bc.solar</name>
+        <name xsi:type="Identifier">6.6.bc.solar</name>
         <description>Imposed historical changing solar forcing</description>
     </numericalRequirement>           
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.022</id>
-        <name>6.6.bc.LandUse</name>
+        <name xsi:type="Identifier">6.6.bc.LU</name>
         <description>Imposed historical changing land use</description>
     </numericalRequirement>
         
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.024</id>
-        <name>6.6.SeaIce.obs</name>
+        <name xsi:type="Identifier">6.6.bc.seaice_obs</name>
         <description>Sea ice imposed from historical observations</description>
     </numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.064</id>
-		<name>6.6.bc.sstpattern</name>
+		<name xsi:type="Identifier">6.6.bc.pattern_sst</name>
 		<description> Patterned SST perturbation applied to the AMIP SSTs of expt 3.3 (provided by CFMIP)</description>
 	</numericalRequirement>
 	
@@ -112,11 +121,14 @@
 			</range>
 		</daily-360>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
-		<!-- Idealised run so dates given here are only dummy values -->
-		<startDate> 1850-01-01T00:00:00Z</startDate>
-		<endDate> 1881-01-01T00:00:00Z</endDate>
-	</requiredDuration></numericalRequirement>
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.6.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id>
+        <requiredDuration xsi:type="ClosedDateRange">
+            <!-- Idealised run so dates given here are only dummy values -->
+	 <startDate> 1850-01-01T00:00:00Z</startDate>
+            <endDate> 1880-01-01T00:00:00Z</endDate>
+            <length units="years">30</length>
+        </requiredDuration>
+    </numericalRequirement>
     <author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>

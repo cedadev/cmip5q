@@ -17,14 +17,14 @@
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.008</id>
-		<name>6.1S.ic</name>
+		<name xsi:type="Identifier">6.1S.ic</name>
 		<description> Simulation needs to be initialised from year 20 of the shortened pre-industrial control run (3.1S) </description>
     </numericalRequirement>
     
 	<!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.059</id>
-        <name>6.1S.bc.1%CO2.conc</name>
+        <name xsi:type="Identifier">6.1S.bc.1%CO2_conc</name>
         <description> 1% per year increase in CO2 over 80yr run</description>
     </numericalRequirement>
     
@@ -38,7 +38,7 @@
 	<calendar>
 		<realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.1S.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1930-01-01T00:00:00Z </endDate>
 		<length units="years">80</length>

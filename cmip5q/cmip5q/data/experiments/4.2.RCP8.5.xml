@@ -30,53 +30,73 @@
     
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.035</id>
-        <name xsi:type="Identifier">4.2.bc.wmg.conc</name>
-        <description>Imposed changing concentrations of RCP8.5 well mixed gases, including CO2</description>
-    </numericalRequirement>
+        <name xsi:type="Identifier">4.2.bc.wmg</name>
+        <description>Imposed changing concentrations or emissions of RCP8.5 well mixed gases, including CO2</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.035</id>
+            <name xsi:type="Identifier">4.2.bc.wmg_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.039</id>
+            <name xsi:type="Identifier">4.2.bc.wmg_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
+    </numericalRequirement>  
+    
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.036</id>
-        <name xsi:type="Identifier">4.2.bc.sls.conc</name>
-        <description>Imposed changing concentrations of RCP8.5 short lived gas species</description>
+        <name xsi:type="Identifier">4.2.bc.sls</name>
+        <description>Imposed changing concentrations or emissions of RCP8.5 short lived gas species</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.036</id>
+            <name xsi:type="Identifier">4.2.bc.sls_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.040</id>
+            <name xsi:type="Identifier">4.2.bc.sls_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
+    
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.037</id>
-        <name xsi:type="Identifier">4.2.bc.aer.conc</name>
-        <description>Imposed changing concentrations of RCP8.5 aerosols </description>
+        <name xsi:type="Identifier">4.2.bc.aer</name>
+        <description>Imposed changing concentrations or emissions of RCP8.5 aerosols </description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.037</id>
+            <name xsi:type="Identifier">4.2.bc.aer_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.041</id>
+            <name xsi:type="Identifier">4.2.bc.aer_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
+    
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.038</id>
-        <name xsi:type="Identifier">4.2.bc.aer_pre.conc</name>
-        <description>Imposed changing concentrations of RCP8.5 aerosol precursors </description>
-    </numericalRequirement>    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.039</id>
-        <name xsi:type="Identifier">4.2.bc.wmg.em</name>
-        <description>Imposed changing emissions of RCP8.5 well mixed gases, including CO2</description>
+        <name xsi:type="Identifier">4.2.bc.aer_pre</name>
+        <description>Imposed changing concentrations or emissions of RCP8.5 aerosol precursors </description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.038</id>
+            <name xsi:type="Identifier">4.2.bc.aer_pre_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.042</id>
+            <name xsi:type="Identifier">4.2.bc.aer_pre_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.040</id>
-        <name xsi:type="Identifier">4.2.bc.sls.em</name>
-        <description>Imposed changing emissions of RCP8.5 short lived gas species </description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.041</id>
-        <name xsi:type="Identifier">4.2.bc.aer.em</name>
-        <description>Imposed changing emissions of RCP8.5 aerosols </description>
-    </numericalRequirement>
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.042</id>
-        <name xsi:type="Identifier">4.2.bc.aer_pre.em</name>
-        <description>Imposed changing emissions of RCP8.5 aerosol precursors </description>
-    </numericalRequirement>
+    
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.043</id>
-        <name xsi:type="Identifier">4.2.bc.LandUse</name>
+        <name xsi:type="Identifier">4.2.bc.LU</name>
         <description>Imposed changing RCP8.5 land use </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.034</id>
-        <name xsi:type="Identifier">4.2.bc.aer_volc.conc</name>
+        <name xsi:type="Identifier">4.2.bc.volc_aer_conc</name>
         <description>Imposed constant background volcanic aerosol may (or may not) be specified</description>
     </numericalRequirement>
     
@@ -86,7 +106,7 @@
     <calendar>
         <realCalendar/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">4.2.stc.2006_94yr</name><id xsi:type="Identifier">stc.030</id><requiredDuration xsi:type="ClosedDateRange">
         <startDate>2006-01-01T00:00:00Z</startDate>
         <endDate>2100-01-01T00:00:00Z</endDate>
         <length units="years">94</length>

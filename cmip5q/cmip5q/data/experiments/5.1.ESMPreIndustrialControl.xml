@@ -26,39 +26,39 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.044</id>
-        <name xsi:type="Identifier">5.1.bc.wmg.em</name>
+        <name xsi:type="Identifier">5.1.bc.wmg_em</name>
         <description>Prescribed atmospheric emissions of pre-industrial well mixed gases: excluding CO2</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.045</id>
-        <name xsi:type="Identifier">5.1.bc.CO2.em</name>
+        <name xsi:type="Identifier">5.1.bc.CO2_em</name>
         <description>Prescribed atmospheric emissions of pre-industrial well mixed gas: Carbon Dioxide</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.046</id>
-        <name xsi:type="Identifier">5.1.bc.sls.em</name>
+        <name xsi:type="Identifier">5.1.bc.sls_em</name>
         <description>Prescribed atmospheric emissions of pre-industrial short lived (reactive) gas
             species</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.007</id>
-        <name xsi:type="Identifier">5.1.bc.nat_aer.em</name>
+        <name xsi:type="Identifier">5.1.bc.nat_aer_em</name>
         <description>Prescribed emissions of pre-industrial natural aerosols</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.008</id>
-        <name xsi:type="Identifier">5.1.bc.nat_aer_precur.em</name>
+        <name xsi:type="Identifier">5.1.bc.nat_aer_pre_em</name>
         <description>Prescribed emissions of pre-industrial natural aerosol precursors</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.009</id>
-        <name xsi:type="Identifier">5.1.bc.sl_aer.em</name>
+        <name xsi:type="Identifier">5.1.bc.sl_aer_em</name>
         <description>Prescribed emissions of pre-industrial short lived (reactive) aerosol
             species</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.010</id>
-        <name xsi:type="Identifier">5.1.bc.LandUse</name>
+        <name xsi:type="Identifier">5.1.bc.LU</name>
         <description>Unperturbed Pre-Industrial Land Use</description>
     </numericalRequirement>
     
@@ -72,7 +72,7 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.1.stc.1850_250yr</name><id xsi:type="Identifier">stc.032</id><requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-12-30T00:00:00Z</endDate>
         <length units="years">250</length>

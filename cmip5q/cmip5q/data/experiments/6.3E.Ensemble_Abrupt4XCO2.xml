@@ -10,19 +10,19 @@
     <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.001</id>
-        <name>6.3E.ic</name>
+        <name xsi:type="Identifier">6.3E.ic</name>
         <description> Initial conditions are from experiment 3.1_pi-control </description>
     </numericalRequirement>
     <numericalRequirement xsi:type="InitialCondition">
 		<id>ic.023</id>
-		<name>6.3E.ic.months</name>
+		<name xsi:type="Identifier">6.3E.ic.months</name>
 		<description> Each of the 11 ensemble members must be initialised in a different month of the year	</description>
 	</numericalRequirement>
     
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.056</id>
-		<name>6.3E.bc.4XCO2.conc</name>
+		<name xsi:type="Identifier">6.3E.bc.4X_CO2_conc</name>
 		<description>CO2 Instantaneous quadrupling of 3.1_pi-control concentration</description>
     </numericalRequirement> 
     
@@ -36,7 +36,7 @@
     <calendar>
    		<perpetualPeriod/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.3E.stc.1850_5yr</name><id xsi:type="Identifier">stc.038</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1850-12-30T00:00:00Z</endDate>
     	<length units="years">5</length>

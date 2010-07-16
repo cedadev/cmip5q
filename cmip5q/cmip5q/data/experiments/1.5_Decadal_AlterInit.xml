@@ -15,7 +15,7 @@
 	
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.014</id>
-		<name>1.5.ic.non-oc</name>
+		<name xsi:type="Identifier">1.5.ic.non-oc</name>
 		<description>Alternative strategy/data to initialise non-ocean conditions </description>
 	</numericalRequirement>
 		

@@ -7,39 +7,39 @@
 	 <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.002</id>
-        <name>6.5.ic</name>
+        <name xsi:type="Identifier">6.5.ic</name>
         <description> Initial conditions are from experiment 3.1_pi-control </description>
     </numericalRequirement>
     
     <!-- Boundary Conditions -->
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.056</id>
-        <name>6.2b.bc.4XCO2.conc</name>
+        <name xsi:type="Identifier">6.2b.bc.4X_CO2_conc</name>
         <description>Prescribed concentration of well mixed Gas: CO2 is quadruple of 3.1_pi-control CO2 concentration</description>
-        <!-- 6.3.bc.4XCO2.conc -->
+        <!-- 6.3.bc.4X_CO2_conc -->
     </numericalRequirement>  
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.053</id>
-        <name>6.2b.SeaIce.clim</name>
+        <name xsi:type="Identifier">6.2b.SeaIce.clim</name>
         <description>Sea ice is the sea ice climatology from the 3.1_pi-control</description>
     </numericalRequirement>       
      
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.010</id>
-        <name>6.2b.bc.LandUse</name>
+        <name xsi:type="Identifier">6.2b.bc.LU</name>
         <description>Unperturbed Land Use - Same as for the 3.1_pi-control</description>
     </numericalRequirement>      
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.054</id>
-        <name>6.2b.bc.Ocean_CO2</name>
+        <name xsi:type="Identifier">6.2b.bc.Ocean_CO2</name>
         <description>CO2 partial pressure dissolved in ocean, climatology from the 3.1_pi-control</description>
     </numericalRequirement> 
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.023</id>
-		<name>6.5.sst.obs</name>
+		<name xsi:type="Identifier">6.5.bc.sst_obs</name>
 		<description>Sea surface temperature (SST) imposed from historical observations</description>
 	</numericalRequirement>
      
@@ -58,10 +58,11 @@
 			</range>
 		</daily-360>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.5.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><requiredDuration xsi:type="ClosedDateRange">
 		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
-		<endDate> 1881-01-01T00:00:00Z</endDate>
+		<endDate> 1880-01-01T00:00:00Z</endDate>
+    	<length units="years">30</length>
 	</requiredDuration></numericalRequirement>
     <author>
 		<gmd:CI_ResponsibleParty>

@@ -7,77 +7,101 @@
 	<!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.002</id>
-        <name>7.3.ic</name>
-        <description> Initial conditions are from experiment 3.1.pi-control </description>
+        <name xsi:type="Identifier">7.3.ic</name>
+        <description> Initial conditions are from experiment 3.1 piControl </description>
     </numericalRequirement>
     
     <!-- Boundary/Forcing conditions -->
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.001</id>
-        <name xsi:type="Identifier">7.3.bc.wmg.conc</name>
+        <name xsi:type="Identifier">7.3.bc.wmg_conc</name>
         <description>Prescribed atmospheric concentrations of pre-industrial well mixed gases:
             excluding CO2</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.002</id>
-        <name xsi:type="Identifier">7.3.bc.CO2.conc</name>
+        <name xsi:type="Identifier">7.3.bc.CO2_conc</name>
         <description>Prescribed atmospheric concentrations of pre-industrial well mixed gas: Carbon
             Dioxide</description>
     </numericalRequirement>
     
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.003</id>
-        <name xsi:type="Identifier">7.3.bc.sls.conc</name>
+        <name xsi:type="Identifier">7.3.bc.sls_conc</name>
         <description>Prescribed atmospheric concentration of pre-industrial short lived (reactive)
             gas species</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.004</id>
-        <name xsi:type="Identifier">7.3.bc.nat_aer.conc</name>
-        <description>Prescribed concentrations of pre-industrial natural aerosols</description>
+        <name xsi:type="Identifier">7.3.bc.nat_aer</name>
+        <description>Prescribed concentrations or emissions of pre-industrial natural aerosols</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.004</id>
+            <name xsi:type="Identifier">7.3.bc.nat_aer_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.007</id>
+            <name xsi:type="Identifier">7.3.bc.nat_aer_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.005</id>
-        <name xsi:type="Identifier">7.3.bc.nat_aer_precur.conc</name>
-        <description>Prescribed concentrations of pre-industrial natural aerosol
-            precursors</description>
-    </numericalRequirement>
+        <name xsi:type="Identifier">7.3.bc.nat_aer_precur</name>
+        <description>Prescribed concentrations or emissions of pre-industrial natural aerosol precursors</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.005</id>
+            <name xsi:type="Identifier">7.3.bc.nat_aer_pre_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.008</id>
+            <name xsi:type="Identifier">7.3.bc.nat_aer_pre_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
+    </numericalRequirement> 
     
     <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.006</id>
-        <name xsi:type="Identifier">7.3.bc.sl_aer.conc</name>
-        <description>Prescribed concentrations of pre-industrial short lived (reactive) aerosol
-            species</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.007</id>
-        <name xsi:type="Identifier">7.3.bc.nat_aer.em</name>
-        <description>Prescribed emissions of pre-industrial natural aerosols</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.008</id>
-        <name xsi:type="Identifier">7.3.bc.nat_aer_precur.em</name>
-        <description>Prescribed emissions of pre-industrial natural aerosol precursors</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-        <id xsi:type="Identifier">bc.009</id>
-        <name xsi:type="Identifier">7.3.bc.sl_aer.em</name>
-        <description>Prescribed emissions of pre-industrial short lived (reactive) aerosol
-            species</description>
+        <name xsi:type="Identifier">7.3.bc.sl_aer</name>
+        <description>Prescribed concentrations or emissions of pre-industrial short lived (reactive) aerosol species</description>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.006</id>
+            <name xsi:type="Identifier">7.3.bc.sl_aer_conc</name>
+            <description>Concentrations</description>            
+        </requirementOption>
+        <requirementOption>
+            <id xsi:type="Identifier">bc.009</id>
+            <name xsi:type="Identifier">7.3.bc.sl_aer_em</name>
+            <description>Emissions</description>            
+        </requirementOption>
     </numericalRequirement>
             
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.101</id>
-		<name>7.3.bc.other></name>
+		<name xsi:type="Identifier">7.3.bc.other></name>
 		<description> Impose changing conditions of, for example, land use changes only, or anthro aerosols only, or volcanic aerosols only etc </description>
     </numericalRequirement>
-    
+    <!--   
+        Other forcing agents, need to decide how best to record these in the questionnaire.
+        Sd anthropogenic sulfate aerosol, accounting only for direct effects 
+        Si anthropogenic sulfate aerosol, accounting only for indirect effects 
+        Sa (= Sd + Si) anthropogenic sulfate aerosol direct and indirect effects 
+        To tropospheric ozone 
+        So stratospheric ozone 
+        Oz (= To + So) ozone (= tropospheric and stratospheric ozone) 
+        Lu land-use change  
+        Sl solar irradiance (note: Sl is “S” followed by a lower case “L”, not an upper case “I”)  
+        Vl volcanic aerosol (note: Vl is “V” followed by a lower case “L”, not an upper case “I”)  
+        Ss sea salt  
+        Ds Dust  
+        Bc black carbon  
+        Md mineral dust  
+        Oc organic carbon  
+        Aa anthropogenic aerosols (a mixture of aerosols, not explicitly defined here)   
+    -->
+   
    
 	<shortName>
 		7.3 historical???
@@ -89,7 +113,7 @@
    <calendar>
        <realCalendar/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">7.3.stc.1850_156yr</name><id xsi:type="Identifier">stc.026</id><requiredDuration xsi:type="ClosedDateRange">
 		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 2006-01-01T00:00:00Z</endDate>

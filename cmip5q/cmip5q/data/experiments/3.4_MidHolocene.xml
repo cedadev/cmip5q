@@ -15,19 +15,19 @@
     <!-- Boundary/Forcing Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.069</id>
-        <name>3.4.bc.MHorb</name>
+        <name>3.4.bc.MH_orb</name>
         <description>Impose Mid-Holocene orbital parameter conditions</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.070</id>
-        <name>3.4.bc.MHwmg</name>
+        <name>3.4.bc.MH_wmg</name>
         <description>Impose Mid-Holocene conditions of well-mixed gases</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.071</id>
-        <name>3.4.bc.MHsolar</name>
+        <name>3.4.bc.MH_solar</name>
         <description>Impose Mid-Holocene solar forcing</description>
     </numericalRequirement>
     
@@ -42,7 +42,7 @@
     <calendar>
     	<perpetualPeriod/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">3.4.stc.4000_100yr</name><id xsi:type="Identifier">stc.028</id><requiredDuration xsi:type="ClosedDateRange">
 		<!--Dates to reflect 100 yrs of simulation 6k yrs ago - to be verified -->
 		<startDate> -4000-01-01T00:00:00Z</startDate>
 		<endDate> -4000-01-01T00:00:00Z </endDate>

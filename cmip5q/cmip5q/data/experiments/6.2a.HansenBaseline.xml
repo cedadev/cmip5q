@@ -29,7 +29,7 @@
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.002</id>
-        <name xsi:type="Identifier">6.2a.bc.CO2.conc</name>
+        <name xsi:type="Identifier">6.2a.bc.CO2_conc</name>
         <description>Prescribed concentration of well mixed Gas: CO2 is the same as experiment
             3.1_piControl</description>
     </numericalRequirement>
@@ -46,7 +46,7 @@
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.010</id>
-        <name xsi:type="Identifier">6.2a.bc.LandUse</name>
+        <name xsi:type="Identifier">6.2a.bc.LU</name>
         <description>Unperturbed Land Use is the same as for experiment 3.1_piControl</description>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
@@ -55,34 +55,13 @@
         <description>CO2 partial pressure dissolved in ocean, climatology from experiment
             3.1_piControl</description>
     </numericalRequirement>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint">
-        <id xsi:type="Identifier">tbd</id>
-        <name xsi:type="Identifier">Physics change part way through run</name>
-        <description> Actually this experiment description is broken, currently
-        code doesn't read sub requirements and it's not actually a stc </description>
-        <outputPeriod>
-            <startDate>0000-01-01T00:00:00Z</startDate>
-            <length units="years">1</length>
-            <description>For one year between year 0 and year 25</description>
-        </outputPeriod>
-        <numericalRequirement xsi:type="BoundaryCondition">
-            <id xsi:type="Identifier">bc.055</id>
-            <name xsi:type="Identifier">6.2a.bc.4XCO2.conc</name>
-            <description>Instantaneous quadrupling of CO2 concentration applied to radiation
-                scheme</description>
-        </numericalRequirement>
-        <numericalRequirement>
-            <id xsi:type="Identifier">bc.002</id>
-            <name xsi:type="Identifier">6.2a.bc.CO2.conc</name>
-            <description>Pre-Industrial CO2 concentration applied to a second call of the radiation
-                scheme</description>
-        </numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
+        <id xsi:type="Identifier">bc.055</id>
+        <name xsi:type="Identifier">6.2a.bc.4X_CO2_conc</name>
+        <description> 2 calls to radiation with 1x[CO2] and 2x[CO2] - only 1x[CO2] heating rates are applied to the model</description>     
     </numericalRequirement>
-    <numericalRequirement xsi:type="OutputRequirement">
-        <name xsi:type="Identifier">Duration</name>
-        <id xsi:type="Identifier">tbd</id>
-      <frequencyUnits>months</frequencyUnits>
-    </numericalRequirement>
+
+
 
     <shortName> 6.2a sstClim </shortName>
     <longName> 6.2a Control SST Climatology </longName>
@@ -91,8 +70,8 @@
         <perpetualPeriod/>
     </calendar>
     <numericalRequirement xsi:type="SpatioTemporalConstraint">
-    <name xsi:type="Identifier">tbd</name>
-        <id xsi:type="Identifier">tbd</id>
+    <name xsi:type="Identifier">6.2a.stc.1850_30yr</name>
+        <id xsi:type="Identifier">stc.036</id>
     <requiredDuration xsi:type="ClosedDateRange">
         
         <startDate>1850-01-01T00:00:00Z</startDate>

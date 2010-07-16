@@ -15,102 +15,111 @@
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.003</id>
-        <name>3.3E.ic</name>
+        <name xsi:type="Identifier">3.3E.ic</name>
         <description> Initial conditions are from year 1979 of experiment 3.2_historical </description>
     </numericalRequirement>
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.015</id>
-		<name>3.3E.ic.altatm</name>
+		<name xsi:type="Identifier">3.3E.ic.altatm</name>
 		<description>Alternate Initial Conditions imposed on the atmosphere (compared to the control run 3.3) </description>
 	</numericalRequirement>
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.16</id>
-		<name>3.3E.ic.altland</name>
+		<name xsi:type="Identifier">3.3E.ic.altland</name>
 		<description>Alternate Initial Conditions imposed on the land (compared to the control run 3.3) </description>
 	</numericalRequirement>
 	
 	<!-- Boundary/Forcing Conditions -->
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.011</id>
-		<name>3.3E.bc.wmg_anth</name>
+		<name xsi:type="Identifier">3.3E.bc.ant_wmg</name>
 		<description>Imposed changing concentrations of well mixed gases (anthropogenic)</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.012</id>
-		<name>3.3E.bc.wmg_volc</name>
+		<name xsi:type="Identifier">3.3E.bc.volc_wmg</name>
 		<description>Imposed changing concentrations of well mixed gases (volcanic)</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.013</id>
-		<name>3.3E.bc.sls_conc</name>
-		<description>Imposed changing concentrations of short lived gas species</description>
+    	<name xsi:type="Identifier">3.3E.bc.sls</name>
+    	<description>Imposed changing concentrations or emissions of short lived gas species</description>
+    	<requirementOption>
+    		<id xsi:type="Identifier">bc.013</id>
+    		<name xsi:type="Identifier">3.3E.bc.sls_conc</name>
+    		<description>Concentrations</description>    		
+    	</requirementOption>
+    	<requirementOption>
+    		<id xsi:type="Identifier">bc.018</id>
+    		<name xsi:type="Identifier">3.3E.bc.sls_em</name>
+    		<description>Emissions</description>    		
+    	</requirementOption>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.018</id>
-		<name>3.3E.bc.sls_em</name>
-		<description>Imposed changing emissions of short lived gas species</description>
+    	<name xsi:type="Identifier">3.3E.bc.nat_aer</name>
+    	<description>Imposed changing concentrations of aerosols (natural)</description>
+    	<requirementOption>
+    		<id xsi:type="Identifier">bc.014</id>
+    		<name xsi:type="Identifier">3.3E.bc.nat_aer_conc</name>
+    		<description>Concentrations</description>    		
+    	</requirementOption>
+    	<requirementOption>
+    		<id xsi:type="Identifier">bc.019</id>
+    		<name xsi:type="Identifier">3.3E.bc.nat_aer_em</name>
+    		<description>Emissions</description>    		
+    	</requirementOption>
     </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.014</id>
-		<name>3.3E.bc.nat_aer_conc</name>
-		<description>Imposed changing concentrations of aerosols (natural)</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.015</id>
-		<name>3.3E.bc.anthr_aer_conc</name>
-		<description>Imposed changing concentrations of aerosols (anthropogenic)</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.019</id>
-		<name>3.3E.bc.nat_aer_em</name>
-		<description>Imposed changing emissions of aerosols (natural)</description>
-    </numericalRequirement>
-    
-    <numericalRequirement xsi:type="BoundaryCondition">
-		<id xsi:type="Identifier">bc.020</id>
-		<name>3.3E.bc.anthr_aer_em</name>
-		<description>Imposed changing emissions of aerosols (anthropogenic)</description>
+	
+	<numericalRequirement xsi:type="BoundaryCondition">
+		<name xsi:type="Identifier">3.3E.bc.ant_aer</name>
+		<description>Imposed changing concentrations or emissions of aerosols (anthropogenic)</description>
+		<requirementOption>
+			<id xsi:type="Identifier">bc.015</id>
+			<name xsi:type="Identifier">3.3E.bc.ant_aer_conc</name>
+			<description>Concentrations</description>			
+		</requirementOption>
+		<requirementOption>
+			<id xsi:type="Identifier">bc.020</id>
+			<name xsi:type="Identifier">3.3E.bc.ant_aer_em</name>
+			<description>Emissions</description>			
+		</requirementOption>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.016</id>
-		<name>3.3E.bc.nat_aer_prec</name>
+		<name xsi:type="Identifier">3.3E.bc.nat_aer_prec</name>
 		<description>Imposed changing concentrations of aerosol (natural) precursors</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.017</id>
-		<name>3.3E.bc.anthro_aer_prec</name>
+		<name xsi:type="Identifier">3.3E.bc.ant_aer_prec</name>
 		<description>Imposed changing concentrations of aerosol (anthropogenic) precursors</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.021</id>
-		<name>3.3E.bc.solar</name>
+		<name xsi:type="Identifier">3.3E.bc.solar</name>
 		<description>Imposed changing solar forcing</description>
     </numericalRequirement>
                
     <numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.022</id>
-		<name>3.3E.bc.land</name>
+		<name xsi:type="Identifier">3.3E.bc.LU</name>
 		<description>Imposed changing land use</description>
     </numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.023</id>
-        <name>3.3E.sst.obs</name>
+        <name xsi:type="Identifier">3.3E.bc.sst_obs</name>
         <description>Sea surface temperature (SST) imposed from historical observations</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.024</id>
-        <name xsi:type="Identifier">3.3E.SeaIce.obs</name>
+        <name xsi:type="Identifier">3.3E.bc.seaice_obs</name>
         <description>Sea ice imposed from historical observations</description>
     </numericalRequirement>
 	
@@ -125,7 +134,7 @@
     <calendar>
     	<realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">3.3E.stc.1979_30yr</name><id xsi:type="Identifier">stc.027</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1979-01-01T00:00:00Z</startDate>
 		<endDate> 2009-01-01T00:00:00Z </endDate>
 		<length units="years">30</length>

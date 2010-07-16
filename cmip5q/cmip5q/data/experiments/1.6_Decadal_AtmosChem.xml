@@ -12,14 +12,14 @@
 	<!-- Initial Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier"></id>
-		<name>1.6.ic</name>
+		<name xsi:type="Identifier">1.6.ic</name>
 		<description>Initial Conditions not yet formulated by aerosol/chemistry community</description>
 	</numericalRequirement>
 	
 	<!-- Boundary/Forcing Conditions -->
 	<numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier"></id>
-		<name>1.6.bc</name>
+		<name xsi:type="Identifier">1.6.bc</name>
 		<description>Boundary Conditions not yet formulated by aerosol/chemistry community</description>
 	</numericalRequirement>
 	

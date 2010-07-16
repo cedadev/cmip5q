@@ -21,13 +21,13 @@
     <numericalRequirement xsi:type="InitialCondition">
         <id xsi:type="Identifier">ic.002</id>
         <name xsi:type="Identifier">6.1.ic</name>
-        <description> Initial conditions are from experiment 3.1_piControl </description>
+        <description> Initial conditions are from experiment 3.1 piControl </description>
     </numericalRequirement>
 
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.051</id>
-        <name xsi:type="Identifier">6.1.bc.1%CO2.conc</name>
+        <name xsi:type="Identifier">6.1.bc.1%CO2_conc</name>
         <description> Prescribed concentration of well mixed Gas: CO2 with 1% per year increase from
             3.1_piControl concentration to quadrupling </description>
     </numericalRequirement>
@@ -38,7 +38,7 @@
     <calendar>
         <realCalendar/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.1.stc.1850_140yr</name><id xsi:type="Identifier">stc.033</id><requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1990-12-30T00:00:00Z</endDate>
         <length units="years">140</length>

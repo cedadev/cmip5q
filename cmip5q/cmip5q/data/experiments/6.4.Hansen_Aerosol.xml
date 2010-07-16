@@ -16,38 +16,38 @@
    <!-- Initial Conditions -->
     <numericalRequirement xsi:type="InitialCondition">
 		<id xsi:type="Identifier">ic.001</id>
-        <name>6.4a.ic</name>
+        <name xsi:type="Identifier">6.4a.ic</name>
         <description> Initial conditions are from experiment 3.1_pi-control </description>
     </numericalRequirement>
     
     <!-- Boundary Conditions -->
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.001</id>
-        <name xsi:type="Identifier">6.4a.bc.wmg.conc</name>
+        <name xsi:type="Identifier">6.4a.bc.wmg_conc</name>
         <description>Prescribed atmospheric concentrations of pre-industrial well mixed gases: excluding CO2</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.002</id>
-        <name xsi:type="Identifier">6.4a.bc.CO2.conc</name>
+        <name xsi:type="Identifier">6.4a.bc.CO2_conc</name>
         <description>Prescribed atmospheric concentrations of pre-industrial well mixed gas: Carbon Dioxide</description>
     </numericalRequirement>
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.003</id>
-        <name xsi:type="Identifier">6.4a.bc.sls.conc</name>
+        <name xsi:type="Identifier">6.4a.bc.sls_conc</name>
         <description>Prescribed atmospheric concentration of pre-industrial short lived (reactive) gas species</description>
     </numericalRequirement>
       
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.010</id>
-        <name xsi:type="Identifier">6.4a.bc.LandUse</name>
+        <name xsi:type="Identifier">6.4a.bc.LU</name>
         <description>Unperturbed Pre-Industrial Land Use</description>
     </numericalRequirement>
  	
 	<numericalRequirement xsi:type="BoundaryCondition">
 		<id xsi:type="Identifier">bc.099a</id>
-        <name>6.4a.bc.Aer2000</name>
+        <name xsi:type="Identifier">6.4a.bc.2000_aer</name>
         <description>Aerosols should be consistant with year 2000 of expt 3.2 (Historical run)</description>
     </numericalRequirement>
         
@@ -62,7 +62,7 @@
     <calendar>
    		<perpetualPeriod/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">Duration</name><id xsi:type="Identifier">tbd</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.4a.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1850-12-30T00:00:00Z</endDate>
     	<length units="years">30</length>
