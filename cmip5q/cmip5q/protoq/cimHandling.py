@@ -1,7 +1,6 @@
 import os,tempfile
 from lxml import etree as ET
 from django.conf import settings
-from Metafor import XMLreport
 import sys
 import StringIO
 logging=settings.LOG
