@@ -265,7 +265,7 @@ class Translator:
 
         # temporary change to grid parent before Gerry fixes the questionnaire
         childGridList=gridObject.grids.all()
-        assert len(childGridList)==1, "top level grid should only have one child"
+        assert len(childGridList)==1, "expecting top level grid to have one child. Perhaps Gerry has fixed the issue with the extra grid level in the Questionnaire?"
         gridObject=childGridList[0]
         # end temporary change to grid parent
 
@@ -278,6 +278,7 @@ class Translator:
 
         HorizGridDiscretization=""
         HorizGridType=""
+        HorizResProps={}
         # extract our horizontal properties
         for pg in horizontalPropertiesObject.paramGroup.all():
             #if pg.name :
@@ -292,18 +293,52 @@ class Translator:
                         if con.constraint=="" :
                             # first set of values have no constraint
                             if bp.name=="GridDiscretization" :
-                                HorizGridDiscretization=str(p.value)
-                            if bp.name=="GridResolution" :
-                                HorizGridResolution=p.value
-                            if bp.name=="GridRefinementScheme" :
-                                HorizGridRefinement=p.value
-                        # rf need a better check below
-                        elif str(con.constraint).find(HorizGridDiscretization)!=-1 :
-                            #rootElement.append(ET.Comment('constraint : '+con.constraint))
-                            #rootElement.append(ET.Comment('HorizGridDiscretization : '+HorizGridDiscretization))
-                            #rootElement.append(ET.Comment('GridType : '+str(p.value)))
+                                if p.value!="None" :
+                                    HorizGridDiscretization=str(p.value)
+                                else :
+                                    HorizGridDiscretization=""
+                            elif bp.name=="GridResolution" :
+                                HorizGridResolution=str(p.value)
+                            elif bp.name=="GridRefinementScheme" :
+                                HorizGridRefinement=str(p.value)
+                        elif HorizGridDiscretization!="" and str(con.constraint).find(HorizGridDiscretization)!=-1 and str(con.constraint).find("GridDiscretization")!=-1 :
+                            #rootElement.append(ET.Comment('DEBUG: constraint : '+con.constraint))
+                            #rootElement.append(ET.Comment('DEBUG: HorizGridDiscretization : '+HorizGridDiscretization))
+                            #rootElement.append(ET.Comment('DEBUG: GridType : '+str(p.value)))
+                            #rootElement.append(ET.Comment('DEBUG: PropertyName : '+str(bp.name)))
                             if bp.name=="GridType" :
                                 HorizGridType=str(p.value)
+                            elif bp.name=="CompositeGridDiscretization" :
+                                #rootElement.append(ET.Comment('DEBUG: Getting names'))
+                                HorizGridChildNames=[]
+                                for term in p.value.all() :
+                                    #rootElement.append(ET.Comment('DEBUG: Found name '+term.name))
+                                    HorizGridChildNames.append(term.name)
+                            elif bp.name=="CompositeGrid" :
+                                HorizGridCompositeName=str(p.value)
+                            else :
+                                #rootElement.append(ET.Comment('ERROR: FOUND PROPERTY : '+str(bp.name)))
+                                assert False, "Error : Unknown grid property found: "+bp.name
+                        elif HorizGridType!="" and str(con.constraint).find(HorizGridType)!=-1 and str(con.constraint).find("GridType")!=-1 :
+                            #rootElement.append(ET.Comment('DEBUG: Adding gridtype property : '+str(bp.name)+' '+str(p.value)))
+                            HorizResProps[str(bp.name)]=str(p.value)
+            elif pg.name=="HorizontalExtent" :
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                for con in constraintSet:
+                    #rootElement.append(ET.Comment('constraint : '+con.constraint))
+                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    for bp in BaseParamSet :
+                        p=bp.get_child_object()
+                        if bp.name=="LatMin" :
+                            HorizExtentLatMin=str(p.value)
+                        elif bp.name=="LatMax" :
+                            HorizExtentLatMax=str(p.value)
+                        elif bp.name=="LonMin" :
+                            HorizExtentLonMin=str(p.value)
+                        elif bp.name=="LonMax" :
+                            HorizExtentLonMax=str(p.value)
+                        else :
+                            assert False, "Error : Unknown grid extent property found: "+bp.name
 
         VertGridDiscretization=""
         VertGridType=""
@@ -323,7 +358,7 @@ class Translator:
                             if bp.name=="VerticalCoordinateType" :
                                 VertGridDiscretization=str(p.value)
                         # rf need a better check below
-                        elif str(con.constraint).find(VertGridDiscretization)!=-1 :
+                        elif str(con.constraint).find(VertGridDiscretization)!=-1 and str(con.constraint).find("GridDiscretization")!=-1:
                             #rootElement.append(ET.Comment('constraint : '+con.constraint))
                             #rootElement.append(ET.Comment('VertGridDiscretization : '+HorizGridDiscretization))
                             #rootElement.append(ET.Comment('GridType : '+str(p.value)))
@@ -332,7 +367,7 @@ class Translator:
 
         
         gridElement=ET.SubElement(rootElement,'gridSpec')
-        esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'horizontalGridType':HorizGridType,'verticalGridType':VertGridType})
+        esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'gridType':HorizGridType}) #,'verticalGridType':VertGridType})
         if gridObject.abbrev :
             ET.SubElement(esmModelGridElement,'shortName').text=gridObject.abbrev
         if gridObject.title :
@@ -342,7 +377,50 @@ class Translator:
         #reference list TBA when Gerry adds in references
         #ET.SubElement(gridElement,'referenceList')
 
-        gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"horizontalGridDiscretization":str(HorizGridDiscretization),"verticalGridDiscretization":str(VertGridDiscretization)})
+        if HorizGridDiscretization!="composite" :
+            gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":HorizGridDiscretization}) #,"verticalGridDiscretization":VertGridDiscretization})
+
+            if horizontalPropertiesObject.abbrev :
+                description=horizontalPropertiesObject.abbrev
+            else :
+                description=""
+            ET.SubElement(gridTileElement,'shortName').text=description
+            if horizontalPropertiesObject.title :
+                ET.SubElement(gridTileElement,'longName').text=horizontalPropertiesObject.title
+            if horizontalPropertiesObject.description :
+                ET.SubElement(gridTileElement,'description').text=horizontalPropertiesObject.description
+
+            horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"details":HorizGridResolution})
+            for attrib in HorizResProps.keys() :
+                ET.SubElement(horizResElement,"property",{"name":attrib}).text=HorizResProps[attrib]
+            horizResElement=ET.SubElement(gridTileElement,"horizontalExtent",{"LatMin":HorizExtentLatMin,"LatMax":HorizExtentLatMax,"LonMin":HorizExtentLonMin,"LonMax":HorizExtentLonMax})
+            ET.SubElement(gridTileElement,"refinement").text=HorizGridRefinement
+        elif HorizGridType=="ying yang":
+            # ying yang is represented as a gridMosaic with two gridTiles
+            gridMosaicElement=ET.SubElement(esmModelGridElement,"gridMosaic")
+            ET.SubElement(gridMosaicElement,'shortName').text=HorizGridCompositeName
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+        elif HorizGridType=="icosahedral geodesic":
+            gridMosaicElement=ET.SubElement(esmModelGridElement,"gridMosaic")
+            # icosahedral geodesic is represented as a gridMosaic with ten gridTiles
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+            gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":HorizGridDiscretization})
+        elif HorizGridType=="other":
+            # we have a composite grid
+            gridMosaicElement=ET.SubElement(esmModelGridElement,"gridMosaic")
+            ET.SubElement(gridMosaicElement,"shortName").text=HorizGridCompositeName
+            for gridTileName in HorizGridChildNames :
+                gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":gridTileName})
+        #else : output nothing
 
         self.addDocumentInfo(gridObject,gridElement)
 
