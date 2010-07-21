@@ -695,7 +695,12 @@ class Translator:
             ''' duration [0..1] '''
             ''' supports [0..inf] '''
             ''' shortName [1] '''
-            ET.SubElement(expElement,'shortName').text=expClass.abbrev
+            # short name is currently a concatenation of the experiment id
+            # and the short name so separate these out
+            expID,sep,expShortName=expClass.abbrev.partition(' ')
+            assert sep!="", "Error, experiment short name does not conform to format 'id name'"
+            expElement.append(ET.Comment('experiment ID: '+expID))
+            ET.SubElement(expElement,'shortName').text=expShortName
             ''' longName [1] '''
             ET.SubElement(expElement,'longName').text=expClass.title
             ''' description [0..1] '''
