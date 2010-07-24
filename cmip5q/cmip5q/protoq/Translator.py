@@ -687,24 +687,32 @@ class Translator:
             ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
             ''' rationale [1..inf] '''
-            ET.SubElement(expElement,'rationale').text=expClass.rationale
+            dummy1,dummy2,rationale=expClass.rationale.partition(' ')
+            assert dummy2!="", "Error, experiment rationale does not conform to format 'id text'"
+            ET.SubElement(expElement,'rationale').text=rationale
             ''' measurementCampaign [0..inf] '''
             ''' requires [0..inf] '''
             ''' generates [0..inf] '''
-            ''' experimentID [0..1] '''
             ''' duration [0..1] '''
             ''' supports [0..inf] '''
             ''' shortName [1] '''
             # short name is currently a concatenation of the experiment id
             # and the short name so separate these out
-            expID,sep,expShortName=expClass.abbrev.partition(' ')
+            expName,sep,expShortName=expClass.abbrev.partition(' ')
             assert sep!="", "Error, experiment short name does not conform to format 'id name'"
-            expElement.append(ET.Comment('experiment ID: '+expID))
-            ET.SubElement(expElement,'shortName').text=expShortName
+            if expShortName and expShortName!='' :
+                ET.SubElement(expElement,'shortName').text=expShortName
             ''' longName [1] '''
-            ET.SubElement(expElement,'longName').text=expClass.title
+            if expClass.title and expClass.title!='' :
+                dummy1,dummy2,longName=expClass.title.partition(' ')
+                assert dummy2!="", "Error, experiment long name does not conform to format 'id name'"
+                ET.SubElement(expElement,'longName').text=longName
             ''' description [0..1] '''
-            ET.SubElement(expElement,'description').text=expClass.description
+            if expClass.description :
+                ET.SubElement(expElement,'description').text=expClass.description
+            ''' experimentName [0..1] '''
+            if expName and expName!='' :
+                ET.SubElement(expElement,'experimentName').text=expName
             ''' calendar [1] '''
             if expClass.requiredCalendar :
                 calendarElement=ET.SubElement(expElement,'calendar')
