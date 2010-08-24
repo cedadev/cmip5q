@@ -1054,7 +1054,7 @@ class Translator:
         ET.SubElement(comp,'scientificProperties')
         '''grid'''
         '''responsibleParty [0..inf]'''
-        self.addResp(c.author,comp,'author')
+        self.addResp(c.author,comp,'PI')
         self.addResp(c.funder,comp,'funder')
         self.addResp(c.contact,comp,'contact')
         self.addResp(c.centre.party,comp,'centre')
