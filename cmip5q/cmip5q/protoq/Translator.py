@@ -1079,7 +1079,9 @@ class Translator:
         '''activity'''
         '''type'''
         # always output the metafor sciencetype
-        ET.SubElement(comp,'type',{'value':c.scienceType})
+        compType=ET.SubElement(comp,'type',{'value':c.scienceType})
+        vocabServ=ET.SubElement(compType,'vocabularyServer')
+        ET.SubElement(vocabServ,'vocabularyName').text='metafor'
         # if it is a realm type then output the relevant drs realm type as well
         if c.scienceType=='Atmosphere' :
             type='atmos'
@@ -1100,7 +1102,9 @@ class Translator:
         else :
             type=''
         if not type=='' :
-            ET.SubElement(comp,'type',{'value':type})
+            compType=ET.SubElement(comp,'type',{'value':type})
+            vocabServ=ET.SubElement(compType,'vocabularyServer')
+            ET.SubElement(vocabServ,'vocabularyName').text='DRS'
         '''component timestep info not explicitely supplied in questionnaire'''
         self.addDocumentInfo(c,comp)
         '''documentGenealogy [0..1] '''
