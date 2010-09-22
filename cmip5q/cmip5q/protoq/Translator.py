@@ -1081,7 +1081,10 @@ class Translator:
         # always output the metafor sciencetype
         compType=ET.SubElement(comp,'type',{'value':c.scienceType})
         vocabServ=ET.SubElement(compType,'vocabularyServer')
-        ET.SubElement(vocabServ,'vocabularyName').text='metafor'
+        if c.controlled :
+          ET.SubElement(vocabServ,'vocabularyName').text='metafor'
+        else :
+          ET.SubElement(vocabServ,'vocabularyName').text='user_defined'
         # if it is a realm type then output the relevant drs realm type as well
         if c.scienceType=='Atmosphere' :
             type='atmos'
