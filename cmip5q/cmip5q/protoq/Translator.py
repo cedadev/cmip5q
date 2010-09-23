@@ -433,8 +433,7 @@ class Translator:
         ensembleElement=ET.SubElement(rootElement,'ensemble')
         ''' responsibleParty [0..inf] '''
         ''' fundingSource [0..inf] '''
-        ''' rationale [1..inf] '''
-        ET.SubElement(ensembleElement,'rationale')
+        ''' rationale [0..inf] '''
         ''' project [0->inf] '''
         ''' shortName [1] '''
         ET.SubElement(ensembleElement,'shortName').text=simClass.abbrev
@@ -537,6 +536,8 @@ class Translator:
                 ET.SubElement(simElement,'shortName').text=simClass.abbrev
                 ''' longName [1] '''
                 ET.SubElement(simElement,'longName').text=simClass.title
+            ''' description [0..1] '''
+            ET.SubElement(simElement,'description').text=simClass.description
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
             self.addCIMReference(simClass.experiment,experimentElement)
@@ -561,8 +562,6 @@ class Translator:
             #            ET.SubElement(dateRangeElement,'startDate').text=simClass.duration.startDate
             #        if simClass.duration.endDate!='' :
             #            ET.SubElement(dateRangeElement,'endDate').text=simClass.duration.endDate
-            ''' description [0..1] '''
-            ET.SubElement(simElement,'description').text=simClass.description
             ''' dataholder [0..inf] '''
             ''' conformance [0..inf] '''
             confClassSet=Conformance.objects.filter(simulation=simClass)
@@ -636,7 +635,12 @@ class Translator:
             ''' endPoint element has an optional start date and an option end date '''
             ''' model [1] '''
             modelElement=ET.SubElement(simElement,'model')
-            self.addCIMReference(simClass.numericalModel,modelElement)
+            refElement=self.addCIMReference(simClass.numericalModel,modelElement)
+            # now add in all mods associated with the simulation
+            # to the reference
+            for modelMod in simClass.codeMod.all() :
+                self.addModelMod(modelMod,refElement)
+            # input mods are not relevant here as they are included directly in the model description as composition information
 
             self.addDocumentInfo(simClass,simElement)
 
@@ -845,7 +849,7 @@ class Translator:
         authorElement=ET.SubElement(rootElement,'documentAuthor')
         self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
         ''' documentCreationDate [1] '''
-        ET.SubElement(rootElement,'documentCreationDate').text=str(datetime.date.today())+'T00:00:00'
+        ET.SubElement(rootElement,'documentCreationDate').text=datetime.datetime.isoformat(datetime.datetime.today())
 
 
     def constraintValid(self,con,constraintSet,root) :
@@ -1084,7 +1088,7 @@ class Translator:
           vocabServ=ET.SubElement(compType,'vocabularyServer')
           ET.SubElement(vocabServ,'vocabularyName').text='metafor'
         else :
-          compType=ET.SubElement(comp,'type',{'value':'other'})
+          compType=ET.SubElement(comp,'type',{'value':'Other'})
           vocabServ=ET.SubElement(compType,'vocabularyServer')
           ET.SubElement(vocabServ,'vocabularyName').text='user_defined'
           compType.text=c.scienceType
