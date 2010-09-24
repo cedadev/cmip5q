@@ -204,7 +204,7 @@
 	</calendar>
 	<numericalRequirement xsi:type="SpatioTemporalConstraint">
 		<name xsi:type="Identifier">1.1I.stc.2001_10yr</name>
-		<id xsi:type="Identifier">stc.011</id>
+		<id xsi:type="Identifier">stc.011</id><description>Begin in 2001 and run for 10 years </description>
 		<requiredDuration xsi:type="ClosedDateRange">
 			<startDate> 2001-09-01T00:00:00Z</startDate>
 			<endDate> 2011-12-31T23:59:59Z </endDate>

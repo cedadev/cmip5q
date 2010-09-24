@@ -72,7 +72,7 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.1.stc.1850_250yr</name><id xsi:type="Identifier">stc.032</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.1.stc.1850_250yr</name><id xsi:type="Identifier">stc.032</id><description>Begin in 1850 and run for 250 years </description><requiredDuration xsi:type="ClosedDateRange">
         <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1850-12-30T00:00:00Z</endDate>
         <length units="years">250</length>

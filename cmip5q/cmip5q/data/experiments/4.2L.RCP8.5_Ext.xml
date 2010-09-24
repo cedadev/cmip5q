@@ -100,7 +100,7 @@
     <calendar>
         <realCalendar/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">4.2L.stc.2100_200yr</name><id xsi:type="Identifier">stc.031</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">4.2L.stc.2100_200yr</name><id xsi:type="Identifier">stc.031</id><description>Begin in 2100 and run for 200 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate>2100-01-01T00:00:00Z</startDate>
         <endDate>2300-01-01T00:00:00Z</endDate>
 	    <length units="years">200</length>

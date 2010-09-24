@@ -10,23 +10,23 @@ class ComponentFamily:
         self.me=me.id
         self.ancestors=[]
         self.siblings=[]
-        self.children=[m.id for m in me.components.all()]
+        self.children=[m.id for m in me.components.all().order_by('id')]
         # Now build up a family tree
         self.__getFamily(me)
         
     def __getFamily(self,component):
         ''' Get my family tree '''
-        parents=Component.objects.filter(components=component.id)
+        parents=Component.objects.filter(components=component.id).order_by('id')
         if len(parents)==0: return 
         parent=parents[0]
-        self.siblings=[i.id for i in parent.components.all()]
+        self.siblings=[i.id for i in parent.components.all().order_by('id')]
         self.siblings.remove(component.id)
         self.__getFogies(parent)
         
     def __getFogies(self,parent):
         ''' Get the parentage of the parents '''
         self.ancestors.insert(0,parent.id)
-        parents=Component.objects.filter(components=parent.id)
+        parents=Component.objects.filter(components=parent.id).order_by('id')
         if len(parents)==0: return 
         parent=parents[0]
         self.__getFogies(parent)
@@ -39,7 +39,7 @@ class GridFamily:
         self.me=me.id
         self.ancestors=[]
         self.siblings=[]
-        self.children=[g.id for g in me.grids.all()]
+        self.children=[g.id for g in me.grids.all().order_by('id')]
         # Now build up a family tree
         self.__getFamily(me)
         
@@ -48,7 +48,7 @@ class GridFamily:
         parents=Grid.objects.filter(grids=grid.id)
         if len(parents)==0: return 
         parent=parents[0]
-        self.siblings=[i.id for i in parent.grids.all()]
+        self.siblings=[i.id for i in parent.grids.all().order_by('id')]
         self.siblings.remove(grid.id)
         self.__getFogies(parent)
         
@@ -80,14 +80,14 @@ class yuiTree2:
         self.expanders=self.family.ancestors
         self.expanders.append(self.family.me)
         #clist=Component.objects.filter(scienceType='model').filter(centre=component.centre_id)
-        clist=Component.objects.filter(scienceType='model').filter(model=component.model)
+        clist=Component.objects.filter(scienceType='model').filter(model=component.model).order_by('id')
         for c in clist: self.__walk(c)
         #self.__debug()
         self.html+='</ul>\n'
     
     def __walk(self,component):
         ''' Show me and my children'''
-        children=component.components.all()
+        children=component.components.all().order_by('id')
         # we don't .order_by('abbrev') because we want the order we loaded them in ...
         classes=[]
         if component.id in self.expanders: classes.append('expanded')
@@ -140,14 +140,14 @@ class gridyuiTree2:
         self.expanders=self.family.ancestors
         self.expanders.append(self.family.me)
         #clist=Component.objects.filter(scienceType='model').filter(centre=component.centre_id)
-        clist=Grid.objects.filter(istopGrid=True).filter(topGrid=grid.topGrid) 
+        clist=Grid.objects.filter(istopGrid=True).filter(topGrid=grid.topGrid).order_by('id') 
         for c in clist: self.__walk(c)
         #self.__debug()
         self.html+='</ul>\n'
     
     def __walk(self,grid):
         ''' Show me and my children'''
-        children=grid.grids.all()
+        children=grid.grids.all().order_by('id')
         # we don't .order_by('abbrev') because we want the order we loaded them in ...
         classes=[]
         if grid.id in self.expanders: classes.append('expanded')

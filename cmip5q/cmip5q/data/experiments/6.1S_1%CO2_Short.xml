@@ -38,7 +38,7 @@
 	<calendar>
 		<realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.1S.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.1S.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><description>Begin in 1850 and run for 30 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1850-01-01T00:00:00Z</startDate>
 		<endDate> 1930-01-01T00:00:00Z </endDate>
 		<length units="years">80</length>

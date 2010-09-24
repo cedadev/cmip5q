@@ -110,7 +110,7 @@
     <calendar>
         <realCalendar/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">4.1.stc.2006_94yr</name><id xsi:type="Identifier">stc.030</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">4.1.stc.2006_94yr</name><id xsi:type="Identifier">stc.030</id><description>Begin in 2006 and run for 94 years </description><requiredDuration xsi:type="ClosedDateRange">
         <startDate>2006-01-01T00:00:00Z</startDate>
         <endDate>2100-01-01T00:00:00Z</endDate>
         <length units="years">94</length>

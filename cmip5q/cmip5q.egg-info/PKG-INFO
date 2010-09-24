@@ -1,0 +1,33 @@
+Metadata-Version: 1.0
+Name: cmip5q
+Version: 1.1.1
+Summary: CMIP5 Questionnaire
+Home-page: http://metaforclimate.eu/trac
+Author: Bryan Lawrence
+Author-email: Bryan.Lawrence@stfc.ac.uk
+License: BSD - See LICENCE file for details
+Description: Django web application for CMIP5 questionnaire
+        
+        To set-up, run:
+        
+        $ ./setupProto.sh
+        
+        from this directory to initialise the SQLite Database.  This uses the 'python'
+        executable in your PATH variable.  To set an alternative python, set the
+        PYTHON environment variable e.g.
+        
+        $ export PYTHON=python2.5
+        $ ./setupProto.sh
+        
+        Then to run the application,
+        
+        $ python manage.py runserver
+        
+        The wsgi package contains settings to run the application using paster e.g.
+        
+        $ paster serve service.ini
+        
+        The service.ini provides example code for securing the application with NDG
+        Security and should be modified to suit
+        
+Platform: UNKNOWN

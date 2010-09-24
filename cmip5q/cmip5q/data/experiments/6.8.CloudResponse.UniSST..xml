@@ -104,7 +104,7 @@
    <calendar>
        <realCalendar/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.8.stc.1979_30yr</name><id xsi:type="Identifier">stc.027</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.8.stc.1979_30yr</name><id xsi:type="Identifier">stc.027</id><description>Begin in 1979 and run for 30 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<!-- Idealised run so dates given here are only dummy values -->
 		<startDate> 1979-01-01T00:00:00Z</startDate>
 		<endDate> 2008-12-30T00:00:00Z</endDate>

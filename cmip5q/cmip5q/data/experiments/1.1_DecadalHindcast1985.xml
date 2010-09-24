@@ -224,7 +224,7 @@
     <calendar>
     	<realCalendar></realCalendar>
     </calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.1.stc.1985_10yr</name><id xsi:type="Identifier">stc.006</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.1.stc.1985_10yr</name><id xsi:type="Identifier">stc.006</id><description>Begin in 1985 and run for 10 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1985-09-01T00:00:00Z</startDate>
 		<endDate> 1995-12-31T23:59:59Z </endDate>
 		<length units="years">10</length>

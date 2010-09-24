@@ -230,10 +230,10 @@ class Validator:
             rulesTree = ET.parse(os.path.join(self.XSLdir, rulesFile))
             xsltSource = open(os.path.join(self.XSLdir, xsltFile), 'r').read()
             xsltTree = ET.parse(StringIO.StringIO(xsltSource))
-        except IOError as e:
+        except IOError,e:
             print "IO error: Unable to read XSLT source file {0}".format(xsltFile)
             sys.exit(1)
-        except ET.XMLSyntaxError as e:
+        except ET.XMLSyntaxError,e:
             print "XML Syntax error: Unable to parse source file {0}".format(xsltFile)
             sys.exit(1)
 

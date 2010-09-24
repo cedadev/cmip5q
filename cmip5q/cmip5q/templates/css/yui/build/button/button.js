@@ -1390,6 +1390,10 @@ version: 2.7.0
         * @description Adds event handlers to the button's form.
         * @protected
         */
+        
+        /**
+         * I have commented this out to disable Enter button submitting the form
+         * 
         _addListenersToForm: function () {
         
             var oForm = this.getForm(),
@@ -1450,9 +1454,9 @@ version: 2.7.0
                 }
             
             }
-        
         },
         
+        */
         
         
         /**

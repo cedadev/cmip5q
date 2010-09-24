@@ -31,8 +31,10 @@ ensure that all the appropriate boundary and initial conditions are described.)
         <table>
             <tr class="{% cycle 'row1' 'row2'%}">
                 <td colspan="2">{{form.instance.requirement}}:{{form.instance.requirement.description}}</td>
+                <td>{% if form.showOptions %}Requirement Option: {{form.option}} {% endif %}</td>
                 <td>Experiment Requirement Type: {{form.instance.requirement.ctype}}</td>
-                <td>How this simulation conformed: {{form.ctype.errors}} {{form.ctype}}</td></tr>
+                <td>How this simulation conformed: {{form.ctype.errors}} {{form.ctype}}</td>
+            </tr>
             <tr class="{% cycle 'row1' 'row2'%}">
                  <td> Model Modification: {{form.mod.errors}}{% if form.showMod %}{{form.mod}}
                  {% else %} No Model Modifications Declared{% endif %}</td>

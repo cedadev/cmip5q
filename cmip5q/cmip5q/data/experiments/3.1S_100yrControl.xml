@@ -103,7 +103,7 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">3.1S.stc.1850_100yr</name><id xsi:type="Identifier">stc.025</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">3.1S.stc.1850_100yr</name><id xsi:type="Identifier">stc.025</id><description>Begin in 1850 and run for 100 years </description><requiredDuration xsi:type="ClosedDateRange">
         <startDate> 1850-01-01T00:00:00Z</startDate>
         <endDate> 1850-01-01T00:00:00Z </endDate>
         <length units="years">100</length>

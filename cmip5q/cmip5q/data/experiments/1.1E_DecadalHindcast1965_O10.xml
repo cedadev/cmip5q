@@ -191,7 +191,7 @@
      <calendar>
      	<realCalendar></realCalendar>
      </calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.1E.stc.1965_10yr</name><id xsi:type="Identifier">stc.002</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.1E.stc.1965_10yr</name><id xsi:type="Identifier">stc.002</id><description>Begin in 1965 and run for 10 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 1965-09-01T00:00:00Z</startDate>
 		<endDate> 1975-12-31T23:59:59Z </endDate>
 		<length units="years">10</length>

@@ -20,6 +20,7 @@ logging=settings.LOG
 ConformanceFormSet=modelformset_factory(Conformance,
                                         form=ConformanceForm,
                                         exclude=('simulation','requirement'))
+                                        #exclude=('simulation'))
 
 class MyConformanceFormSet(ConformanceFormSet):
     ''' Mimics the function of a formset for the situation where we want to edit the

@@ -2,7 +2,7 @@
 /* Generic css */
 
 * {margin:0;padding:0;font-family:"Times New Roman", Arial, Helvetica, sans-serif;
-   line-height:1.4;color:#333;font-size:12px;}
+   line-height:1.7;color:#333;font-size:12px;}
 
 h1 {font-size:16px;}
 
@@ -165,3 +165,9 @@ not for now ...
 .undone {background-color:#F5CF85;}
         
 a.atom {background-image:url(icons/atom.png);background-repeat:no-repeat;}
+
+/* styling for form file browser widget */
+#filebrowse {
+	background:transparent;
+	padding-bottom: 30px;
+	}

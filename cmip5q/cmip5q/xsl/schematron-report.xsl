@@ -40,7 +40,7 @@
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
    xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias">
 
-<xsl:import href="skeleton1-5.xsl"/>
+<xsl:import href="file:///xsl/skeleton1-5.xsl" />
 <xsl:param name="diagnose">yes</xsl:param>     
 
 <xsl:template name="process-prolog">

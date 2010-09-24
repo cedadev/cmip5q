@@ -81,7 +81,7 @@ class componentHandler(object):
             #nm=NumericalModel(0,centre=Centre.objects.get(id=centre_id))
             #nm.read()
             cmip5c=Centre.objects.get(abbrev='CMIP5')
-            original=Component.objects.filter(abbrev='GCM Template').get(centre=cmip5c)
+            original=Component.objects.filter(abbrev='Model Template').get(centre=cmip5c)
             self.component=original.copy(Centre.objects.get(id=centre_id))
         else:
             try:
@@ -231,6 +231,7 @@ class componentHandler(object):
                 'urls':urls,
                 'isRealm':c.isRealm,
                 'isModel':c.isModel,
+                'isParamGroup':c.isParamGroup,
                 'cset':cset,
                 'tabs':tabs(request,self.centre_id,'Model',self.component.model.id),
                 'notAjax':not request.is_ajax()})

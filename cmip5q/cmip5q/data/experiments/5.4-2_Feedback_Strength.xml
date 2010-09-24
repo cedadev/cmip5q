@@ -102,7 +102,7 @@
 	<calendar>
 	    <realCalendar/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.4-2.stc.1850_251yr</name><id xsi:type="Identifier">stc.034</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.4-2.stc.1850_251yr</name><id xsi:type="Identifier">stc.034</id><description>Begin in 1850 and run for 251 years </description><requiredDuration xsi:type="ClosedDateRange">
          <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>2100-12-30T00:00:00Z</endDate>
         <length units="years">251</length>

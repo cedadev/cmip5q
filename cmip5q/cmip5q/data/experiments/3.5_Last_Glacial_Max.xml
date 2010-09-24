@@ -50,6 +50,7 @@
 	<numericalRequirement xsi:type="SpatioTemporalConstraint">
 		<name xsi:type="Identifier">3.5.stc.-19000_100yr</name>
 		<id xsi:type="Identifier">stc.029</id>
+		<description>Begin around 19000 BC and run for 100 years</description>
 		<requiredDuration xsi:type="ClosedDateRange">
 		<!--Dates to reflect 100 yrs of simulation 21K yrs ago - to be verified -->
 		<startDate> -19000-01-01T00:00:00Z</startDate>

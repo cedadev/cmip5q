@@ -108,7 +108,7 @@
     <calendar>
     	<realCalendar/>
 	</calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">2.1.stc.2026_10yr</name><id xsi:type="Identifier">stc.023</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">2.1.stc.2026_10yr</name><id xsi:type="Identifier">stc.023</id><description>Begin in 2026 and run for 10 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 2026-01-01T00:00:00Z</startDate>
 		<endDate> 2036-01-01T00:00:00Z </endDate>
 		<length units="years">10</length>

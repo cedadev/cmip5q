@@ -132,7 +132,7 @@ class XMLreport(object):
             self.status = True
             self.__file.file.close()
 
-        except et.XMLSyntaxError as e:
+        except et.XMLSyntaxError,e:
             self.__parseErrors.append(e)
             self.status = False
 
@@ -144,7 +144,7 @@ class XMLreport(object):
     def makeHTMLParseReport(self, xmlbuffer):
         try:
             xmlroot = et.fromstring(xmlbuffer)
-        except et.XMLSyntaxError as e:
+        except et.XMLSyntaxError, e:
             return "Invalid XML input: Unable to generate HTML."
 
         report = xmlroot[0]
@@ -274,7 +274,7 @@ class XMLreport(object):
     def writeHTMLValidationReport(self, xmlbuffer):
         try:
             xmlroot = et.fromstring(xmlbuffer)
-        except et.XMLSyntaxError as e:
+        except et.XMLSyntaxError,e:
             return "Invalid XML input: Unable to generate validation report."
 
         report = xmlroot[0]
@@ -339,10 +339,10 @@ class XMLreport(object):
             #stTree = et.XML(stSource)
             #print StringIO.StringIO(stSource).getvalue()
             #print et.tostring(stTree)
-        except IOError as e:
+        except IOError, e:
             print "IO Error: Unable to open file {0}".format(e.filename)
             sys.exit(1)
-        except et.XMLSyntaxError as e:
+        except et.XMLSyntaxError, e:
             print "XML Syntax Error: Unable to parse Schematron source file {0}".format(stFile)
             sys.exit(1)
 
@@ -362,7 +362,7 @@ class XMLreport(object):
 #        except et.SchematronParseError as e:
 #            print "Schematron Parse Error: {0}".format(e) 
 #            sys.exit(1)
-        except et.SchematronValidateError as e:
+        except et.SchematronValidateError, e:
             print e
             sys.exit(1)
 
@@ -458,10 +458,10 @@ class XMLreport(object):
             rulesTree = et.parse(rulesFile)
             xsltSource = open(xsltFile, 'r').read()
             xsltTree = et.parse(StringIO.StringIO(xsltSource))
-        except IOError as e:
+        except IOError, e:
             print "IO error: Unable to read XSLT source file {0}".format(xsltFile)
             sys.exit(1)
-        except et.XMLSyntaxError as e:
+        except et.XMLSyntaxError, e:
             print "XML Syntax error: Unable to parse source file {0}".format(xsltFile)
             sys.exit(1)
 

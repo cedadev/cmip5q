@@ -239,7 +239,7 @@ class Doc(Fundamentals):
     
     uri=models.CharField(max_length=64,unique=True,editable=False)
     title=models.CharField(max_length=128,blank=True,null=True)
-    abbrev=models.CharField(max_length=32)
+    abbrev=models.CharField(max_length=40)
     description=models.TextField(blank=True)
    
     # next two are used to calculate the status bar, and are filled in by the validation software
@@ -314,7 +314,7 @@ class Doc(Fundamentals):
             return False,'This document has already been exported',None
         valid,html=self.validate()
         logging.info('WARNING Exporting document for ESG regardless of validation state')
-        valid=True # FIXME
+        #valid=True # FIXME
         self.isComplete=valid
         self.save(complete=self.isComplete) # make that completeness status last.
         if self.isComplete: 
@@ -489,6 +489,9 @@ class Component(Doc):
     isRealm=models.BooleanField(default=False)
     isModel=models.BooleanField(default=False)
     
+    #to support paramgroups with componentView set to true
+    isParamGroup=models.BooleanField(default=False)
+    
     # the following are common parameters
     geneology=models.TextField(blank=True,null=True)
     yearReleased=models.IntegerField(blank=True,null=True)
@@ -507,7 +510,7 @@ class Component(Doc):
             raise ValueError('Invalid centre passed to component copy')
         
         attrs=['title','abbrev','description',
-               'scienceType','controlled','isRealm','isModel',
+               'scienceType','controlled','isRealm','isModel','isParamGroup',
                'author','contact','funder']
         kwargs={}
         for i in attrs: kwargs[i]=self.__getattribute__(i)
@@ -538,17 +541,17 @@ class Component(Doc):
         new.model=model
         new.realm=realm
        
-        for c in self.components.all():
+        for c in self.components.all().order_by('id'):
             logging.debug('About to add a sub-component to component %s (in centre %s, model %s with realm %s)'%(new,centre, model,realm))
             r=c.copy(centre,model=model,realm=realm)
             new.components.add(r)
             logging.debug('Added new component %s to component %s (in centre %s, model %s with realm %s)'%(r,new,centre, model,realm))
             
-        for p in self.paramGroup.all(): 
+        for p in self.paramGroup.all().order_by('id'): 
             new.paramGroup.add(p.copy())
         
         ### And deal with the component inputs too ..
-        inputset=ComponentInput.objects.filter(owner=self)
+        inputset=ComponentInput.objects.filter(owner=self).order_by('id')
         for i in inputset: i.makeNewCopy(new)
         new.save()        
         return new
@@ -675,12 +678,12 @@ class Experiment(Doc):
         root=etree.getroot()
         getter=etTxt(root)
         #basic document stuff, note q'naire doc not identical to experiment bits ...
-        doc={'description':'description','shortName':'abbrev','longName':'title'}
+        doc={'description':'description','shortName':'abbrev','longName':'title','rationale':'rationale'}
         for key in doc:
             E.__setattr__(doc[key],getter.get(root,key))
         
         #FIXME handle calendars before date
-        E.rationale=getter.get(root,key)
+        #E.rationale=getter.get(root,key)
        
         # bypass reading all that nasty gmd party stuff ...
         E.metadataMaintainer=ResponsibleParty.fromXML(root.find('{%s}author'%cimv))
@@ -1037,11 +1040,12 @@ class PhysicalProperty(Term):
 class ParamGroup(models.Model):
     ''' This holds either constraintGroups or parameters to link to components '''
     name=models.CharField(max_length=64,default="Attributes")
-    componentView=models.BooleanField(default=False)
+    paramgroups=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
+    
     def copy(self):
-        new=ParamGroup(name=self.name,componentView=self.componentView)
+        new=ParamGroup(name=self.name)
         new.save()
-        for constraint in self.constraintgroup_set.all():constraint.copy(new)
+        for constraint in self.constraintgroup_set.all().order_by('id'):constraint.copy(new)
         return new
     def __unicode__(self):
         return self.name
@@ -1056,7 +1060,7 @@ class ConstraintGroup(models.Model):
     def copy(self,paramgrp):
         new=ConstraintGroup(constraint=self.constraint,parentGroup=paramgrp)
         new.save()
-        for param in self.baseparam_set.all(): param.copy(new)
+        for param in self.baseparam_set.all().order_by('id'): param.copy(new)
         
 class BaseParam(ParentModel):
     ''' Base class for parameters within constraint groups '''
@@ -1067,7 +1071,7 @@ class BaseParam(ParentModel):
     #strictly we don't need the following attribute, but it simplifies template code
     controlled=models.BooleanField(default=False)
     # should have definition
-    definition=models.CharField(max_length=512,null=True,blank=True)
+    definition=models.CharField(max_length=1024,null=True,blank=True)
     #
     def get_parent_model(self):
         return BaseParam
@@ -1081,7 +1085,7 @@ class BaseParam(ParentModel):
         o=obj.__class__(**d)
         o.save()
         if self.get_child_name()=='orparam':
-            for m in obj.value.all(): o.value.add(m)
+            for m in obj.value.all().order_by('id'): o.value.add(m)
         return o
         
 class OrParam(BaseParam):

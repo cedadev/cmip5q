@@ -199,7 +199,7 @@
     <calendar>
     	<realCalendar></realCalendar>
     </calendar>
-	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.2.stc.2005_30yr</name><id xsi:type="Identifier">stc.021</id><requiredDuration xsi:type="ClosedDateRange">
+	<numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">1.2.stc.2005_30yr</name><id xsi:type="Identifier">stc.021</id><description>Begin in 1980 and run for 30 years </description><requiredDuration xsi:type="ClosedDateRange">
 		<startDate> 2005-09-01T00:00:00Z</startDate>
 		<endDate> 2035-12-31T23:59:59Z </endDate>
 		<length units="years">30</length>

@@ -112,7 +112,7 @@
     <calendar>
         <perpetualPeriod/>
     </calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.7a.stc.1850_5yr</name><id xsi:type="Identifier">stc.038</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.7a.stc.1850_5yr</name><id xsi:type="Identifier">stc.038</id><description>Begin in 1850 and run for 5 years </description><requiredDuration xsi:type="ClosedDateRange">
         <!-- Idealised run so dates given here are only dummy values -->
         <startDate> 1850-01-01T00:00:00Z</startDate>
         <endDate> 1850-12-30T00:00:00Z</endDate>

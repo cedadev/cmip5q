@@ -100,7 +100,7 @@
 	<calendar>
 	    <realCalendar/>
 	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.5-2.stc.1850_140yr</name><id xsi:type="Identifier">stc.033</id><requiredDuration xsi:type="ClosedDateRange">
+    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">5.5-2.stc.1850_140yr</name><id xsi:type="Identifier">stc.033</id><description>Begin in 1850 and run for 140 years </description><requiredDuration xsi:type="ClosedDateRange">
          <startDate>1850-01-01T00:00:00Z</startDate>
         <endDate>1990-12-30T00:00:00Z</endDate>
         <length units="years">140</length>

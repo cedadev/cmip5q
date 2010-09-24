@@ -22,13 +22,15 @@ from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 class ConformanceForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
     # We need the queryset, note that the queryset is limited in the specialisation
-    q1,q2,q3=CodeMod.objects.all(),Coupling.objects.all(),Term.objects.all()
+    q1,q2,q3,q4=CodeMod.objects.all(),Coupling.objects.all(),Term.objects.all(), RequirementOption.objects.all()
     mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'3'}))
     coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=DropDownWidget(attrs={'size':'3'}))
     ctype=forms.ModelChoiceField(required=False,queryset=q3,widget=DropDownSingleWidget)
+    option=forms.ModelChoiceField(required=False,queryset=q4,widget=DropDownSingleWidget)
     class Meta:
         model=Conformance
-        exclude=('simulation','requirementOption') # sim: we know it, reqopt: not ready for it
+        exclude=('simulation')
+        #exclude=('simulation','requirementOption') # sim: we know it, reqopt: not ready for it
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
@@ -42,8 +44,10 @@ class ConformanceForm(forms.ModelForm):
             self.fields['coupling'].queryset=[]
         v=Vocab.objects.get(name='ConformanceTypes')
         self.fields['ctype'].queryset=Term.objects.filter(vocab=v)
+        self.fields['option'].queryset=GenericNumericalRequirement.objects.get(id=self.instance.requirement_id).options.all()
         self.showMod=len(self.fields['mod'].queryset)
         self.showCoupling=len(self.fields['coupling'].queryset)
+        self.showOptions=len(self.fields['option'].queryset)
 
 class CouplingForm(forms.ModelForm):
     manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
@@ -86,7 +90,7 @@ class ComponentForm(forms.ModelForm):
     
     class Meta:
         model=Component
-        exclude=('centre','uri','model','realm','isRealm','isModel','visited',
+        exclude=('centre','uri','model','realm','isRealm','isModel','isParamGroup','visited',
                  'references','components','paramGroup')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
@@ -104,6 +108,7 @@ class ComponentForm(forms.ModelForm):
             self.fields['scienceType'].widget=forms.TextInput(attrs={'size':'40'})
             self.viewableScienceType=''
             self.showImplemented=False
+    
 
 class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
@@ -206,7 +211,7 @@ class DataHandlingForm(object):
     hostCentre=property(getCentre,setCentre)
 
 class EnsembleForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
+    description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}),required=False)
     class Meta:
         model=Ensemble
         exclude=('simulation')
@@ -523,20 +528,20 @@ class ParamGroupForm:
     def __init__(self,component,POST=None,prefix=''):
         self.prefix=prefix
         self.component=component
-        self.pgset=self.component.paramGroup.all()
+        self.pgset=self.component.paramGroup.all().order_by('id')
         fid=0 # a form id, so we get unique forms for each parameter 
         for pg in self.pgset:
             pg.cgset=[]
-            for cg in pg.constraintgroup_set.all():
+            for cg in pg.constraintgroup_set.all().order_by('id'):
                 pg.cgset.append(cg)
                 cg.forms=[]
-                for p in cg.baseparam_set.filter(controlled=True):
+                for p in cg.baseparam_set.filter(controlled=True).order_by('id'):
                     fid+=1
                     n=p.get_child_name() # kill this line when we know it works
                     f={'orparam':OrParamForm,'xorparam':XorParamForm,'keyboardparam':KeyBoardParamForm}[p.get_child_name()]
                     cg.forms.append(f(POST,instance=p.get_child_object(),prefix='%s-%s'%(prefix,fid)))
             # Get direct to uncontrolled keyboards for the last constraint group in a param group
-            q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False)
+            q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False).order_by('id')
             logging.debug('Userparams for %s in %s'%(cg.id,pg))
             cg.userforms=self.UserFormSet(POST,queryset=q,prefix='%s-uf-%s'%(prefix,cg.id))  
                  

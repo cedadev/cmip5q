@@ -42,6 +42,7 @@ class SimDateTime(object):
     def __init__(self,s,calendar=Calendar('realCalendar')):
         ''' Expect ISO8601 [yyyy-mm-dd hh:mm:ss] plus optional calendar '''
         #FIXME: Should validate against calendar types
+        #if s is None or s=='None': return None
         self.s=s.strip()
         s=self.s
         # allow a date time without a time, and set that to 00:00:00
@@ -79,6 +80,8 @@ class SimDateTime(object):
         return self.s
     def __str__(self):
         return self.s
+    def __len__(self):
+        return len(str(self))
         
 class TimeLength(object):
     def __init__(self,s):
@@ -103,12 +106,16 @@ class TimeLength(object):
         
 class DateRange(object):
     def __init__(self,startDate,endDate=None,length=None,description=None):
+        if startDate is None:
+            raise ValidationError('A start date is required')
         self.startDate=startDate
         self.endDate=endDate
         self.length=length
         self.description=description
     def __unicode__(self):
         return self.__str__()
+    def __len__(self):
+        return len(str(self))
     def __str__(self):
         s=str(self.startDate)
         if self.endDate: s+=' to %s'%self.endDate
@@ -133,12 +140,13 @@ class DateRange(object):
     @staticmethod
     def fromXML(e):
         getter=etTxt(e)
-        dr=DateRange(startDate=SimDateTime(getter.get(e,'startDate')))
-        ed=getter.getN(e,'endDate')
-        if ed is not None:dr.endDate=SimDateTime(ed)
-        dr.description=getter.getN(e,'description')
+        s1=SimDateTime(getter.get(e,'startDate'))
+        s2=getter.getN(e,'endDate')
+        if s2 is not None: s2=SimDateTime(s2)
         tl=getter.find(e,'length')
-        if tl is not None: dr.length=TimeLength('%s %s'%(tl.text,tl.attrib['units']))
+        if tl is not None: tl=TimeLength('%s %s'%(tl.text,tl.attrib['units']))
+        dr=DateRange(startDate=s1,endDate=s2,length=tl)
+        dr.description=getter.getN(e,'description')
         return dr
     @staticmethod
     def hack(s):
@@ -156,7 +164,7 @@ class DateRange(object):
 
 class SimDateTimeField(models.CharField):
     ''' We are creating a specific type of field that we want to see on forms. It's a bit like
-    a date, but not exactly, since it includes (optinally) a calendar designate. If not 
+    a date, but not exactly, since it includes (optionally) a calendar designate. If not 
     calendar is included, it's a real calendar. However, for now, it is just a char field '''
     
     description = ' A simulation date time (with optional calendar)'
@@ -170,8 +178,9 @@ class SimDateTimeField(models.CharField):
     def formfield(self, **kwargs):
         return SimDateTimeFieldForm2 (*kwargs)
         
-    def clean(self,s):
-        
+    #def clean(self,s,y=None):
+    #    print 'why',y
+    def clean(self,s,y=None):
         if isinstance(s,list):
             # this is a hack, it ought not be, but these nested multi widgets cause naughtiness
             # that I haven't time to fix #FIXME
@@ -182,7 +191,9 @@ class SimDateTimeField(models.CharField):
         elif s<> '':
             pass
         else: return None
+        if isinstance(s,SimDateTime): return s
         try:
+            print s
             sdt=SimDateTime(s)
             return sdt
         except:
@@ -244,6 +255,7 @@ class TimeLengthField(models.CharField):
         ''' Take a form instance and see if can be turned into a time length field '''
         # The form returns the number and an id from a term list. 
         # we've loaded that into the terms attribute of the widget so we have it now
+        if value[0]=='': return None
         try:
             tlv=TimeLength('%s %s'%(value[0],self.units[value[1]]))
             print tlv
@@ -268,6 +280,7 @@ class DateRangeField(models.CharField):
         if isinstance(value,basestring):
             # for the moment, just hand it off to the hack
             if value[0:1]=='<': 
+                print value
                 return DateRange.fromxml(value)
             else: return DateRange.hack(value)
         elif isinstance(value,DateRange):
@@ -282,7 +295,7 @@ class DateRangeField(models.CharField):
         if value is None:
             return None
         else:
-            return DataRange.fromxml(value)
+            return DateRange.fromxml(value)
     def get_db_prep_value(self, value):
         ''' From python to db character field for storage '''
         if value is None:
@@ -314,7 +327,10 @@ class SimDateTimeFieldForm2(forms.MultiValueField):
             d='-'.join(data_list[0:3])
             if data_list[3]<>None:
                 d+='T%s'%data_list[3]
-        return SimDateTime(d)
+        try:
+            return SimDateTime(d)
+        except ValueError:
+            raise ValidationError('Please enter a valid date time')
 
 class DateRangeFieldForm(forms.CharField):
     ''' Used to ensure that the clean method validates date range entries '''
@@ -355,9 +371,25 @@ class DateRangeFieldForm2(forms.MultiValueField):
         mywidget.units=units
         forms.MultiValueField.__init__(self,fields,widget=mywidget,required=False)
     
+    ## Note that the base class cleans all the objects against the clean methods
+    ## exposed by each of the fields listed.
+    
     def compress(self,data_list):
+        ''' At which point we have the three *field* objects to compress, and this
+        is where we have to do any cross object validation '''
+        if data_list[1] is None and data_list[2] is None:
+            raise ValidationError('Require either an end date or a length ')
+        if data_list[1] is not None and data_list[2] is not None:
+            raise ValidationError('Cannot have both an enddate and a length')
         if data_list == []:
             return None
         else:
             d=DateRange(startDate=data_list[0],endDate=data_list[1],length=data_list[2])
         return d
+        
+    
+        
+
+
+       
+       

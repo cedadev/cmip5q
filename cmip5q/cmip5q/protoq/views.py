@@ -211,7 +211,6 @@ def componentInp(request,centre_id,component_id):
 def componentCopy(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.copy(request)
-   
 
 #### GRID HANDLING ###########################################################
 

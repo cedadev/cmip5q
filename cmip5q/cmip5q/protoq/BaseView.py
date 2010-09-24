@@ -100,6 +100,7 @@ class BaseViewHandler:
             # get a URL for a blank form
             formURL=reverse('cmip5q.protoq.views.edit',
                             args=(self.cid,self.resource['type'],0,'list',))
+            
             for o in objects:
                 # monkey patch an edit URL into the object, saying come back here (list)
                 args=(self.cid,self.resource['type'],o.id,'list',)

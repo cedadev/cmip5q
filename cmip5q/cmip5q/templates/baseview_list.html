@@ -55,7 +55,7 @@
 <div class="boxer2">
 <h4> Add new {{instance.title|lower}}: </h4>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" ENCTYPE="multipart/form-data">
        {% include snippet_template %}
     </form>
 </div>

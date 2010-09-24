@@ -66,8 +66,8 @@ class NumericalModel:
                       author=None,
                       contact=None,
                       funder=None,
-                      title='GCM Template',
-                      abbrev='GCM Template'):
+                      title='Model Template',
+                      abbrev='Model Template'):
         
         if author is None: author=self.joe
         if funder is None: funder=self.joe
@@ -133,13 +133,16 @@ class XMLVocabReader:
         self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s). CMIP5 Questionnaire Version alpha10.'%(
         self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
         self.root.attrib['mmlcrevision'])
+        
+
 		
 class ComponentParser:
     ''' class for handling all elements '''
-    def __init__(self, item, model):
+    def __init__(self, item, model, isParamGroup=False):
         ''' initialise  parser '''
         self.item = item
         self.model = model
+        self.isParamGroup = isParamGroup
         #logging.debug("Instantiated Parser for %s"% item.tag)
         if item.attrib['name']:
             logging.debug("name = %s"%item.attrib['name'])
@@ -151,6 +154,7 @@ class ComponentParser:
         p=ParamGroup(name=elem.attrib['name'])
         p.save()
         self.component.paramGroup.add(p)
+        
         cg=None
         empty=True
         for item in elem:
@@ -263,6 +267,7 @@ class ComponentParser:
                 scienceType=self.item.attrib['name'],
                 abbrev=nameWithSpaces,
                 controlled=True,
+                isParamGroup=self.isParamGroup,
                 uri=u,
                 centre=self.model.centre,
                 contact=self.model.contact,
@@ -294,7 +299,15 @@ class ComponentParser:
                     logging.debug("Adding sub-component %s to component %s (model %s, realm %s)"%(child.abbrev, component.abbrev,child.model,child.realm))
                     component.components.add(child)
                 elif subchild.tag == 'parametergroup': 
-                    self.__handleParamGrp(subchild)
+                    if subchild.attrib['componentView'] == 'False' or subchild.attrib['componentView'] == 'false':
+                        self.__handleParamGrp(subchild)
+                    else:
+                        # treating the componentView=true as a component
+                        subComponentParser = ComponentParser(subchild, self.model, isParamGroup=True)
+                        # Handle child components of this one (True = recursive)
+                        child=subComponentParser.add(True,realm=realm)
+                        logging.debug("Adding sub-component (parameter group) (paramgroup %s to component %s (model %s, realm %s)"%(child.abbrev, component.abbrev,child.model,child.realm))
+                        component.components.add(child)
                 elif subchild.tag == 'parameter':
                     print logging.info('OOOOOOOPPPPPPs')
                     self.__handleParam(subchild)
