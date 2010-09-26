@@ -244,8 +244,6 @@ class simulationHandler(object):
                 ss=s.copy(exp)
                 url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
                 return HttpResponseRedirect(url)
-                #except Exception,e:
-                return HttpResponse('ERROR, %s, malformed POST to simulation copy'%e)
         else:
             return self.list(request)
         
@@ -255,7 +253,6 @@ class simulationHandler(object):
         this one does. One closure at a time can be done via the coupling handler. '''
         s=self.s
         s.resetCoupling(closures=True)
-        s._resetIO()
         # and return to the coupling view 
         url=reverse('cmip5q.protoq.views.simulationCup',
                     args=(self.centreid,s.id,))

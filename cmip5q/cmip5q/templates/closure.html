@@ -1,12 +1,14 @@
-<tr class="{% cycle 'row1' 'row2' %}">
-    <td> {% ifequal ff.instance.ctype 'internal' %}
-    From: {{ff.target.errors}}{{ff.target}} &nbsp; {% else %}
-    <table> 
+<table>
+<tr>
+    <td> <table> 
+    {% ifequal ff.instance.ctype 'internal' %}
+    <tr><td>From: {{ff.target.errors}}{{ff.target}} &nbsp;</td></tr> {% else %}
+    
     <tr><td>File: {{ff.targetFile.errors}}{{ff.targetFile}}</td></tr>
     <tr><td {% if forloop.first %}id="tt{{f.cf.instance.id}}"{% endif %} >Variable: {{ff.target.errors}}{{ff.target}}</td></tr>
-    </table>
     {% endifequal %}
-    {% if forloop.last %} {% else %} <br/>(delete: {{ff.DELETE.errors}}{{ff.DELETE}}){% endif %}</td>
+    <tr><td>(delete: {{ff.DELETE.errors}}{{ff.DELETE}})</td></tr>
+    </table></td>
     <td>
         <table>
         <tr><td> 
@@ -17,4 +19,5 @@ Time Mapping: {{ff.temporalTransform.errors}} {{ff.temporalTransform}}
         </table>
     </td>
 </tr>
+</table>
 {% for hid in ff.hidden_fields %} {{hid}}{% endfor %}

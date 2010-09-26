@@ -4,25 +4,18 @@
 <h1> How "{{s}}" conforms to the requirements of "{{e}}" </h1>
 </div>
 <div class="boxer">
-<table width="100%">
-<tr><td width="85%">
+
 <p> On this page we ask you explain how the experimental requirements are satisfied by
-your simulation. The most likely case is that you have chosen initial and boundary
-conditions appropriately, and so you can simply run down each row, and choose which
-initial or boundary condition matches this requirement. In some cases you may have
-made an additional code modification, in which case you probably need to go to
-the code modifications page, describe the code modification(s) and then come
-back to this page so that you can choose the appropriate code modification for a 
-specific requirement. (You might also first need to return to your simulation to
-ensure that all the appropriate boundary and initial conditions are described.)
+your simulation. There is a drop down list which gives you a choice between: <br/>
+(1) Not being conformant, (2) Your standard model configuration is conformant (3) You use
+a combination of changes to the model code and inputs, (4) you only change inputs (boundary
+conditions, ancillary files etc), or (5) you only changed the code. (It is possible for someone to satisfya a boundary condition requirement change by changing the code ...). We'd also like to know
+anything else you think might be relevant to how your simulation conformed to the model - which you can
+enter in the text boxes.
 </p>
 
-</td><td align="right">
 <p class="red"> Save conformances before navigating away </p>
-<p><a id="simbut" href="{{urls.sim}}"> Return to {{s}}</a></p>
-<p><a id="codebut" href="{{urls.mods}}"> Model Modifications </a></p>
-</td></tr>
-</table>
+
 <div id="data" class="boxer2">
     <form action="{{urls.self}}" method="POST">
     {{cform.management_form}}
@@ -30,20 +23,15 @@ ensure that all the appropriate boundary and initial conditions are described.)
         <div class="boxer">
         <table>
             <tr class="{% cycle 'row1' 'row2'%}">
-                <td colspan="2">{{form.instance.requirement}}:{{form.instance.requirement.description}}</td>
-                <td>{% if form.showOptions %}Requirement Option: {{form.option}} {% endif %}</td>
-                <td>Experiment Requirement Type: {{form.instance.requirement.ctype}}</td>
+                <td><b>Experiment Requirement Type: {{form.instance.requirement.ctype}}</b></td>
+                <td>{{form.instance.requirement}}:{{form.instance.requirement.description}}</td>
                 <td>How this simulation conformed: {{form.ctype.errors}} {{form.ctype}}</td>
             </tr>
             <tr class="{% cycle 'row1' 'row2'%}">
-                 <td> Model Modification: {{form.mod.errors}}{% if form.showMod %}{{form.mod}}
-                 {% else %} No Model Modifications Declared{% endif %}</td>
-                 <td> Input Bindings: {{form.coupling.errors}}{% if form.showCoupling %} {{form.coupling}} {% else %} No Input Bindings Declared {% endif %}</td>
-                <td colspan="2"> Notes: {{form.description.errors}}{{form.description}}</td>
+                <td>{% if form.showOptions %}Requirement Option: {{form.option}} {% endif %}</td>
+                <td> Notes: {{form.description.errors}}{{form.description}}</td>
+                <td></td>
             </tr>
-            <tr><td colspan="2"> In either select box, hold down "Control", or "Command" on a Mac, to select more than one. to "unselect" you can shift click on a selected value.</td><td colspan="2"> 
-            {% with form.instance as con %}{% if con.ctype %} Currently {% include 'pretty_conformance.html' %} {% endif %}{% endwith %}
-            </td></tr>
         </table> 
         {% for hid in form.hidden_fields %} {{hid}}{% endfor %}
         </div>

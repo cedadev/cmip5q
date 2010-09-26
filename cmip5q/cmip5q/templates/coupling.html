@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Input resolution for the {% if not s %} default {% endif %} inputs to "{{c.abbrev}}"
+<h1> Tell us how you delivered the {% if not s %} default {% endif %} inputs to "{{c.abbrev}}"
   {% if s %} for simulation "{{s}}" {% endif %}
 </h1>
+<p>
+{% if s%}This is where you tell us about any changes to the model input settings that were made for <em>this</em> simulation.
+{% else %} This is where you tell about <em> default</em> model input settings.
+{% endif %}</p>
 </div>
 <div class="boxer">
     <p> On previous pages we have asked you to describe the inputs <em> required </em> by the various components in your model. 
@@ -22,17 +26,17 @@
     
     <p> There is one entry for each input requirement you declared in your model component description. It may be you need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, so you can describe them here. </p>
     
-    <p> The level of detail to input is up to you, but we will be asking you about how your simulation conformed to the experimental requirements on the simulation "conformance" pages. In many cases that will be asking you to link some response of yours to both a particular requirement and a particular input, so if you don't do it now, you might have to come back later :-) (and obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external files. Note also that the simulation description will not validate as complete unless all declared input requirements resolved.</p>
+    <p> The level of detail to input is up to you, but obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external files. Note that simulation descriptions will not validate as complete unless all declared input requirements are "resolved".</p>
 </div>
     <div class="boxer">
-    <h4> Input Binding </h4>
+    <h4> Input Binding</h4>
     {% if Intform.forms|length %}
     {% if Intform.FormError %} <p class="red"> You form has not been saved. An error has occurred. Please correct error below. </p> {% endif %}
     <div class="boxer2">
     {% if s %}
     <div class="boxer">
     <table>
-    <tr><td><p>You may have entered some or all of this information while describing your model. Use this button to SET or RESET the values for this simulation from your model definition.
+    <tr><td><p>You may have entered some or all of this information while describing your model. Use this button to SET or RESET the values for this simulation from your model definition.<br/>
     <span class="red">Do not use this button if you have already filled in information below that you don't want to lose. </p></td><td align="right"><form action={{urls.reset}} method="POST">
     <input id="ResetBut" type="submit" value="(RE)SET"></form></td></tr></table>
     </div>
@@ -46,12 +50,14 @@
     we can ask questions about how those inputs are coupled to files (or other components).</p> {% endif %}
     </div>
 <div class="boxer">
-    <p> <a id="returnBut" href="{{urls.return}}">Return to {{urls.returnName}} {% if s %} {{s}} {% else %} {{c}} {% endif %} </a>
+   
+    <p> Back: <a id="returnBut" href="{{urls.return}}">Return to {{urls.returnName}} {% if s %} {{s}} {% else %} {{c}} {% endif %} </a>&nbsp;&nbsp;&nbsp;Next: Simulation specific <a id="nextBut" href="{{urls.nextURL}}">Model Mods</a></p>
 </div>
 <script type="text/javascript">
     var InternalBut = new YAHOO.widget.Button("InternalBut",
                                   {value:"InternalButvalue"});  
     var ReturnBut = new YAHOO.widget.Button("returnBut");
     var ResetBut = new YAHOO.widget.Button("resetBut");
+    var NextBut = new  YAHOO.widget.Button("nextBut");
         </script>
 {% endblock%} 

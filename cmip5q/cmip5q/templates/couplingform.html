@@ -10,26 +10,34 @@ Coupling Frequency: {{f.cf.couplingFreq.errors}}{{f.cf.couplingFreq}}&nbsp;
 </p>
 <hr>
 {% endifequal %}
+<p>
+Enter input details. There are {% ifequal f.cf.instance.targetInput.ctype f.bcv%} three {% else %} two {% endifequal %} options here: you can bind to one or more of (1) an already defined file {% ifequal f.cf.instance.targetInput.ctype f.bcv%}, {% else %}, or {% endifequal %} (2) to a new file description
+{% ifequal f.cf.instance.targetInput.ctype f.bcv%}, or (3) to another model component. {% else %}.{% endifequal %}
+(If you add a new file, you can edit further details via the file tab.)
+</p>
+<table class="boxer" width="100%">
+{{f.ec.management_form}}{{ f.ic.management_form}} 
+{% if f.formrows|length %}
+<tr><th {% ifequal f.cf.instance.targetInput.ctype f.bcv%} width="50%"{% endifequal %}> From files </th><th> {% ifequal f.cf.instance.targetInput.ctype f.bcv %}From other model components {% endifequal %}</th></tr> {% endif %}
+{% for row in f.formrows %}
+<tr class="{% cycle 'row1' 'row2' %}">{% for ff in row %}<td>
+{% ifnotequal ff '' %}{% include 'closure.html' %}{% endifnotequal %} </td>{% endfor %}</tr>
+{% endfor %}
+<tr><th colspan="2">
+Add {%if f.formrows|length %}another{% endif %} new place from which input is found and spatiotemporal sampling</th></tr>
+<tr><td colspan="2">
 <table>
-<tr><td colspan="2"> Enter input details. {% ifequal f.cf.instance.targetInput.ctype f.bcv %} It
-is likely you will only need to enter material in both columns if you have a regional model. {% endifequal %} New blank rows will appear after rows which have been completed and saved. Only use these if you wish to enter multiple sources as input.  </td></tr>
-<tr><th {% ifequal f.cf.instance.targetInput.ctype f.bcv%} width="50%"{% endifequal %}> From files </th><th> {% ifequal f.cf.instance.targetInput.ctype f.bcv %}From other model components {% endifequal %}</th></tr>
-<tr><td>
-    {{f.ec.management_form}}
-    <table class="boxer">
-    {% for ff in f.ec.forms %}
-    {% include 'closure.html' %}
-    {% endfor %}
-    </table>
-</td><td>
-    {{ f.ic.management_form}}
-    {% ifequal f.cf.instance.targetInput.ctype f.bcv %}
-    <table class="boxer">
-    {% for ff in f.ic.forms %}
-    {% include 'closure.html' %}
-    {% endfor %}
-    </table>{% endifequal %}
-</td> </tr>
+{% if f.dc.non_field_errors %} <tr><td colspan="5"> {{f.dc.non_field_errors}}</td></tr>{% endif %}
+<tr>
+<td>Existing file: {{f.dc.efile.errors}}{{f.dc.efile}}</td><td width="8%" align="center">OR</td>
+<td><table>
+<tr><td>New file:URL{{f.dc.nurl.errors}}</td><td>{{f.dc.nurl}}</td></tr>
+<tr><td>mnemonic: {{f.dc.nfname.errors}}</td><td>{{f.dc.nfname}}</td></tr>
+</table></td><td width="8%" align="center">OR</td><td>internal component {{f.dc.component.errors}}{{f.dc.component}}</td></tr>
+<tr><td colspan="5"><center> Spatial Regridding: {{f.dc.spatialRegrid}}&nbsp;&nbsp; Time Mapping: {{f.dc.temporalTransform}}</center></td></tr>
+
+</table>
+</td></tr>
 </table>
 <hr>
 

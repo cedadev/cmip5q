@@ -30,7 +30,7 @@ properties={
     'SpatialRegrid':('Method used to spatially interpolate a field from one grid (source grid) to another (target grid)',
         [('Conservative','The area integral of the coupling field is conserved between the source and the target grid',),
          ('Non-Conservative','No properties are conserved in the regridding'),
-         ('None','No spatial regridding is carried out'),
+         ('None Used','No spatial regridding is carried out'),
          ]),
     
     'SpatialRegridDim':('Dimensionality of the regridding',

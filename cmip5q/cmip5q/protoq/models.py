@@ -125,9 +125,6 @@ def soft_delete(obj,simulate=False):
     
     if not simulate: delete_objects(on_death_row)
     return True,{}
-        
-
-        
 
 class ChildQuerySet(QuerySet):
     ''' Used to support the queryset options on ParentModel'''
@@ -358,6 +355,11 @@ class Doc(Fundamentals):
     def delete(self,*args,**kwargs):
         ''' Avoid deleting documents which have foreign keys to this instance'''
         return soft_delete(self,*args,**kwargs)
+        
+    def delete4real(self):
+        ''' Don't bugger round, just blow me away ... and accept that if anything points to me,
+        they're history too'''
+        return Fundamentals.delete(self)
         
     @models.permalink
     def edit_url(self):
@@ -765,7 +767,6 @@ class GenericNumericalRequirement(ParentModel):
             ro=RequirementOption()
             a = ro.fromXML(e)
             self.options.add(a)
-        print experiment,self.id,self.name
 
 class RequirementOption(models.Model):
     ''' A numerical requirement option ''' 
@@ -802,7 +803,6 @@ class SpatioTemporalConstraint(GenericNumericalRequirement):
         nr.save()
         nr.gfromXML(experiment,elem)
         op=elem.find('{%s}requiredDuration'%cimv)
-        print 'duration element ',op
         if op is not None: nr.requiredDuration=DateRange.fromXML(op)
         op=elem.find('{%s}spatialResolution'%cimv)
         if op is not None:
@@ -932,6 +932,7 @@ class Simulation(Doc):
         s.duration=self.duration.copy()
         for mm in self.inputMod.all():s.inputMod.add(mm)
         for mm in self.codeMod.all():s.codeMod.add(mm)
+        s._resetIO()
         s.save() # I don't think I need to do this ... but to be sure ...
         #couplings:
         myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self)
@@ -960,13 +961,14 @@ class Simulation(Doc):
         numerical models are not propagated to the simuations already made with them. '''
         # first, do we have our own coupling group yet?
         cgs=self.couplinggroup_set.all()
-        if len(cgs): 
+        if len(cgs):
             # we've already got a coupling group, let's update it
-            assert(len(cgs)==1,'Simulation %s should only have one coupling group'%self) 
+            assert len(cgs)==1,'Simulation %s should only have one coupling group'%self
             cgs=cgs[0]
             modelCouplings=self.numericalModel.couplings()
             myCouplings=self.numericalModel.couplings(self)
             myOriginals=[i.original for i in myCouplings]
+            logging.debug('Existing Couplings: %s'%myCouplings)
             for m in modelCouplings:
                 if m not in myOriginals: 
                     r=m.copy(cgs)
@@ -981,6 +983,7 @@ class Simulation(Doc):
                 cgs=mcgs.get(simulation=None)
                 cgs=cgs.duplicate4sim(self)
         # having updated the couplings, we'll now find any new files (if any)
+        logging.debug('Updated couplings: %s'%self.numericalModel.couplings(self))
         self._updateIO()
         return cgs  # it's quite useful to get this back (e.g. for resetclosures etc)
 
@@ -1003,7 +1006,7 @@ class Simulation(Doc):
         # see updateIO for documentation of what we're doing here.
         itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
         existing=self.datasets.all()
-        for e in existing:e.delete()
+        for e in existing:e.delete4real()
         for itype in itypes:
             d=Dataset(usage=itype)
             d.save()
@@ -1018,7 +1021,7 @@ class Simulation(Doc):
         itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
         # now these are my datasets corresponding to those types (we hope):
         existing=self.datasets.all()
-        assert len(existing)==len(itypes),'Unexpected condition on entry to simulation method updateIO for %s'%self
+        assert len(existing)==len(itypes),'Unexpected condition (%s,%s)on entry to simulation method updateIO for %s'%(len(existing),len(itypes),self)
         # all my couplings:
         myCouplings=self.numericalModel.couplings(self)
         for itype in itypes:
@@ -1169,6 +1172,8 @@ class Dataset(Doc):
     usage=models.ForeignKey(Term)
     # Either the dataset is associated with a simulation or an EnsembleMember, but
     # they know that, the dataset is agnostic
+    def __unicode__(self): 
+        return '%s(%s)'%(self.usage,len(self.children.all()))
 
 class CouplingGroup(models.Model):
     ''' This class is used to help manage the couplings in terms of presentation and
@@ -1230,7 +1235,10 @@ class Coupling(models.Model):
         '''Make a copy of self, and associate with a new group'''
         # first make a copy of self
         args=['inputTechnique','couplingFreq','FreqUnits','manipulation','targetInput']
-        kw={'original':self,'parent':group}
+        if self.original:
+            kw={'original':self.original}
+        else: kw={'original':self}
+        kw['parent']=group
         for a in args:kw[a]=self.__getattribute__(a)
         new=Coupling(**kw)
         new.save()
@@ -1322,10 +1330,12 @@ class Ensemble(models.Model):
         ed.etype=self.etype
         # we can't assume that none of the simulation characteristics have not been changed, so
         # let's just copy them lock stock and barrel.
-        for a in (centre,author,funder,contact,metadtaMaintainer,title,abbrev,description):
-            ed.__setattribute__(a,self.description.__getattribute__(a))
+        for a in ('centre','author','funder','contact','metadataMaintainer','title','abbrev','description'):
+            ed.__setattr__(a,self.simulation.__getattribute__(a))
         # is that enough of a shell?
-        return ed.save()
+        ed.save()
+        if not self.doc: self.doc=ed
+        return ed
     
 class EnsembleMember(models.Model):
     ensemble=models.ForeignKey(Ensemble,blank=True,null=True)
@@ -1465,8 +1475,6 @@ class Grid(Doc):
        
         new.save()        
         return new
-   
-    
     
 class DRSOutput(models.Model):
     ''' This is a holding class for how a simulation relates to it's output in the DRS '''

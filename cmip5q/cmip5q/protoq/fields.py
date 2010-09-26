@@ -132,6 +132,10 @@ class DateRange(object):
     def strxml(self,parent='DateRange'):
         e=self.xml(parent)
         return ET.tostring(e)
+    def copy(self):
+        new=DateRange(startDate=self.startDate,endDate=self.endDate,
+            length=self.length,description=self.description)
+        return new
     @staticmethod
     def fromxml(xml):
         ''' Where we expect an xml string, with no namespace '''
@@ -178,8 +182,6 @@ class SimDateTimeField(models.CharField):
     def formfield(self, **kwargs):
         return SimDateTimeFieldForm2 (*kwargs)
         
-    #def clean(self,s,y=None):
-    #    print 'why',y
     def clean(self,s,y=None):
         if isinstance(s,list):
             # this is a hack, it ought not be, but these nested multi widgets cause naughtiness
@@ -193,7 +195,6 @@ class SimDateTimeField(models.CharField):
         else: return None
         if isinstance(s,SimDateTime): return s
         try:
-            print s
             sdt=SimDateTime(s)
             return sdt
         except:
@@ -258,10 +259,8 @@ class TimeLengthField(models.CharField):
         if value[0]=='': return None
         try:
             tlv=TimeLength('%s %s'%(value[0],self.units[value[1]]))
-            print tlv
             return tlv
         except Exception,e:
-            print str(e)
             raise ValidationError('Please enter a valid time length field  (not "%s")'%value)
         
         
@@ -280,7 +279,6 @@ class DateRangeField(models.CharField):
         if isinstance(value,basestring):
             # for the moment, just hand it off to the hack
             if value[0:1]=='<': 
-                print value
                 return DateRange.fromxml(value)
             else: return DateRange.hack(value)
         elif isinstance(value,DateRange):

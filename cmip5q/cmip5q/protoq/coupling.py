@@ -16,10 +16,10 @@ from cmip5q.protoq.layoutUtilities import tabs
 logging=settings.LOG
 
 InternalClosureFormSet=modelformset_factory(InternalClosure,can_delete=True,
-                                    form=InternalClosureForm,
+                                    form=InternalClosureForm,extra=0,
                                     exclude=('coupling'))
 ExternalClosureFormSet=modelformset_factory(ExternalClosure,can_delete=True,
-                                    form=ExternalClosureForm,
+                                    form=ExternalClosureForm,extra=0,
                                     exclude=('coupling'))                                
 
 #https://www.cduce.org/~abate/index.php?q=dynamic-forms-with-django
@@ -74,12 +74,93 @@ class MyExternalClosures(ExternalClosureFormSet):
             i.coupling=self.coupling
             i.save()
             
+class DualClosureForm(forms.Form):
+    ''' To replace individual closures and simplify the input entry '''
+    #existing file options
+    empty=[(None,None)]
+    efile=forms.ChoiceField(choices=empty,required=False)
+    # new file options
+    nurl=forms.URLField(required=False)
+    nfname=forms.CharField(max_length=132,required=False)
+    # component options
+    component=forms.ChoiceField(choices=empty,required=False)
+    # detail:
+    spatialRegrid=forms.ChoiceField(choices=empty,required=False)
+    temporalTransform=forms.ChoiceField(choices=empty,required=False)
+    
+    def specialise(self,centre,q,vocabs,efiles,components):
+        ''' Initialise the target for processing this form '''
+        self.vocabs=vocabs
+        for k in vocabs:
+            self.fields[k].choices=[(i.id,str(i)) for i in vocabs[k]]
+        self.fields['component'].choices=self.empty+[(i.id,str(i)) for i in components]
+        self.fields['efile'].choices=self.empty+[(i.id,str(i)) for i in efiles]
+        self.efiles=[e.abbrev for e in efiles]
+        self.coupling=q
+        self.centre=centre
+    
+    def process(self):
+        ''' Takes the cleaned data and loads into the appropriate closure '''
+        # It's not a save, because it's not a save directly to a model
+        if self.selectedOption is None: return
+        if self.selectedOption=='efile':
+            e=ExternalClosure(coupling=self.coupling,
+                              targetFile=DataContainer.objects.get(id=self.cleaned_data['efile']),
+                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
+            e.save()
+        elif self.selectedOption=='nurl':
+            #create new DataContainer, then create new External Closure
+            d=DataContainer(abbrev=self.cleaned_data['nfname'],
+                            link=self.cleaned_data['nurl'], 
+                            centre=self.centre)
+            d.save()
+            e=ExternalClosure(coupling=self.coupling,
+                              targetFile=d,
+                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
+            e.save()
+        elif self.selectedOption=='component':
+            #create new internal closure
+            i=InternalClosure(coupling=self.coupling,
+                              target=Component.objects.get(id=self.cleaned_data['component']),
+                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
+            i.save()
+        else: raise ValueError('Unexpected condition in DualClosureForm.process %s'%self.selectedOption)
+
+        
+    def clean(self):
+        ''' Need to make sure we have only one option submitted (and in the case of a new file,
+        both the url and mnemnoic '''
+        logging.debug(self.cleaned_data)
+        efile=(self.cleaned_data['efile'] <> 'None')
+        nurl,nfname=False,False
+        if 'nurl' in self.cleaned_data: nurl=self.cleaned_data['nurl'] <> ''
+        if 'nfname' in self.cleaned_data: nfname=self.cleaned_data['nfname'] <> ''
+        component=self.cleaned_data['component'] <> 'None'
+        ok=True
+        selected=int(efile)+int(nurl or nfname)+int(component)
+        if selected>1: 
+            raise ValidationError('Choose only one binding (ie only one of the OR options)!')
+        if (nurl or nfname) and not (nurl and nfname):
+            raise ValidationError('You need to choose both a new url and a new mnemonic for a new file!')
+        if nfname:
+            if self.cleaned_data['nfname'] in self.efiles: 
+                raise ValidationError('Your new file short name is already in use!')
+
+        logging.debug('acceptable dual form')
+        # which option (for use in processing so we don't have to repeat the logic)
+        self.selectedOption={0:None,1:'efile',2:'nurl',3:'component'}[efile*1+nurl*2+component*3]
+        return self.cleaned_data
+        
+            
 class MyCouplingForm(object):
     def __init__(self,dict):
         for k in dict:
             self.__setattr__(k,dict[k])
     def __str__(self):
-        s=self.title+str(self.cf)+str(self.ec)+str(self.ic)
+        s=self.title+str(self.cf)+str(self.ec)+str(self.ic)+str(self.dcf)
         return s 
 
 class MyCouplingFormSet:
@@ -132,9 +213,21 @@ class MyCouplingFormSet:
                 cf.fields[key].queryset=self.couplingVocabs[key]
             ic=MyInternalClosures(q,data)
             ec=MyExternalClosures(q,data)
+            # need to collect rows of forms here to simplify template
+            formrows=[]
+            for i in range(max(len(ic.forms),len(ec.forms))):
+                entry=['','']
+                if i < len(ec.forms): entry[0]=ec.forms[i]
+                if i < len(ic.forms): entry[1]=ic.forms[i]
+                formrows.append(entry)
+            print len(ic.forms),len(ec.forms),formrows
+            dcf=DualClosureForm(data,prefix='dcf%s'%q)
             #make sure we don't offer up the target input owner component:
             iqs=BaseInternalQueryset.exclude(id__exact=q.targetInput.owner.id)
-            self.forms.append(MyCouplingForm({'title':title,
+            # and only offer up our files.
+            efiles = DataContainer.objects.filter(centre=self.model.centre)| DataContainer.objects.filter(centre=None)
+            dcf.specialise(self.model.centre,q,self.closureVocabs,efiles,iqs)
+            self.forms.append(MyCouplingForm({'title':title,'formrows':formrows,'dc':dcf,
                                               'cf':cf,'ic':ic,'ec':ec,'iqs':iqs,
                                               'bcv':bcvalue,'afv':afvalue,'icv':icvalue}))
             
@@ -147,7 +240,10 @@ class MyCouplingFormSet:
             if not r2: ok=False
             r3=f.ic.is_valid()
             if not r3: ok=False
-            print '[#',f.cf.errors,'##',f.ec.errors,'##',f.ic.errors,'#]'
+            r4=f.dc.is_valid()
+            if not r4: ok=False
+            #logging.debug('%s-%s-%s-%s'%(r1,r2,r3,r4))
+            #logging.debug('%s[cf#%s#_ec#%s#_ic#%s#_dc#%s#]'%(ok,f.cf.errors,f.ec.errors,f.ic.errors,f.dc.errors))
         self.FormError=not ok   # used in coupling.html
         return ok
             
@@ -167,9 +263,11 @@ class MyCouplingFormSet:
             #cf.parent=self.parent
             #cf.targetInput=self.queryset.get(id=cf.id).targetInput
             cf.save()
-            # now the external closures formset ...
+            # now the external, internal closures formsets ...
             instances=f.ec.save()
             instances=f.ic.save()
+            # and finally, the dual closure (new) entries
+            dc=f.dc.process()
         
         if self.simulation: 
             # aggregate up the files in our closures
@@ -196,12 +294,15 @@ class couplingHandler:
         self.urls={'ok':reverse('cmip5q.protoq.views.simulationCup',args=(self.centre_id,simulation_id,)),
               'return':reverse('cmip5q.protoq.views.simulationEdit',args=(self.centre_id,simulation_id,)),
               'returnName':'simulation',
+              'nextURL':reverse('cmip5q.protoq.views.assign',
+                     args=(self.centre_id,'modelmod','simulation',simulation_id,)),
               'reset':reverse('cmip5q.protoq.views.simulationCupReset',args=(self.centre_id,simulation_id,)),
               }
+        print self.urls['nextURL']
         return self.__handle(simulation)
     def __handle(self,simulation=None):
         model=self.component.model
-        assert (model != None,'Component %s has no model'%self.component)
+        assert model != None,'Component %s has no model'%self.component
         queryset=model.couplings(simulation)
         self.urls['model']=reverse('cmip5q.protoq.views.componentEdit',
                     args=(self.centre_id,model.id,))
@@ -232,9 +333,3 @@ class couplingHandler:
     def update(self,coupling_id):
         ''' Used to update just one coupling, probably as an ajax activity '''
         pass
-            
-        
-        
-    
-        
-            

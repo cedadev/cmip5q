@@ -29,19 +29,22 @@
             add further simulation characteristics will appear here.</p>
         {% else %}
             <h4> Dependencies</h4>
+            <p> List of tasks you need to carry out: It will be best to proceed down this list in order!</p>
             <!--<p><a id="iclinkbut" href="{{urls.ic}}">Initial Conditions</a></p>-->
-            <p><a id="bclinkbut" href="{{urls.bc}}">Resolve Inputs</a></p>
+            <p><b>1:</b> <a id="bclinkbut" href="{{urls.bc}}"> Simulation Inputs</a></p>
             <h4> Experiment Criteria</h4>
-            <p><a id="modlinkbut" href="{{urls.mod}}">Model Mods</a></p>
+            <p>Tell us about:</p>
+            <p><b>2:</b> <a id="modlinkbut" href="{{urls.mod}}">Model Mods</a></p>
             <!--<p><a id="icslinkbut" href="{{urls.ics}}">Input Mods</a></p>-->
-            <p><a id="conlinkbut" href="{{urls.con}}">Conformance</a></p>
+            <p><b>3:</b> <a id="conlinkbut" href="{{urls.con}}">Conformance</a></p>
             <h4> Ensemble Characteristics </h4>
             {% ifequal s.ensembleMembers 1 %}
                     Not an ensemble 
             {% else %}
-                <p><a id="enslinkbut" href="{{urls.ens}}"> Describe Ensemble</a></p>
+                <p><b>4:</b> <a id="enslinkbut" href="{{urls.ens}}">Describe Ensemble</a></p>
             {% endifequal %}
-            <h4> Use the simulation to </h4>
+            <p> Then you will be ready to:</p>
+            <h4> Use this simulation to </h4>
             {% include 'docbuttons.html' %}
         {% endifnotequal %}
     </div>
