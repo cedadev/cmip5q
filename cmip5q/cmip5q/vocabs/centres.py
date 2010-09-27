@@ -8,7 +8,7 @@ CENTRES=(
              ('IPSL','Institut Pierre Simon Laplace',('IPSL-CM6','IPSL-CM5')),
              ('MPI-M','Max Planck Institute for Meteorology',('ECHAM5-MPIOM')), 
              ('CMIP5','Dummy Centre used to hold model template',('dum')),
-             ('Example','Dummy Centre used to hold examples',('dum')),
+             ('1. Example','Dummy Centre used to hold examples',('dum')),
              ('NorClim','Norwegian Climate Centre',('NorESM')),
              ('MRI','Japanese Meteorological Institute',('MRI-CGM3','MRI-ESM1','MRI-AM20km','MRI-AM60km')),
              ('MIROC','University of Tokyo, National Institute for Environmental Studies, and Japan Agency for Marine-Earth Science and Technology',('MIROC4.2(M)','(MIRO4.2(H)','MIROC3.2(M)','MIROC-ESM')),
@@ -20,7 +20,9 @@ CENTRES=(
              ('CNRM/CERFACS','...',('CNRM-CM5')),
              ('CCCMA','Canadian Centre for Climate Modelling and Analysis',('CanESM2')),
              ('CAWCR','...	Australia',('ACCESS',)),
-             ('CMA-BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM'))
+             ('CMA-BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM')),
+             ('2. Test Centre','Test area',('dum')),
+             ('EC-Earth','Europe',('EC-Earth'))
         )
 def loadCentres():
     for centre in CENTRES:

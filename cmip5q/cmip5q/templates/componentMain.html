@@ -59,9 +59,12 @@
                 </td>
                 </tr>
                 
+                {% if isModel %}
             	<tr>
             	<td colspan="4">*Short Name must match the model name used in the output files</td>
             	</tr>
+                {% endif %}
+                
                 {% if cform.showImplemented %}
                     {% if isModel %} {{cform.implemented.as_hidden}}
                     {% else %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
