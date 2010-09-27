@@ -46,15 +46,15 @@
     </rule>
   </pattern>
   <pattern name="Model initial condition inputs requirements">
-    <rule context="childComponent/modelComponent/componentProperties/componentProperty[@represented][count(componentProperty)=0]">
-      <assert test="string-length(longName)>0">
-        Model Component attribute <value-of select="shortName" /> in Component <value-of select="../../shortName"/> has no longName field.
+    <rule context="cim:childComponent/cim:modelComponent/cim:componentProperties/cim:componentProperty[@represented][count(cim:componentProperty)=0][(count(cim:units)=1) or (count(cim:cfName)=1)]">
+      <assert test="string-length(cim:longName)>0">
+        Model Component attribute <value-of select="cim:shortName" /> in Component <value-of select="../../cim:shortName"/> has no longName field.
       </assert>
-      <assert test="string-length(description)>0">
-        Model Component attribute <value-of select="shortName" /> in Component <value-of select="../../shortName"/> has no description field.
+      <assert test="string-length(cim:description)>0">
+        Model Component attribute <value-of select="cim:shortName" /> in Component <value-of select="../../cim:shortName"/> has no description field.
       </assert>
-      <assert test="string-length(units/@value)>0">
-        Model Component attribute <value-of select="shortName" /> in Component <value-of select="../../shortName"/> has no units specified.
+      <assert test="string-length(cim:units/@value)>0">
+        Model Component attribute <value-of select="cim:shortName" /> in Component <value-of select="../../cim:shortName"/> has no units specified.
       </assert>
     </rule>
   </pattern>
