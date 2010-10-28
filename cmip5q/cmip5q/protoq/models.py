@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -411,7 +412,7 @@ class ResponsibleParty(models.Model):
         s=ET.tostring(elem)
         if s.find('Charlotte')>-1: 
             n='Charlotte Pascoe'
-            c=ResponsibleParty.objects.filter(name=n)
+            c=ResponsibleParty.objects.filter(name=n).order_by('id')
             if len(c)==0:
                 p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
                                 email='Charlotte.Pascoe@stfc.ac.uk')
@@ -419,7 +420,7 @@ class ResponsibleParty(models.Model):
             else: p=c[0]
         elif s.find('Gerard')>1:
             n='Gerard Devine'
-            c=ResponsibleParty.objects.filter(name=n)
+            c=ResponsibleParty.objects.filter(name=n).order_by('id')
             if len(c)==0:
                 p=ResponsibleParty(name=n,abbrev=n,uri=atomuri(),
                                 email='g.m.devine@reading.ac.uk')
@@ -527,7 +528,7 @@ class Component(Doc):
         #if new.isModel: print '2',new.couplinggroup_set.all()
        
         # now handle the references
-        for r in self.references.all():
+        for r in self.references.all().order_by('id'):
             new.references.add(r)
        
         if model is None:
@@ -562,10 +563,10 @@ class Component(Doc):
         ''' Return a coupling set for me, in a simulation or not '''
         if not self.isModel:
             raise ValueError('No couplings for non "Model" components')
-        mygroups=self.couplinggroup_set.all()
+        mygroups=self.couplinggroup_set.all().order_by('id')
         if len(mygroups):
             cg=mygroups.get(simulation=simulation)
-            return Coupling.objects.filter(parent=cg)
+            return Coupling.objects.filter(parent=cg).order_by('id')
         else: return []
         
     def save(self,*args,**kwargs):
@@ -579,7 +580,7 @@ class Component(Doc):
         
     def filterdown(self):
         ''' To filter responsible party details downwards to subcomponents '''
-        for x in self.components.all():
+        for x in self.components.all().order_by('id'):
             x.funder_id=self.funder_id
             x.contact_id=self.contact_id
             x.author_id=self.author_id
@@ -589,7 +590,7 @@ class Component(Doc):
             
     def filterdowngrid(self):
         ''' To filter grid details downwards to subcomponents '''
-        for x in self.components.all():
+        for x in self.components.all().order_by('id'):
             x.grid_id=self.grid_id
             if x.components:
                 x.filterdowngrid()
@@ -645,7 +646,7 @@ def Calendar(elem):
         e=ET.Element(parent)
         e.text=self.name
         return e
-    cv=Term.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes'))
+    cv=Term.objects.filter(vocab=Vocab.objects.get(name='CalendarTypes')).order_by('id')
     try:
         tag=elem[0].tag.split('}')[1]
         r=cv.get(name=tag)
@@ -683,9 +684,13 @@ class Experiment(Doc):
         doc={'description':'description','shortName':'abbrev','longName':'title','rationale':'rationale'}
         for key in doc:
             E.__setattr__(doc[key],getter.get(root,key))
-        
-        #FIXME handle calendars before date
-        #E.rationale=getter.get(root,key)
+
+        # load the calendar type
+        calendarName=root.find("{%s}calendar"%cimv)[0].tag.split('}')[1]
+        vocab=Vocab.objects.get(name="CalendarTypes")
+        term=Term(vocab=vocab,name=calendarName)
+        term.save()
+        E.requiredCalendar=term
        
         # bypass reading all that nasty gmd party stuff ...
         E.metadataMaintainer=ResponsibleParty.fromXML(root.find('{%s}author'%cimv))
@@ -726,7 +731,7 @@ def instantiateNumericalRequirement(experiment,elem):
         ctype=elem.attrib[typekey]
     else: ctype='NumericalRequirement'
     v=Vocab.objects.get(name='NumReqTypes')
-    ctypeVals=Term.objects.filter(vocab=v)
+    ctypeVals=Term.objects.filter(vocab=v).order_by('id')
     try:
         ctype=ctypeVals.get(name=ctype)
     except:
@@ -773,7 +778,7 @@ class RequirementOption(models.Model):
     description=models.TextField(blank=True,null=True) 
     name=models.CharField(max_length=128) 
     def __unicode__(self):    
-        return self.name 
+        return self.description 
     def fromXML(self,elem):
         getter=etTxt(elem)
         name=getter.get(elem,'name')
@@ -930,12 +935,12 @@ class Simulation(Doc):
         #now we need to get all the other stuff related to this simulation
         # every simulation has it's own date range:
         s.duration=self.duration.copy()
-        for mm in self.inputMod.all():s.inputMod.add(mm)
-        for mm in self.codeMod.all():s.codeMod.add(mm)
+        for mm in self.inputMod.all().order_by('id'):s.inputMod.add(mm)
+        for mm in self.codeMod.all().order_by('id'):s.codeMod.add(mm)
         s._resetIO()
         s.save() # I don't think I need to do this ... but to be sure ...
         #couplings:
-        myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self)
+        myCouplings=CouplingGroup.objects.filter(component=self.numericalModel).filter(simulation=self).order_by('id')
         for m in myCouplings:
             r=m.duplicate4sim(s)
         # conformance:
@@ -946,11 +951,11 @@ class Simulation(Doc):
     
     def resetConformances(self):
         ''' We need to set up the conformances or reset them from time to time '''
-        existingConformances=Conformance.objects.filter(simulation=self)
+        existingConformances=Conformance.objects.filter(simulation=self).order_by('id')
         for c in existingConformances:c.delete()
         ctypes=Vocab.objects.get(name='ConformanceTypes')
         defaultConformance=None#Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
-        reqs=self.experiment.requirements.all()
+        reqs=self.experiment.requirements.all().order_by('id')
         for r in reqs:
             c=Conformance(requirement=r,simulation=self, ctype=defaultConformance)
             c.save()
@@ -960,7 +965,7 @@ class Simulation(Doc):
         in the numerical model, but note that updates to existing input couplings in
         numerical models are not propagated to the simuations already made with them. '''
         # first, do we have our own coupling group yet?
-        cgs=self.couplinggroup_set.all()
+        cgs=self.couplinggroup_set.all().order_by('id')
         if len(cgs):
             # we've already got a coupling group, let's update it
             assert len(cgs)==1,'Simulation %s should only have one coupling group'%self
@@ -975,7 +980,7 @@ class Simulation(Doc):
         else:
             # get the model coupling group ... and copy it.
             # it's possible we might be doing this before there is a modelling group
-            mcgs=self.numericalModel.couplinggroup_set.all()
+            mcgs=self.numericalModel.couplinggroup_set.all().order_by('id')
             if len(mcgs)==0: 
                 pass # nothing to do
                 cgs=None # I'm not sure this should ever happen any more ...
@@ -991,7 +996,7 @@ class Simulation(Doc):
         '''We had some couplings, but we need to get rid of them for some reason
         (usually because we've just changed model) '''
         self._resetIO()
-        cgs=self.couplinggroup_set.all()
+        cgs=self.couplinggroup_set.all().order_by('id')
         if len(cgs)<>0:
             assert len(cgs)==1,'Expect only one coupling group for simulation %s'%self
             cg=cgs[0]
@@ -1004,8 +1009,8 @@ class Simulation(Doc):
         ''' create or replace the default datasets for this simulation, usually to be
         called by resetCoupling '''
         # see updateIO for documentation of what we're doing here.
-        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
-        existing=self.datasets.all()
+        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes')).order_by('id')
+        existing=self.datasets.all().order_by('id')
         for e in existing:e.delete4real()
         for itype in itypes:
             d=Dataset(usage=itype)
@@ -1018,9 +1023,9 @@ class Simulation(Doc):
         the files into the datasets associated with this simulation. We
         expect this to be called after a simulation has updated couplings'''
         # first get the list of input types (so these'll be the datasets):
-        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes'))
+        itypes=Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes')).order_by('id')
         # now these are my datasets corresponding to those types (we hope):
-        existing=self.datasets.all()
+        existing=self.datasets.all().order_by('id')
         assert len(existing)==len(itypes),'Unexpected condition (%s,%s)on entry to simulation method updateIO for %s'%(len(existing),len(itypes),self)
         # all my couplings:
         myCouplings=self.numericalModel.couplings(self)
@@ -1030,12 +1035,12 @@ class Simulation(Doc):
             # now restrict our external closures to just those relevant to this dataset
             # we want couplings that are to target inputs which (themselves componentinputs)
             # have attribute ctype equal to itype.
-            theseCouplings=myCouplings.filter(targetInput__ctype=itype)
+            theseCouplings=myCouplings.filter(targetInput__ctype=itype).order_by('id')
             # now get all the external closures in my couplings (aka files)
             # avoid an extra database query to get to the files ...
-            ecset=ExternalClosure.objects.select_related('targetFile').filter(coupling__in=theseCouplings)
+            ecset=ExternalClosure.objects.select_related('targetFile').filter(coupling__in=theseCouplings).order_by('id')
             for e in ecset:
-                if e.targetFile not in d.children.all(): d.children.add(e.targetFile)
+                if e.targetFile not in d.children.all().order_by('id'): d.children.add(e.targetFile)
                 
 class PhysicalProperty(Term):
     units=models.ForeignKey(Term,related_name='property_units')
@@ -1095,7 +1100,7 @@ class OrParam(BaseParam):
     value=models.ManyToManyField(Term)
     vocab=models.ForeignKey(Vocab,blank=True,null=True)
     def __unicode__(self):
-        s='%s:'%self.name+','.join([a for a in self.value.all()])
+        s='%s:'%self.name+','.join([a for a in self.value.all().order_by('id')])
         return s
     def cpattr(self):
         return ['vocab']
@@ -1173,7 +1178,7 @@ class Dataset(Doc):
     # Either the dataset is associated with a simulation or an EnsembleMember, but
     # they know that, the dataset is agnostic
     def __unicode__(self): 
-        return '%s(%s)'%(self.usage,len(self.children.all()))
+        return '%s(%s)'%(self.usage,len(self.children.all().order_by('id')))
 
 class CouplingGroup(models.Model):
     ''' This class is used to help manage the couplings in terms of presentation and
@@ -1194,9 +1199,9 @@ class CouplingGroup(models.Model):
         new=CouplingGroup(**kw)
         new.save()
         #can't do the many to manager above, need to do them one by one
-        for af in self.associatedFiles.all():new.associatedFiles.add(af)
+        for af in self.associatedFiles.all().order_by('id'):new.associatedFiles.add(af)
         # now copy all the individual couplings associated with this group
-        cset=self.coupling_set.all()
+        cset=self.coupling_set.all().order_by('id')
         for c in cset: c.copy(new)
         return new
     def propagateClosures(self):
@@ -1204,7 +1209,7 @@ class CouplingGroup(models.Model):
         model coupling group to a simulation coupling group '''
         if self.original is None:raise ValueError('No original coupling group available')
         #start by finding all the couplings in this coupling set.
-        myset=self.coupling_set.all()
+        myset=self.coupling_set.all().order_by('id')
         for coupling in myset:
             # find all the relevant closures and copy them
             coupling.propagateClosures()          
@@ -1250,7 +1255,7 @@ class Coupling(models.Model):
         ''' Update my closures from an original if it exists '''
         if self.original is None:raise ValueError('No original coupling available')
         for cmodel in [InternalClosure,ExternalClosure]:
-            set=cmodel.objects.filter(coupling=self.original)
+            set=cmodel.objects.filter(coupling=self.original).order_by('id')
             for i in set: i.makeNewCopy(self)
         return '%s updated from %s'%(self,self.original)
     class Meta:
@@ -1309,7 +1314,7 @@ class Ensemble(models.Model):
     def updateMembers(self):
         ''' Make sure we have enough members, this needs to be called if the
         simulation changes it's mind over the number of members '''
-        objects=self.ensemblemember_set.all()
+        objects=self.ensemblemember_set.all().order_by('id')
         n=len(objects)
         nShouldBe=self.simulation.ensembleMembers
         ndif=n-nShouldBe
@@ -1334,7 +1339,9 @@ class Ensemble(models.Model):
             ed.__setattr__(a,self.simulation.__getattribute__(a))
         # is that enough of a shell?
         ed.save()
-        if not self.doc: self.doc=ed
+        if not self.doc :
+            self.doc=ed
+            self.save()
         return ed
     
 class EnsembleMember(models.Model):
@@ -1464,13 +1471,13 @@ class Grid(Doc):
         
         new.topGrid=topGrid
        
-        for c in self.grids.all():
+        for c in self.grids.all().order_by('id'):
             logging.debug('About to add a sub-grid to grid %s (in centre %s, grid %s)'%(new,centre, topGrid))
             r=c.copy(centre,topGrid=topGrid)
             new.grids.add(r)
             logging.debug('Added new grid %s to grid %s (in centre %s, grid %s)'%(r,new,centre, topGrid))
             
-        for p in self.paramGroup.all(): 
+        for p in self.paramGroup.all().order_by('id'): 
             new.paramGroup.add(p.copy())
        
         new.save()        
@@ -1489,6 +1496,45 @@ class DRSOutput(models.Model):
     def __unicode__(self):
 	return '%s/%s/%s/%s/%s/%s/%s/'%(activity,product,institute,model,experiment,frequency,realm)
 
+
+class TestDocs(object):
+    ''' Dummy queryset for test documents'''
+    @staticmethod
+    def getdocs(testdir):
+        myfiles=[]
+        for f in os.listdir(testdir):
+            if f.endswith('.xml'): myfiles.append(TestDocumentSet(testdir,f))
+        return TestDocs(myfiles)
+    def __init__(self,myfiles):
+        self.myfiles=myfiles
+    def order_by(self,arg):
+        ''' Just return the list, which probably has only one entry '''
+        return self.myfiles
+
+class TestDocumentSet(object):
+    ''' This class provides pseudo CIMObjects from files on disk '''
+    class DummyAuthor(object):
+        def __init__(self):
+            self.name='Test Author: Gerry Devine'
+            self.email='g.devine@met.reading.ac.uk'
+    def __init__(self,d,f):
+        ff=os.path.join(d,f)
+        ef=ET.parse(ff)
+        e=ef.getroot()
+        getter=etTxt(e)
+        #basic document stuff for feed
+        doc={'description':'description','shortName':'abbrev','longName':'title',
+             'documentCreationDate':'created','updated':'updated','documentID':'uri'}
+        for key in doc.keys():
+            self.__setattr__(doc[key],getter.get(e,key))
+        self.fname=f
+        self.cimtype='DocumentSet'
+        self.author=self.DummyAuthor()
+        if self.created=='':self.created=datetime.now()
+        if self.updated=='':self.updated=datetime.now()
+    def get_absolute_url(self):
+        return reverse('cmip5q.protoq.views.testFile',args=(self.fname,))
+
 class DocFeed(Feed):
     ''' This is the atom feed for xml documents available from the questionnaire '''
     # See http://code.google.com/p/django-atompub/wiki/UserGuide
@@ -1497,7 +1543,8 @@ class DocFeed(Feed):
            'component':CIMObject.objects.filter(cimtype='component'),
            'experiment':CIMObject.objects.filter(cimtype='experiment'),
            'files':CIMObject.objects.filter(cimtype='dataContainer'),
-           'all':CIMObject.objects.all()}
+           'all':CIMObject.objects.all(),
+           'test':TestDocs.getdocs(settings.TESTDIR)}
     def _mydomain(self):
         # the request object has been passed to the constructor for the Feed base class,
         # so we have access to the protocol, port, etc

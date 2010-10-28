@@ -13,13 +13,13 @@ CENTRES=(
              ('MRI','Japanese Meteorological Institute',('MRI-CGM3','MRI-ESM1','MRI-AM20km','MRI-AM60km')),
              ('MIROC','University of Tokyo, National Institute for Environmental Studies, and Japan Agency for Marine-Earth Science and Technology',('MIROC4.2(M)','(MIRO4.2(H)','MIROC3.2(M)','MIROC-ESM')),
              ('INM','Russian Institute for Numerical Mathematics',('INMCM4.0')),
-             ('NIMR','Korean Naitonal Institute for Meteorological Research',('HadGEM2-AO')),
+             ('NIMR','Korean National Institute for Meteorological Research',('HadGEM2-AO')),
              ('LASG','Institute of Atmospheric Physics, Chinese Academy of Sciences	China',
                      ('FGOALS-S2.0','FGOALS-G2.0','FGOALS-gl')),
              ('QCCCE-CSIRO','Queensland Climate Change Centre of Excellence and Commonwealth Scientific and Industrial Research Organisation',('CSIRO-Mk3.5A')),
-             ('CNRM/CERFACS','...',('CNRM-CM5')),
+             ('CNRM/CERFACS','Centre National de Recherches Meteorologiques / Centre Europeen de Recherche et de Formation Avancee en Calcul Scientifique',('CNRM-CM5')),
              ('CCCMA','Canadian Centre for Climate Modelling and Analysis',('CanESM2')),
-             ('CAWCR','...	Australia',('ACCESS',)),
+             ('CAWCR','Centre for Australian Weather and Climate Research',('ACCESS',)),
              ('CMA-BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM')),
              ('2. Test Centre','Test area',('dum')),
              ('EC-Earth','Europe',('EC-Earth'))
@@ -28,6 +28,7 @@ def loadCentres():
     for centre in CENTRES:
         u=str(uuid.uuid1())
         c=Centre(abbrev=centre[0],name=centre[1],uri=u)
+        c.isOrganisation=True
         c.save()
         #and give each of them an unknown user to play with
         rp=ResponsibleParty(name='Unknown',abbrev='Unknown',address='Erehwon',email='u@foo.bar',

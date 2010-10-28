@@ -18,7 +18,7 @@ from initialiseVars import *
 initialise()
 
 # load cmip5 input files
-initialiseFiles()
+#initialiseFiles()
 
 # load variables associated with cmip5 input files
 initialiseVars()

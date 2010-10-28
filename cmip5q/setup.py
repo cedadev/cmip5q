@@ -43,7 +43,7 @@ Security and should be modified to suit
 
 setup(
     name =                   'cmip5q',
-    version =                '1.1.1',
+    version =                '1.0.0',
     description =            'CMIP5 Questionnaire',
     long_description =       _longDescription,
     author =                 'Bryan Lawrence',
@@ -58,7 +58,7 @@ setup(
         'cmip5q': [
             '000Issues', 'LICENSE', 'loadmm', '*.xml', 
             'data/experiment/*.xml', 'data/model/*.xml', 
-            'setupProto.sh'
+            'setupProto.sh','vocabs/*.xml'
         ],
         'cmip5q.test.data': ['*'], 
         'cmip5q.test.integration.wsgi.paste': ['README', '*.ini'],

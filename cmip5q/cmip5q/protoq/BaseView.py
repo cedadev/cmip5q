@@ -243,7 +243,8 @@ class BaseViewHandler:
         class AssignForm(forms.Form):
             ''' Used for producing a form for selection of multiple choices '''
             choose=forms.MultipleChoiceField(choices=data,
-                          widget=forms.CheckboxSelectMultiple())
+                          widget=forms.CheckboxSelectMultiple(), required=False)  
+            
         class AssignOneForm(forms.Form):
             ''' Used for selecting just one option from a list '''
             choose=forms.ChoiceField(choices=data)

@@ -1,63 +1,119 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="boxer">
-<h1> Tell us how you delivered the {% if not s %} default {% endif %} inputs to "{{c.abbrev}}"
-  {% if s %} for simulation "{{s}}" {% endif %}
-</h1>
-<p>
-{% if s%}This is where you tell us about any changes to the model input settings that were made for <em>this</em> simulation.
-{% else %} This is where you tell about <em> default</em> model input settings.
-{% endif %}</p>
+	<h1>
+	{% if s %}Simulation Inputs: Tell us how you delivered inputs to 
+	{% else %}Default Inputs: Tell us how you delivered the default inputs to 
+	{% endif %}  
+	"{{c.abbrev}}"
+	{% if s %} for simulation "{{s}}" {% endif %}
+	</h1>
+	<p>
+	{% if s%}
+		This is where you tell us about significant changes to the model input settings that were made for <em>this</em> simulation.
+		<p class="red">It is NOT necessary to tell us about all inputs associated with this simulation, only those you consider important! </p>
+	{% else %}
+		This is where you tell us about <em>default</em> model input settings that are common to all runs of this model.
+		<p class="red"> It is NOT necessary to tell us about all inputs delivered to the model, only those you consider important! </p>
+	{% endif %}
+	</p>
 </div>
 <div class="boxer">
-    <p> On previous pages we have asked you to describe the inputs <em> required </em> by the various components in your model. 
-    On this page we want you to describe {% if not s %} the <em> default</em> {% endif %} method by which 
-    those <em> requirements </em> {% if s %} were {% else %} are {% endif %} resolved; that is, which external or internal
-    information {% if s %} was {% else %} is {% endif %} <em> bound </em> to those input requirements.</p>
+    <p> On previous pages we have asked you to describe 
+	{% if s%} important inputs required by various components in your model.  
+	{% else %} some of the default inputs required by various components in your model.
+	{% endif %} <br>
+    On this page we want you to describe the method by which those inputs
+	{% if s %} were resolved for this simulation;
+	{% else %} are resolved;
+	{% endif %} 
+	that is, which external or internal information
+    {% if s %} was 
+	{% else %} is 
+	{% endif %} 
+	<em> bound </em> to those inputs.</p>
     
-    <p class="red"> {% if not s %}  We will ask you these questions again on a simulation by simulation basis, this page
-    is for declaring the <em> default </em> input bindings, you will get an opportunity to override some or all of 
-    this information when you describe the simulations. You do not need to fill out any (or even all) of these entries
-    at this time, but if you are reusing this model with each simulation having minor changes to the inputs, it will be easier 
-    to enter the defaults now!{% else %}
-    If you have resolved some (or all) of your inputs when you entered the model description, then you can copy them using the button below ... but only do
-    that if you have not already made changes for <em> this </em> simulation.
-    {% endif %} </p>
+    <p class="red"> 
+	{% if not s %}  
+		We will ask you these questions again on a simulation by simulation basis, this page
+		is for declaring the <em> default </em> input bindings, you will get an opportunity to override some or all of 
+		this information when you describe the simulations. You do not need to fill out any (or even all) of these entries
+		at this time, but if you are reusing this model with each simulation having minor changes to the inputs, it will be easier 
+		to enter default descriptions now!
+	{% else %}
+		If you resolved some (or all) of the default inputs when you described your model, 
+		then you can copy them onto this form using the "(RE)SET" button below. <br>
+		Using (RE)SET will overwrite any simulation specific input bindings	with default settings, so use with caution!
+    {% endif %} 
+	</p>
     
-    <p> There is one entry for each input requirement you declared in your model component description. It may be you need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, so you can describe them here. </p>
+    <p> 
+	There is one entry for each input requirement that you declared in your model description. 
+	You may need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, 
+	so you can describe them here. 
+	</p>
     
-    <p> The level of detail to input is up to you, but obviously the scientific interpretation of the simulation results is significantly enhanced if one knows how the various model components are coupled to each other and to external files. Note that simulation descriptions will not validate as complete unless all declared input requirements are "resolved".</p>
+    <p> 
+	The level of detail to input is up to you, but obviously the scientific interpretation of the simulation results is 
+	significantly enhanced if one knows how the various model components are coupled to each other and coupled to external data. 
+	Note that simulation descriptions will not validate as complete unless all declared input requirements are "resolved".
+	</p>
 </div>
-    <div class="boxer">
+<div class="boxer">
     <h4> Input Binding</h4>
+	{% if Intform.FormError %} 
+	<p class="red"> Your form has not been saved. An error has occurred. Please correct the error below. </p> 
+	{% endif %}
     {% if Intform.forms|length %}
-    {% if Intform.FormError %} <p class="red"> You form has not been saved. An error has occurred. Please correct error below. </p> {% endif %}
     <div class="boxer2">
-    {% if s %}
-    <div class="boxer">
-    <table>
-    <tr><td><p>You may have entered some or all of this information while describing your model. Use this button to SET or RESET the values for this simulation from your model definition.<br/>
-    <span class="red">Do not use this button if you have already filled in information below that you don't want to lose. </p></td><td align="right"><form action={{urls.reset}} method="POST">
-    <input id="ResetBut" type="submit" value="(RE)SET"></form></td></tr></table>
+		{% if s %}
+			<div class="boxer">
+				<table>
+				<tr>
+				<td>
+				<p>
+				You may have entered some or all of this information while describing your model. 
+				Use this button to SET or RESET the values for this simulation from your model definition.<br/>
+				<span class="red">Do not use the RESET button if you have filled in information below that you don't want to lose.
+				</p>
+				</td>
+				<td align="right"><form action={{urls.reset}} method="POST"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>
+				</tr>
+				</table>
+			</div>
+		{% else %} 
+			<div class="boxer">
+				<p class="red"> 
+				You need to add input requirements to your model description before we can ask questions about how the inputs are coupled 
+				to other components or coupled to external data (files).
+				</p> 
+			</div>
+		{% endif %}
+	{% endif %}
+		
+	<form action="{{urls.ok}}" method="POST">
+		{% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}
+		<center><input id="InternalBut" type="submit" value="Save"></center>
+	</form>
     </div>
-    {% endif %}
-    <form action="{{urls.ok}}" method="POST">
-    {% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}
-    <center><input id="InternalBut" type="submit" value="Save"></center>
-    </form>
-    </div>
-    {% else %} <p class="red"> You need to enter inputs in your components before
-    we can ask questions about how those inputs are coupled to files (or other components).</p> {% endif %}
-    </div>
+</div>
 <div class="boxer">
-   
-    <p> Back: <a id="returnBut" href="{{urls.return}}">Return to {{urls.returnName}} {% if s %} {{s}} {% else %} {{c}} {% endif %} </a>&nbsp;&nbsp;&nbsp;Next: Simulation specific <a id="nextBut" href="{{urls.nextURL}}">Model Mods</a></p>
+	<p> 
+	Back: <a id="returnBut" href="{{urls.return}}">Return to {{urls.returnName}} 
+	{% if s %} {{s}} 
+	{% else %} {{c}} 
+	{% endif %} 
+	</a>&nbsp;&nbsp;&nbsp;
+	{% if s %}
+	Next: Simulation specific <a id="nextBut" href="{{urls.nextURL}}">Model Mods</a>
+	{% endif %}
+	</p>
 </div>
 <script type="text/javascript">
-    var InternalBut = new YAHOO.widget.Button("InternalBut",
+var InternalBut = new YAHOO.widget.Button("InternalBut",
                                   {value:"InternalButvalue"});  
-    var ReturnBut = new YAHOO.widget.Button("returnBut");
-    var ResetBut = new YAHOO.widget.Button("resetBut");
-    var NextBut = new  YAHOO.widget.Button("nextBut");
-        </script>
-{% endblock%} 
+var ReturnBut = new YAHOO.widget.Button("returnBut");
+var ResetBut = new YAHOO.widget.Button("resetBut");
+var NextBut = new  YAHOO.widget.Button("nextBut");
+</script>
+{% endblock%}

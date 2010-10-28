@@ -98,6 +98,12 @@ def exportFiles(request,cen_id):
     objects=DataContainer.objects.filter(centre__id=cen_id)
     return render_badrequest('error.html',{'message':'Sorry not completely implemented'})
 
+def testFile(request,fname):
+    ''' This method returns a file from the test directory '''
+    filename=os.path.join(settings.TESTDIR,fname)
+    f=open(filename)
+    return HttpResponse(f.read(),mimetype='application/xml')
+
 def index(request):
     #find all the centre objects
     centre_list=Centre.objects.all()
@@ -590,4 +596,5 @@ def assign(request,cen_id,resourceType,targetType,target_id):
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 
+ 
     

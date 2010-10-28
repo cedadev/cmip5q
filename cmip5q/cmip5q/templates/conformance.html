@@ -9,7 +9,7 @@
 your simulation. There is a drop down list which gives you a choice between: <br/>
 (1) Not being conformant, (2) Your standard model configuration is conformant (3) You use
 a combination of changes to the model code and inputs, (4) you only change inputs (boundary
-conditions, ancillary files etc), or (5) you only changed the code. (It is possible for someone to satisfya a boundary condition requirement change by changing the code ...). We'd also like to know
+conditions, ancillary files etc), or (5) you only changed the code. (It is possible for someone to satisfy a boundary condition requirement change by changing the code ...). We'd also like to know
 anything else you think might be relevant to how your simulation conformed to the model - which you can
 enter in the text boxes.
 </p>
@@ -28,7 +28,9 @@ enter in the text boxes.
                 <td>How this simulation conformed: {{form.ctype.errors}} {{form.ctype}}</td>
             </tr>
             <tr class="{% cycle 'row1' 'row2'%}">
-                <td>{% if form.showOptions %}Requirement Option: {{form.option}} {% endif %}</td>
+                <td>
+				{% if form.showOptions %} Choose the "OR" requirement that applies to this simulation<br>
+				{{form.option}} {% endif %}</td>
                 <td> Notes: {{form.description.errors}}{{form.description}}</td>
                 <td></td>
             </tr>

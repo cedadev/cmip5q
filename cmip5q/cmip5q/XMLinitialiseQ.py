@@ -110,7 +110,7 @@ def loadProperties(args):
 def reloadVocab(key):
     ''' Used to reset vocabulariews '''
     vocab=Vocab.objects.get(name=key)
-    for v in Term.objects.filter(vocab=vocab):
+    for v in Term.objects.filter(vocab=vocab).order_by('id'):
         v.delete()
     vocab.delete()
     loadvocab(key)

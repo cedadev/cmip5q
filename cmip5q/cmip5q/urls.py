@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.conf import settings
 
@@ -124,6 +125,7 @@ urlpatterns = patterns('',
             
     # export files to CMIP5
     (r'^cmip5/(?P<cen_id>\d+)/exportFiles/$','cmip5q.protoq.views.exportFiles'), 
+    (r'^cmip5/testFile/(?P<fname>.+)$','cmip5q.protoq.views.testFile'),
         
             # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

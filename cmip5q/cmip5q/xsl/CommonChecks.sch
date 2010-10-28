@@ -8,8 +8,11 @@
       <assert test="string-length(shortName) > 0">
         Each leaf <name /> must possess a non-empty shortName element.
       </assert>
-    </rule>
-    <rule context="//documentAuthor[@citationContact]" >
+       <assert test="string-length(value) > 0">
+        Each leaf <name /> <value-of select="shortName" /> must possess a non-empty value element.
+      </assert>
+   </rule>
+   <rule context="//documentAuthor[@citationContact]" >
       <assert test="contains(gmd:CI_ResponsibleParty/gmd:electronicMailAddress/gco:CharacterString, '@')">
         Each citation contact author must have an email address specified.
       </assert>
@@ -46,9 +49,9 @@
     </rule>
   </pattern>
   <pattern name="Model initial condition inputs requirements">
-<!--    <rule context="cim:childComponent/cim:modelComponent/cim:componentProperties/cim:componentProperty[@represented][count(cim:componentProperty)=0][(count(cim:units)=1) or (count(cim:cfName)=1)]"> -->
+<!--    <rule context="childComponent/modelComponent/componentProperties/componentProperty[@represented][count(componentProperty)=0][(count(units)=1) or (count(cfName)=1)]"> -->
     <rule context="childComponent/modelComponent/componentProperties/componentProperty[@represented][count(componentProperty)=0][shortName=(//conformance/source/reference/name)]" >
-<!--      <assert test="cim:childComponent/cim:modelComponent/cim:componentProperties/cim:componentProperty[@represented][count(cim        :componentProperty)=0][cim:shortName=current() " >
+<!--      <assert test="childComponent/modelComponent/componentProperties/componentProperty[@represented][count(cim        :componentProperty)=0][shortName=current() " >
       </assert> 
     </rule> -->
       <assert test="string-length(longName)>0">
@@ -205,51 +208,51 @@
 
   </pattern>
   <pattern name="Model component AerosolKeyProperties constraints">
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolKeyProperties']]/cim:componentProperties/cim:componentProperty[cim:shortName='AerosolTimeStepFramework']/cim:componentProperty[cim:shortName='Method']">
-      <assert test="not ( (cim:value='specific time stepping (operator splitting)') and (string-length(../cim:componentProperty[cim:shortName='AdvectionTimeStep']/cim:value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (operator splitting), a value must be specified for AdvectionTimeStep</assert>
-      <assert test="not ( (cim:value='specific time stepping (operator splitting)') and (string-length(../cim:componentProperty[cim:shortName='PhysicalTimeStep']/cim:value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (operator splitting), a value must be specified for PhysicalTimeStep</assert>
-      <assert test="not ( (cim:value='specific time stepping (integrated)') and (string-length(../cim:componentProperty[cim:shortName='TimeStep']/cim:value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (integrated), a value must be specified for TimeStep</assert>
-      <assert test="not ( (cim:value='specific time stepping (integrated)') and (string-length(../cim:componentProperty[cim:shortName='SchemeType']/cim:value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (integrated), a value must be specified for SchemeType</assert>
+    <rule context="//modelComponent[type[@value='AerosolKeyProperties']]/componentProperties/componentProperty[shortName='AerosolTimeStepFramework']/componentProperty[shortName='Method']">
+      <assert test="not ( (value='specific time stepping (operator splitting)') and (string-length(../componentProperty[shortName='AdvectionTimeStep']/value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (operator splitting), a value must be specified for AdvectionTimeStep</assert>
+      <assert test="not ( (value='specific time stepping (operator splitting)') and (string-length(../componentProperty[shortName='PhysicalTimeStep']/value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (operator splitting), a value must be specified for PhysicalTimeStep</assert>
+      <assert test="not ( (value='specific time stepping (integrated)') and (string-length(../componentProperty[shortName='TimeStep']/value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (integrated), a value must be specified for TimeStep</assert>
+      <assert test="not ( (value='specific time stepping (integrated)') and (string-length(../componentProperty[shortName='SchemeType']/value)=0) )">Model component AerosolKeyProperties, Parameter AerosolTimeStepFramework: Where Method is specific time stepping (integrated), a value must be specified for SchemeType</assert>
     </rule>
   </pattern>
   <pattern name="Model component AerosolTransport constraints">
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolTransport']]/cim:componentProperties/cim:componentProperty[cim:shortName='General Attributes']/cim:componentProperty[cim:shortName='Method']">
-      <assert test="not ( (cim:value='specific transport scheme') and (string-length(../cim:componentProperty[cim:shortName='SchemeType']/cim:value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for SchemeType</assert>
-      <assert test="not ( (cim:value='specific transport scheme') and (string-length(../cim:componentProperty[cim:shortName='MassConservation']/cim:value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for MassConservation</assert>
-      <assert test="not ( (cim:value='specific transport scheme') and (string-length(../cim:componentProperty[cim:shortName='Convection']/cim:value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for Convection</assert>
+    <rule context="//modelComponent[type[@value='AerosolTransport']]/componentProperties/componentProperty[shortName='General Attributes']/componentProperty[shortName='Method']">
+      <assert test="not ( (value='specific transport scheme') and (string-length(../componentProperty[shortName='SchemeType']/value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for SchemeType</assert>
+      <assert test="not ( (value='specific transport scheme') and (string-length(../componentProperty[shortName='MassConservation']/value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for MassConservation</assert>
+      <assert test="not ( (value='specific transport scheme') and (string-length(../componentProperty[shortName='Convection']/value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for Convection</assert>
     </rule>
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolTransport']]/cim:componentProperties/cim:componentProperty[cim:shortName='Turbulence']/cim:componentProperty[cim:shortName='Method']">
-      <assert test="not ( (cim:value='specific turbulence scheme') and (string-length(../cim:componentProperty[cim:shortName='Scheme']/cim:value)=0) )">Model component AerosolTransport, Parameter Turbulence: Where Method is specific turbulence scheme, a value must be specified for Scheme</assert>
+    <rule context="//modelComponent[type[@value='AerosolTransport']]/componentProperties/componentProperty[shortName='Turbulence']/componentProperty[shortName='Method']">
+      <assert test="not ( (value='specific turbulence scheme') and (string-length(../componentProperty[shortName='Scheme']/value)=0) )">Model component AerosolTransport, Parameter Turbulence: Where Method is specific turbulence scheme, a value must be specified for Scheme</assert>
     </rule>
   </pattern>
   <pattern name="Model component AerosolEmissionAndConc constraints">
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolEmissionAndConc']]/cim:componentProperties/cim:componentProperty[cim:shortName='2D-Emissions']/cim:componentProperty[cim:shortName='Method']">
-      <assert test="not ( (cim:value='prescribed (climatology)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (climatology)ClimatologyType']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
-      <assert test="not ( (cim:value='prescribed (climatology)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (climatology)SpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='prescribed (spatially uniform)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (spatially uniform)SpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='interactive') and (string-length(../cim:componentProperty[cim:shortName='interactiveSpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherMethodCharacteristics']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherSpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
+    <rule context="//modelComponent[type[@value='AerosolEmissionAndConc']]/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method']">
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)ClimatologyType']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='interactiveSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherMethodCharacteristics']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
     </rule>
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolEmissionAndConc']]/cim:componentProperties/cim:componentProperty[cim:shortName='3D-Emissions']/cim:componentProperty[cim:shortName='Method']">
-      <assert test="not ( (cim:value='prescribed (climatology)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (climatology)ClimatologyType']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
-      <assert test="not ( (cim:value='prescribed (climatology)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (climatology)SpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='prescribed (spatially uniform)') and (string-length(../cim:componentProperty[cim:shortName='prescribed (spatially uniform)SpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='interactive') and (string-length(../cim:componentProperty[cim:shortName='interactiveSpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherMethodCharacteristics']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherSpeciesEmitted']/cim:value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
+    <rule context="//modelComponent[type[@value='AerosolEmissionAndConc']]/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method']">
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)ClimatologyType']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='interactiveSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherMethodCharacteristics']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
     </rule>
   </pattern>
   <pattern name="Model component AerosolModel constraints">
-    <rule context="//cim:modelComponent[cim:type[@value='AerosolModel']]/cim:componentProperties/cim:componentProperty[cim:shortName='AerosolScheme']/cim:componentProperty[cim:shortName='SchemeType']">
-      <assert test="not ( (cim:value='bulk') and (string-length(../cim:componentProperty[cim:shortName='bulkSpecies']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bulk, a value must be specified for Species</assert>
-      <assert test="not ( (cim:value='modal') and (string-length(../cim:componentProperty[cim:shortName='modalFramework']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has modal, a value must be specified for Framework</assert>
-      <assert test="not ( (cim:value='modal') and (string-length(../cim:componentProperty[cim:shortName='modalSpecies']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has modal, a value must be specified for Species</assert>
-      <assert test="not ( (cim:value='bin') and (string-length(../cim:componentProperty[cim:shortName='binFramework']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bin, a value must be specified for Framework</assert>
-      <assert test="not ( (cim:value='bin') and (string-length(../cim:componentProperty[cim:shortName='binSpecies']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bin, a value must be specified for Species</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherSchemeType']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for SchemeType</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherFramework']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for Framework</assert>
-      <assert test="not ( (cim:value='other') and (string-length(../cim:componentProperty[cim:shortName='otherSpecies']/cim:value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for Species</assert>
+    <rule context="//modelComponent[type[@value='AerosolModel']]/componentProperties/componentProperty[shortName='AerosolScheme']/componentProperty[shortName='SchemeType']">
+      <assert test="not ( (value='bulk') and (string-length(../componentProperty[shortName='bulkSpecies']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bulk, a value must be specified for Species</assert>
+      <assert test="not ( (value='modal') and (string-length(../componentProperty[shortName='modalFramework']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has modal, a value must be specified for Framework</assert>
+      <assert test="not ( (value='modal') and (string-length(../componentProperty[shortName='modalSpecies']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has modal, a value must be specified for Species</assert>
+      <assert test="not ( (value='bin') and (string-length(../componentProperty[shortName='binFramework']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bin, a value must be specified for Framework</assert>
+      <assert test="not ( (value='bin') and (string-length(../componentProperty[shortName='binSpecies']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has bin, a value must be specified for Species</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSchemeType']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for SchemeType</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherFramework']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for Framework</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSpecies']/value)=0) )">Model component AerosolModel, Parameter AerosolScheme: Where SchemeType has other, a value must be specified for Species</assert>
     </rule>
   </pattern>
 

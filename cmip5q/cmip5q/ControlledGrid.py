@@ -21,7 +21,7 @@ def initialiseGrid():
     try:
         c=Centre.objects.get(abbrev='CMIP5')
     except:
-        cl=Centre.objects.all()
+        cl=Centre.objects.all().order_by('id')
         logging.debug('Unable to read dummy CMIP5 centre description, existing centres are %s'%cl)
         return False
     m=NumericalGrid(c,xml=True)
@@ -106,7 +106,8 @@ class NumericalGrid:
         for m in mindmaps:
             x=XMLVocabReader(m, self.top)
             x.doParse()
-            self.top.grids.add(x.component)
+            #self.top.grids.add(x.component)
+            self.top=x.component
             logging.debug('Mindmap %s added with grid id %s'%(m,x.component.id))
         
         self.top.save()
@@ -127,7 +128,7 @@ class XMLVocabReader:
         logging.info("New component: %s for grid %s"%(first.attrib['name'],self.grid))
         # Initiate new top-level component in django:
         modelParser = ComponentParser(first, self.grid)
-        self.component=modelParser.add(True)
+        self.component=modelParser.add(True,True)
         self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s). CMIP5 Questionnaire Version alpha10.'%(
         self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
         self.root.attrib['mmlcrevision'])
@@ -234,7 +235,7 @@ class ComponentParser:
         logging.info('Added component input %s for %s in %s'%(paramName,cg,pg))
         return cg
                
-    def add(self, doSubs):
+    def add(self, doSubs, isTop):
         u=atomuri()
         # add spaces before any capital letters to make the tree formatting look nicer
         name=self.item.attrib['name']
@@ -250,17 +251,20 @@ class ComponentParser:
         if len(nameWithSpaces)> 29: 
             logging.debug('TOOLONG: name %s will be abbreviated'%nameWithSpaces)
             nameWithSpaces=nameWithSpaces[0:29]
-        grid = Grid(title='',
-                abbrev=nameWithSpaces,
-                uri=u,
-                centre=self.grid.centre,
-                contact=self.grid.contact,
-                author=self.grid.author,
-                funder=self.grid.funder)
-        grid.save() # we need a primary key value so we can add subcomponents later
-        self.grid=grid # used to assign parameters ...
+        if isTop <> True:
+            grid = Grid(title='',
+                    abbrev=nameWithSpaces,
+                    uri=u,
+                    centre=self.grid.centre,
+                    contact=self.grid.contact,
+                    author=self.grid.author,
+                    funder=self.grid.funder)
+            grid.save() # we need a primary key value so we can add subcomponents later
+            self.grid=grid # used to assign parameters ...
         
-        logging.debug('Handling Grid %s'%(grid.abbrev))
+            logging.debug('Handling Grid %s'%(grid.abbrev))
+        else:
+            grid=self.grid
 
             
         if doSubs:
@@ -270,11 +274,11 @@ class ComponentParser:
                     logging.debug("Found child : %s"%subchild.tag)
                     subComponentParser = ComponentParser(subchild, self.grid)
                     # Handle child components of this one (True = recursive)
-                    child=subComponentParser.add(True)
+                    child=subComponentParser.add(True, False)
                     logging.debug("Adding sub-component %s to K %s"%(child.abbrev, grid.abbrev))
                     grid.grids.add(child)
                 elif subchild.tag == 'parametergroup': 
-                    self.__handleParamGrp(subchild)
+                    self.__handleParamGrp(subchild)                    
                 elif subchild.tag == 'parameter':
                     print logging.info('OOOOOOOPPPPPPs')
                     self.__handleParam(subchild)

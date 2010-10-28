@@ -24,7 +24,7 @@ def initialiseModel():
     try:
         c=Centre.objects.get(abbrev='CMIP5')
     except:
-        cl=Centre.objects.all()
+        cl=Centre.objects.all().order_by('id')
         logging.debug('Unable to read dummy CMIP5 centre description, existing centres are %s'%cl)
         return False
     m=NumericalModel(c,xml=True)
@@ -339,7 +339,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(True,c.isModel)
         self.assertEqual(False,c.isRealm)
         
-        for c in nm.top.components.all():
+        for c in nm.top.components.all().order_by('id'):
             self.assertEqual(True,c.scienceType in Realms)
             self.assertEqual(True,c.isRealm)
             self.assertEqual(False,c.isModel)
@@ -358,8 +358,8 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(str(model.title),str(copy.title))
         self.assertEqual(str(model.model),str(copy.model))
             
-        originalRealms=model.components.all()
-        copyRealms=copy.components.all()
+        originalRealms=model.components.all().order_by('id')
+        copyRealms=copy.components.all().order_by('id')
         
         for i in range(len(originalRealms)):
             self.assertEqual(str(originalRealms[i].abbrev),str(copyRealms[i].abbrev))

@@ -53,7 +53,11 @@
     <form action="{{urls.form}}" method='post'>
         <div class="boxer">    
             <table>
+            	{% if isModel %}
                 <tr><td class="inputH1">Short Name*:&nbsp;{{cform.abbrev.errors}}</td>
+                {% else %}
+                <tr><td class="inputH1">Short Name:&nbsp;{{cform.abbrev.errors}}</td>
+                {% endif %}
                 <td colspan="4">
                   {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
                 </td>
@@ -61,7 +65,7 @@
                 
                 {% if isModel %}
             	<tr>
-            	<td colspan="4">*Short Name must match the model name used in the output files</td>
+            	<td colspan="4">*The short name must match the official model name chosen for cmip5</td>
             	</tr>
                 {% endif %}
                 
@@ -107,14 +111,20 @@
         </div>
         {% endif %}
         <div class="boxer">
-        <h4> Component Attributes </h4>
-        	{% if isParamGroup or isModel%}
-        		<p> In this section enter the attributes associated with this component</p>
-            {% else %}
-	            <p> In this section enter the grid and other parameters and attributes associated with this 
-	            {% if c.isModel %} model {% endif %}{% if c.isRealm %} realm {% endif %}
-	            {% if not c.isModel %} component {% endif %}.</p>
-        	{% endif %}
+			{% if isParamGroup %}
+				<h4> Component Attributes </h4>
+				<p> In this section enter parameters and attributes associated with this component</p>
+			{% endif %}
+            {% if isModel %}
+				<h4> Model Attributes </h4>
+				<p> In this section enter parameters and attributes associated with this model</p>
+			{% endif %}
+			{% if isRealm %}
+			<h4> Realm Attributes </h4>
+	        <p> In this section select a grid and enter parameters and attributes associated with this 
+	        {% if c.isModel %} model {% endif %}{% if c.isRealm %} realm {% endif %}
+	        {% if not c.isModel %} component {% endif %}</p>
+			{% endif %}
         	
         	
         	{% if isParamGroup %}

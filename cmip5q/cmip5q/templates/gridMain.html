@@ -15,7 +15,7 @@
 {% block leftcolumn %}
     <div class="boxer">
         <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
-        <div class="boxer"><h4> Available Grids </h4><div id="treeDiv"> {{navtree|safe}}</div>
+        <div class="boxer"><h4> Grid Structure </h4><div id="treeDiv"> {{navtree|safe}}</div>
         <h4>Grid {{c.abbrev}}</h4>
     </div>
     <div class="boxer"> 
@@ -37,24 +37,46 @@
                   		{{cform.abbrev}}
                 	</td>
                 </tr>
-                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr>                 
+                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr>
+                <tr></tr>               
             </table>
-            <!-- Following is hidden -->
-            {{cform.controlled}} 
         </div>
         
-        <div class="boxer">
-        <h4> Grid Attributes </h4>
-            <p> In this section enter parameters and attributes associated with this grid.</p>
-            {% include 'attributeform.html' %}
-        </div>
-       
+         {% if c.istopGrid %}
+	         <div style="display:none">
+	     {% else %}
+	         <div class="boxer">
+	     {% endif %}
+	      
+	          <h4> Grid Attributes </h4>
+	          <p> In this section enter parameters and attributes associated with this grid.  <br>
+					We will ask for generic information 
+					but you can also tell us about additional parameters and attributes that are specific to your grid.</p>
+		
+	       	  {% include 'attributeform.html' %}
+	      
+	       	</div>
+      
+	      
+        
         <div class="boxer"> 
-            <h4> Additional Information</h4>
-            <center>
-            <p class="guidance">Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
-            <p>{{cform.description}}</p> 
-            </center> 
+        
+        	{% if c.istopGrid %}
+        		 <h4> Description</h4>
+            	<center>
+            	<p class="guidance">Please provide a description for this grid.</p>
+            	<p>{{cform.description}}</p> 
+            	</center> 
+        	
+        	{% else %}
+        	
+	            <h4> Additional Information</h4>
+	            <center>
+	            <p class="guidance">Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
+	            <p>{{cform.description}}</p> 
+	            </center> 
+        	{% endif %}
+           
         </div>
         <center><input id="updateButton1" type="submit" value="Save"/>
         </center>

@@ -35,7 +35,12 @@
         {% endfor %}
     </script>
     {% if forloop.last %}
-    <p>You can enter {% if cg.forms|length %} additional {% endif %} attributes or parameters here if you wish (to enter more than one, you need to save them one at a time - using the button below - to get new blank entry forms).</p>
+    <p>Use the <b>Name</b> and <b>Value</b> boxes to enter 
+	{% if cg.forms|length %} an additional 
+	{% else %} a
+	{% endif %} 
+	parameter or attribute and it's value. 
+	The "Save" button below will generate entry boxes for another parameter/attribute.</p>
     <table>
     {{ cg.userforms.management_form }}
     <tr><th>Name</th><th>Value</th></tr>

@@ -30,7 +30,6 @@ class ConformanceForm(forms.ModelForm):
     class Meta:
         model=Conformance
         exclude=('simulation')
-        #exclude=('simulation','requirementOption') # sim: we know it, reqopt: not ready for it
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
