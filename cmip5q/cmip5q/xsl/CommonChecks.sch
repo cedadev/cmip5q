@@ -1,4 +1,4 @@
-<!-- vi:set number filetype=xml: -->
+<!-- vi:set filetype=xml: -->
 <schema xmlns="http://www.ascc.net/xml/schematron" >
  <ns prefix="cim" uri="http://www.metaforclimate.eu/schema/cim/1.5" />
  <ns prefix="gmd" uri="http://www.isotc211.org/2005/gmd" />
@@ -15,6 +15,11 @@
    <rule context="//documentAuthor[@citationContact]" >
       <assert test="contains(gmd:CI_ResponsibleParty/gmd:electronicMailAddress/gco:CharacterString, '@')">
         Each citation contact author must have an email address specified.
+      </assert>
+    </rule>
+    <rule context="//simulationRun/responsibleParty" >
+      <assert test="contains(gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString, '@')">
+        Each simulation contact must have an email address specified.
       </assert>
     </rule>
     <rule context="//ensembleMember" >
