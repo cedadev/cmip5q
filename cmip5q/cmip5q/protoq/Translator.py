@@ -81,8 +81,8 @@ class Translator:
         ET.SubElement(titleRow,'td').text='Options'
         ET.SubElement(titleRow,'td').text='Value'
 
-        for pg in c.paramGroup.all():
-            constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+        for pg in c.paramGroup.all().order_by('id'):
+            constraintSet=ConstraintGroup.objects.filter(parentGroup=pg).order_by('id')
             for con in constraintSet:
                 #
                 # we need to keep the parameters in the same order
