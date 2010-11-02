@@ -19,7 +19,7 @@
     </rule>
     <rule context="//simulationRun/responsibleParty" >
       <assert test="contains(gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString, '@')">
-        Each simulation contact must have an email address specified.
+        Simulation contact <value-of select="gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString" /> <value-of select="gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString" /> must have an email address specified.
       </assert>
     </rule>
     <rule context="//ensembleMember" >
@@ -75,7 +75,7 @@
       <assert test="not( (string-length(units/@value)>0) and (string-length(cfName)>0) )">
         Either a CF Type *or* a Units Type must be specified for <value-of select="shortName"/> initial condition inputs in Component <value-of select="../../shortName"/>.
       </assert>
-<!--      <assert test="not( (string-length(units/@value)=0) and (string-length(cfName)=0) )">
+    <!--  <assert test="not( (string-length(units/@value)=0) and (string-length(cfName)=0) )">
         Either one of CF Type or Units Type must be specified for <value-of select="shortName"/> initial condition inputs.
       </assert> -->
     </rule>
