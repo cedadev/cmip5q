@@ -546,9 +546,11 @@ class Translator:
             self.addResp(simClass.author,simElement,'author')
             self.addResp(simClass.funder,simElement,'funder')
             self.addResp(simClass.centre.party,simElement,'centre')
-            ''' principleInvestigator [0..inf] '''
             ''' fundingSource [0..inf] '''
             ''' rationale [0..inf] '''
+            ''' project [0..inf] '''
+            self.addCVValue(simElement,'project','CMIP5',isOpen=False)
+            ''' shortName [1] and longName [1] '''
             if simClass.ensembleMembers>1 :
                 # our simulation is really the base simulation of an ensemble
                 ''' shortName [1] '''
@@ -562,10 +564,11 @@ class Translator:
                 ET.SubElement(simElement,'longName').text=simClass.title
             ''' description [0..1] '''
             ET.SubElement(simElement,'description').text=simClass.description
+            ''' dataHolder [0...inf] '''
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
             self.addCIMReference(simClass.experiment,experimentElement)
-
+            ''' simulationID [0..1] '''
             ''' calendar [1] '''
             if simClass.experiment.requiredCalendar :
                 calendarElement=ET.SubElement(simElement,'calendar')
@@ -573,7 +576,11 @@ class Translator:
                 calTypeElement=ET.SubElement(calendarElement,str(simClass.experiment.requiredCalendar.name))
             else :
                 assert False, "Error, a calendar must exist"
-
+            ''' input [0..inf] '''
+            ''' output [0..inf] '''
+            ''' restart [0..inf] '''
+            ''' spinupDateRange [0..1] '''
+            ''' spinupSimulation [0..1] and controlSImulation [0..1] '''
             relatedSimulations=SimRelationship.objects.filter(sfrom=simClass)
             assert len(relatedSimulations)==1, "Expecting related simulations to be of size 1"
             relatedSimulation=relatedSimulations[0]
@@ -589,7 +596,10 @@ class Translator:
                 else:
                     # I am stored as a genealogy relationhip
                     pass
-            ''' dataholder [0..inf] '''
+            ''' authorsList '''
+            alElement=ET.SubElement(simElement,'authorsList')
+            assert simClass.authorList!='', "Error authorList must have some content"
+            ET.SubElement(alElement,'list').text=simClass.authorList
             ''' conformance [0..inf] '''
             confClassSet=Conformance.objects.filter(simulation=simClass)
             for confClass in confClassSet:
@@ -632,27 +642,11 @@ class Translator:
                 elif (confClass.description and confClass.description!='') or len(confClass.mod.all())>0 or len(confClass.coupling.all())>0 :
                     # confClass.ctype is mot mandatory in the CIM but is required for a conformance so output something purely for validation purposes if other fields have been set without confClass.ctype being set
                     ET.SubElement(simElement,"conformance",{'type':'invalid'})
-            ''' simulationComposite [0..1] '''
-            # removed by Allyn in the latest version
-            #''' ensemble [0..1] '''
-            #if (simClass.ensembleMembers>1) :
-            #    ensembleElement=ET.SubElement(simElement,'ensemble')
-            #    ensembleClassSet=Ensemble.objects.filter(simulation=simClass)
-            #    assert(len(ensembleClassSet)==1,'Simulation %s should have one and only one associated ensembles class'%simClass)
-            #    ensembleClass=ensembleClassSet[0]
-            #    self.addCIMReference(ensembleClass,ensembleElement)
-            ''' input [0..inf] ???COUPLING??? '''
-            ''' output [0..inf] '''
-            ''' restart [0..inf] '''
-            ''' spinup [0..1] '''
             ''' deployment [0..1] '''
             dep2Element=ET.SubElement(simElement,'deployment')
             ET.SubElement(dep2Element,'description').text='The resources(deployment) on which this simulation ran'
             platElement=ET.SubElement(dep2Element,'platform')
             self.addCIMReference(simClass.platform,platElement)
-
-            ''' previousSimulation [0..1] '''
-            ''' simulationID [0..1] '''
             ''' startPoint [1] '''
             ET.SubElement(simElement,'startPoint').text=str(simClass.duration.startDate)
             ''' endPoint [0..1] '''
@@ -699,11 +693,6 @@ class Translator:
                     targetElement=ET.SubElement(simRelationshipElement,"target")
                     self.addCIMReference(relatedSimulation.sto,targetElement)
             ''' quality [0..inf] '''
-            if self.VALIDCIMONLY :
-                simElement.append(ET.Comment('TBD: AuthorList: '+simClass.authorList))
-            else :
-                ET.SubElement(simElement,'Q_AuthorList').text=simClass.authorList
-
             return rootElement
 
     def addRequirement(self,reqClass,rootElement):
@@ -852,16 +841,18 @@ class Translator:
             ''' quality [0..inf] '''
         return rootElement
 
-    def addCVValue(self,root,elementName,value,controlled=True,cvName='',cvURL='http://proj.badc.rl.ac.uk/svn/metafor/cmip5q/branches/vn1.0_devel',isOpen=True):
+    def addCVValue(self,root,elementName,value,controlled=True,cvName='',cvURL='http://proj.badc.rl.ac.uk/svn/metafor/cmip5q/trunk',isOpen=True):
         if cvName=='' : cvName=elementName
 
+        #hack while I learn how to output closed vocabs
+        #open='false'
+        #if isOpen : open='true'
+        open='true'
         if controlled :
-          type=ET.SubElement(root,elementName,{'value':value,'cv':'true'})
+            type=ET.SubElement(root,elementName,{'value':value,'cv':'true','open':open})
         else :
-          type=ET.SubElement(root,'type',{'value':'Other','cv':'true'})
-        open='false'
-        if isOpen : open='true'
-        #vocabServ=ET.SubElement(type,'controlledVocabulary',{'open':open})
+            assert isOpen, "Error: CV is specified as being closed yet we have a value that is not in the vocabulary"
+            type=ET.SubElement(root,'type',{'value':'Other','cv':'true','open':open})
         vocabServ=ET.SubElement(type,'controlledVocabulary')
         ET.SubElement(vocabServ,'name').text=cvName
         ET.SubElement(vocabServ,'server').text=cvURL
@@ -1193,7 +1184,9 @@ class Translator:
     def addReference(self,refInstance,rootElement):
         if refInstance :
                 refElement=ET.SubElement(rootElement,'citation')
-                citeElement=ET.SubElement(refElement,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
+                #we no longer output CI_Citation
+                #citeElement=ET.SubElement(refElement,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
+                citeElement=refElement
                 titleElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'title')
                 ET.SubElement(titleElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.name
                 # CIM expects a date element even if it is empty
@@ -1207,7 +1200,9 @@ class Translator:
 
 
     def addSimpleResp(self,respName,rootElement,respType) :
-        ciresp=ET.SubElement(rootElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+        #we no longer have a CI_ResponsibleParty element
+        #ciresp=ET.SubElement(rootElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+        ciresp=rootElement
         name=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'individualName')
         ET.SubElement(name,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=respName
         role=ET.SubElement(ciresp,self.GMD_NAMESPACE_BRACKETS+'role')
@@ -1221,7 +1216,9 @@ class Translator:
                     return
                 respElement=ET.SubElement(rootElement,parentElement)
                 respElement.append(ET.Comment('responsibleParty uri :: '+respClass.uri))
-                ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+                #we no longer have a CI_ResponsibleParty element
+                #ciresp=ET.SubElement(respElement,self.GMD_NAMESPACE_BRACKETS+'CI_ResponsibleParty')
+                ciresp=respElement
         #http://www.isotc211.org/2005/gmd
         #CI_ResponsibleParty referenced in citation.xsd
         # <gmd:individualName>
