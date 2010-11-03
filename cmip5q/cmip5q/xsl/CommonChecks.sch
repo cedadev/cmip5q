@@ -29,7 +29,7 @@
     </rule>
   </pattern>
   <pattern name="Simulation Conformances fulfilment requirements">
-    <rule context="numericalRequirement/name">
+    <rule context="numericalRequirement/*/name">
       <assert test="//simulationRun/conformance/requirement/reference[name = current()]">
         Simulation Conformance <value-of select="current()" /> must be fully specified.
       </assert>
