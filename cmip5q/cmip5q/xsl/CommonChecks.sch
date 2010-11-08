@@ -17,14 +17,9 @@
         Each citation contact author must have an email address specified.
       </assert>
     </rule>
-    <rule context="//simulationRun/responsibleParty" >
+    <rule context="//simulationRun/responsibleParty[gmd:CI_ResponsibleParty/gmd:role/gmd:CI_RoleCode[@codeListValue != 'centre']]" >
       <assert test="contains(gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString, '@')">
         Simulation contact <value-of select="gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString" /> <value-of select="gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString" /> must have an email address specified.
-      </assert>
-    </rule>
-    <rule context="//ensembleMember" >
-      <assert test="string-length(description) > 0" >
-        Each ensemble member must have a description.
       </assert>
     </rule>
   </pattern>
@@ -98,6 +93,17 @@
     <rule context="//componentProperty">
       <assert test="not( value='N/A' and (count(value)>1) )">
         Component Property <value-of select="shortName"/> in Component <value-of select="../../../shortName"/> set to NA yet includes other values.
+      </assert>
+    </rule>
+  </pattern>
+  <pattern name="Ensemble Constraints" >
+     <rule context="//ensembleMember" >
+      <assert test="string-length(description) > 0" >
+       A description must be provided for each Ensemble member in Simulation <value-of select="current()/simulation/reference/name"/>.
+      </assert>
+      <assert test="count(..//ensembleMember/simulation/reference[change[1][name = current()/simulation/reference/change[1]/name]][change[last()][name = current()/simulation/reference/change[last()]/name]]/name)&lt;2" >
+<!--        Ensemble member uniqueness constraint: <value-of select="simulation/reference/change[1]/name" />  and <value-of select="simulation/reference/change[last()]/name" /> from <value-of select="count(..//ensembleMember/simulation/reference[change[1][name = current()/simulation/reference/change[1]/name]][change[last()][name = current()/simulation/reference/change[last()]/name]]/name)" /> -->
+        An Ensemble member's mods must be unique within an Ensemble: Mod combination <value-of select="simulation/reference/change[1]/name" /> and <value-of select="simulation/reference/change[last()]/name" /> occurs multiple times within Ensemble for Simulation <value-of select="current()/simulation/reference/name" />
       </assert>
     </rule>
   </pattern>
@@ -210,7 +216,6 @@
         In Sea Ice Key Properties, where the TimeSteppingFramework methods include Specific Time Step, a value must be specified for the TimeStep field.
       </assert>
     </rule>
-
   </pattern>
   <pattern name="Model component AerosolKeyProperties constraints">
     <rule context="//modelComponent[type[@value='AerosolKeyProperties']]/componentProperties/componentProperty[shortName='AerosolTimeStepFramework']/componentProperty[shortName='Method']">
