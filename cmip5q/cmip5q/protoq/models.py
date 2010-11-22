@@ -1494,7 +1494,7 @@ class DRSOutput(models.Model):
     realm=models.ForeignKey(Term,related_name='drs_realm')
     # we don't need to point to simulations, they point to this ...
     def __unicode__(self):
-	return '%s/%s/%s/%s/%s/%s/%s/'%(activity,product,institute,model,experiment,frequency,realm)
+        return '%s/%s/%s/%s/%s/%s/%s/'%(activity,product,institute,model,experiment,frequency,realm)
 
 
 class TestDocs(object):
@@ -1520,7 +1520,12 @@ class TestDocumentSet(object):
     def __init__(self,d,f):
         ff=os.path.join(d,f)
         ef=ET.parse(ff)
-        e=ef.getroot()
+        cimns = 'http://www.metaforclimate.eu/schema/cim/1.5'
+        cimdoclist=['{%s}modelComponent' %cimns,'{%s}platform' %cimns,'{%s}CIMRecord/{%s}CIMRecord/{%s}simulationRun' %(cimns,cimns,cimns)]
+        for cimdoc in cimdoclist:
+            if ef.getroot().find(cimdoc) is not None:
+                e=ef.getroot().find(cimdoc)
+                
         getter=etTxt(e)
         #basic document stuff for feed
         doc={'description':'description','shortName':'abbrev','longName':'title',
@@ -1530,8 +1535,12 @@ class TestDocumentSet(object):
         self.fname=f
         self.cimtype='DocumentSet'
         self.author=self.DummyAuthor()
-        if self.created=='':self.created=datetime.now()
-        if self.updated=='':self.updated=datetime.now()
+        #if self.created=='':self.created=datetime.now()
+        #if self.updated=='':self.updated=datetime.now()
+        #FIXME: temporary fix for strange date bug
+        self.created=datetime.now()
+        self.updated=datetime.now()
+
     def get_absolute_url(self):
         return reverse('cmip5q.protoq.views.testFile',args=(self.fname,))
 
