@@ -85,9 +85,11 @@ urlpatterns = patterns('',
     (r'^cmip5/conformance/(?P<cen_id>\d+)/(?P<sim_id>\d+)/(?P<req_id>\d+)/$',
             'cmip5q.protoq.views.conformanceEdit'),  
                      
-    # help, intro, about
+    # help, intro, about, vn history
     (r'^cmip5/(?P<cen_id>\d+)/help/$',
-            'cmip5q.protoq.views.help'),                  
+            'cmip5q.protoq.views.help'),
+    (r'^cmip5/(?P<cen_id>\d+)/vnhist/$',
+            'cmip5q.protoq.views.vnhist'),                  
     (r'^cmip5/(?P<cen_id>\d+)/about/$',
             'cmip5q.protoq.views.about'),     
     (r'^cmip5/(?P<cen_id>\d+)/intro/$',
@@ -143,7 +145,8 @@ urlpatterns = patterns('',
         }}),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', admin.site.root),
+    #(r'^admin/(.*)', admin.site.root),
+    (r'^admin/', include(admin.site.urls)),
 )
 # now add the common document url methods
 #for doc in ['experiment','platform','component','simulation']:

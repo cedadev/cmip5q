@@ -368,10 +368,15 @@ def viewExperiment(request,cen_id,experiment_id):
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'tabs':tabs(request,cen_id,'Experiment')})
 
-######## HELP and ABOUT ###############
+######## HELP, ABOUT and Vn History ###############
 
-def help(request,cen_id):
-    return render_to_response('help.html',{'tabs':tabs(request,cen_id,'Help')})
+def vnhist(request,cen_id):
+    return render_to_response('vnhist.html')
+
+def help(request,cen_id):    
+    urls={'vnhist':reverse('cmip5q.protoq.views.vnhist',args=(cen_id,)),}
+    
+    return render_to_response('help.html',{'urls':urls,'tabs':tabs(request,cen_id,'Help')})
  
 def about(request,cen_id):
     return render_to_response('about.html',{'tabs':tabs(request,cen_id,'About')})
