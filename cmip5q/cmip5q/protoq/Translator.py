@@ -375,30 +375,27 @@ class Translator:
         if gridObject.description :
             ET.SubElement(esmModelGridElement,'description').text=gridObject.description
         if len(gridObject.references.all())>0:
-            refList=ET.SubElement(gridElement,'referenceList')
-            self.addReferences(gridObject.references,refList)
+            refList=ET.SubElement(esmModelGridElement,'referenceList')
+            self.addReferences(gridObject.references,refList,parentName="reference")
 
         if HorizGridDiscretization!="composite" :
             esmModelGridElement.set('isLeaf','true')
             esmModelGridElement.set('numTiles','1')
             esmModelGridElement.set('numMosaics','0')
             gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":HorizGridDiscretization}) #,"verticalGridDiscretization":VertGridDiscretization})
-
-            if horizontalPropertiesObject.abbrev :
-                description=horizontalPropertiesObject.abbrev
-            else :
-                description=""
-            ET.SubElement(gridTileElement,'shortName').text=description
-            if horizontalPropertiesObject.title :
-                ET.SubElement(gridTileElement,'longName').text=horizontalPropertiesObject.title
-            if horizontalPropertiesObject.description :
-                ET.SubElement(gridTileElement,'description').text=horizontalPropertiesObject.description
-
-            horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"details":HorizGridResolution})
+            self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+            description=HorizGridResolution
+            if HorizGridRefinement!="" :
+                description+=". Refinement details: "+HorizGridRefinement
+            horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"description":description})
             for attrib in HorizResProps.keys() :
                 ET.SubElement(horizResElement,"property",{"name":attrib}).text=HorizResProps[attrib]
-            horizResElement=ET.SubElement(gridTileElement,"horizontalExtent",{"LatMin":HorizExtentLatMin,"LatMax":HorizExtentLatMax,"LonMin":HorizExtentLonMin,"LonMax":HorizExtentLonMax})
-            ET.SubElement(gridTileElement,"refinement").text=HorizGridRefinement
+            horizResElement=ET.SubElement(gridTileElement,"extent")
+            ET.SubElement(horizResElement,"latMin").text=HorizExtentLatMin
+            ET.SubElement(horizResElement,"latMax").text=HorizExtentLatMax
+            ET.SubElement(horizResElement,"lonMin").text=HorizExtentLonMin
+            ET.SubElement(horizResElement,"lonMax").text=HorizExtentLonMax
+
             if HorizGridMnemonic!="" :
                 ET.SubElement(gridTileElement,'mnemonic').text=HorizGridMnemonic
         else : # HorizGridDiscretization=="composite"
@@ -406,17 +403,8 @@ class Translator:
             esmModelGridElement.set('numTiles','0')
             esmModelGridElement.set('numMosaics','1')
             gridMosaicElement=ET.SubElement(esmModelGridElement,'gridMosaic',{'gridType':HorizGridDiscretization,'isLeaf':'true','numMosaics':'0'})
-            #ET.SubElement(gridMosaicElement,'shortName').text=HorizGridCompositeName
-
-            if horizontalPropertiesObject.abbrev :
-                description=horizontalPropertiesObject.abbrev
-            else :
-                description=""
-            ET.SubElement(gridMosaicElement,'shortName').text=description
-            if horizontalPropertiesObject.title :
-                ET.SubElement(gridMosaicElement,'longName').text=horizontalPropertiesObject.title
-            if horizontalPropertiesObject.description :
-                ET.SubElement(gridMosaicElement,'description').text=horizontalPropertiesObject.description
+            if HorizGridCompositeName!="" :
+                ET.SubElement(gridMosaicElement,'description').text=HorizGridCompositeName
 
             if HorizGridMnemonic!="" :
                 ET.SubElement(gridMosaicElement,'mnemonic').text=HorizGridMnemonic
@@ -425,20 +413,34 @@ class Translator:
                 # ying yang is represented as a gridMosaic with two gridTiles
                 for i in range(2-1):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'half_torus'})
+                    self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
             elif HorizGridType=="icosahedral":
                 gridMosaicElement.set('numTiles','10')
                 # icosahedral is represented as a gridMosaic with ten logically rectangular gridTiles
                 for i in range(10-1):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'logically_rectangular'})
+                    self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
             elif HorizGridType=="other":
                 numTiles=len(HorizGridChildNames)
                 gridMosaicElement.set('numTiles',numTiles)
                 # we have a composite grid
                 for gridTileName in HorizGridChildNames :
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":gridTileName})
+                    self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
             #else : output nothing
 
         self.addDocumentInfo(gridObject,gridElement)
+
+    def addGridTileDescription(self,rootElement,horizontalPropertiesObject,verticalPropertiesObject) :
+        description=""
+        if horizontalPropertiesObject.description :
+            description="Horizontal properties: "+horizontalPropertiesObject.description
+        if horizontalPropertiesObject.description and verticalPropertiesObject.description :
+            description+=" "
+        if verticalPropertiesObject.description :
+            description+="Vertical properties: "+verticalPropertiesObject.description
+        if description!="" :
+            ET.SubElement(rootElement,'description').text=description
 
     def add_ensemble(self,simClass,rootElement):
 
@@ -1091,7 +1093,7 @@ class Translator:
         '''description'''
         ET.SubElement(comp,'description').text=c.description
         '''license'''
-        '''componentProperties'''
+        '''componentProperties [0..1]'''
         componentProperties=ET.SubElement(comp,'componentProperties')
         self.addProperties(c,componentProperties)
 
@@ -1112,10 +1114,13 @@ class Translator:
             '''cfname'''
             if CompInpClass.cfname :
                 ET.SubElement(cp,'cfName').text=CompInpClass.cfname.name
-        '''numericalProperties'''
-        ET.SubElement(comp,'numericalProperties')
-        '''scientificProperties'''
-        ET.SubElement(comp,'scientificProperties')
+        # Check whether we actually have any component properties.
+        # If not, then remove this element as it is optional in the CIM
+        # and if it exists it expects at least one property within it.
+        if len(componentProperties)==0:
+            comp.remove(componentProperties)
+        '''numericalProperties [0..1]'''
+        '''scientificProperties [0..1]'''
         '''grid'''
         '''responsibleParty [0..inf]'''
         self.addResp(c.author,comp,'PI')
@@ -1170,13 +1175,13 @@ class Translator:
         #logging.debug("component "+c.abbrev+" has implemented set to false")
       return
 
-    def addReferences(self,references,rootElement):
+    def addReferences(self,references,rootElement,parentName='citation'):
         for ref in references.all():
-            self.addReference(ref,rootElement)
+            self.addReference(ref,rootElement,parentName)
 
-    def addReference(self,refInstance,rootElement):
+    def addReference(self,refInstance,rootElement,parentName='citation'):
         if refInstance :
-                refElement=ET.SubElement(rootElement,'citation')
+                refElement=ET.SubElement(rootElement,parentName)
                 #we no longer output CI_Citation
                 #citeElement=ET.SubElement(refElement,self.GMD_NAMESPACE_BRACKETS+'CI_Citation')
                 citeElement=refElement
