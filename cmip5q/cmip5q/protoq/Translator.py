@@ -376,7 +376,7 @@ class Translator:
             ET.SubElement(esmModelGridElement,'description').text=gridObject.description
         if len(gridObject.references.all())>0:
             refList=ET.SubElement(esmModelGridElement,'referenceList')
-            self.addReferences(gridObject.references,refList,parentName="reference")
+            self.addReferences(gridObject.references,refList)
 
         if HorizGridDiscretization!="composite" :
             esmModelGridElement.set('isLeaf','true')
@@ -384,18 +384,8 @@ class Translator:
             esmModelGridElement.set('numMosaics','0')
             gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":HorizGridDiscretization}) #,"verticalGridDiscretization":VertGridDiscretization})
             self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
-            description=HorizGridResolution
-            if HorizGridRefinement!="" :
-                description+=". Refinement details: "+HorizGridRefinement
-            horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"description":description})
-            for attrib in HorizResProps.keys() :
-                ET.SubElement(horizResElement,"property",{"name":attrib}).text=HorizResProps[attrib]
-            horizResElement=ET.SubElement(gridTileElement,"extent")
-            ET.SubElement(horizResElement,"latMin").text=HorizExtentLatMin
-            ET.SubElement(horizResElement,"latMax").text=HorizExtentLatMax
-            ET.SubElement(horizResElement,"lonMin").text=HorizExtentLonMin
-            ET.SubElement(horizResElement,"lonMax").text=HorizExtentLonMax
-
+            self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
+            self.addGridExtent(gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
             if HorizGridMnemonic!="" :
                 ET.SubElement(gridTileElement,'mnemonic').text=HorizGridMnemonic
         else : # HorizGridDiscretization=="composite"
@@ -406,6 +396,7 @@ class Translator:
             if HorizGridCompositeName!="" :
                 ET.SubElement(gridMosaicElement,'description').text=HorizGridCompositeName
 
+            self.addGridExtent(gridMosaicElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
             if HorizGridMnemonic!="" :
                 ET.SubElement(gridMosaicElement,'mnemonic').text=HorizGridMnemonic
             if HorizGridType=="ying yang":
@@ -414,12 +405,14 @@ class Translator:
                 for i in range(2-1):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'half_torus'})
                     self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+                    self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
             elif HorizGridType=="icosahedral":
                 gridMosaicElement.set('numTiles','10')
                 # icosahedral is represented as a gridMosaic with ten logically rectangular gridTiles
                 for i in range(10-1):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'logically_rectangular'})
                     self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+                    self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
             elif HorizGridType=="other":
                 numTiles=len(HorizGridChildNames)
                 gridMosaicElement.set('numTiles',numTiles)
@@ -427,6 +420,7 @@ class Translator:
                 for gridTileName in HorizGridChildNames :
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":gridTileName})
                     self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+                    self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
             #else : output nothing
 
         self.addDocumentInfo(gridObject,gridElement)
@@ -441,6 +435,21 @@ class Translator:
             description+="Vertical properties: "+verticalPropertiesObject.description
         if description!="" :
             ET.SubElement(rootElement,'description').text=description
+
+    def addGridTileHorizRes(self,gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps) :
+        description=HorizGridResolution
+        if HorizGridRefinement!="" :
+            description+=". Refinement details: "+HorizGridRefinement
+        horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"description":description})
+        for attrib in HorizResProps.keys() :
+            ET.SubElement(horizResElement,"property",{"name":attrib}).text=HorizResProps[attrib]
+
+    def addGridExtent(self,gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax) :
+        horizResElement=ET.SubElement(gridTileElement,"extent")
+        ET.SubElement(horizResElement,"latMin").text=HorizExtentLatMin
+        ET.SubElement(horizResElement,"latMax").text=HorizExtentLatMax
+        ET.SubElement(horizResElement,"lonMin").text=HorizExtentLonMin
+        ET.SubElement(horizResElement,"lonMax").text=HorizExtentLonMax
 
     def add_ensemble(self,simClass,rootElement):
 
