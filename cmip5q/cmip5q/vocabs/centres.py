@@ -20,11 +20,12 @@ CENTRES=(
              ('CNRM/CERFACS','Centre National de Recherches Meteorologiques / Centre Europeen de Recherche et de Formation Avancee en Calcul Scientifique',('CNRM-CM5')),
              ('CCCMA','Canadian Centre for Climate Modelling and Analysis',('CanESM2')),
              ('CAWCR','Centre for Australian Weather and Climate Research',('ACCESS',)),
+             ('NASA-GISS','NASA Goddard Institute for Space Studies USA',('')),
              ('CMA-BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM')),
              ('2. Test Centre','Test area',('dum')),
              ('EC-Earth','Europe',('EC-Earth'))
         )
-def loadCentres():
+def loadCentres():(abbrev=)
     for centre in CENTRES:
         u=str(uuid.uuid1())
         c=Centre(abbrev=centre[0],name=centre[1],uri=u)
