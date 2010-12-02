@@ -25,7 +25,7 @@ CENTRES=(
              ('2. Test Centre','Test area',('dum')),
              ('EC-Earth','Europe',('EC-Earth'))
         )
-def loadCentres():(abbrev=)
+def loadCentres():
     for centre in CENTRES:
         u=str(uuid.uuid1())
         c=Centre(abbrev=centre[0],name=centre[1],uri=u)
