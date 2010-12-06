@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.1 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
+<numericalExperiment documentVersion="1" control="false" xmlns="http://www.metaforclimate.eu/cim/1.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.metaforclimate.eu/cim/1.4 Z:\CIM\XSDs\dev0p3\activity.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
 	
 	<!-- Notes from document:
 	Since there is at present no generally accepted “best” way to initialize models, some groups may choose to try different initialization methods.
@@ -63,8 +63,7 @@
 			</gmd:role>
 		</gmd:CI_ResponsibleParty>
 	</author>
-	<documentID xsi:type="Identifier">
-	</documentID>
+	<documentID xsi:type="Identifier">b0e0c422-d3a5-11df-837f-00163e9152a5</documentID>
 	<creationDate>
 		2009-06-23T15:00:00Z
 	</creationDate>
