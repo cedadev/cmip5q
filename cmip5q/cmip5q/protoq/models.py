@@ -31,7 +31,7 @@ from django.core.files.base import ContentFile
 from django.db.models.query import QuerySet
 import types
 
-cimv='http://www.metaforclimate.eu/cim/1.1'
+cimv='http://www.metaforclimate.eu/cim/1.4'
 gmd='http://www.isotc211.org/2005/gmd'
 gco="http://www.isotc211.org/2005/gco"
 
