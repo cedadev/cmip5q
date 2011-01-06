@@ -58,7 +58,7 @@ VocabList={'Realms':
     # input requirements
     'InputTypes':('InitialCondition','BoundaryCondition','AncillaryFile'),
     # model modification types
-    'ModelModTypes':('ParameterChange','CodeChange'),
+    'ModelModTypes':('ParameterChange','CodeChange','Unused'),
 
     # types of numerical requirement 
     'NumReqTypes':('NumericalRequirement','BoundaryCondition','InitialCondition','SpatioTemporalConstraint','RequirementSet','OutputRequirement'),
