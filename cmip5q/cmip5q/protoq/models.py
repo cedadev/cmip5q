@@ -1231,6 +1231,8 @@ class Coupling(models.Model):
     manipulation=models.TextField(blank=True,null=True)
     # original if I'm a copy.
     original=models.ForeignKey('Coupling',blank=True,null=True)
+    notInUse=models.BooleanField(default=False)
+    
     def __unicode__(self):
         if self.parent.simulation:
             return 'CouplingFor:%s(in %s)'%(self.targetInput,self.parent.simulation)
