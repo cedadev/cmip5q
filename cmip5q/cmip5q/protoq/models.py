@@ -1115,9 +1115,9 @@ class XorParam(BaseParam):
         return ['value','vocab']
 
 class KeyBoardParam(BaseParam):
-    value=models.CharField(max_length=128,blank=True,null=True)
+    value=models.CharField(max_length=1024,blank=True,null=True)
     # but it might be a numeric parameter, in which case we have more attributes
-    units=models.CharField(max_length=128,null=True,blank=True)
+    units=models.CharField(max_length=1024,null=True,blank=True)
     numeric=models.BooleanField(default=False)
     def __unicode__(self):
         s='%s:%s'%(self.name,self.value)
