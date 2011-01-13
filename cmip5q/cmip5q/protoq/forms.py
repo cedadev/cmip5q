@@ -511,7 +511,7 @@ class XorParamForm(BaseParamForm):
         self.model='XOR'
         
 class KeyBoardParamForm(BaseParamForm):
-    value=forms.CharField(widget=forms.TextInput(attrs={'size':'64'}),required=False)
+    value=forms.CharField(max_length=1024,widget=forms.TextInput(attrs={'size':'64'}),required=False)
     class Meta(BaseParamForm.Meta):
         model=KeyBoardParam
         exclude=BaseParamForm.Meta.exclude+['numeric','units']
