@@ -257,7 +257,7 @@ class Doc(Fundamentals):
     def status(self):
         ''' Return a percentage completion in terms of validation '''
         if self.validErrors<>-1 and self.numberOfValidationChecks<>0:
-            return 100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks)
+            return int(100.0*(1.0-float(self.validErrors)/self.numberOfValidationChecks))
         else: return 0.0
         # FIXME: and eventually see if we have a children attribute and sum them up ...
     
@@ -293,6 +293,7 @@ class Doc(Fundamentals):
         self.numberOfValidationChecks=v.nChecks
         logging.debug("%s validate checks=%s"%(self._meta.module_name,self.numberOfValidationChecks))
         logging.debug("%s validate errors=%s"%(self._meta.module_name,self.validErrors))
+        self.save()
         return v.valid,v.errorsAsHtml()
 # FIXME: This moved from component to here ... needs something done eventually ...
 #    def validate(self):
@@ -311,7 +312,7 @@ class Doc(Fundamentals):
         if self.isComplete:
             return False,'This document has already been exported',None
         valid,html=self.validate()
-        logging.info('WARNING Exporting document for ESG regardless of validation state')
+        #logging.info('WARNING Exporting document for ESG regardless of validation state')
         #valid=True # FIXME
         self.isComplete=valid
         self.save(complete=self.isComplete) # make that completeness status last.
