@@ -23,7 +23,7 @@
                         <th><a href="http://pcmdi-cmip.llnl.gov/cmip5/output_req.html" target="_blank">DRS</a> member name </th>
                     </tr>
                     {% for form in eformset.forms %}
-                        <tr><td>Member {{forloop.counter}} uses </td>
+                        <tr><td>Member {{form.instance.memberNumber}} uses </td>
                             <td>{{form.cmod.errors}}{{form.cmod}}&nbsp;and/or&nbsp;</td>
                             <td>{{form.imod.errors}}{{form.imod}} </td>
                             <td>{% if eform.rset %} conforms to {{form.requirement.errors}}{{form.requirement}} {% endif %}</td>

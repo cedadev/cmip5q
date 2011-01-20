@@ -391,7 +391,7 @@ def ensemble(request,cen_id,sim_id):
     s=Simulation.objects.get(id=sim_id)
     e=Ensemble.objects.get(simulation=s)
     e.updateMembers()  # in case members were deleted via their code mods or ics.
-    members=e.ensemblemember_set.all()
+    members=e.ensemblemember_set.all()[1:]
         
     EnsembleMemberFormset=modelformset_factory(EnsembleMember,form=EnsembleMemberForm,
                                                formset=BaseEnsembleMemberFormSet,
