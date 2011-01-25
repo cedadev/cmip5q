@@ -90,7 +90,7 @@
     </rule>
   </pattern>
   <pattern name="Component Property value NA must exclude all others">
-    <rule context="//componentProperty">
+   <rule context="//componentProperty[count(value)>1]">
       <assert test="not( value='N/A' and (count(value)>1) )">
         Component Property <value-of select="shortName"/> in Component <value-of select="../../../shortName"/> set to NA yet includes other values.
       </assert>
