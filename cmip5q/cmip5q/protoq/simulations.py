@@ -95,7 +95,7 @@ class simulationHandler(object):
                     oldmodel=None
                 else: oldmodel=s.numericalModel
                 news=simform.save()
-                logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))
+                logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))      
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
