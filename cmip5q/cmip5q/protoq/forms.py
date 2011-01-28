@@ -111,7 +111,7 @@ class ComponentForm(forms.ModelForm):
 
 class ComponentInputForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
-    abbrev=forms.CharField(widget=forms.TextInput(attrs={'size':'24'}),required=True)
+    abbrev=forms.CharField(max_length=24,widget=forms.TextInput(attrs={'size':'24'}),required=True)
     units=forms.CharField(widget=forms.TextInput(attrs={'size':'48'}),required=False)
     cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False,size=60)
  
@@ -407,6 +407,7 @@ class SimulationForm(forms.ModelForm):
     #duration=forms.CharField(widget=forms.TextInput())
     #duration=DateRangeFieldForm(widget=DateRangeWidget())
     duration=DateRangeFieldForm2()
+    #drsMember=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
     class Meta:
         model=Simulation
         #the first three are enforced by the workflow leading to the form, the second two are
@@ -415,6 +416,18 @@ class SimulationForm(forms.ModelForm):
         #loss of information ...
         exclude=('centre','experiment','uri','codeMod','inputMod','relatedSimulations',
                  'drsOutput','datasets')
+    
+    def clean_drsMember(self):
+        # needs to parse into DRS member format
+        value=self.cleaned_data['drsMember']
+        p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
+        try:
+            m=p.search(value)
+            [r,i,p]=map(int,[m.group('r'),m.group('i'),m.group('p')])
+            return value
+        except:
+            raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
+    
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
