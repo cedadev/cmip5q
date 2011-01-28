@@ -166,6 +166,7 @@ class DateRange(object):
 # so we need foreach Thing, we need a ThingField ...
 #
 
+
 class SimDateTimeField(models.CharField):
     ''' We are creating a specific type of field that we want to see on forms. It's a bit like
     a date, but not exactly, since it includes (optionally) a calendar designate. If not 
@@ -224,8 +225,8 @@ class SimDateTimeField(models.CharField):
     def get_db_prep_value(self, value):
         ''' From python to db character field '''
         return str(value)
-      
-
+    
+    
 class TimeLengthField(models.CharField):
     ''' It turns out that it's unbelievably clunky to pass in a vocabulary for
     timelengths in and out of Django Widgets and Forms. So, sadly, in the spirit
@@ -300,6 +301,7 @@ class DateRangeField(models.CharField):
             return None
         else:
             return value.strxml()
+
 
 #
 # And for each ThingField, we need a ThingFieldForm
@@ -385,8 +387,16 @@ class DateRangeFieldForm2(forms.MultiValueField):
             d=DateRange(startDate=data_list[0],endDate=data_list[1],length=data_list[2])
         return d
         
-    
-        
+
+
+
+## South needs information on custom fields:
+from south.modelsinspector import add_introspection_rules
+
+add_introspection_rules([], ["cmip5q.protoq.fields.SimDateTimeField"])
+add_introspection_rules([], ["cmip5q.protoq.fields.DateRangeField"])
+
+
 
 
        
