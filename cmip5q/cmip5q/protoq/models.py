@@ -36,8 +36,6 @@ gmd='http://www.isotc211.org/2005/gmd'
 gco="http://www.isotc211.org/2005/gco"
 
 
-
-
 def soft_delete(obj,simulate=False):
     ''' This method provided to use to override native model deletes to avoid
     cascade on delete ... the first requirement is only in responsible parties,
@@ -904,6 +902,9 @@ class Simulation(Doc):
     relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
     
     duration=DateRangeField(blank=True,null=True)
+    
+    # mimicking the drs member of ensembleMember for the case of a non-ensemble simulation 
+    drsMember=models.CharField(max_length=10,blank=True,null=True)
     
     # not yet used:
     drsOutput=models.ManyToManyField('DRSOutput')
