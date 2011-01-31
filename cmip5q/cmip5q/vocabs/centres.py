@@ -15,7 +15,7 @@ CENTRES=(
              ('INM','Russian Institute for Numerical Mathematics',('INMCM4.0')),
              ('NIMR','Korean National Institute for Meteorological Research',('HadGEM2-AO')),
              ('LASG','Institute of Atmospheric Physics, Chinese Academy of Sciences	China',
-                     ('FGOALS-S2.0','FGOALS-G2.0','FGOALS-gl')),
+             ('FGOALS-S2.0','FGOALS-G2.0','FGOALS-gl')),
              ('QCCCE-CSIRO','Queensland Climate Change Centre of Excellence and Commonwealth Scientific and Industrial Research Organisation',('CSIRO-Mk3.5A')),
              ('CNRM/CERFACS','Centre National de Recherches Meteorologiques / Centre Europeen de Recherche et de Formation Avancee en Calcul Scientifique',('CNRM-CM5')),
              ('CCCMA','Canadian Centre for Climate Modelling and Analysis',('CanESM2')),
@@ -23,7 +23,12 @@ CENTRES=(
              ('NASA-GISS','NASA Goddard Institute for Space Studies USA',('')),
              ('CMA-BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM')),
              ('2. Test Centre','Test area',('dum')),
-             ('EC-Earth','Europe',('EC-Earth'))
+             ('EC-Earth','Europe',('EC-Earth')),
+             ('CCSM','Community Climate System Model',('')),
+             ('CMCC','Centro Euro-Mediterraneo per I Cambiamenti Climatici',('')),
+             ('GCESS','College of Global Change and Earth System Science, Beijing Normal University',('')),
+             ('FIO','The First Institute of Oceanography, SOA, China',('')),
+             ('RSMAS','University of Miami - RSMAS',(''))
         )
 def loadCentres():
     for centre in CENTRES:
