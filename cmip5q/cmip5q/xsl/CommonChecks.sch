@@ -65,16 +65,13 @@
       </assert>
     </rule>
   </pattern>
-  <pattern name="Either Units or CF type must be specified for initial condition inputs">
+<!--  <pattern name="Either Units or CF type must be specified for initial condition inputs">
     <rule context="//childComponent/modelComponent/componentProperties/componentProperty[@represented][count(componentProperty)=0]">
       <assert test="not( (string-length(units/@value)>0) and (string-length(cfName)>0) )">
         Either a CF Type *or* a Units Type must be specified for <value-of select="shortName"/> initial condition inputs in Component <value-of select="../../shortName"/>.
       </assert>
-    <!--  <assert test="not( (string-length(units/@value)=0) and (string-length(cfName)=0) )">
-        Either one of CF Type or Units Type must be specified for <value-of select="shortName"/> initial condition inputs.
-      </assert> -->
     </rule>
-  </pattern>
+  </pattern> -->
   <pattern name="Document Genealogy coherence check">
     <rule context="//documentGenealogy/relationship/documentRelationship/description">
       <assert test="string-length(//documentGenealogy/relationship/documentRelationship/target/reference/name)>0">
