@@ -428,6 +428,21 @@ class SimulationForm(forms.ModelForm):
         except:
             raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
     
+    def clean_abbrev(self):
+        # abbrev name needs to be unique within a particular centre
+        value=self.cleaned_data['abbrev']
+        s=Simulation.objects.filter(centre=self.instance.centre)
+        
+        SimulList=[]
+        for x in s:
+            SimulList.append(x.abbrev)
+        # In the case of a page update, ignore the currently valid simulation name
+        SimulList.remove(self.instance.abbrev)
+        if value in SimulList:
+            raise ValidationError('Simulation name must be unique from other simulation names')
+        return value
+    
+    
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
