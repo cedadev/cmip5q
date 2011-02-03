@@ -1,0 +1,17 @@
+
+.msg_list {
+margin: 0px;
+padding: 0px;
+width: 100%;
+}
+.msg_head {
+padding: 5px 10px;
+cursor: pointer;
+position: relative;
+background-color:#FECF85;
+margin:1px;
+}
+.msg_body {
+padding: 5px 10px 15px;
+background-color:#F4F4F8;
+}

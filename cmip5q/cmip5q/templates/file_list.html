@@ -23,7 +23,7 @@
 <p> Add new file description: </p>
 <div id="data">
 <table></tr><td>
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
        <table>
        {% include 'data_snippet.html' %}
        </table>

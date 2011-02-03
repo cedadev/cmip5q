@@ -20,7 +20,7 @@
 {% endblock %}
 {% block mainpanel %}
     <div class="boxer2">
-    <form action='{{urls.edit}}' method='post'>
+    <form action='{{urls.edit}}' method='post' onsubmit="myProject.bypassConfirm()">
         <div class="boxer">
         <table>
         <tr>

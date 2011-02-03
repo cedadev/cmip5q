@@ -34,7 +34,7 @@
                 <td width="50%" style="vertical-align:top">
                 <div class="boxer"><h4>Add new reference</h4>
                 {{refset}}
-                <form action="{{refu}}" method="POST">
+                <form action="{{refu}}" method="POST" onsubmit="myProject.bypassConfirm()">
                     {{rform.as_p}}
                     <input type="submit" value="Add Reference"/>
                     </form>

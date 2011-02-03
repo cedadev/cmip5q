@@ -4,7 +4,7 @@
 <table width="100%"><tr><td>
 <h1> {{instance.title}} {% if target %} for {{target.attname}} {{target.instance}} {% endif %} </h1></td>
 {% if exportFiles %}<td align="right">
-<form action="{{exportFiles}}" method="POST"><input value="Export" type="submit" id="cmipbut"> Files to CMIP5</form></td>{% endif %}
+<form action="{{exportFiles}}" method="POST" onsubmit="myProject.bypassConfirm()"><input value="Export" type="submit" id="cmipbut" > Files to CMIP5</form></td>{% endif %}
 </tr></table>
 <script type="text/javascript"> 
         var oLinkButton1 = new YAHOO.widget.Button("cmipbut"); 
@@ -13,7 +13,7 @@
 {% if filter %}
 <div class="boxer">
     <h4>{{filter.m}}</h4>
-    <form action="{{filter.url}}" method="POST">
+    <form action="{{filter.url}}" method="POST" onsubmit="myProject.bypassConfirm()">
     <select name="id" id="filterops">
     {% for o in filter.ops %}
     <option value="{{o.id}}">{{o}}</option>
@@ -42,7 +42,7 @@
     {% for d in r %}
         <td width="21%"><a href="{{d.editURL}}">{{d}}</td><td width="5%">
           {% if d.delURL %}
-          <form action="{{d.delURL}}" method="POST">(<input  type="submit" value="delete">)</form>
+          <form action="{{d.delURL}}" method="POST" onsubmit="myProject.bypassConfirm()">(<input  type="submit" value="delete">)</form>
           {% endif %}
         </td>
     {% endfor %}
@@ -55,7 +55,7 @@
 <div class="boxer2">
 <h4> Add new {{instance.title|lower}}: </h4>
 <div id="data">
-    <form action="{{editURL}}" method="POST" ENCTYPE="multipart/form-data">
+    <form action="{{editURL}}" method="POST" ENCTYPE="multipart/form-data" onsubmit="myProject.bypassConfirm()">
        {% include snippet_template %}
     </form>
 </div>

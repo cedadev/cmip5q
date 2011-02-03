@@ -19,7 +19,7 @@
 <div class="boxer2">
 <p> Add new initial description: </p>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
        <table>
        {% include 'initialcondition_snippet.html' %}
        </table>

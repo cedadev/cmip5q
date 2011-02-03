@@ -3,7 +3,7 @@
 <div class="boxer">
 <h4> Edit Boundary Condition </h4>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
        {% include 'boundaryCondition_snippet.html' %}
     </form>
 </div>

@@ -14,7 +14,7 @@ inputs:<ul><li>spatially varying <b>"initial conditions"</b> for prognostic vari
 
 <div class="boxer">
     <div class="boxer2">
-        <form action="{{urls.ok}}" method="POST">
+        <form action="{{urls.ok}}" method="POST" onsubmit="myProject.bypassConfirm()">
             {{ form.management_form }}
             {% for f in form.forms %}
             {% if forloop.last %} <p> Add a new input: </p> {% endif %}

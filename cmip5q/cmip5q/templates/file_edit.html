@@ -3,7 +3,7 @@
 <div class="boxer">
 <h4> Edit file description </h4>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
        {% include 'file_snippet.html' %}
     </form>
 </div>

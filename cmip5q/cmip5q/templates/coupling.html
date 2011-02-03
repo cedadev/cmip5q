@@ -77,7 +77,7 @@
 				<span class="red">Do not use the RESET button if you have filled in information below that you don't want to lose.
 				</p>
 				</td>
-				<td align="right"><form action={{urls.reset}} method="POST"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>
+				<td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>
 				</tr>
 				</table>
 			</div>
@@ -91,7 +91,7 @@
 		{% endif %}
 	{% endif %}
 		
-	<form action="{{urls.ok}}" method="POST">
+	<form action="{{urls.ok}}" method="POST" onsubmit="myProject.bypassConfirm()">
 		{% for f in Intform.forms %} {% include 'couplingform.html' %} {% endfor %}
 		<center><input id="InternalBut" type="submit" value="Save"></center>
 	</form>

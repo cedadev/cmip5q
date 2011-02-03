@@ -4,7 +4,7 @@
 <h1> Confirmation Required </h1>
 <p> Please confirm that you wish to delete <b>{{klass}}<b> "<b>{{i}}</b>":</p> 
     <center>
-     <form action="{{url}}" method="POST"><input  type="submit" value="delete">
+     <form action="{{url}}" method="POST" onsubmit="myProject.bypassConfirm()"><input  type="submit" value="delete">
      <input type="hidden" name="confirmed" value="1"></form>
     </center>
 </div>

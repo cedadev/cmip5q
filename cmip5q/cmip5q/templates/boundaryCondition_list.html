@@ -18,7 +18,7 @@
 <div class="boxer">
 <p> Add boundary condition: </p>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
        {% include 'boundaryCondition_snippet.html' %}
     </form>
 </div>

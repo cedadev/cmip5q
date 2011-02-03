@@ -9,7 +9,7 @@ and enter doi strings in the link box as doi:a.b.c </p>
 <tbody>
   {% for r in dform %}
   <tr><td width="95%">
-    <form action="{{r.MyEditURL}}" method="POST" id="newref">
+    <form action="{{r.MyEditURL}}" method="POST" id="newref" onsubmit="myProject.bypassConfirm()">
     <table> {% include "reference.html" %} </table>
     </td><td  align="center"><input id="newrefin" type="submit" value="update"/></td>
   </tr>

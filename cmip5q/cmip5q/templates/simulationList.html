@@ -25,7 +25,7 @@
                 <table><tr>
                 <td>Add</td><td><a id="simAddButton{{forloop.counter}}" href="{{e.new}}">New</a> 
                 </td><td>or, from existing:</td><td>
-                <form action="{{cpurl}}" method="POST">
+                <form action="{{cpurl}}" method="POST" onsubmit="myProject.bypassConfirm()">
                 <input type="hidden" name="targetExp" value="{{e.id}}">
                 <select name="targetSim" size="1">
                     <option value="---" selected="true">-------</option>

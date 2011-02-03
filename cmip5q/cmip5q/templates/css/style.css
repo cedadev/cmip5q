@@ -11,7 +11,7 @@ body {
     background-image:url(icons/hilbert.gif);
     width: 1120px; margin:auto }
     
-table,form {margin: 0; padding: 0;}
+table,form {margin: 0; padding: 0; width: 100%;}
 p {padding: 2px; }
 ol {padding-left:20px;}
 ul {padding-left:20px;}
@@ -171,3 +171,7 @@ a.atom {background-image:url(icons/atom.png);background-repeat:no-repeat;}
 	background:transparent;
 	padding-bottom: 30px;
 	}
+	
+.message_body {
+	padding: 5px 10px 15px;
+	color: #666666;

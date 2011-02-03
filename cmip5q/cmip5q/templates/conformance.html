@@ -17,7 +17,7 @@ enter in the text boxes.
 <p class="red"> Save conformances before navigating away </p>
 
 <div id="data" class="boxer2">
-    <form action="{{urls.self}}" method="POST">
+    <form action="{{urls.self}}" method="POST" onsubmit="myProject.bypassConfirm()">
     {{cform.management_form}}
     {% for form in cform.forms %}
         <div class="boxer">

@@ -52,16 +52,50 @@
 
 {% block mainpanel %}
     <div class="boxer2">
-        <form action="{{urls.url}}" method="post">
+        <form action="{{urls.url}}" method="post" onsubmit="myProject.bypassConfirm()">
             <div class="boxer">
-            <h4> General Characteristics of the Simulation </h4>
-            <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
-            <table>
-            <tr><td>Short Name:{{simform.abbrev.errors}} </td><td colspan="3">{{simform.abbrev}}</td></tr>
+	            
+	            <!-- expandable/collapsable page help (will want to pull this out eventually into its own block) -->
+	            <div class="msg_list">
+				    <p class="msg_head">
+				      <table>
+				        <tr>
+				          <td>Page Information</td>
+				          <td align="right">(click to expand/collapse)</td>
+				        </tr>
+				      </table>
+				    </p>
+				    <div class="msg_body">
+	                    On this page you are asked to fill out information about a particular simulation....
+	                    <br/>
+	                    When describing simulations you will be asked to clearly explain how the 
+	                    simulation has met the numerical requirements of the experiment with which 
+	                    it is associated. This is done via the conformance page, which maps the 
+	                    numerical requirements onto initial and boundary conditions (and, if 
+	                    necessary, onto code modifications) . You will probably have to dive off 
+	                    and create some initial conditions. 
+					</div>
+	            </div>
+	            
+            </div>
+            
+            <div class="boxer">
+              <h1> General Characteristics of the Simulation </h1>
+              <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
+              <table>
+                <tr>
+                  <td>Short Name: </td>
+                  <td>{{simform.abbrev}}</td>
+                  <td>{{simform.abbrev.errors}}</td>
+                </tr>
             <tr><td>Long Name:{{simform.title.errors}} </td><td colspan="3">{{simform.title}}</td></tr>
-        
-            <tr><td> Simulation used:  </td><td colspan="3">Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
-            on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr> 
+             
+            <tr><td> Simulation used:  </td><td colspan="3"><b>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
+            on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr>
+            <br/>
+            
+            <tr><td>rip value:{{simform.drsMember.errors}} </td><td colspan="3">{{simform.drsMember}}</td></tr>
+             
             <tr><td>Ensemble Members: </td><td colspan="3">{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
             </td></tr>
             <tr><td>Description (notes){{simform.description.errors}}</td><td colspan="3">{{simform.description}}</td></tr> 
@@ -93,7 +127,7 @@
             {{simform.authorList.errors}}:</p><p>{{simform.authorList}}</p>
             </center>
             </div>
-            <center><input id="simFormButton" type="submit" value="{{label}}"/>
+            <center><input id="simFormButton" type="submit" value="{{label}}" />
             </center>
         </form>
     </div> <!-- boxser2 -->

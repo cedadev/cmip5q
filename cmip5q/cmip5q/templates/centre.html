@@ -58,7 +58,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tr class="{% cycle 'row2' 'row1'%}">
             <td width="45%">{{g.abbrev}}</td>
             <td><span class="{{g.qstatus}}"> <a id="edGridButton{{forloop.counter}}" href="{{g.url}}">Edit</a></span></td>
-            <td><form action="{{g.cpURL}}" method="POST"><input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+            <td><form action="{{g.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()"><input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
         </tr>
         <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edGridButton{{forloop.counter}}");
@@ -86,7 +86,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tr class="{% cycle 'row2' 'row1'%}">
             <td width="45%">{{m.abbrev}}</td>
             <td><span class="{{m.qstatus}}"> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></span></td>
-            <td><form action="{{m.cpURL}}" method="POST"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+            <td><form action="{{m.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
             <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td>
         </tr>
         <script type="text/javascript">

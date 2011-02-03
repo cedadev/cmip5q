@@ -18,7 +18,7 @@
 <div class="boxer">
 <h4> Add new code modification: </h4>
 <div id="data">
-    <form action="{{editURL}}" method="POST">
+    <form action="{{editURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
       
        {% include 'codemodification_snippet.html' %}
        

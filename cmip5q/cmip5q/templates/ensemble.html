@@ -6,7 +6,7 @@
 <div class="boxer">
     <div class="boxer2">
         <center>
-        <form action={{urls.self}} method="POST">
+        <form action={{urls.self}} method="POST" onsubmit="myProject.bypassConfirm()">
             <table>
                 <tr><td width="20%">Ensemble Type:{{eform.etype.errors}}</td>
                     <td colspan="4">{{eform.etype}}&nbsp;</td></tr>
