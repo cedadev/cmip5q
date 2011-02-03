@@ -504,6 +504,8 @@ class Component(Doc):
     components=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     paramGroup=models.ManyToManyField('ParamGroup')
     grid=models.ForeignKey('Grid',blank=True,null=True)
+    
+    isDeleted=models.BooleanField(default=False)
 
     def copy(self,centre,model=None,realm=None):
         ''' Carry out a deep copy of a model '''
@@ -904,10 +906,13 @@ class Simulation(Doc):
     duration=DateRangeField(blank=True,null=True)
     
     # mimicking the drs member of ensembleMember for the case of a non-ensemble simulation 
-    drsMember=models.CharField(max_length=10,blank=True,null=True)
+    drsMember=models.CharField(max_length=20,blank=True,null=True)
     
     # not yet used:
     drsOutput=models.ManyToManyField('DRSOutput')
+    
+    # To mark a simulation as deleting without actually removing it from the database
+    isDeleted=models.BooleanField(default=False)
         
     # I/O datasets
     # only modified by resetIO and updateIO
@@ -1445,6 +1450,7 @@ class Grid(Doc):
     grids=models.ManyToManyField('self',blank=True,null=True,symmetrical=False)
     paramGroup=models.ManyToManyField('ParamGroup')
     references=models.ManyToManyField(Reference,blank=True,null=True)
+    isDeleted=models.BooleanField(default=False)
     
     
     def copy(self,centre,topGrid=None):

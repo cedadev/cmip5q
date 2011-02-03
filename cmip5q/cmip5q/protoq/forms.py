@@ -220,6 +220,7 @@ class EnsembleForm(forms.ModelForm):
         self.fields['etype'].queryset=Term.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
 
 class EnsembleMemberForm(forms.ModelForm):
+    drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
     class Meta:
         model=EnsembleMember
     def __init__(self,*args,**kwargs):
@@ -407,7 +408,7 @@ class SimulationForm(forms.ModelForm):
     #duration=forms.CharField(widget=forms.TextInput())
     #duration=DateRangeFieldForm(widget=DateRangeWidget())
     duration=DateRangeFieldForm2()
-    #drsMember=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
+    drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
     class Meta:
         model=Simulation
         #the first three are enforced by the workflow leading to the form, the second two are
