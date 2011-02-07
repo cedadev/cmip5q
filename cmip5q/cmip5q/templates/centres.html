@@ -6,7 +6,7 @@
 <td valign="top">
 <div><h2>  Model Centre Metadata Entry </h2>
 <p>Choose your centre from below:</p>
-<form action="{{curl}}" method='post'>
+<form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
 {% for choice in centreList %}
 <p>
 <input type="radio" name="choice" id="{{forloop.counter}}"
