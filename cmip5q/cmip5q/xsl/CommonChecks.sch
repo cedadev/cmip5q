@@ -116,23 +116,23 @@
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'climatology')]">
-      <assert test="(string-length(../componentProperty[shortName='ClimatologyType']/value)>0) and (string-length(../componentProperty[shortName='SpeciesEmitted']/value)>0)">
-        In Aerosol Emission And Conc, where 2D-Emissions Method is prescribed (climatology), values must be provided for ClimatologyType and SpeciesEmitted.
+      <assert test="(string-length(../componentProperty[shortName='ClimatologyType']/value)>0) and (string-length(../componentProperty[shortName='EmittedSpecies']/value)>0)">
+        In Aerosol Emission And Conc, where 2D-Emissions Method is prescribed (climatology), values must be provided for ClimatologyType and EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'spatially')]">
       <assert test="string-length(../componentProperty[shortName='EmittedSpecies']/value)>0">
-        In Aerosol Emission And Conc, where 2D-Emissions Method is prescribed (spatially uniform), a value must be provided for SpeciesEmitted.
+        In Aerosol Emission And Conc, where 2D-Emissions Method is prescribed (spatially uniform), a value must be provided for EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'interactive')]">
-      <assert test="string-length(../componentProperty[shortName='EmittedSpecies']/value)>0">
-        In Aerosol Emission And Conc, where 2D-Emissions Method is interactive, a value must be provided for SpeciesEmitted.
+      <assert test="string-length(../componentProperty[shortName='InteractivEmittedSpecies']/value)>0">
+        In Aerosol Emission And Conc, where 2D-Emissions Method is interactive, a value must be provided for EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'other')]">
       <assert test="(string-length(../componentProperty[shortName='MethodCharacteristics']/value)>0) and (string-length(../componentProperty[shortName='EmittedSpecies']/value)>0)">
-        In Aerosol Emission And Conc, where 2D-Emissions Method is other, values must be provided for MethodCharacteristics and SpeciesEmitted.
+        In Aerosol Emission And Conc, where 2D-Emissions Method is other, values must be provided for MethodCharacteristics and EmittedSpecies: <value-of select="../componentProperty[shortName='EmittedSpecies']/value"/>.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='3D-Emissions']" >
@@ -142,22 +142,22 @@
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'climatology')]">
       <assert test="(string-length(../componentProperty[shortName='ClimatologyType']/value)>0) and (string-length(../componentProperty[shortName='EmittedSpecies']/value)>0)">
-        In Aerosol Emission And Conc, where 3D-Emissions Method is prescribed (climatology), values must be provided for ClimatologyType and SpeciesEmitted.
+        In Aerosol Emission And Conc, where 3D-Emissions Method is prescribed (climatology), values must be provided for ClimatologyType and EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'spatially')]">
       <assert test="string-length(../componentProperty[shortName='EmittedSpecies']/value)>0">
-        In Aerosol Emission And Conc, where 3D-Emissions Method is prescribed (spatially uniform), a value must be provided for SpeciesEmitted.
+        In Aerosol Emission And Conc, where 3D-Emissions Method is prescribed (spatially uniform), a value must be provided for EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'interactive')]">
       <assert test="string-length(../componentProperty[shortName='EmittedSpecies']/value)>0">
-        In Aerosol Emission And Conc, where 3D-Emissions Method is interactive, a value must be provided for SpeciesEmitted.
+        In Aerosol Emission And Conc, where 3D-Emissions Method is interactive, a value must be provided for EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Aerosol Emission And Conc']/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method'][contains(value[last()],'other')]">
       <assert test="(string-length(../componentProperty[shortName='MethodCharacteristics']/value)>0) and (string-length(../componentProperty[shortName='EmittedSpecies']/value)>0)">
-        In Aerosol Emission And Conc, where 3D-Emissions Method is other, values must be provided for MethodCharacteristics and SpeciesEmitted.
+        In Aerosol Emission And Conc, where 3D-Emissions Method is other, values must be provided for MethodCharacteristics and EmittedSpecies.
       </assert> 
     </rule>
     <rule context="//modelComponent[shortName='Atmos Convect Turbul Cloud']/componentProperties/componentProperty[shortName='BoundaryLayerTurbulence']/componentProperty[shortName='SchemeName'][contains(value[last()],'Mellor-Yamada')]">
@@ -235,19 +235,19 @@
   <pattern name="Model component AerosolEmissionAndConc constraints">
     <rule context="//modelComponent[type[@value='AerosolEmissionAndConc']]/componentProperties/componentProperty[shortName='2D-Emissions']/componentProperty[shortName='Method']">
       <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)ClimatologyType']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
-      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='interactiveSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherMethodCharacteristics']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
-      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)EmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (climatology), a value must be specified for EmittedSpecies</assert>
+      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)EmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for EmittedSpecies</assert>
+      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='InteractivEmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has interactive, a value must be specified for EmittedSpecies</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='MethodCharacteristics']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='EmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 2D-Emissions: Where Method has other, a value must be specified for EmittedSpecies</assert>
     </rule>
     <rule context="//modelComponent[type[@value='AerosolEmissionAndConc']]/componentProperties/componentProperty[shortName='3D-Emissions']/componentProperty[shortName='Method']">
       <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)ClimatologyType']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for ClimatologyType</assert>
-      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)SpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for SpeciesEmitted</assert>
-      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='interactiveSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has interactive, a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='prescribed (climatology)') and (string-length(../componentProperty[shortName='prescribed (climatology)EmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (climatology), a value must be specified for EmittedSpecies</assert>
+      <assert test="not ( (value='prescribed (spatially uniform)') and (string-length(../componentProperty[shortName='prescribed (spatially uniform)EmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has prescribed (spatially uniform), a value must be specified for EmittedSpecies</assert>
+      <assert test="not ( (value='interactive') and (string-length(../componentProperty[shortName='interactiveEmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has interactive, a value must be specified for EmittedSpecies</assert>
       <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherMethodCharacteristics']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for MethodCharacteristics</assert>
-      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherSpeciesEmitted']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for SpeciesEmitted</assert>
+      <assert test="not ( (value='other') and (string-length(../componentProperty[shortName='otherEmittedSpecies']/value)=0) )">Model component AerosolEmissionAndConc, Parameter 3D-Emissions: Where Method has other, a value must be specified for EmittedSpecies</assert>
     </rule>
   </pattern>
   <pattern name="Model component AerosolModel constraints">
