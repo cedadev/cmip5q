@@ -4,6 +4,7 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.forms import *
@@ -113,11 +114,23 @@ def index(request):
 def centres(request):
     ''' For choosing amongst centres '''
     p=Centre.objects.all()
-    p=p.exclude(abbrev='CMIP5')
+    for ab in ['CMIP5','1. Example','2. Test Centre']:
+        p=p.exclude(abbrev=ab)
+    
+    # creating a separate list for the example and test centre
+    p_aux=Centre.objects.filter(Q(abbrev='1. Example')|Q(abbrev='2. Test Centre'))
+    
+    #for ab in ['1. Example','2. Test Centre']:
+    #    p_aux.append(Centre.objects.get(abbrev=ab))
+        
+    
     if request.method=='POST':
         #yep we've selected something
         try:
-            selected_centre=p.get(id=request.POST['choice'])
+            if 'choice' in request.POST:
+                selected_centre=p.get(id=request.POST['choice'])
+            elif 'auxchoice' in request.POST:
+                selected_centre=p_aux.get(id=request.POST['auxchoice'])
             return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,))) 
         except KeyError:
             m='Unable to select requested centre %s'%request.POST['choice']
@@ -130,7 +143,8 @@ def centres(request):
         feedlist=[]
         for f in sorted(feeds):
             feedlist.append((f,reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%f,))))
-        return render_to_response('centres.html',{'centreList':p,'curl':curl,'feeds':feedlist})
+        #return render_to_response('centres.html',{'objects':sublist(p,3),'centreList':p,'auxList':p_aux,'curl':curl,'feeds':feedlist})
+        return render_to_response('centres.html',{'objects':sublist(p,3),'centreList':p,'auxList':p_aux,'curl':curl,'feedobjects':sublist(feedlist,2)})
     
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''

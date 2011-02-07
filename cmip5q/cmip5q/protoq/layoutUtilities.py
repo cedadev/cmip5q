@@ -10,10 +10,11 @@ logging=settings.LOG
 
 class tab:
     ''' This is a simple tab class to support navigation tabs '''
-    def __init__(self,name,url,active=0):
+    def __init__(self,name,url,active=0, pos='left'):
         self.name=name # what is seen in the tab
         self.url=url
         self.active=active
+        self.pos=pos
         #print 't[%s,%s]'%(self.name,self.url)
     def activate(self):
         self.active=1
@@ -44,16 +45,16 @@ class tabs(list):
         if 'Grid' not in request.session:request.session['Grid']=0
         #This is the list of tabs '''
         self.tablist=[#('Intro','cmip5q.protoq.views.intro',(centre_id,)),
-                 ('Summary','cmip5q.protoq.views.centre',(centre_id,)),
-                 ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,)),
-                 ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],)),
-                 ('Grid','cmip5q.protoq.views.gridEdit',(centre_id,request.session['Grid'],)),
-                 ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],)),
-                 ('Files','cmip5q.protoq.views.list',(centre_id,'file',)),
-                 ('References','cmip5q.protoq.views.list',(centre_id,'reference',)),
-                 ('Parties','cmip5q.protoq.views.list',(centre_id,'parties',)),
-                 ('Help','cmip5q.protoq.views.help',(centre_id,)),
-                 ('About','cmip5q.protoq.views.about',(centre_id,)),
+                 ('Summary','cmip5q.protoq.views.centre',(centre_id,),'left'),
+                 ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,),'left'),
+                 ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],),'left'),
+                 ('Grid','cmip5q.protoq.views.gridEdit',(centre_id,request.session['Grid'],),'left'),
+                 ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],),'left'),
+                 ('Files','cmip5q.protoq.views.list',(centre_id,'file',),'left'),
+                 ('References','cmip5q.protoq.views.list',(centre_id,'reference',),'left'),
+                 ('Parties','cmip5q.protoq.views.list',(centre_id,'parties',),'left'),
+                 ('Help','cmip5q.protoq.views.help',(centre_id,),'right'),
+                 ('About','cmip5q.protoq.views.about',(centre_id,),'right'),
                  ]
         for item in self.tablist:
             self.append(self.tabify(item,page))
@@ -63,19 +64,19 @@ class tabs(list):
     def tabify(self,item,page):
         if item[0] not in ['Simulation','Model','Grid']:
             #it's easy:
-            return tab(item[0],reverse(item[1],args=item[2]),page==item[0])
+            return tab(item[0],reverse(item[1],args=item[2]),page==item[0],item[3])
         else:
             if item[2][1]==0:
-                return tab(item[0],'',-1)
+                return tab(item[0],'',-1, item[3])
             else: 
                 try:
                     obj={'Model':Component,'Simulation':Simulation,'Grid':Grid}[item[0]].objects.get(id=item[2][1])
                 except:
                     logging.info('Attempt to access deleted component, simulation or grid %s,%s'%(item[0],item[2][1]))
-                    return tab(item[0],'',-1)
+                    return tab(item[0],'',-1,item[3] )
                 return tab('%s:%s'%(item[0][0:5],obj),
                            reverse(item[1],args=item[2]),
-                           page==item[0])
+                           page==item[0], item[3])
             
     def history(self,request,page):
         #initialise as necessary.

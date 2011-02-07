@@ -11,7 +11,7 @@ body {
     background-image:url(icons/hilbert.gif);
     width: 1120px; margin:auto }
     
-table,form {margin: 0; padding: 0; width: 100%;}
+table,form {margin: 0; padding: 0; width:100%;}
 p {padding: 2px; }
 ol {padding-left:20px;}
 ul {padding-left:20px;}
@@ -108,7 +108,8 @@ display: inline;                             /* IMPORTANT */
 border: solid;
 border-width: 1px 1px 0 1px;                 /* BOTTOM HAS TO BE ZERO */
 margin: 0 0.5em 0 0 ;                        /* Second one is spacing */
-padding: 2px 0px 5px 0;                        /* nb can't pad down any different from the ul down padding */
+padding: 2px 0px 5px 0;						/* nb can't pad down any different from the ul down padding */
+width: 500em;
 }
 
 .tabnav a {
@@ -171,7 +172,3 @@ a.atom {background-image:url(icons/atom.png);background-repeat:no-repeat;}
 	background:transparent;
 	padding-bottom: 30px;
 	}
-	
-.message_body {
-	padding: 5px 10px 15px;
-	color: #666666;

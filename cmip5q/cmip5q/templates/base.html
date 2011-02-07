@@ -42,7 +42,7 @@
                 <tr>
                 <td width="100px" align="center"><img height="60" src="/css/icons/eu_fw7_logo.jpg"/></td>
                 <td width="900px" align="center">
-                <center><h1>CMIP5 Metadata Questionnaire (1.01)</h1>
+                <center><h1>CMIP5 Metadata Questionnaire (1.02)</h1>
                 <p> Completed data will be sent to the Earth System Grid for inclusion in all official CMIP5 catalogues.</p>
                 </td>
                 <td width="100px" align="center"><img height="60" src="/css/icons/enes_logo.png"/></td>
@@ -55,14 +55,34 @@
                 <center class="red">Instructions for gaining access to the questionnaire can be found <a href="http://metafortrac.badc.rl.ac.uk/trac/wiki/CMIP5/QuestionnaireAccess" target="_blank">here</a></center>
             </div>
             <div class="main">
+            	<table>
+                <tr>
+                <td width="700px">
                 <div class="tabnav">
                     <ul>
                     {% for tab in tabs %}
+                    {% ifequal tab.pos "left" %}
                     <li {% ifequal tab.active 1 %} class="selected"{% endifequal %}{% ifequal tab.active -1 %} class="subdue"{% endifequal %}>
                     <a href="{{tab.url}}">{{tab.name}}</a></li>
+                    {% endifequal %}
                     {% endfor %}
                     </ul>
                 </div>
+                </td>
+                <td width="300px" align="right">
+                <div class="tabnav">
+                    <ul>
+                    {% for tab in tabs %}
+                    {% ifequal tab.pos "right" %}
+                    <li {% ifequal tab.active 1 %} class="selected"{% endifequal %}{% ifequal tab.active -1 %} class="subdue"{% endifequal %}>
+                    <a href="{{tab.url}}">{{tab.name}}</a></li>
+                    {% endifequal %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                </td>
+                </tr>
+                </table>
                 <div class="tabcontent">
                     {% block content %}
                     {% endblock %}</p>
