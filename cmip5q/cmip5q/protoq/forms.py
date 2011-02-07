@@ -339,7 +339,7 @@ class CodeModForm(ModForm):
         model=CodeMod
         exclude=('centre','mods')  # ignoring mods for now ...
     def specialise(self,model):
-        self.fields['component'].queryset=Component.objects.filter(model=model)
+        self.fields['component'].queryset=Component.objects.filter(model=model).filter(isDeleted=False)
         ivocab=Vocab.objects.get(name='ModelModTypes')
         self.fields['mtype'].queryset=Term.objects.filter(vocab=ivocab)
 
@@ -447,7 +447,7 @@ class SimulationForm(forms.ModelForm):
     def specialise(self,centre):
         self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
         self.fields['numericalModel'].queryset=Component.objects.filter(
-                            scienceType='model').filter(centre=centre)
+                            scienceType='model').filter(centre=centre).filter(isDeleted=False)
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
         for i in ['author','funder','contact']: self.fields[i].queryset=qs
     def save(self):

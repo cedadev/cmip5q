@@ -150,7 +150,7 @@ def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''
     c=Centre.objects.get(id=centre_id)
     models=[]
-    models=[Component.objects.get(id=m.id) for m in c.component_set.filter(scienceType='model')]
+    models=[Component.objects.get(id=m.id) for m in c.component_set.filter(scienceType='model').filter(isDeleted=False)]
     #monkey patch the urls to edit these ...
     for m in models:
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
