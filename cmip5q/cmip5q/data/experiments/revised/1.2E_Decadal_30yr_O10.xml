@@ -207,7 +207,7 @@
 
 	<numericalRequirement xsi:type="SpatioTemporalConstraint">
 		<name xsi:type="Identifier">1.2E.stc.decadal_20yr</name>
-		<id xsi:type="Identifier">stc.020</id>
+		<id xsi:type="Identifier">stc.002</id>
 		<description>Run for 20 years</description>
 		<requiredDuration xsi:type="OpenDateRange">
 			<length units="years">20</length>
