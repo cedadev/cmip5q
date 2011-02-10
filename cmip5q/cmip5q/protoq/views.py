@@ -157,7 +157,7 @@ def centre(request,centre_id):
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
         m.cpURL=reverse('cmip5q.protoq.views.componentCopy',args=(c.id,m.id))
     
-    platforms=[Platform.objects.get(id=p['id']) for p in c.platform_set.values()]
+    platforms=[Platform.objects.get(id=p['id']) for p in c.platform_set.values().filter(isDeleted=False)]
     for p in platforms:
         p.url=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,p.id))
     

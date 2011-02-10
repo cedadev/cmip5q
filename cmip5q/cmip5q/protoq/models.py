@@ -639,6 +639,7 @@ class Platform(Doc):
     operatingSystem=models.ForeignKey('Term',related_name='operatingSystemVal',null=True,blank=True)
     processor=models.ForeignKey('Term',related_name='processorVal',null=True,blank=True)
     interconnect=models.ForeignKey('Term',related_name='interconnectVal',null=True,blank=True)
+    isDeleted=models.BooleanField(default=False)
     #see http://metaforclimate.eu/trac/wiki/tickets/280
 
 def Calendar(elem):

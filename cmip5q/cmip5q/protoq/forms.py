@@ -96,7 +96,7 @@ class ComponentForm(forms.ModelForm):
         #concatenate to allow the centre to be shown as well as the other parties tied to it.
         qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
         for i in ['author','contact','funder']: self.fields[i].queryset=qs
-        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre).filter(istopGrid=True)
+        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre).filter(istopGrid=True).filter(isDeleted=False)
         if self.instance.controlled: 
             # We don't want this to be editable 
             self.fields['scienceType'].widget=forms.HiddenInput()
@@ -432,7 +432,7 @@ class SimulationForm(forms.ModelForm):
     def clean_abbrev(self):
         # abbrev name needs to be unique within a particular centre
         value=self.cleaned_data['abbrev']
-        s=Simulation.objects.filter(centre=self.instance.centre)
+        s=Simulation.objects.filter(centre=self.instance.centre).filter(isDeleted=False)
         
         SimulList=[]
         for x in s:
@@ -445,7 +445,7 @@ class SimulationForm(forms.ModelForm):
     
     
     def specialise(self,centre):
-        self.fields['platform'].queryset=Platform.objects.filter(centre=centre)
+        self.fields['platform'].queryset=Platform.objects.filter(centre=centre).filter(isDeleted=False)
         self.fields['numericalModel'].queryset=Component.objects.filter(
                             scienceType='model').filter(centre=centre).filter(isDeleted=False)
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
@@ -471,7 +471,7 @@ class SimRelationshipForm(forms.ModelForm):
         self.vocab=Vocab.objects.get(name='SimRelationships')
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.fields['value'].queryset=Term.objects.filter(vocab=self.vocab)
-        self.fields['sto'].queryset=Simulation.objects.filter(centre=self.simulation.centre)
+        self.fields['sto'].queryset=Simulation.objects.filter(centre=self.simulation.centre).filter(isDeleted=False)
     def clean(self):
         tmp=self.cleaned_data.copy()
         for k in 'value','sto':
