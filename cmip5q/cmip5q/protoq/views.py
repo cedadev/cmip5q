@@ -149,19 +149,23 @@ def centres(request):
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''
     c=Centre.objects.get(id=centre_id)
+    
     models=[]
     models=[Component.objects.get(id=m.id) for m in c.component_set.filter(scienceType='model').filter(isDeleted=False)]
     #monkey patch the urls to edit these ...
     for m in models:
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
         m.cpURL=reverse('cmip5q.protoq.views.componentCopy',args=(c.id,m.id))
+    
     platforms=[Platform.objects.get(id=p['id']) for p in c.platform_set.values()]
     for p in platforms:
         p.url=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,p.id))
-    sims=Simulation.objects.filter(centre=c.id)
+    
+    sims=Simulation.objects.filter(centre=c.id).filter(isDeleted=False)
     for s in sims:
         s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id))
-    grids=Grid.objects.filter(centre=c.id).filter(istopGrid=True) 
+    
+    grids=Grid.objects.filter(centre=c.id).filter(istopGrid=True).filter(isDeleted=False) 
     for g in grids:
         g.url=reverse('cmip5q.protoq.views.gridEdit',args=(c.id,g.id))
         g.cpURL=reverse('cmip5q.protoq.views.gridCopy',args=(c.id,g.id))

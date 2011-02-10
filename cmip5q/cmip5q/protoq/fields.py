@@ -391,10 +391,10 @@ class DateRangeFieldForm2(forms.MultiValueField):
 
 
 ## South needs information on custom fields:
-from south.modelsinspector import add_introspection_rules
+#from south.modelsinspector import add_introspection_rules
 
-add_introspection_rules([], ["cmip5q.protoq.fields.SimDateTimeField"])
-add_introspection_rules([], ["cmip5q.protoq.fields.DateRangeField"])
+#add_introspection_rules([], ["cmip5q.protoq.fields.SimDateTimeField"])
+#add_introspection_rules([], ["cmip5q.protoq.fields.DateRangeField"])
 
 
 
