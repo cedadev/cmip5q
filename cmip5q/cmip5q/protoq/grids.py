@@ -55,8 +55,7 @@ class gridHandler(object):
         
         #TODO; figure out if we want to keep the idea of a 'controlled' grid component, i.e. do we want the 
         #ability to add extra grid components (doubtful) - I've removed the delete capability for now:
-        #
-        #
+        
                         
         # find my own urls ...
         urls={}

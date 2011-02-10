@@ -491,7 +491,7 @@ class Component(Doc):
     isRealm=models.BooleanField(default=False)
     isModel=models.BooleanField(default=False)
     
-    #to support paramgroups with componentView set to true
+    #to support paramgroups dressed as components
     isParamGroup=models.BooleanField(default=False)
     
     # the following are common parameters
@@ -1453,6 +1453,9 @@ class Grid(Doc):
     references=models.ManyToManyField(Reference,blank=True,null=True)
     isDeleted=models.BooleanField(default=False)
     
+    #to support paramgroups dressed as components/grids
+    isParamGroup=models.BooleanField(default=False)
+    
     
     def copy(self,centre,topGrid=None):
         ''' Carry out a deep copy of a grid '''
@@ -1461,7 +1464,7 @@ class Grid(Doc):
             raise ValueError('Invalid centre passed to grid copy')
         
         attrs=['title','abbrev','description',
-               'istopGrid','author','contact','funder']
+               'istopGrid','isParamGroup','author','contact','funder']
         kwargs={}
         for i in attrs: kwargs[i]=self.__getattribute__(i)
         if kwargs['istopGrid']: 

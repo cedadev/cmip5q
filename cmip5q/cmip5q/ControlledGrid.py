@@ -127,18 +127,19 @@ class XMLVocabReader:
         first = self.root.findall('component')[0]
         logging.info("New component: %s for grid %s"%(first.attrib['name'],self.grid))
         # Initiate new top-level component in django:
-        modelParser = ComponentParser(first, self.grid)
+        modelParser = GridParser(first, self.grid)
         self.component=modelParser.add(True,True)
         self.component.metadataVersion='Mindmap Version %s,  Translation Version %s  (using %s). CMIP5 Questionnaire Version alpha10.'%(
         self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
         self.root.attrib['mmlcrevision'])
 
-class ComponentParser:
+class GridParser:
     ''' class for handling all elements '''
-    def __init__(self, item, grid):
+    def __init__(self, item, grid, isParamGroup=False):
         ''' initialise  parser '''
         self.item = item
         self.grid = grid
+        self.isParamGroup = isParamGroup
         #logging.debug("Instantiated Parser for %s"% item.tag)
         if item.attrib['name']:
             logging.debug("name = %s"%item.attrib['name'])
@@ -254,6 +255,7 @@ class ComponentParser:
         if isTop <> True:
             grid = Grid(title='',
                     abbrev=nameWithSpaces,
+                    isParamGroup=self.isParamGroup,
                     uri=u,
                     centre=self.grid.centre,
                     contact=self.grid.contact,
@@ -272,13 +274,21 @@ class ComponentParser:
             for subchild in self.item:
                 if subchild.tag == "component":
                     logging.debug("Found child : %s"%subchild.tag)
-                    subComponentParser = ComponentParser(subchild, self.grid)
+                    subGridParser = GridParser(subchild, self.grid)
                     # Handle child components of this one (True = recursive)
-                    child=subComponentParser.add(True, False)
-                    logging.debug("Adding sub-component %s to K %s"%(child.abbrev, grid.abbrev))
+                    child=subGridParser.add(True, False)
+                    logging.debug("Adding sub-grid %s to K %s"%(child.abbrev, grid.abbrev))
                     grid.grids.add(child)
-                elif subchild.tag == 'parametergroup': 
-                    self.__handleParamGrp(subchild)                    
+                elif subchild.tag == 'parametergroup':
+                    if subchild.attrib['componentView'] == 'False' or subchild.attrib['componentView'] == 'false': 
+                        self.__handleParamGrp(subchild)
+                    else:
+                        # treating the componentView=true as a grid component
+                        subGridParser = GridParser(subchild, self.grid, isParamGroup=True)
+                        # Handle child grid components of this one (True = recursive)
+                        child=subGridParser.add(True,False)
+                        logging.debug("Adding sub-grid (parameter group) (paramgroup %s to grid %s)"%(child.abbrev, grid.abbrev))
+                        grid.grids.add(child)                  
                 elif subchild.tag == 'parameter':
                     print logging.info('OOOOOOOPPPPPPs')
                     self.__handleParam(subchild)

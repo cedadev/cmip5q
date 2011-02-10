@@ -134,8 +134,6 @@ class XMLVocabReader:
         self.root.attrib['mmrevision'],self.root.attrib['transrevision'],
         self.root.attrib['mmlcrevision'])
         
-
-		
 class ComponentParser:
     ''' class for handling all elements '''
     def __init__(self, item, model, isParamGroup=False):
@@ -292,7 +290,7 @@ class ComponentParser:
             #temporary
             for subchild in self.item:
                 if subchild.tag == "component":
-                    #logging.debug("Found child : %s"%subchild.tag)
+                    logging.debug("Found child : %s"%subchild.tag)
                     subComponentParser = ComponentParser(subchild, self.model)
                     # Handle child components of this one (True = recursive)
                     child=subComponentParser.add(True,realm=realm)
