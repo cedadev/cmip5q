@@ -119,11 +119,11 @@ text-decoration: none;
 .tabnav a:hover {background: #ddf; }
 
 .tabcontent {
-margin-left: 5px;
-margin-right: 5px;
+margin-left: 3px;
+margin-right: 3px;
 border: 1px solid black;
 background-color:#FFFACD; /* lemonchiffon, see http://www.somacon.com/p142.php */
-padding: 5px;
+padding: 2px;
 }        /* tabs sit on this div */
 
 

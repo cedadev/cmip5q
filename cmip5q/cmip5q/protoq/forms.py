@@ -570,8 +570,11 @@ class ParamGroupForm:
                     cg.forms.append(f(POST,instance=p.get_child_object(),prefix='%s-%s'%(prefix,fid)))
             # Get direct to uncontrolled keyboards for the last constraint group in a param group
             q=KeyBoardParam.objects.filter(constraint=cg).filter(controlled=False).order_by('id')
+            #if len(q):
             logging.debug('Userparams for %s in %s'%(cg.id,pg))
-            cg.userforms=self.UserFormSet(POST,queryset=q,prefix='%s-uf-%s'%(prefix,cg.id))  
+            cg.userforms=self.UserFormSet(POST,queryset=q,prefix='%s-uf-%s'%(prefix,cg.id))
+            #else:
+            #    cg.userforms=None  
                  
     def save(self):
         ''' Try and save what we can, return status, and return form for reuse '''
@@ -586,6 +589,9 @@ class ParamGroupForm:
                         logging.debug('%s:\n%s'%(p,p.errors))
                         ok=False
             # The last one has a userforms parameter set
+            # (adding an initial check that these are present as grids page means they don't have to be
+            
+            #if cg.userforms is not None:
             if cg.userforms.is_valid():
                 instances=cg.userforms.save(commit=False)
                 for uf in instances:

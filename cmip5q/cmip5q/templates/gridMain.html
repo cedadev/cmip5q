@@ -18,10 +18,13 @@
         <div class="boxer"><h4> Grid Structure </h4><div id="treeDiv"> {{navtree|safe}}</div>
         <h4>Grid {{c.abbrev}}</h4>
     </div>
+    {% if c.istopGrid %}
     <div class="boxer"> 
     	<p> The button(s) in this box navigate to pages which further describe this <b>grid</b>.</p>
         <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
     </div>
+    {% else %}
+    {% endif %}
 {% endblock %}
 
 {% block mainpanel %}
@@ -42,18 +45,20 @@
             </table>
         </div>
         
+         <!-- 
          {% if c.istopGrid %}
 	         <div style="display:none">
 	     {% else %}
 	         <div class="boxer">
 	     {% endif %}
+	     
+	     -->
+	         <div class="boxer">
 	  
 	      	          <h4> Grid Attributes </h4>
 	          <p> In this section enter parameters and attributes associated with this grid.  <br>
-					We will ask for generic information 
-					but you can also tell us about additional parameters and attributes that are specific to your grid.</p>
-		
-	       	  {% include 'attributeform.html' %}
+						
+	       	  {% include 'gridattributeform.html' %}
 	      
 	       	</div>
       
@@ -83,6 +88,7 @@
     </form>
     </div><!-- boxer2 div -->
     
+    {% if c.istopGrid %}
     <div class="boxer">
         <h4> References (associated with this grid) </h4>
         {% if refs|length_is:0 %} 
@@ -97,6 +103,8 @@
         </table>
         {% endif %}
     </div>
+    {% else %}
+    {% endif %}
     
    
 <!-- button specific javascript follows -->
