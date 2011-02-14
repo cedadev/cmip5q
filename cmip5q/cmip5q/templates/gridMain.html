@@ -33,14 +33,24 @@
         <div class="boxer">    
             <table>
                 <tr>
+                  {% if c.isParamGroup %}
+                 	    <h1>{{c.abbrev}} </h1>
+                 	{% else %}
                 	<td class="inputH1">
                 		Short Name:&nbsp;{{cform.abbrev.errors}}
                 	</td>
                 	<td colspan="4">
-                  		{{cform.abbrev}}
+	                    {{cform.abbrev}}
                 	</td>
+               	  {% endif %}
                 </tr>
-                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr>
+                {% if c.isParamGroup %}
+                {% else %}
+                <tr>
+                  <td>Long Name:&nbsp;{{cform.title.errors}}</td>
+                  <td colspan="3">{{cform.title}}</td>
+                </tr>
+                {% endif %}
                 <tr></tr>               
             </table>
         </div>
