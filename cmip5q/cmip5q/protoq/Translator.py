@@ -17,7 +17,7 @@ class Translator:
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
-    CIM_NAMESPACE = "http://www.metaforclimate.eu/schema/cim/1.5"
+    CIM_NAMESPACE = "http://metafor.eu/cim/schemas/1.5"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = CIM_NAMESPACE+"/"+"cim.xsd"
@@ -192,7 +192,7 @@ class Translator:
         return comp
 
     def cimRecord(self,rootElement) :
-        ''' return the top level cim document invarient structure from within a CIMRecordSet'''
+        ''' return the top level cim document invarient structure from within a CIMDocumentSet'''
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
         return cr2
@@ -204,37 +204,44 @@ class Translator:
                              nsmap=self.NSMAP)
         return root
 
-    def cimRecordSetRoot(self):
+    def cimDocumentSetRoot(self):
         ''' return the top level cim document invarient structure for a recordset'''
-        root=ET.Element('CIMRecordSet', \
+        root=ET.Element('CIMDocumentSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
         return root
 
     def q2cim(self,ref,docType):
 
+        # check whether this object is marked as deleted. This code should never called if the object is deleted so throw an error if this is the case.
+        assert not(ref.isDeleted),"GerryWobbler error: An object that has been maked as deleted is being translated to XML"
         ''' primary public entry point. '''
         method_name = 'add_' + str(docType)
         logging.debug("q2cim calling "+method_name)
         method = getattr(self, method_name)
         # make a special case for simulation as we output
         # all information associated with a simulation
-        # using a CIMRecordSet
+        # using a CIMDocumentSet
         if method_name=='add_simulation' :
             # save our simulation instance so the composition can pick it up
             self.simClass=ref
-            root=self.cimRecordSetRoot()
-            modelElement=self.cimRecord(root)
-            self.add_component(ref.numericalModel,modelElement)
-            simulationElement=self.cimRecord(root)
-            self.add_simulation(ref,simulationElement)
+            root=self.cimDocumentSetRoot()
+            #modelElement=self.cimRecord(root)
+            #self.add_component(ref.numericalModel,modelElement)
+            self.add_component(ref.numericalModel,root)
+            #simulationElement=self.cimRecord(root)
+            #self.add_simulation(ref,simulationElement)
+            self.add_simulation(ref,root)
             if ref.ensembleMembers>1 :
-                ensembleElement=self.cimRecord(root)
-                self.add_ensemble(ref,ensembleElement)
-            experimentElement=self.cimRecord(root)
-            self.add_experiment(ref.experiment,experimentElement)
-            platformElement=self.cimRecord(root)
-            self.add_platform(ref.platform,platformElement)
+                #ensembleElement=self.cimRecord(root)
+                #self.add_ensemble(ref,ensembleElement)
+                self.add_ensemble(ref,root)
+            #experimentElement=self.cimRecord(root)
+            #self.add_experiment(ref.experiment,experimentElement)
+            self.add_experiment(ref.experiment,root)
+            #platformElement=self.cimRecord(root)
+            #self.add_platform(ref.platform,platformElement)
+            self.add_platform(ref.platform,root)
 
             uniqueFileList=[]
             couplings=ref.numericalModel.couplings(simulation=self.simClass)
@@ -244,16 +251,18 @@ class Translator:
                     if externalClosure.targetFile not in uniqueFileList :
                         uniqueFileList.append(externalClosure.targetFile)
             for fileObject in uniqueFileList :
-                dataObjectElement=self.cimRecord(root)
-                self.add_dataobject(fileObject,dataObjectElement)
+                #dataObjectElement=self.cimRecord(root)
+                #self.add_dataobject(fileObject,dataObjectElement)
+                self.add_dataobject(fileObject,root)
 
             # find all unique grid references in our model
             uniqueGridList=[]
             myModel=ref.numericalModel
             self.componentWalk(myModel,uniqueGridList)
             for gridObject in uniqueGridList :
-                gridObjectElement=self.cimRecord(root)
-                self.add_gridobject(gridObject,gridObjectElement)
+                #gridObjectElement=self.cimRecord(root)
+                #self.add_gridobject(gridObject,gridObjectElement)
+                self.add_gridobject(gridObject,root)
             cimDoc=root
         else :
             root=self.cimRecordRoot()
@@ -281,6 +290,7 @@ class Translator:
         HorizGridDiscretization=""
         HorizGridType=""
         HorizResProps={}
+        HorizGridMnemonic=""
         for pg in horizontalPropertiesObject.paramGroup.all():
             if pg.name=="HorizontalCoordinateSystem" :
                 # We rely on the constraint set objects appearing in our list in the same order as they appear in the questionnaire. We rely on this as the information we gather from this affects what we need to read from the others. The order_by('id') should sort this out but I've put a check in the code (for the first constraint only) just in case.
@@ -707,11 +717,40 @@ class Translator:
             typeElement=ET.SubElement(reqElement,mapping[reqClass.ctype.name])
             ''' numericalRequirement [0..inf] '''
             ''' id [0..1] '''
+            ET.SubElement(typeElement,"id").text=reqClass.docid
             ''' name [1] '''
             ET.SubElement(typeElement,'name').text=reqClass.name
             ''' description [0,1] '''
             ET.SubElement(typeElement,'description').text=reqClass.description
-        
+            if reqClass.ctype.name=='SpatioTemporalConstraint':
+                rdElement=ET.SubElement(typeElement,'requiredDuration')
+                stcObject=reqClass.get_child_object()
+                if stcObject.requiredDuration:
+                    startDate=stcObject.requiredDuration.startDate
+                    endDate=stcObject.requiredDuration.endDate
+                    period=""
+                    units=""
+                    if stcObject.requiredDuration.length:
+                        period=stcObject.requiredDuration.length.period
+                        units=stcObject.requiredDuration.length.units
+                    if startDate and endDate or startDate and period:
+                        # closed date range
+                        drElement=ET.SubElement(rdElement,'closedDateRange')
+                    else:
+                        # open date range
+                        drElement=ET.SubElement(rdElement,'openDateRange')
+                    if startDate!=None:
+                        ET.SubElement(drElement,'startDate').text=str(startDate)
+                    if endDate!=None:
+                        ET.SubElement(drElement,'endDate').text=str(endDate)
+                    if period:
+                        # we are using the standard schema duration type in the CIM here,
+                        # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
+                        # more details
+                        mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+                        length='P'+str(int(period))+mappingUnits[units]
+                        ET.SubElement(drElement,'duration').text=length
+
     def add_experiment(self,expClass,rootElement):
 
             expElement=ET.SubElement(rootElement,'numericalExperiment')
@@ -750,9 +789,6 @@ class Translator:
                 calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
             else :
                 assert False, "Error, a calendar must exist"
-            ''' requiredDuration [1] '''
-            # extract this information from the conformance?
-            ET.SubElement(expElement,'requiredDuration')
             ''' numericalRequirement [1..inf] '''
             for reqClass in expClass.requirements.all():
                 self.addRequirement(reqClass,expElement)
@@ -1171,7 +1207,7 @@ class Translator:
         if c.otherVersion or c.geneology :
             GenEl=ET.SubElement(comp,'documentGenealogy')
             RelEl=ET.SubElement(GenEl,'relationship')
-            DocEl=ET.SubElement(RelEl,'documentRelationship',{'type' : 'previousVersion'})
+            DocEl=ET.SubElement(RelEl,'documentRelationship',{'type' : 'previousVersionOf', 'direction' : 'toTarget'})
             if c.geneology :
                 ET.SubElement(DocEl,'description').text=c.geneology
             TargEl=ET.SubElement(DocEl,'target')
