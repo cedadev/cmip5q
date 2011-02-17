@@ -391,8 +391,12 @@ def viewExperiment(request,cen_id,experiment_id):
 def vnhist(request,cen_id):
     return render_to_response('vnhist.html')
 
+def trans(request,cen_id):
+    return render_to_response('trans.html')
+
 def help(request,cen_id):    
-    urls={'vnhist':reverse('cmip5q.protoq.views.vnhist',args=(cen_id,)),}
+    urls={'vnhist':reverse('cmip5q.protoq.views.vnhist',args=(cen_id,)),
+          'trans':reverse('cmip5q.protoq.views.trans',args=(cen_id,)),}
     
     return render_to_response('help.html',{'urls':urls,'tabs':tabs(request,cen_id,'Help')})
  
