@@ -8,12 +8,12 @@ width: 100%;
 padding: 5px 10px;
 cursor: pointer;
 position: relative;
-background-color:#FECF85;
+background-color:#FFFFFF;
 margin:1px;
 }
 .msg_body {
 padding: 5px 10px 15px;
-background-color:#F4F4F8;
+background-color:#FFFFFF;
 }
 
 #active {
