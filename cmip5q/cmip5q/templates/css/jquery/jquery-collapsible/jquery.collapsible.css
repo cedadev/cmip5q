@@ -15,3 +15,12 @@ margin:1px;
 padding: 5px 10px 15px;
 background-color:#F4F4F8;
 }
+
+#active {
+background-color:#FFF9AB;
+}
+
+#inactive {
+background-color:#DBDBDB;
+}
+
