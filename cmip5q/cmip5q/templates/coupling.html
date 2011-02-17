@@ -1,25 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
+
+<!-- expandable/collapsable panel help (will want to pull this out eventually into its own block) -->
 <div class="boxer">
-	<h1>
-	{% if s %}Simulation Inputs: Tell us how you delivered inputs to 
-	{% else %}Default Inputs: Tell us how you delivered the default inputs to 
-	{% endif %}  
-	"{{c.abbrev}}"
-	{% if s %} for simulation "{{s}}" {% endif %}
-	</h1>
-	<p>
-	{% if s%}
+  <div class="msg_list">
+    
+    <div class="msg_head">
+      <table>
+        {% if s %}
+          <tr>
+            <td>
+              <h1>
+                Simulation Inputs:
+ 	          </h1> 
+ 	          Tell us how you delivered inputs to
+ 	          
+	    {% else %}
+	      <tr>
+	        <td>
+	          <h1>
+	            Default Inputs:
+	          </h1>
+	          Tell us how you delivered the default inputs to 
+	    {% endif %}  
+	    
+	    "{{c.abbrev}}"
+	    {% if s %} for simulation "{{s}}" {% endif %}
+	    </td>
+	    <td align="right">
+	      (click to expand/collapse help panel)
+	    </td>
+	    </tr>
+	  </table>
+	</div>
+	
+	<div class="msg_body">	
+	  <p>
+	  {% if s%}
 		This is where you tell us about significant changes to the model input settings that were made for <em>this</em> simulation.
 		<p class="red">It is NOT necessary to tell us about all inputs associated with this simulation, only those you consider important! </p>
-	{% else %}
+	  {% else %}
 		This is where you tell us about <em>default</em> model input settings that are common to all runs of this model.
 		<p class="red"> It is NOT necessary to tell us about all inputs delivered to the model, only those you consider important! </p>
-	{% endif %}
-	</p>
-</div>
-<div class="boxer">
-    <p> On previous pages we have asked you to describe 
+	  {% endif %}
+	  </p>
+	  
+	  <p> On previous pages we have asked you to describe 
 	{% if s%} important inputs required by various components in your model.  
 	{% else %} some of the default inputs required by various components in your model.
 	{% endif %} <br>
@@ -58,7 +84,13 @@
 	significantly enhanced if one knows how the various model components are coupled to each other and coupled to external data. 
 	Note that simulation descriptions will not validate as complete unless all declared input requirements are "resolved".
 	</p>
+	</div>
+	
+  </div>
 </div>
+<!-- End of expandable/collapsable panel -->
+
+
 <div class="boxer">
     <h4> Input Binding</h4>
 	{% if Intform.FormError %} 
