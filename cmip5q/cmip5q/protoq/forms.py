@@ -50,6 +50,7 @@ class ConformanceForm(forms.ModelForm):
 
 class CouplingForm(forms.ModelForm):
     manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
+    notInUse=forms.BooleanField(required=False)
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         for k in ('parent', 'targetInput','original'):
