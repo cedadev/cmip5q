@@ -190,7 +190,7 @@ class simulationHandler(object):
                 self.url=reverse('cmip5q.protoq.views.viewExperiment',args=(c.id,id,))
                 self.new=reverse('cmip5q.protoq.views.simulationAdd',args=(c.id,id,))
                 
-        csims=Simulation.objects.filter(centre=c)
+        csims=Simulation.objects.filter(centre=c).filter(isDeleted=False)
         cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
 
         eset=Experiment.objects.all()
