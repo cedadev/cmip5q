@@ -196,7 +196,7 @@ class simulationHandler(object):
         eset=Experiment.objects.all()
         exp=[]
         for e in eset:
-            sims=e.simulation_set.filter(centre=c.id)
+            sims=e.simulation_set.filter(centre=c.id).filter(isDeleted=False)
             for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))    
             exp.append(etmp(e.abbrev,sims,e.id))
 
