@@ -82,16 +82,16 @@
         </requirementOption>
     </numericalRequirement>
     <numericalRequirement xsi:type="BoundaryCondition">
-        <name xsi:type="Identifier">3.2E.bc.nat_aer_pre_conc</name>
+        <name xsi:type="Identifier">3.2E.bc.ant_aer_pre_conc</name>
         <description>Imposed changing concentrations or emissions of historical anthropogenic aerosol precursors</description>
         <requirementOption>
             <id xsi:type="Identifier">bc.017</id>
-            <name xsi:type="Identifier">3.2E.bc.nat_aer_pre_conc</name>
+            <name xsi:type="Identifier">3.2E.bc.ant_aer_pre_conc</name>
             <description>Concentrations</description>            
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.050</id>
-            <name xsi:type="Identifier">3.2E.bc.nat_aer_pre_em</name>
+            <name xsi:type="Identifier">3.2E.bc.ant_aer_pre_em</name>
             <description>Emissions</description>            
         </requirementOption>
     </numericalRequirement>
