@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.views.generic.simple import direct_to_template
+
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -159,6 +161,13 @@ if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
         (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
     )
+    
+# To direct web crawlers to bypass potentially redundant links
+urlpatterns += patterns('',
+    (r'^robots\.txt$', direct_to_template,
+     {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+)
+
 
 # finally if necessary, throw it down a level
 
