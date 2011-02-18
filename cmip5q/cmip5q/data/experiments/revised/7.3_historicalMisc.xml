@@ -83,82 +83,82 @@
         <description>Individual forcing agent: </description>
         <requirementOption>
             <id xsi:type="Identifier">bc.058</id>
-            <name xsi:type="Identifier">7.3.bc.SD></name>
+            <name xsi:type="Identifier">7.3.bc.SD</name>
             <description>SD anthropogenic sulfate aerosol, accounting only for direct effects</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.059</id>
-            <name xsi:type="Identifier">7.3.bc.SI></name>
+            <name xsi:type="Identifier">7.3.bc.SI</name>
             <description>SI anthropogenic sulfate aerosol, accounting only for indirect effects</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.060</id>
-            <name xsi:type="Identifier">7.3.bc.SA></name>
+            <name xsi:type="Identifier">7.3.bc.SA</name>
             <description>SA (= SD + SI) anthropogenic sulfate aerosol direct and indirect effects </description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.061</id>
-            <name xsi:type="Identifier">7.3.bc.TO></name>
+            <name xsi:type="Identifier">7.3.bc.TO</name>
             <description>TO tropospheric ozone</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.062</id>
-            <name xsi:type="Identifier">7.3.bc.SO></name>
+            <name xsi:type="Identifier">7.3.bc.SO</name>
             <description>SO stratospheric ozone</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.063</id>
-            <name xsi:type="Identifier">7.3.bc.Oz></name>
+            <name xsi:type="Identifier">7.3.bc.Oz</name>
             <description>Oz tropospheric and stratospheric ozone</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.064</id>
-            <name xsi:type="Identifier">7.3.bc.LU></name>
+            <name xsi:type="Identifier">7.3.bc.LU</name>
             <description>LU land-use</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.065</id>
-            <name xsi:type="Identifier">7.3.bc.Sl></name>
+            <name xsi:type="Identifier">7.3.bc.Sl</name>
             <description>Sl solar irradiance</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.066</id>
-            <name xsi:type="Identifier">7.3.bc.Vl></name>
+            <name xsi:type="Identifier">7.3.bc.Vl</name>
             <description>Vl volcanic aerosol</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.067</id>
-            <name xsi:type="Identifier">7.3.bc.SS></name>
+            <name xsi:type="Identifier">7.3.bc.SS</name>
             <description>SS sea salt</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.068</id>
-            <name xsi:type="Identifier">7.3.bc.Ds></name>
+            <name xsi:type="Identifier">7.3.bc.Ds</name>
             <description>Ds dust</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.069</id>
-            <name xsi:type="Identifier">7.3.bc.Bc></name>
+            <name xsi:type="Identifier">7.3.bc.Bc</name>
             <description>Bc black carbon</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.070</id>
-            <name xsi:type="Identifier">7.3.bc.MD></name>
+            <name xsi:type="Identifier">7.3.bc.MD</name>
             <description>MD mineral dust</description>            
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.071</id>
-            <name xsi:type="Identifier">7.3.bc.OC></name>
+            <name xsi:type="Identifier">7.3.bc.OC</name>
             <description>OC organic carbon</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.072</id>
-            <name xsi:type="Identifier">7.3.bc.AA></name>
+            <name xsi:type="Identifier">7.3.bc.AA</name>
             <description>AA anthropogenic aerosol</description>
         </requirementOption>
         <requirementOption>
             <id xsi:type="Identifier">bc.101</id>
-            <name xsi:type="Identifier">7.3.bc.other></name>
+            <name xsi:type="Identifier">7.3.bc.other</name>
             <description>Other forcing</description>
         </requirementOption>
     </numericalRequirement>
