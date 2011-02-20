@@ -623,5 +623,12 @@ def assign(request,cen_id,resourceType,targetType,target_id):
    
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.assign(request) 
+
+
+# For crawlers hitting redundant instances
+
+#def robots(request):
+#    ''' Provides a robot.txt file to tell web crawlers which redundant info to bypass '''
+#    return HttpResponse(open('robots.txt').read(), 'text/plain')
  
     
