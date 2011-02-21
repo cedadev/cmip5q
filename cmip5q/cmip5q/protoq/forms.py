@@ -59,16 +59,16 @@ class CouplingForm(forms.ModelForm):
         model=Coupling
         
 class InternalClosureForm(forms.ModelForm):
-     class Meta:
-         model=InternalClosure
-     def specialise(self):
-         pass
+    class Meta:
+        model=InternalClosure
+    def specialise(self):
+        pass
 
 class ExternalClosureForm(forms.ModelForm):
-     class Meta:
-         model=ExternalClosure
-     def specialise(self):
-         if self.instance.targetFile:
+    class Meta:
+        model=ExternalClosure
+    def specialise(self):
+        if self.instance.targetFile:
             self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
 
 
@@ -439,7 +439,7 @@ class SimulationForm(forms.ModelForm):
         for x in s:
             SimulList.append(x.abbrev)
         # In the case of a page update, ignore the currently valid simulation name
-        if SimulList:
+        if self.instance.abbrev in SimulList:
             SimulList.remove(self.instance.abbrev)
         if value in SimulList:
             raise ValidationError('Simulation name must be unique from other simulation names')
