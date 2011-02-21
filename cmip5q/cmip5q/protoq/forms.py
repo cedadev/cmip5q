@@ -68,6 +68,8 @@ class ExternalClosureForm(forms.ModelForm):
     class Meta:
         model=ExternalClosure
     def specialise(self):
+        # GD - making sure targetfiles are only within the current centre
+        self.fields['targetFile'].queryset=DataContainer.objects.filter(centre=self.instance.targetFile.centre)
         if self.instance.targetFile:
             self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
 
