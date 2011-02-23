@@ -109,11 +109,13 @@
 				<td>
 				<p>
 				You may have entered some or all of this information while describing your model. 
-				Use this button to SET or RESET the values for this simulation from your model definition.<br/>
-				<span class="red">Do not use the RESET button if you have filled in information below that you don't want to lose.
+				<!-- Use this button to SET or RESET the values for this simulation from your model definition.<br/> -->
+				 Use this button to load the values for this simulation from your model definition.<br/>
+				<span class="red">Do not use the RELOAD button if you have filled in information below that you don't want to lose.
 				</p>
 				</td>
-				<td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>
+				<!-- <td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>-->
+				<td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="RELOAD"></form></td>
 				</tr>
 				</table>
 			</div>
