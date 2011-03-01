@@ -41,8 +41,8 @@
 	<div class="msg_body">	
 	  <p>
 	  {% if s%}
-		This is where you tell us about significant changes to the model input settings that were made for <em>this</em> simulation.
-		<p class="red">It is NOT necessary to tell us about all inputs associated with this simulation, only those you consider important! </p>
+		This is where you tell us about significant changes to the model input settings that were made for <em>this</em> simulation.  
+		<p class="red">It is NOT necessary to tell us about all model inputs associated with this simulation, only those inputs you consider important! </p>
 	  {% else %}
 		This is where you tell us about <em>default</em> model input settings that are common to all runs of this model.
 		<p class="red"> It is NOT necessary to tell us about all inputs delivered to the model, only those you consider important! </p>
@@ -59,9 +59,10 @@
 	{% endif %} 
 	that is, which external or internal information
     {% if s %} was 
-	{% else %} is 
+	{% else %} is
 	{% endif %} 
-	<em> bound </em> to those inputs.</p>
+	<em> bound </em> to those inputs. 
+	</p>
     
     <p class="red"> 
 	{% if not s %}  
@@ -80,7 +81,9 @@
     <p> 
 	There is one entry for each input requirement that you declared in your model description. 
 	You may need to <a href="{{urls.model}}">go back to the model description</a> to add input requirements, 
-	so you can describe them here. 
+	so you can describe them here. <br>
+	{% if s %} If any of the input requiremens you declared are not used by this simulation they can be marked as "Not applicable".
+	{% endif %}
 	</p>
     
     <p> 
