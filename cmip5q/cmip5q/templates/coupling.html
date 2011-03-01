@@ -72,8 +72,8 @@
 		to enter default descriptions now!
 	{% else %}
 		If you resolved some (or all) of the default inputs when you described your model, 
-		then you can copy them onto this form using the "(RE)SET" button below. <br>
-		Using (RE)SET will overwrite any simulation specific input bindings	with default settings, so use with caution!
+		then you can copy them onto this form using the "(RE)LOAD" button below. <br>
+		Using (RE)LOAD will overwrite any simulation specific input bindings	with default settings, so use with caution!
     {% endif %} 
 	</p>
     
@@ -109,13 +109,13 @@
 				<td>
 				<p>
 				You may have entered some or all of this information while describing your model. 
-				<!-- Use this button to SET or RESET the values for this simulation from your model definition.<br/> -->
-				 Use this button to load the values for this simulation from your model definition.<br/>
-				<span class="red">Do not use the RELOAD button if you have filled in information below that you don't want to lose.
+				<!-- Use this button to LOAD or RELOAD the values for this simulation from your model definition.<br/> -->
+				 Use this button to LOAD or RELOAD the values for this simulation from your model definition.<br/>
+				<span class="red">Do not use the (RE)LOAD button if you have filled in information below that you don't want to lose.
 				</p>
 				</td>
 				<!-- <td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="(RE)SET"></form></td>-->
-				<td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="RELOAD"></form></td>
+				<td align="right"><form action={{urls.reset}} method="POST" onsubmit="myProject.bypassConfirm()"><input id="ResetBut" type="submit" value="(RE)LOAD"></form></td>
 				</tr>
 				</table>
 			</div>
