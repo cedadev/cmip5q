@@ -16,7 +16,7 @@ CENTRES=(
              ('NIMR','Korean National Institute for Meteorological Research',('HadGEM2-AO')),
              ('LASG','Institute of Atmospheric Physics, Chinese Academy of Sciences	China',('FGOALS-S2.0','FGOALS-G2.0','FGOALS-gl')),
              ('QCCCE-CSIRO','Queensland Climate Change Centre of Excellence and Commonwealth Scientific and Industrial Research Organisation',('CSIRO-Mk3.5A')),
-             ('CNRM/CERFACS','Centre National de Recherches Meteorologiques / Centre Europeen de Recherche et de Formation Avancee en Calcul Scientifique',('CNRM-CM5')),
+             ('CNRM-CERFACS','Centre National de Recherches Meteorologiques / Centre Europeen de Recherche et de Formation Avancee en Calcul Scientifique',('CNRM-CM5')),
              ('CCCMA','Canadian Centre for Climate Modelling and Analysis',('CanESM2')),
              ('CAWCR','Centre for Australian Weather and Climate Research',('ACCESS',)),
              ('NASA-GISS','NASA Goddard Institute for Space Studies USA',('')),
