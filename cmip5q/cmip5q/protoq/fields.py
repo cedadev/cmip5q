@@ -85,10 +85,10 @@ class SimDateTime(object):
         
 class TimeLength(object):
     def __init__(self,s):
-        '''Time lengths consist of a float number and a unit '''
+        '''Time lengths consist of a integer number and a unit '''
         try:
             l,u=s.split(' ')
-            l=float(l)
+            l=int(float(l))
         except:
             raise ValueError('"%s" is not a valid TimeLength'%s)
         self.s='%s %s'%(l,u)
@@ -230,7 +230,7 @@ class SimDateTimeField(models.CharField):
 class TimeLengthField(models.CharField):
     ''' It turns out that it's unbelievably clunky to pass in a vocabulary for
     timelengths in and out of Django Widgets and Forms. So, sadly, in the spirit
-    of gettings something done, we're hardcoding the timelength units here.'''
+    of getting something done, we're hardcoding the timelength units here.'''
     description = ' A time length '
     __metaclass__ = models.SubfieldBase
     def __init__(self,units,**kwargs):
@@ -257,7 +257,12 @@ class TimeLengthField(models.CharField):
         ''' Take a form instance and see if can be turned into a time length field '''
         # The form returns the number and an id from a term list. 
         # we've loaded that into the terms attribute of the widget so we have it now
-        if value[0]=='': return None
+        if value[0]=='': 
+            return None
+        #checking that string value is not akin to a float
+        elif '.' in value[0]:
+            raise ValidationError('Please enter an integer value here for duration')
+        
         try:
             tlv=TimeLength('%s %s'%(value[0],self.units[value[1]]))
             return tlv
