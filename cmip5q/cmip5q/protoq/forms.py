@@ -420,7 +420,7 @@ class SimulationForm(forms.ModelForm):
         #loss of information ...
         exclude=('centre','experiment','uri','codeMod','inputMod','relatedSimulations',
                  'drsOutput','datasets')
-    
+
     def clean_drsMember(self):
         # needs to parse into DRS member format
         value=self.cleaned_data['drsMember']
@@ -453,7 +453,11 @@ class SimulationForm(forms.ModelForm):
         self.fields['numericalModel'].queryset=Component.objects.filter(
                             scienceType='model').filter(centre=centre).filter(isDeleted=False)
         qs=ResponsibleParty.objects.filter(centre=centre)|ResponsibleParty.objects.filter(party=centre)
-        for i in ['author','funder','contact']: self.fields[i].queryset=qs
+        for i in ['author','funder','contact']: 
+            self.fields[i].queryset=qs
+        
+        self.fields['contact'].required = True
+    
     def save(self):
         s=forms.ModelForm.save(self)
         try:
