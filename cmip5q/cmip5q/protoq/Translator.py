@@ -1,6 +1,8 @@
 
 from cmip5q.protoq.models import *
 
+from cmip5q.XMLinitialiseQ import QuestionniareConfiguration
+
 from lxml import etree as ET
 import uuid
 import datetime
@@ -553,7 +555,8 @@ class Translator:
             ''' fundingSource [0..inf] '''
             ''' rationale [0..inf] '''
             ''' project [0..inf] '''
-            self.addCVValue(simElement,'project','CMIP5',isOpen=False)
+            if QuestionniareConfiguration is 'cmip5':
+                self.addCVValue(simElement,'project','CMIP5',isOpen=False)
             ''' shortName [1] and longName [1] '''
             if simClass.ensembleMembers>1 :
                 # our simulation is really the base simulation of an ensemble
@@ -571,7 +574,24 @@ class Translator:
             ''' dataHolder [0...inf] '''
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
-            self.addCIMReference(simClass.experiment,experimentElement)
+            if QuestionniareConfiguration is 'cmip5':
+                # split our experiment name into its component parts
+                expName,sep,expShortName=simClass.experiment.abbrev.partition(' ')
+                # check that the format is as expected
+                assert sep!="", "Error, experiment short name does not conform to format 'id name'"
+                assert expShortName and expShortName!='', "Error, experiment short name does not conform to format 'id name'"
+                # treat some experiments as special cases
+                if expShortName in ["decadal","noVolc"]:
+                    # we need to append the user supplied simulation duration to get the required local experiment name
+                    assert simClass.duration.startDate, "Error, simulation must have a start date specified"
+                    simStartDate=str(simClass.duration.startDate.year)
+                    self.addCIMReference(simClass.experiment,experimentElement,argName=expShortName+simStartDate,argType="experiment",description="Reference to an Experiment called "+expShortName+" with experimentNumber "+expName+" which this simulation has specialised as "+expShortName+simStartDate)
+                else:
+                    # just use the experiment name
+                    self.addCIMReference(simClass.experiment,experimentElement,argName=expShortName,argType="experiment",description="Reference to an Experiment called "+expShortName+" with experimentNumber "+expName)
+            else:
+                # we are not a cmip5 configuration
+                self.addCIMReference(simClass.experiment,experimentElement)
             ''' simulationID [0..1] '''
             ''' calendar [1] '''
             if simClass.experiment.requiredCalendar :

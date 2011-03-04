@@ -13,6 +13,10 @@ from cf import CFtable
 
 from vocabs.centres import loadCentres 
 
+# tell the questionnaire that this is a cmip5 configuration.
+# This allows us to do cmip5 specific things in the questionnaire
+QuestionniareConfiguration='cmip5'
+
 # this is the controlled vocabulary for realms:
 # that is, the top level areas under the model definitions.
 
