@@ -106,8 +106,9 @@ class TimeLength(object):
         
 class DateRange(object):
     def __init__(self,startDate,endDate=None,length=None,description=None):
-        if startDate is None:
-            raise ValidationError('A start date is required')
+        #startDate can be None if we have an open date range
+        #if startDate is None:
+        #    raise ValidationError('A start date is required')
         self.startDate=startDate
         self.endDate=endDate
         self.length=length
@@ -124,7 +125,7 @@ class DateRange(object):
         return s
     def xml(self,parent='DateRange'):
         e=ET.Element(parent)
-        e.append(self.startDate.xml('startDate'))
+        if self.startDate is not None: e.append(self.startDate.xml('startDate'))
         if self.endDate is not None: e.append(self.endDate.xml('endDate'))
         if self.length is not None: e.append(self.length.xml('length'))
         if self.description is not None: ET.SubElement(e,'description').text=self.description
@@ -144,7 +145,8 @@ class DateRange(object):
     @staticmethod
     def fromXML(e):
         getter=etTxt(e)
-        s1=SimDateTime(getter.get(e,'startDate'))
+        s1=getter.getN(e,'startDate')
+        if s1 is not None: s1=SimDateTime(s1)
         s2=getter.getN(e,'endDate')
         if s2 is not None: s2=SimDateTime(s2)
         tl=getter.find(e,'length')
