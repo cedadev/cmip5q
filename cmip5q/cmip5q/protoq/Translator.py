@@ -731,55 +731,12 @@ class Translator:
             ET.SubElement(typeElement,'name').text=reqClass.name
             ''' description [0,1] '''
             ET.SubElement(typeElement,'description').text=reqClass.description
-        
+
     def add_experiment(self,expClass,rootElement):
 
-            expElement=ET.SubElement(rootElement,'numericalExperiment')
-            ''' responsibleParty [0..inf] '''
-            ''' principleInvestigator [0..inf] '''
-            ''' fundingSource [0..inf] '''
-            ''' rationale [1..inf] '''
-            if expClass.rationale: 
-                ET.SubElement(expElement,'rationale').text=expClass.rationale
-            ''' measurementCampaign [0..inf] '''
-            ''' requires [0..inf] '''
-            ''' generates [0..inf] '''
-            ''' duration [0..1] '''
-            ''' supports [0..inf] '''
-            ''' shortName [1] '''
-            # short name is currently a concatenation of the experiment id
-            # and the short name so separate these out
-            expName,sep,expShortName=expClass.abbrev.partition(' ')
-            assert sep!="", "Error, experiment short name does not conform to format 'id name'"
-            if expShortName and expShortName!='' :
-                ET.SubElement(expElement,'shortName').text=expShortName
-            ''' longName [1] '''
-            if expClass.title and expClass.title!='' :
-                dummy1,dummy2,longName=expClass.title.partition(' ')
-                assert dummy2!="", "Error, experiment long name does not conform to format 'id name'"
-                ET.SubElement(expElement,'longName').text=longName
-            ''' description [0..1] '''
-            if expClass.description :
-                ET.SubElement(expElement,'description').text=expClass.description
-            ''' experimentNumber [0..1] '''
-            if expName and expName!='' :
-                ET.SubElement(expElement,'experimentNumber').text=expName
-            ''' calendar [1] '''
-            if expClass.requiredCalendar :
-                calendarElement=ET.SubElement(expElement,'calendar')
-                calTypeElement=ET.SubElement(calendarElement,str(expClass.requiredCalendar.name))
-            else :
-                assert False, "Error, a calendar must exist"
-            ''' requiredDuration [1] '''
-            # extract this information from the conformance?
-            ET.SubElement(expElement,'requiredDuration')
-            ''' numericalRequirement [1..inf] '''
-            for reqClass in expClass.requirements.all():
-                self.addRequirement(reqClass,expElement)
-
-            self.addDocumentInfo(expClass,expElement)
-            ''' documentGenealogy [0..inf] '''
-            ''' quality [0..inf] '''
+        expElement=expClass.toXML()
+        self.addDocumentInfo(expClass,expElement)
+        rootElement.append(expElement)
 
     def setComponentOptions(self,recurse,composition):
 

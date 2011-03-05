@@ -724,7 +724,39 @@ class Experiment(Doc):
                                ContentFile(txt),save=False)
         cfile.title='%s (%s)'%(E.abbrev,E.title)
         cfile.save()
-        
+
+    def toXML(self,parent='numericalExperiment'):
+        expElement=ET.Element(parent)
+        if self.rationale: 
+            ET.SubElement(expElement,'rationale').text=self.rationale
+        # short name is currently a concatenation of the experiment id
+        # and the short name so separate these out
+        expName,sep,expShortName=self.abbrev.partition(' ')
+        assert sep!="", "Error, experiment short name does not conform to format 'id name'"
+        if expShortName and expShortName!='' :
+            ET.SubElement(expElement,'shortName').text=expShortName
+        ''' longName [1] '''
+        if self.title and self.title!='' :
+            dummy1,dummy2,longName=self.title.partition(' ')
+            assert dummy2!="", "Error, experiment long name does not conform to format 'id name'"
+            ET.SubElement(expElement,'longName').text=longName
+        ''' description [0..1] '''
+        if self.description :
+            ET.SubElement(expElement,'description').text=self.description
+        ''' experimentNumber [0..1] '''
+        if expName and expName!='' :
+            ET.SubElement(expElement,'experimentNumber').text=expName
+        ''' calendar [1] '''
+        if self.requiredCalendar :
+            calendarElement=ET.SubElement(expElement,'calendar')
+            calTypeElement=ET.SubElement(calendarElement,str(self.requiredCalendar.name))
+        else :
+            assert False, "Error, a calendar must exist"
+        ''' numericalRequirement [1..inf] '''
+        for reqObject in self.requirements.all():
+            expElement.append(reqObject.toXML())
+        return expElement
+    
 def instantiateNumericalRequirement(experiment,elem):
     ''' This provides an interface to return any sort of numerical requirement, given
     an element '''
@@ -774,20 +806,44 @@ class GenericNumericalRequirement(ParentModel):
             ro=RequirementOption()
             a = ro.fromXML(e)
             self.options.add(a)
+    def toXML(self,parent='numericalRequirement'):
+        reqElement=ET.Element(parent)
+        assert self.ctype,"Error, requirement must have ctype set"
+        mapping={'BoundaryCondition':'boundaryCondition','InitialCondition':'initialCondition','SpatioTemporalConstraint':'spatioTemporalConstraint'}
+        typeElement=ET.SubElement(reqElement,mapping[self.ctype.name])
+        if self.docid:
+            ET.SubElement(typeElement,'id').text=self.docid
+        ET.SubElement(typeElement,'name').text=self.name
+        ET.SubElement(typeElement,'description').text=self.description
+        if mapping[self.ctype.name]=='spatioTemporalConstraint':
+            typeElement.append(self.get_child_object().requiredDuration.xml(parent="requiredDuration"))
+        for reqOptionObject in self.options.all():
+            typeElement.append(reqOptionObject.toXML())
+        return reqElement
 
 class RequirementOption(models.Model):
     ''' A numerical requirement option ''' 
     description=models.TextField(blank=True,null=True) 
     name=models.CharField(max_length=128) 
+    docid=models.CharField(max_length=64)
     def __unicode__(self):    
         return self.description 
     def fromXML(self,elem):
         getter=etTxt(elem)
         name=getter.get(elem,'name')
         description=getter.get(elem,'description')
-        a = RequirementOption(name=name,description=description)
+        docid=getter.get(elem,'id')
+        a = RequirementOption(name=name,description=description,docid=docid)
         a.save()
         return a
+    def toXML(self,parent='requirementOption'):
+        reqOptionElement=ET.Element(parent)
+        if self.docid:
+            ET.SubElement(reqOptionElement,'id').text=self.docid
+        ET.SubElement(reqOptionElement,'name').text=self.name
+        ET.SubElement(reqOptionElement,'description').text=self.description
+        return reqOptionElement
+
     
 class NumericalRequirement(GenericNumericalRequirement):
     ''' A Numerical Requirement '''
@@ -815,7 +871,7 @@ class SpatioTemporalConstraint(GenericNumericalRequirement):
         if op is not None:
             raise ValueError('NO CODE TO READ spatialResolution in SpatioTemporalConstraint')
         nr.save()
-        return nr
+        return n
 
 class RequirementSet(GenericNumericalRequirement):
     members=models.ManyToManyField(GenericNumericalRequirement,blank=True,null=True,symmetrical=False,related_name='members')

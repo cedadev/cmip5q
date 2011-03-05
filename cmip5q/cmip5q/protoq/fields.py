@@ -124,12 +124,17 @@ class DateRange(object):
         if self.description: s+=' (%s)'%self.description
         return s
     def xml(self,parent='DateRange'):
-        e=ET.Element(parent)
+        top=ET.Element(parent)
+        if self.startDate:
+            e=ET.SubElement(top,"closedDateRange")
+        else:
+            e=ET.SubElement(top,"openDateRange")
+        
         if self.startDate is not None: e.append(self.startDate.xml('startDate'))
         if self.endDate is not None: e.append(self.endDate.xml('endDate'))
         if self.length is not None: e.append(self.length.xml('length'))
         if self.description is not None: ET.SubElement(e,'description').text=self.description
-        return e
+        return top
     def strxml(self,parent='DateRange'):
         e=self.xml(parent)
         return ET.tostring(e)
@@ -308,7 +313,6 @@ class DateRangeField(models.CharField):
             return None
         else:
             return value.strxml()
-
 
 #
 # And for each ThingField, we need a ThingFieldForm
