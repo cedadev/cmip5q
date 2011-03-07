@@ -871,7 +871,7 @@ class SpatioTemporalConstraint(GenericNumericalRequirement):
         if op is not None:
             raise ValueError('NO CODE TO READ spatialResolution in SpatioTemporalConstraint')
         nr.save()
-        return n
+        return nr
 
 class RequirementSet(GenericNumericalRequirement):
     members=models.ManyToManyField(GenericNumericalRequirement,blank=True,null=True,symmetrical=False,related_name='members')
