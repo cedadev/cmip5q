@@ -193,7 +193,7 @@ class simulationHandler(object):
         csims=Simulation.objects.filter(centre=c).filter(isDeleted=False)
         cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
 
-        eset=Experiment.objects.all()
+        eset=Experiment.objects.all().filter(isDeleted=False)
         exp=[]
         for e in eset:
             sims=e.simulation_set.filter(centre=c.id).filter(isDeleted=False)

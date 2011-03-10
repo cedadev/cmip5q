@@ -667,6 +667,8 @@ class Experiment(Doc):
     #used to identify groups of experiments
     memberOf=models.ForeignKey('Experiment',blank=True,null=True)
     requirementSet=models.ForeignKey('RequirementSet',blank=True,null=True,related_name='ensembleRequirements')
+    # To mark a simulation as deleting without actually removing it from the database
+    isDeleted=models.BooleanField(default=False)
     def __unicode__(self):
         return self.abbrev
    
