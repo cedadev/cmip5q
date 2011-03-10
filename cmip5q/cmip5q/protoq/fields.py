@@ -150,11 +150,11 @@ class DateRange(object):
     @staticmethod
     def fromXML(e):
         getter=etTxt(e)
-        s1=getter.getN(e,'startDate')
+        s1=getter.getN(e,'closedDateRange/startDate')
         if s1 is not None: s1=SimDateTime(s1)
-        s2=getter.getN(e,'endDate')
+        s2=getter.getN(e,'closedDateRange/endDate')
         if s2 is not None: s2=SimDateTime(s2)
-        tl=getter.find(e,'length')
+        tl=getter.find(e,'closedDateRange/length')
         if tl is not None: tl=TimeLength('%s %s'%(tl.text,tl.attrib['units']))
         dr=DateRange(startDate=s1,endDate=s2,length=tl)
         dr.description=getter.getN(e,'description')

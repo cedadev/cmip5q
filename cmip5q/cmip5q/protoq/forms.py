@@ -142,7 +142,7 @@ class DataContainerForm(forms.ModelForm):
         self.fields['format'].widget=DropDownSingleWidget()
         self.fields['format'].queryset=Term.objects.filter(vocab=v)
         self.fields['experiments'].widget=DropDownWidget()
-        self.fields['experiments'].queryset=Experiment.objects.all()
+        self.fields['experiments'].queryset=Experiment.objects.all().filter(isDeleted=False)
         self.hostCentre=None
     def specialise(self,centre):
         self.fields['reference'].widget=DropDownSingleWidget()
