@@ -194,7 +194,7 @@ class Translator:
         return comp
 
     def cimRecord(self,rootElement) :
-        ''' return the top level cim document invarient structure from within a CIMRecordSet'''
+        ''' return the top level cim document invarient structure from within a CIMDocumentSet'''
         cr1=ET.SubElement(rootElement,'CIMRecord')
         cr2=ET.SubElement(cr1,'CIMRecord')
         return cr2
@@ -206,9 +206,9 @@ class Translator:
                              nsmap=self.NSMAP)
         return root
 
-    def cimRecordSetRoot(self):
+    def CIMDocumentSetRoot(self):
         ''' return the top level cim document invarient structure for a recordset'''
-        root=ET.Element('CIMRecordSet', \
+        root=ET.Element('CIMDocumentSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
                              nsmap=self.NSMAP)
         return root
@@ -221,11 +221,11 @@ class Translator:
         method = getattr(self, method_name)
         # make a special case for simulation as we output
         # all information associated with a simulation
-        # using a CIMRecordSet
+        # using a CIMDocumentSet
         if method_name=='add_simulation' :
             # save our simulation instance so the composition can pick it up
             self.simClass=ref
-            root=self.cimRecordSetRoot()
+            root=self.CIMDocumentSetRoot()
             modelElement=self.cimRecord(root)
             self.add_component(ref.numericalModel,modelElement)
             simulationElement=self.cimRecord(root)

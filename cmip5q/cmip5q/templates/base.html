@@ -21,7 +21,7 @@
         <script type="text/javascript" src="/css/jquery/jquery-checkformsave/jquery.checkformsave.js"></script>
         <script type="text/javascript" src="/css/jquery/ui.core-min.js"></script>
         <script type="text/javascript" src="/css/jquery/ui.dropdownchecklist-min.js"></script>
-       
+               
         <!-- -->
         <link rel="stylesheet" type="text/css" href="/css/yui/build/treeview/assets/skins/sam/treeview.css">
         <link rel="stylesheet" type="text/css" href="/css/yui/build/button/assets/skins/sam/button.css"> 
@@ -29,9 +29,29 @@
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-autocomplete/jquery.autocomplete.css"/>
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-collapsible/jquery.collapsible.css"/>
         <link rel="stylesheet" type="text/css" href="/css/jquery/css-dropdown/ui.dropdownchecklist.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/jquery/accordian/accordian_styles.css"/>
+        
+        <link rel="stylesheet" href="/css/jquery-ui.css" type="text/css" />
+        <link rel="stylesheet" href="/css/accordian_styles.css" type="text/css" />
+        
         <!-- end of YUI treeview stuff for head -->
 
-</script> 
+		<!-- for accordian -->
+		  <script src="/css/jquery/jquery.tools.min.js"></script>
+		  <script type="text/javascript" src="/css/jquery/jquery.nestedAccordion.js"></script>
+		  <script type="text/javascript">
+		  <!--//--><![CDATA[//><!--
+		  $(function() {
+		    $("#main").accordion({
+		        objID: "#acc1", 
+		        el: ".h", 
+		        head: "h4, h5", 
+		        next: "div", 
+		        initShow : "h4 + div.outer:eq(0) div.outer:eq(0)"
+		    });
+		  });
+		  //--><!]]>
+		  </script> 
         
     </head>
     <body class="yui-skin-sam">

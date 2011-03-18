@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 
 def commonURLs(obj,dictionary):
     '''Add urls for the common methods to a dictionary for use in a template '''
-    for key in ['validate','xml','html','export']:
+    for key in ['validate','xml','html','cimView','export']:
         dictionary[key]=reverse('cmip5q.protoq.views.genericDoc',args=(obj.centre.id,obj._meta.module_name,obj.id,key))
     return dictionary
     
@@ -53,6 +53,13 @@ class cimHandler(object):
         del urls['export']
         return render_to_response('cimpage.html',{'source':'Export to CMIP5','obj':self.obj,'html':html,
                                   'urls':urls})
+    
+    def cimView(self):
+        ''' View this in the CIMView interface '''
+        html=self.obj.cimView()
+        urls=commonURLs(self.obj,{})
+        del urls['cimView']  # we've just done it
+        return render_to_response('cimview.html',{'source':'cimView','obj':self.obj,'viewhtml':html,'urls':urls})
     
    
     

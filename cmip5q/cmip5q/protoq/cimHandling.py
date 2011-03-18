@@ -1,6 +1,7 @@
 import os,tempfile
 from lxml import etree as ET
 from django.conf import settings
+from cimViewer import *
 import sys
 import StringIO
 logging=settings.LOG
@@ -272,3 +273,45 @@ class Validator:
 
         print "Checks: {0}  Invalids: {1}".format(checks, invalids)
         return (checks, invalids, error_list)
+    
+
+class CIMViewer:
+    ''' View CIM documents in the CIM viewer interface '''
+    def __init__(self):
+        ''' Setup the CIMViewer tools etc '''
+        self.blank={}
+    
+    def cimViewDoc(self,CIMdoc):
+        ''' This method views the CIM info in the view interface '''
+        # create an html representation of our document
+        #parser = ET.XMLParser(ns_clean=True)
+        #etree=ET.parse(CIMdoc, parser)
+        #root=CIMdoc.getroot() # "CIMRecordSet" or "CIMRecord" element
+        if CIMdoc.tag=='CIMDocumentSet':
+            qnModels = CIMdoc.findall('CIMRecord/CIMRecord/modelComponent')
+            #qnExps = CIMdoc.findall('CIMRecord/CIMRecord/numericalExperiment')
+            #qnSims = CIMdoc.findall('CIMRecord/CIMRecord/simulationRun')
+            #qnData = root.findall('{%s}CIMRecord/{%s}CIMRecord/{%s}dataObject' %(cimns,cimns,cimns))
+        
+            #first, get nav headings
+            mods=[]
+            #exps=[]
+            #sims=[]
+            #datas=[]
+            
+            for model in qnModels:
+                m = modelView(model, 'model')
+                m.getnavname(model)
+                mods.append(m)
+            
+            #if viewtype == 'model':
+            #m=modelView(CIMfile, viewtype)
+            #m=modelView(CIMdoc,'model')
+            m=modelView(qnModels[0],'model')
+            m.genhtml(qnModels[0])
+            #return render_to_response('ModelView.html',{'mods':mods,'exps':exps,'sims':sims,'datas':datas, 'code':m.code})
+            
+            #cimHtml=''
+        
+            #return cimHtml
+            return m.code

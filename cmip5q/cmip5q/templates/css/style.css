@@ -9,7 +9,10 @@ h1 {font-size:16px;}
 body {
     background-color:#aaa;
     background-image:url(icons/hilbert.gif);
-    width: 1120px; margin:auto }
+    width: 1120px; 
+    margin:auto; 
+    height: 100%;
+    }
     
 table,form {margin: 0; padding: 0; width:100%;}
 p {padding: 2px; }

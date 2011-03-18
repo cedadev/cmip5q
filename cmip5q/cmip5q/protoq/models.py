@@ -302,6 +302,12 @@ class Doc(Fundamentals):
 #       sct_doc = ET.parse("xsl/BasicChecks.sch")
 #        schematron = ET.Schematron(sct_doc)
 #        return schematron.validate(CIMFragment)
+
+    def cimView(self):
+        ''' All document types should be viewable in the CIM View interface '''
+        cv=CIMViewer()
+        self.XMLO=self.xmlobject()
+        return cv.cimViewDoc(self.XMLO)
     
         
     def export(self):
