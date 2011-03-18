@@ -22,11 +22,10 @@ def modeliter(elemroot, modelhtml):
     moddescription = elemroot.find('description')
     modtype = elemroot.find('type').get('value')
     #first non-attribute information
-    for mi in [modshortname,modlongname,moddescription]:
+    for i,mi in enumerate([modshortname,modlongname,moddescription]):
         if mi is not None:
-            #tagminns = mi.tag.split(cimns + '}')[1]
             mihtml.append('            <table>')
-            mihtml.append('                <tr height="5px">')
+            mihtml.append('                <tr height="5px" class="row1">')
             mihtml.append('                    <td width = 20%>')
             mihtml.append('                        <p class="titletext">%s</p>' %mi.tag)
             mihtml.append('                    </td>')
@@ -36,7 +35,7 @@ def modeliter(elemroot, modelhtml):
     #and now attribute info
     if modtype is not None:
         mihtml.append('            <table>')
-        mihtml.append('                <tr height="5px">')
+        mihtml.append('                <tr height="5px" class="row1">')
         mihtml.append('                    <td width = 20%>')
         mihtml.append('                        <p class="titletext">type</p>')
         mihtml.append('                    </td>')
@@ -87,7 +86,7 @@ def modeliter(elemroot, modelhtml):
         if di is not None:
             #tagminns = di.tag.split(cimns + '}')[1]
             dihtml.append('            <table>')
-            dihtml.append('                <tr height="5px">')
+            dihtml.append('                <tr height="5px" class="row1">')
             dihtml.append('                    <td width = 20%>')
             dihtml.append('                        <p class="titletext">%s</p>' %di.tag)
             dihtml.append('                    </td>')
@@ -144,7 +143,7 @@ def expiter(elemroot, exphtml):
         if mi is not None:
             tagminns = mi.tag.split(cimns + '}')[1]
             mihtml.append('            <table>')
-            mihtml.append('                <tr height="5px">')
+            mihtml.append('                <tr height="5px" class="row1">')
             mihtml.append('                    <td width = 20%>')
             mihtml.append('                        <p class="titletext">%s</p>' %tagminns)
             mihtml.append('                    </td>')
@@ -164,7 +163,7 @@ def expiter(elemroot, exphtml):
         nrhtml.append('<h5>Numerical Requirements</h5>')
         nrhtml.append('<div class="inner">')
         nrhtml.append('            <table>')
-        nrhtml.append('                <tr height="5px">')
+        nrhtml.append('                <tr height="5px" class="row1">')
         nrhtml.append('                    <td width = 20%>')
         nrhtml.append('                        <p class="titletext">Name</p>')
         nrhtml.append('                    </td>')
@@ -184,7 +183,7 @@ def expiter(elemroot, exphtml):
             nrtype = nr.get('{%s}type' %xsins)
             #nameminns = n.tag.split(cimns + '}')[1]
             nrhtml.append('            <table>')
-            nrhtml.append('                <tr height="5px">')
+            nrhtml.append('                <tr height="5px" class="row1">')
             nrhtml.append('                    <td width = 20%>')
             nrhtml.append('                        <p class="bodytext">%s</p>' %nrname)
             nrhtml.append('                    </td>')
@@ -215,7 +214,7 @@ def expiter(elemroot, exphtml):
         if di is not None:
             tagminns = di.tag.split(cimns + '}')[1]
             dihtml.append('            <table>')
-            dihtml.append('                <tr height="5px">')
+            dihtml.append('                <tr height="5px" class="row1">')
             dihtml.append('                    <td width = 20%>')
             dihtml.append('                        <p class="titletext">%s</p>' %tagminns)
             dihtml.append('                    </td>')
@@ -245,7 +244,7 @@ def rp_iter(elemroot, rphtml):
     email = elemroot.findtext('contactInfo/CI_Contact/address/CI_Address/electronicMailAddress/CharacterString')
 
     rphtml.append('            <table>')
-    rphtml.append('                <tr height="5px">')
+    rphtml.append('                <tr height="5px" class="row1">')
     rphtml.append('                    <td width = 20%>')
     rphtml.append('                        <p class="titletext">%s</p>' %role)
     rphtml.append('                    </td>')
@@ -263,14 +262,14 @@ def cp_iter(elemroot, cphtml):
     cpvalues = elemroot.findall('value')
     cpprops = elemroot.findall('componentProperty')
     cphtml.append('            <table>')
-    cphtml.append('                <tr height="5px">')
+    cphtml.append('                <tr height="5px" class="row1">')
     cphtml.append('                    <td width = 30%>')
     cphtml.append('                        <p class="titletext">%s</p>' %cpshortname.text)
     cphtml.append('                    </td>')
     cphtml.append('                    <td>')
     cphtml.append('                        <table>')
     for value in cpvalues:
-        cphtml.append('                        <tr height="5px">')
+        cphtml.append('                        <tr height="5px" class="row1">')
         cphtml.append('                            <td>')
         cphtml.append('                                <p class="bodytext">%s</p>' %value.text)
         cphtml.append('                            </td>')
