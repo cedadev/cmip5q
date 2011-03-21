@@ -111,10 +111,10 @@
     </numericalRequirement>
         
    <shortName>
-		7.1E historicalNat
+		7.1-E historicalNat
 	</shortName>
     <longName> 
-		7.1E natural-only historical - Ensemble
+		7.1-E natural-only historical - Ensemble
 	</longName>
         
    <calendar>

@@ -83,10 +83,10 @@
     </numericalRequirement>       
    
    <shortName>
-		7.2E historicalGHG
+		7.2-E historicalGHG
 	</shortName>
     <longName> 
-		7.2E GHG-only historical - Ensemble
+		7.2-E GHG-only historical - Ensemble
 	</longName>
      
    <calendar>
