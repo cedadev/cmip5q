@@ -99,8 +99,6 @@
             on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr>
             <br/>
             
-            <tr><td>rip value:{{simform.drsMember.errors}} </td><td colspan="3">{{simform.drsMember}}</td></tr>
-             
             <tr><td>Ensemble Members: </td><td colspan="3">{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
             </td></tr>
             <tr><td>Description (notes){{simform.description.errors}}</td><td colspan="3">{{simform.description}}</td></tr> 
@@ -110,6 +108,20 @@
                         <td>Funder:&nbsp;{{simform.funder.errors}}{{simform.funder}}</td></tr>
             </table>
             </div>
+            
+            
+            <div class="boxer">
+            <h4> rip information </h4>
+            <p class="guidance">In this section, we ask you what the rip value is for this particular simulation (see <a href="http://cmip-pcmdi.llnl.gov/cmip5/output_req.html" target="_blank">here</a>)</p>
+              <table>
+                <tr>
+                  <td>rip value:{{simform.drsMember.errors}} </td>
+                  <td colspan="3">{{simform.drsMember}}</td>
+                </tr>
+              </table>
+            </div>
+            
+            
             <div class="boxer">
             <h4> Duration </h4>
             <p class="guidance"> Enter Start date/time and <i>either</i> End date/time <b>or</b> duration, where format is Year-Month-Date 00:00:00.</p>

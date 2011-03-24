@@ -93,12 +93,20 @@ class simulationHandler(object):
                 simok=True
                 if label=='Add':
                     oldmodel=None
-                else: oldmodel=s.numericalModel
+                else: 
+                    oldmodel=s.numericalModel
+                    olddrs=s.drsMember
+                    
                 news=simform.save()
                 logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))      
+                
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
+                    
+                if news.drsMember!=olddrs:
+                    s.updateDRS()
+                
             elif not simform.is_valid():
                 simok=False
                 logging.info('SIMFORM not valid [%s]'%simform.errors)
@@ -111,6 +119,10 @@ class simulationHandler(object):
             else:
                 # if there is no sto, then we should delete this relationship instance and move on.
                 pass
+            
+            #generate a drs string instance in DRS Output class
+            
+            
         else:
             relform=SimRelationshipForm(s,instance=r,prefix='rel')
             simform=SimulationForm(instance=s,prefix='sim')
@@ -130,11 +142,13 @@ class simulationHandler(object):
              'cset':cset,'coset':cs,'ensemble':ensemble,'rform':relform,
              'tabs':tabs(request,self.centreid,'Simulation',s.id or 0)})
             # note that cform points to simform too, to support completion.html
+            
     def edit(self,request):
         ''' Handle providing and receiving edit forms '''
        
         s=self.s
         s.updateCoupling()
+        
         e=s.experiment
         url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,s.id,))
         label='Update'

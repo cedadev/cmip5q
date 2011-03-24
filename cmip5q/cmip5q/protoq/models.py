@@ -969,12 +969,12 @@ class Simulation(Doc):
     relatedSimulations=models.ManyToManyField('self',through='SimRelationship',symmetrical=False,blank=True,null=True)
     
     duration=DateRangeField(blank=True,null=True)
-    
+        
     # mimicking the drs member of ensembleMember for the case of a non-ensemble simulation 
     drsMember=models.CharField(max_length=20,blank=True,null=True)
-    
-    # not yet used:
-    drsOutput=models.ManyToManyField('DRSOutput')
+       
+    # for generating the drs string:
+    drsOutput=models.ManyToManyField('DRSOutput',blank=True,null=True)
     
     # To mark a simulation as deleting without actually removing it from the database
     isDeleted=models.BooleanField(default=False)
@@ -1113,6 +1113,20 @@ class Simulation(Doc):
             ecset=ExternalClosure.objects.select_related('targetFile').filter(coupling__in=theseCouplings).order_by('id')
             for e in ecset:
                 if e.targetFile not in d.children.all().order_by('id'): d.children.add(e.targetFile)
+                
+                
+    def updateDRS(self):
+        ''' Collect and store the information to be put in the drs string'''
+        #really should only be one drs output? So deleting any current drs first....
+        dels=self.drsOutput.all()        
+        
+        dels.delete()
+        
+        #now generate the new one
+        d=DRSOutput(institute=self.centre,model=self.numericalModel,member=self.drsMember,experiment=self.experiment)
+        d.save()
+        self.drsOutput.add(d)
+        
                 
 class PhysicalProperty(Term):
     units=models.ForeignKey(Term,related_name='property_units')
@@ -1431,6 +1445,7 @@ class EnsembleMember(models.Model):
         ordering=('memberNumber',)
     
     
+    
 # Consider an ensemble with a staggered start.
 # Consider an ensemble with a range of realisations reflecting different initialisatoin strategies
 # Consider a perturbed physics ensemble.
@@ -1448,7 +1463,9 @@ class Modification(ParentModel):
     description=models.TextField()
     centre=models.ForeignKey(Centre)
     def __unicode__(self):
-        return '%s(%s)'%(self.mnemonic,self.get_child_name())
+        #return '%s(%s)'%(self.mnemonic,self.get_child_name())
+        return '%s'%(self.mnemonic)
+    
     def get_parent_model(self):
         return Modification
     class Meta:
@@ -1569,10 +1586,16 @@ class DRSOutput(models.Model):
     model=models.ForeignKey(Component)
     experiment=models.ForeignKey(Experiment)
     frequency=models.ForeignKey(Term,blank=True,null=True,related_name='drs_frequency')
-    realm=models.ForeignKey(Term,related_name='drs_realm')
+    #frequency=models.CharField(max_length=64)
+    realm=models.ForeignKey(Term,blank=True,null=True,related_name='drs_realm')
+    #realm=models.CharField(max_length=64)
+    # the rip member value
+    member=models.CharField(max_length=64)
     # we don't need to point to simulations, they point to this ...
     def __unicode__(self):
-        return '%s/%s/%s/%s/%s/%s/%s/'%(activity,product,institute,model,experiment,frequency,realm)
+        #return '%s/%s/%s/%s/%s/%s/%s/%s'%(activity,product,institute,model,experiment,frequency,realm,version)
+        #return '%s/%s/%s/%s/%s/%s/%s/%s'%('CMIP5','output',institute,model,experiment,'<frequency>','<realm>','<version>')
+        return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment,self.member)
 
 
 class TestDocs(object):

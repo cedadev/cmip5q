@@ -224,6 +224,8 @@ class EnsembleForm(forms.ModelForm):
 
 class EnsembleMemberForm(forms.ModelForm):
     drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
+    # Currently not asking for data file version information
+    #dataVersion=forms.IntegerField(widget=forms.TextInput(attrs={'size':'16'}),required=False)
     class Meta:
         model=EnsembleMember
     def __init__(self,*args,**kwargs):
@@ -412,6 +414,9 @@ class SimulationForm(forms.ModelForm):
     #duration=DateRangeFieldForm(widget=DateRangeWidget())
     duration=DateRangeFieldForm2()
     drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
+    #currently not asking for data file version information
+    #dataVersion=forms.IntegerField(widget=forms.TextInput(attrs={'size':'16'}),required=False)
+    
     class Meta:
         model=Simulation
         #the first three are enforced by the workflow leading to the form, the second two are
@@ -456,7 +461,7 @@ class SimulationForm(forms.ModelForm):
         for i in ['author','funder','contact']: 
             self.fields[i].queryset=qs
         
-        self.fields['contact'].required = True
+        self.fields['contact'].required = True 
     
     def save(self):
         s=forms.ModelForm.save(self)
@@ -468,6 +473,7 @@ class SimulationForm(forms.ModelForm):
             e.save()
         e.updateMembers()
         return s
+        
         
 class SimRelationshipForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':"80",'rows':"2"}),required=False)
