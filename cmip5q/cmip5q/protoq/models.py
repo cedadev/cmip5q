@@ -205,7 +205,7 @@ class CIMObject (Fundamentals):
     but it's included here, because the questionnaire can return it '''
     uri=models.CharField(max_length=64,editable=False)    
     cimtype=models.CharField(max_length=64,editable=False)
-    xmlfile=models.FileField(upload_to='PersistedXML')
+    xmlfile=models.FileField(upload_to='../../../PersistedXML')
     # These are update by the parent doc, which is why they're not "fundamentals"
     created=models.DateField(editable=False)
     updated=models.DateField(editable=False)
