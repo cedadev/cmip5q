@@ -54,6 +54,13 @@
     <form action="{{urls.form}}" method='post' onsubmit="myProject.bypassConfirm()">
         <div class="boxer">    
             <table>
+              {% if isParamGroup %}
+                <tr>
+                  <td>
+                    <h1>{{c.scienceType}} </h1>
+                  </td>
+                </tr>
+              {% else %}
             	{% if isModel %}
                 <tr><td class="inputH1">Short Name*:&nbsp;{{cform.abbrev.errors}}</td>
                 {% else %}
@@ -81,6 +88,9 @@
                     </td></tr> 
                     {% endif %}
                 {% else %}{{cform.implemented.as_hidden}}{% endif %}
+              
+              {% endif %}
+              
                 <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
                 {% if isParamGroup %}
                 {% else %}
