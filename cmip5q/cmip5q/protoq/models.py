@@ -606,7 +606,7 @@ class Component(Doc):
     
 class ComponentInput(models.Model):
     ''' This class is used to capture the inputs required by a component '''
-    abbrev=models.CharField(max_length=24)
+    abbrev=models.CharField(max_length=40)
     description=models.TextField(blank=True,null=True)
     #mainly we're going to be interested in boundary condition inputs:
     ctype=models.ForeignKey('Term')
@@ -1584,7 +1584,7 @@ class DRSOutput(models.Model):
     product=models.CharField(max_length=64)
     institute=models.ForeignKey(Centre)
     model=models.ForeignKey(Component)
-    experiment=models.ForeignKey(Experiment)
+    experiment=models.ForeignKey(Experiment)<
     frequency=models.ForeignKey(Term,blank=True,null=True,related_name='drs_frequency')
     #frequency=models.CharField(max_length=64)
     realm=models.ForeignKey(Term,blank=True,null=True,related_name='drs_realm')
@@ -1592,10 +1592,10 @@ class DRSOutput(models.Model):
     # the rip member value
     member=models.CharField(max_length=64)
     # we don't need to point to simulations, they point to this ...
-    def __unicode__(self):
-        #return '%s/%s/%s/%s/%s/%s/%s/%s'%(activity,product,institute,model,experiment,frequency,realm,version)
-        #return '%s/%s/%s/%s/%s/%s/%s/%s'%('CMIP5','output',institute,model,experiment,'<frequency>','<realm>','<version>')
-        return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment,self.member)
+    def __unicode__(self): 
+        #return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment,self.member)
+        #changing this to not include member explicitly as in an ensemble run we will include the rip meber at the ensmble level
+        return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment)
 
 
 class TestDocs(object):
