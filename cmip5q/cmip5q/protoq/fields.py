@@ -87,10 +87,21 @@ class TimeLength(object):
     def __init__(self,s):
         '''Time lengths consist of a integer number and a unit '''
         try:
+            # standard string format
             l,u=s.split(' ')
             l=int(float(l))
         except:
-            raise ValueError('"%s" is not a valid TimeLength'%s)
+            try :
+                # CIM1.5 format
+                mappingUnits={'D':'Days','Y':'Years'}
+                assert s[0]=='P'
+                l=s[1:len(s)-1]
+                u=s[len(s)-1]
+                assert u in mappingUnits
+                u=mappingUnits[u]
+                logging.debug('duration '+s+' : '+l+','+u)
+            except :
+                raise ValueError('"%s" is not a valid TimeLength'%s)
         self.s='%s %s'%(l,u)
         self.period=l
         self.units=u
@@ -99,7 +110,7 @@ class TimeLength(object):
     def __str__(self):
         return self.s
     def xml(self,parent='duration'):
-        mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+        mappingUnits={'Years':'Y','Days':'D','years':'Y','days':'D'}
         length='P'+str(int(self.period))+mappingUnits[self.units]
         e=ET.Element(parent)
         e.text=length
@@ -162,8 +173,15 @@ class DateRange(object):
         s2=getter.getN(s0,'endDate')
         if s2 is not None: s2=SimDateTime(s2)
         logging.debug('endDate '+str(s2))
+        # length is an out of date format used by the experiment configuration documents
         tl=getter.find(s0,'length')
-        if tl is not None: tl=TimeLength('%s %s'%(tl.text,tl.attrib['units']))
+        if tl is not None:
+            tl=TimeLength('%s %s'%(tl.text,tl.attrib['units']))
+        else:
+            # duration is the CIM1.5 format
+            tl=getter.find(s0,'duration')
+            if tl is not None:
+                tl=TimeLength(tl.text)
         logging.debug('timelength '+str(tl))
         dr=DateRange(startDate=s1,endDate=s2,length=tl)
         dr.description=getter.getN(e,'description')
