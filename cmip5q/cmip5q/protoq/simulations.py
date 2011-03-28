@@ -93,6 +93,7 @@ class simulationHandler(object):
                 simok=True
                 if label=='Add':
                     oldmodel=None
+                    olddrs=None
                 else: 
                     oldmodel=s.numericalModel
                     olddrs=s.drsMember

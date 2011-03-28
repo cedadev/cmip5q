@@ -19,7 +19,7 @@ class Translator:
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
-    CIM_NAMESPACE = "http://www.purl.org/esmetadata/cim/1.5"
+    CIM_NAMESPACE = "http://www.purl.org/org/esmetadata/cim/1.5/schemas"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = CIM_NAMESPACE+"/"+"cim.xsd"
@@ -198,7 +198,7 @@ class Translator:
 
         return comp
 
-    def CIMDocumentSetRoot(self):
+    def cimDocumentSetRoot(self):
         ''' return the top level cim document invarient structure for a recordset'''
         root=ET.Element('CIMDocumentSet', \
                              attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
@@ -219,18 +219,23 @@ class Translator:
         if method_name=='add_simulation' :
             # save our simulation instance so the composition can pick it up
             self.simClass=ref
-            root=self.CIMDocumentSetRoot()
-            modelElement=self.cimRecord(root)
-            self.add_component(ref.numericalModel,modelElement)
-            simulationElement=self.cimRecord(root)
-            self.add_simulation(ref,simulationElement)
+            root=self.cimDocumentSetRoot()
+            #modelElement=self.cimRecord(root)
+            #self.add_component(ref.numericalModel,modelElement)
+            self.add_component(ref.numericalModel,root)
+            #simulationElement=self.cimRecord(root)
+            #self.add_simulation(ref,simulationElement)
+            self.add_simulation(ref,root)
             if ref.ensembleMembers>1 :
-                ensembleElement=self.cimRecord(root)
-                self.add_ensemble(ref,ensembleElement)
-            experimentElement=self.cimRecord(root)
-            self.add_experiment(ref.experiment,experimentElement)
-            platformElement=self.cimRecord(root)
-            self.add_platform(ref.platform,platformElement)
+                #ensembleElement=self.cimRecord(root)
+                #self.add_ensemble(ref,ensembleElement)
+                self.add_ensemble(ref,root)
+            #experimentElement=self.cimRecord(root)
+            #self.add_experiment(ref.experiment,experimentElement)
+            self.add_experiment(ref.experiment,root)
+            #platformElement=self.cimRecord(root)
+            #self.add_platform(ref.platform,platformElement)
+            self.add_platform(ref.platform,root)
 
             uniqueFileList=[]
             couplings=ref.numericalModel.couplings(simulation=self.simClass)
@@ -240,16 +245,18 @@ class Translator:
                     if externalClosure.targetFile not in uniqueFileList :
                         uniqueFileList.append(externalClosure.targetFile)
             for fileObject in uniqueFileList :
-                dataObjectElement=self.cimRecord(root)
-                self.add_dataobject(fileObject,dataObjectElement)
+                #dataObjectElement=self.cimRecord(root)
+                #self.add_dataobject(fileObject,dataObjectElement)
+                self.add_dataobject(fileObject,root)
 
             # find all unique grid references in our model
             uniqueGridList=[]
             myModel=ref.numericalModel
             self.componentWalkGrids(myModel,uniqueGridList)
             for gridObject in uniqueGridList :
-                gridObjectElement=self.cimRecord(root)
-                self.add_gridobject(gridObject,gridObjectElement)
+                #gridObjectElement=self.cimRecord(root)
+                #self.add_gridobject(gridObject,gridObjectElement)
+                self.add_gridobject(gridObject,root)
             cimDoc=root
         else :
             root=ET.Element("tmp_container",nsmap=self.NSMAP)
@@ -300,6 +307,7 @@ class Translator:
         HorizGridDiscretization=""
         HorizGridType=""
         HorizResProps={}
+        HorizGridMnemonic=""
         for pg in horizontalPropertiesObject.paramGroup.all():
             if pg.name=="HorizontalCoordinateSystem" :
                 # We rely on the constraint set objects appearing in our list in the same order as they appear in the questionnaire. We rely on this as the information we gather from this affects what we need to read from the others. The order_by('id') should sort this out but I've put a check in the code (for the first constraint only) just in case.
@@ -711,8 +719,8 @@ class Translator:
                 assert False, "Error, a calendar must exist"
             ''' input [0..inf] '''
             # add in our model bindings (couplings)
-            inputElement=ET.SubElement(simElement,'input')
-            self.componentWalkComposition(simClass.numericalModel,inputElement)
+            # inputElement=ET.SubElement(simElement,'input')
+            # self.componentWalkComposition(simClass.numericalModel,inputElement)
             #couplings=simClass.numericalModel.couplings(simulation=simClass)
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
@@ -1386,7 +1394,7 @@ class Translator:
         if c.otherVersion or c.geneology :
             GenEl=ET.SubElement(comp,'documentGenealogy')
             RelEl=ET.SubElement(GenEl,'relationship')
-            DocEl=ET.SubElement(RelEl,'documentRelationship',{'type' : 'previousVersion'})
+            DocEl=ET.SubElement(RelEl,'documentRelationship',{'type' : 'previousVersionOf', 'direction' : 'toTarget'})
             if c.geneology :
                 ET.SubElement(DocEl,'description').text=c.geneology
             TargEl=ET.SubElement(DocEl,'target')
