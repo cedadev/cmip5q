@@ -1597,7 +1597,7 @@ class DRSOutput(models.Model):
     product=models.CharField(max_length=64)
     institute=models.ForeignKey(Centre)
     model=models.ForeignKey(Component)
-    experiment=models.ForeignKey(Experiment)<
+    experiment=models.ForeignKey(Experiment)
     frequency=models.ForeignKey(Term,blank=True,null=True,related_name='drs_frequency')
     #frequency=models.CharField(max_length=64)
     realm=models.ForeignKey(Term,blank=True,null=True,related_name='drs_realm')
