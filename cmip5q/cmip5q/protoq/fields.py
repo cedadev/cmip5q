@@ -98,10 +98,11 @@ class TimeLength(object):
         return self.s
     def __str__(self):
         return self.s
-    def xml(self,parent='length'):
+    def xml(self,parent='duration'):
+        mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+        length='P'+str(int(self.period))+mappingUnits[self.units]
         e=ET.Element(parent)
-        e.attrib['units']=self.units
-        e.text=str(self.period)
+        e.text=length
         return e
         
 class DateRange(object):
@@ -132,7 +133,7 @@ class DateRange(object):
         
         if self.startDate is not None: e.append(self.startDate.xml('startDate'))
         if self.endDate is not None: e.append(self.endDate.xml('endDate'))
-        if self.length is not None: e.append(self.length.xml('length'))
+        if self.length is not None: e.append(self.length.xml('duration'))
         if self.description is not None: ET.SubElement(e,'description').text=self.description
         return top
     def strxml(self,parent='DateRange'):

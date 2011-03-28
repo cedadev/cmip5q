@@ -6,7 +6,7 @@ from cmip5q.XMLinitialiseQ import QuestionniareConfiguration
 from lxml import etree as ET
 import uuid
 import datetime
-
+import string
 from django.conf import settings
 logging=settings.LOG
 
@@ -19,10 +19,12 @@ class Translator:
     # only valid CIM will be output if the following is set to true. This means that all information will not be output as some does not align with the CIM structure (ensembles and genealogy in particular).
     VALIDCIMONLY=True
 
-    CIM_NAMESPACE = "http://www.metaforclimate.eu/schema/cim/1.5"
+    CIM_NAMESPACE = "http://www.purl.org/esmetadata/cim/1.5"
     SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
     SCHEMA_INSTANCE_NAMESPACE_BRACKETS = "{"+SCHEMA_INSTANCE_NAMESPACE+"}"
     CIM_URL = CIM_NAMESPACE+"/"+"cim.xsd"
+    GML_NAMESPACE = "http://www.opengis.net/gml/3.2"
+    GML_NAMESPACE_BRACKETS="{"+GML_NAMESPACE+"}"    
     GMD_NAMESPACE = "http://www.isotc211.org/2005/gmd"
     GMD_NAMESPACE_BRACKETS="{"+GMD_NAMESPACE+"}"
     GCO_NAMESPACE = "http://www.isotc211.org/2005/gco"
@@ -31,6 +33,7 @@ class Translator:
     XLINK_NAMESPACE_BRACKETS="{"+XLINK_NAMESPACE+"}"
     NSMAP = {None    : CIM_NAMESPACE,             \
              "xsi"   : SCHEMA_INSTANCE_NAMESPACE, \
+             "gml"   : GML_NAMESPACE,             \
              "gmd"   : GMD_NAMESPACE,             \
              "gco"   : GCO_NAMESPACE,             \
              "xlink" : XLINK_NAMESPACE}
@@ -92,6 +95,8 @@ class Translator:
                 # not treat XOR, then OR, then KeyBoard. I don't know
                 # how to determine a derived class from a base class.
                 # So here is a rubbish solution that works!
+                # RF: one can now get at a child object (get_child)
+                # so we could simplify the code below, but as it works ...
                 #
                 # Needed to add .order_by('id') as the database does not guarantee
                 # to return objects in the same order, hence the order of the baseclass
@@ -193,19 +198,6 @@ class Translator:
 
         return comp
 
-    def cimRecord(self,rootElement) :
-        ''' return the top level cim document invarient structure from within a CIMDocumentSet'''
-        cr1=ET.SubElement(rootElement,'CIMRecord')
-        cr2=ET.SubElement(cr1,'CIMRecord')
-        return cr2
-    
-    def cimRecordRoot(self):
-        ''' return the top level cim document invarient structure '''
-        root=ET.Element('CIMRecord', \
-                             attrib={self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation": self.CIM_URL}, \
-                             nsmap=self.NSMAP)
-        return root
-
     def CIMDocumentSetRoot(self):
         ''' return the top level cim document invarient structure for a recordset'''
         root=ET.Element('CIMDocumentSet', \
@@ -215,6 +207,8 @@ class Translator:
 
     def q2cim(self,ref,docType):
 
+        # check whether this object is marked as deleted. This code should never called if the object is deleted so throw an error if this is the case.
+        assert not(ref.isDeleted),"GerryWobbler error: An object that has been marked as deleted is being translated to XML"
         ''' primary public entry point. '''
         method_name = 'add_' + str(docType)
         logging.debug("q2cim calling "+method_name)
@@ -252,27 +246,50 @@ class Translator:
             # find all unique grid references in our model
             uniqueGridList=[]
             myModel=ref.numericalModel
-            self.componentWalk(myModel,uniqueGridList)
+            self.componentWalkGrids(myModel,uniqueGridList)
             for gridObject in uniqueGridList :
                 gridObjectElement=self.cimRecord(root)
                 self.add_gridobject(gridObject,gridObjectElement)
             cimDoc=root
         else :
-            root=self.cimRecordRoot()
+            root=ET.Element("tmp_container",nsmap=self.NSMAP)
             cimDoc=method(ref,root)
+            # remove our temporary container element
+            cimDoc=cimDoc[0]
+            # add in our namespace. Note NSMAP is propogated to children so should be OK as we set it for the original root element tmp_container
+            cimDoc.attrib[self.SCHEMA_INSTANCE_NAMESPACE_BRACKETS+"schemaLocation"]=self.CIM_URL
         return cimDoc
         
-    def componentWalk(self,c,uniqueGridList) :
+    def componentWalkGrids(self,c,uniqueGridList) :
         if c.implemented :
             if c.grid :
                 if c.grid not in uniqueGridList :
                     uniqueGridList.append(c.grid)
             for child in c.components.all():
-                self.componentWalk(child,uniqueGridList)
+                self.componentWalkGrids(child,uniqueGridList)
+
+    def componentWalkComposition(self,c,rootElement) :
+        if c.implemented :
+            self.addComposition(c,rootElement)
+            rootElement.append(ET.Comment('Looking in component '+c.abbrev))
+            for child in c.components.all():
+                self.componentWalkComposition(child,rootElement)
 
     def add_gridobject(self,gridObject,rootElement) :
 
-        # get our horizontal and vertical grid properties
+        # get mnemonic from the top level
+        MnemonicValue=''
+        for pg in gridObject.paramGroup.all():
+            if pg.name=="General Attributes" :
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                for con in constraintSet :
+                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
+                    for bp in BaseParamSet:
+                        if bp.name=="Mnemonic":
+                            childBP=bp.get_child_object()
+                            MnemonicValue=childBP.value
+
+        # get our horizontal and vertical grid property pages
         # the assumption here is that horizontal is stored before vertical.
         childList=gridObject.grids.all().order_by('id')
         assert len(childList)==2, "expecting 2 grid subcomponents (horizontal and vertical properties) but found "+len(childList)
@@ -291,7 +308,7 @@ class Translator:
                 for con in constraintSet:
                     assert (con.constraint=="" and first) or (con.constraint!="" and not(first)), "Error, the first constraint set should have no associated constraint and there should only be one constraint set with no constraint"
                     #rootElement.append(ET.Comment('constraint : '+con.constraint))
-                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
                     for bp in BaseParamSet :
                         p=bp.get_child_object()
                         if con.constraint=="" :
@@ -328,7 +345,7 @@ class Translator:
             elif pg.name=="HorizontalExtent" :
                 constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
                 for con in constraintSet:
-                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
                     for bp in BaseParamSet :
                         p=bp.get_child_object()
                         if bp.name=="LatMin" :
@@ -343,58 +360,116 @@ class Translator:
                             assert False, "Error : Unknown grid extent property found: "+bp.name
 
         # extract our vertical properties
-        VertGridDiscretization=""
-        VertGridType=""
+        vertCoordType=""
+        vertCoord=""
+        vertCoordProps={}
+        VertResProps={}
+        VertDomain=""
         for pg in verticalPropertiesObject.paramGroup.all():
             if pg.name=="VerticalCoordinateSystem" :
                 # We rely on the constraint set objects appearing in our list in the same order as they appear in the questionnaire. We rely on this as the information we gather from this affects what we need to read from the others. The order_by('id') should sort this out but I've put a check in the code (for the first constraint only) just in case.
+                foundVertCoordType=False
+                foundVertCoord=False
+                constraintSet=ConstraintGroup.objects.filter(parentGroup=pg).order_by('id')
+                for con in constraintSet:
+                    assert (con.constraint=="" and not foundVertCoordType) or (con.constraint!="" and foundVertCoordType), "Error, the first constraint set should have no associated constraint and there should only be one constraint set with no constraint"
+                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
+                    for bp in BaseParamSet :
+                        p=bp.get_child_object()
+                        if con.constraint=="" : 
+                            assert not foundVertCoordType,"Error expecting unconstrained property to appear first"
+                            foundVertCoordType=True
+                            # first set of values have no constraint
+                            if bp.name=="VerticalCoordinateType" :
+                                vertCoordType=str(p.value)
+                        elif str(con.constraint).find(vertCoordType)!=-1 and foundVertCoordType :
+                            if bp.name=="VerticalCoordinate" :
+                                assert not foundVertCoord, "Error expecting VerticalCoordinate to appear first"
+                                foundVertCoord=True
+                                vertCoord=str(p.value)
+                            else:
+                                assert foundVertCoord, "Error expecting VerticalCoordinate to appear first"
+                                # pick up any other properties within this constraint
+                                vertCoordProps[bp.name]=str(p.value)
+                        elif str(con.constraint).find(vertCoord)!=-1 and foundVertCoord :
+                            # pick up any properties that depend on vertCoord
+                            vertCoordProps[bp.name]=str(p.value)
+                        else :
+                            pass
+
+            elif pg.name=="VerticalExtent" :
                 first=True
                 constraintSet=ConstraintGroup.objects.filter(parentGroup=pg).order_by('id')
                 for con in constraintSet:
                     assert (con.constraint=="" and first) or (con.constraint!="" and not(first)), "Error, the first constraint set should have no associated constraint and there should only be one constraint set with no constraint"
-                    BaseParamSet=BaseParam.objects.filter(constraint=con)
+                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
                     for bp in BaseParamSet :
                         p=bp.get_child_object()
                         if con.constraint=="" :
+                            assert first, "Error expecting unconstrained property to appear first"
                             first=False
                             # first set of values have no constraint
-                            if bp.name=="VerticalCoordinateType" :
-                                VertGridDiscretization=str(p.value)
-                        # rf need a better check below
-                        elif str(con.constraint).find(VertGridDiscretization)!=-1 and str(con.constraint).find("GridDiscretization")!=-1:
-                            if bp.name=="VerticalCoordinate" :
-                                VertGridType=str(p.value)
-                        else:
+                            if bp.name=="Domain" :
+                                VertDomain=str(p.value)
+                            else:
+                                assert False,"Unknown parameter, expecting 'Domain' but found "+bp.name
+                        elif str(con.constraint).find(VertDomain)!=-1 :
+                            assert not first, "Error expecting constraint to appear first"
+                            assert VertDomain=="atmospheric" or VertDomain=="oceanic", "Error, expecting either ocean or atmosphere but found constraint "+str(con.constraint)
+                            VertResProps[str(bp.name)]=str(p.value)
+                        else : # VertDomain should be other or n/a
                             pass
+            else :
+                assert False, "Found an unknown param group in vertical coordinates"
         
         # now we start creating our grid
-        gridElement=ET.SubElement(rootElement,'gridSpec')
-        esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'gridType':HorizGridType})
+        # gml:id can not just be a uuid as it needs to start with a letter so prepend with 'metafor'
+        gridElement=ET.SubElement(rootElement,'gridSpec',{self.GML_NAMESPACE_BRACKETS+'id':'metafor'+gridObject.uri})
+        #CV expects "_" instead of " " in CV so simply replace any spaces here
+        CVHorizGridType=HorizGridType.replace(' ','_')
+        # quick bug fix. Should change CV in the questionnaire.
+        if CVHorizGridType=='ying_yang' : CVHorizGridType='yin_yang'
+        esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'gridType':CVHorizGridType,'id':''})
+        # before the simple replacement solution I did an explicit mapping
+        #MappingHorizGridType={'displaced pole':'displaced_pole','ying yang':'ying_yang'}
+        #esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'gridType':MappingHorizGridType[HorizGridType],'id':''})
+        ''' shortName [0..1] '''
         if gridObject.abbrev :
             ET.SubElement(esmModelGridElement,'shortName').text=gridObject.abbrev
+        ''' longName [0..1] '''
         if gridObject.title :
             ET.SubElement(esmModelGridElement,'longName').text=gridObject.title
+        ''' description [0..1] '''
         if gridObject.description :
             ET.SubElement(esmModelGridElement,'description').text=gridObject.description
+        ''' citationList [0..1] '''
         if len(gridObject.references.all())>0:
-            refList=ET.SubElement(esmModelGridElement,'referenceList')
+            refList=ET.SubElement(esmModelGridElement,'citationList')
             self.addReferences(gridObject.references,refList)
-
+        ''' extent [0..1] '''
+        ''' mnemonic [0..1] '''
+        if MnemonicValue :
+            ET.SubElement(esmModelGridElement,'mnemonic').text=MnemonicValue
+        ''' gridMosaic or gridTile '''
+        CVHorizGridType=HorizGridType.replace(' ','_')
+        mappingHorizDiscretizationType={'logically rectangular':'logically_rectangular','structured triangular':'structured_triangular','unstructured triangular':'unstructured_triangular','unstructured polygonal':'unstructured_polygonal','pixel-based catchment':'pixel-based_catchment','other':'other'}
         if HorizGridDiscretization!="composite" :
             esmModelGridElement.set('isLeaf','true')
             esmModelGridElement.set('numTiles','1')
             esmModelGridElement.set('numMosaics','0')
-            gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":HorizGridDiscretization}) #,"verticalGridDiscretization":VertGridDiscretization})
+            gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":mappingHorizDiscretizationType[HorizGridDiscretization]}) #,"verticalGridDiscretization":vertCoordType})
+            self.addGridExtent(gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
             self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
             self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
-            self.addGridExtent(gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
+            self.addGridTileVertRes(gridTileElement,VertResProps,VertDomain)
+            self.addGridTileVertCoords(gridTileElement,vertCoordType,vertCoord,vertCoordProps)
             if HorizGridMnemonic!="" :
                 ET.SubElement(gridTileElement,'mnemonic').text=HorizGridMnemonic
         else : # HorizGridDiscretization=="composite"
             esmModelGridElement.set('isLeaf','false')
             esmModelGridElement.set('numTiles','0')
             esmModelGridElement.set('numMosaics','1')
-            gridMosaicElement=ET.SubElement(esmModelGridElement,'gridMosaic',{'gridType':HorizGridDiscretization,'isLeaf':'true','numMosaics':'0'})
+            gridMosaicElement=ET.SubElement(esmModelGridElement,'gridMosaic',{'gridType':HorizGridDiscretization,'isLeaf':'true','numMosaics':'0','id':''})
             if HorizGridCompositeName!="" :
                 ET.SubElement(gridMosaicElement,'description').text=HorizGridCompositeName
 
@@ -404,25 +479,32 @@ class Translator:
             if HorizGridType=="ying yang":
                 gridMosaicElement.set('numTiles','2')
                 # ying yang is represented as a gridMosaic with two gridTiles
-                for i in range(2-1):
+                for i in range(2):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'half_torus'})
                     self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
                     self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
+                    self.addGridTileVertRes(gridTileElement,VertResProps,VertDomain)
+                    self.addGridTileVertCoords(gridTileElement,vertCoordType,vertCoord,vertCoordProps)
             elif HorizGridType=="icosahedral":
                 gridMosaicElement.set('numTiles','10')
                 # icosahedral is represented as a gridMosaic with ten logically rectangular gridTiles
-                for i in range(10-1):
+                for i in range(10):
                     gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":'logically_rectangular'})
                     self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
                     self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
+                    self.addGridTileVertRes(gridTileElement,VertResProps,VertDomain)
+                    self.addGridTileVertCoords(gridTileElement,vertCoordType,vertCoord,vertCoordProps)
             elif HorizGridType=="other":
                 numTiles=len(HorizGridChildNames)
-                gridMosaicElement.set('numTiles',numTiles)
-                # we have a composite grid
-                for gridTileName in HorizGridChildNames :
-                    gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":gridTileName})
-                    self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
-                    self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
+                if numTiles : # make sure some values are provided
+                    gridMosaicElement.set('numTiles',str(numTiles))
+                    # we have a composite grid
+                    for gridTileName in HorizGridChildNames :
+                        gridTileElement=ET.SubElement(gridMosaicElement,"gridTile",{"discretizationType":mappingHorizDiscretizationType[gridTileName]})
+                        self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+                        self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
+                        self.addGridTileVertRes(gridTileElement,VertResProps,VertDomain)
+                        self.addGridTileVertCoords(gridTileElement,vertCoordType,vertCoord,vertCoordProps)
             #else : output nothing
 
         self.addDocumentInfo(gridObject,gridElement)
@@ -444,7 +526,25 @@ class Translator:
             description+=". Refinement details: "+HorizGridRefinement
         horizResElement=ET.SubElement(gridTileElement,"horizontalResolution",{"description":description})
         for attrib in HorizResProps.keys() :
-            ET.SubElement(horizResElement,"property",{"name":attrib}).text=HorizResProps[attrib]
+            propElement=ET.SubElement(horizResElement,"property")
+            ET.SubElement(propElement,"value").text=HorizResProps[attrib]
+            ET.SubElement(propElement,"name").text=attrib
+
+    def addGridTileVertCoords(self,gridTileElement,vertCoordType,vertCoord,vertCoordProps) :
+        vertCoordsElement=ET.SubElement(gridTileElement,"zcoords",{'coordinateType':vertCoordType, 'coordinateForm':vertCoord})
+        for attrib in vertCoordProps.keys() :
+            propElement=ET.SubElement(vertCoordsElement,"property")
+            ET.SubElement(propElement,"value").text=vertCoordProps[attrib]
+            ET.SubElement(propElement,"name").text=attrib
+
+    def addGridTileVertRes(self,gridTileElement,VertResProps,VertDomain) :
+        gridTileElement.append(ET.Comment('Vertical Domain specified as : '+VertDomain))
+        if VertResProps:
+            vertResElement=ET.SubElement(gridTileElement,"verticalResolution")
+            for attrib in VertResProps.keys() :
+                propElement=ET.SubElement(vertResElement,"property")
+                ET.SubElement(propElement,"value").text=VertResProps[attrib]
+                ET.SubElement(propElement,"name").text=attrib
 
     def addGridExtent(self,gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax) :
         horizResElement=ET.SubElement(gridTileElement,"extent")
@@ -481,7 +581,13 @@ class Translator:
             self.addCVValue(ensembleElement,'ensembleType',ensembleClass.etype.name)
         ''' ensembleMember [2..inf] '''    
         ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
-        assert(len(ensembleClassSet)>1,'Ensemble %s should have at least two ensemble members'%ensembleClass)
+        assert(len(ensembleClassSet)>0),'Ensemble %s should have at least two ensemble members'%ensembleClass
+        # first add in our control member
+        ensMemberElement=ET.SubElement(ensembleElement,'ensembleMember')
+        simulationElement=ET.SubElement(ensMemberElement,'simulation')
+        refElement=self.addCIMReference(simClass,simulationElement)
+        self.addCVValue(ensMemberElement,'ensembleMemberID',simClass.drsMember,cvName='DRS_CMIP5_ensembleType')
+        # now add in our modified members
         for ensMemberClass in ensMemberClassSet :
             if ensMemberClass.drsMember :
                 ensMemberElement=ET.SubElement(ensembleElement,'ensembleMember')
@@ -494,7 +600,7 @@ class Translator:
                 #extIDElement=ET.SubElement(ensMemberElement,'externalID')
                 #ET.SubElement(extIDElement,'name').text=ensMemberClass.drsMember
                 #ET.SubElement(extIDElement,'standard',{'value':'DRS'})
-                self.addCVValue(ensMemberElement,'externalID',ensMemberClass.drsMember,cvName='DRS_CMIP5_ensembleType')
+                self.addCVValue(ensMemberElement,'ensembleMemberID',ensMemberClass.drsMember,cvName='DRS_CMIP5_ensembleType')
 
         myEnsembleDoc=ensembleClass.makeDoc()
         self.addDocumentInfo(myEnsembleDoc,ensembleElement)
@@ -557,7 +663,7 @@ class Translator:
             ''' project [0..inf] '''
             if QuestionniareConfiguration is 'cmip5':
                 self.addCVValue(simElement,'project','CMIP5',isOpen=False)
-            ''' shortName [1] and longName [1] '''
+            ''' longName [1] and shortName [1] '''
             if simClass.ensembleMembers>1 :
                 # our simulation is really the base simulation of an ensemble
                 ''' shortName [1] '''
@@ -566,12 +672,15 @@ class Translator:
                 ET.SubElement(simElement,'longName').text='Base Simulation of Ensemble'+simClass.title
             else :
                 ''' shortName [1] '''
-                ET.SubElement(simElement,'shortName').text=simClass.abbrev
+                if simClass.abbrev:
+                    ET.SubElement(simElement,'shortName').text=simClass.abbrev
                 ''' longName [1] '''
+                # longName is optional in the Questionnaire but required in the CIM.
+                # Therefore always provide the element even if it is empty.
                 ET.SubElement(simElement,'longName').text=simClass.title
             ''' description [0..1] '''
-            ET.SubElement(simElement,'description').text=simClass.description
-            ''' dataHolder [0...inf] '''
+            if simClass.description:
+                ET.SubElement(simElement,'description').text=simClass.description
             ''' supports [1..inf] '''
             experimentElement=ET.SubElement(simElement,'supports')
             if QuestionniareConfiguration is 'cmip5':
@@ -601,10 +710,14 @@ class Translator:
             else :
                 assert False, "Error, a calendar must exist"
             ''' input [0..inf] '''
+            # add in our model bindings (couplings)
+            inputElement=ET.SubElement(simElement,'input')
+            self.componentWalkComposition(simClass.numericalModel,inputElement)
+            #couplings=simClass.numericalModel.couplings(simulation=simClass)
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
             ''' spinupDateRange [0..1] '''
-            ''' spinupSimulation [0..1] and controlSImulation [0..1] '''
+            ''' spinupSimulation [0..1] '''
             relatedSimulations=SimRelationship.objects.filter(sfrom=simClass)
             assert len(relatedSimulations)==1, "Expecting related simulations to be of size 1"
             relatedSimulation=relatedSimulations[0]
@@ -613,14 +726,16 @@ class Translator:
                     #capture relationship as a spinup reference
                     spinupElement=ET.SubElement(simElement,'spinupSimulation')
                     self.addCIMReference(relatedSimulation.sto,spinupElement,description=relatedSimulation.description)
-                elif str(relatedSimulation.value)=='hasControlSimulation':
+            ''' controlSimulation [0..1]'''
+            relatedSimulations=SimRelationship.objects.filter(sfrom=simClass)
+            assert len(relatedSimulations)==1, "Expecting related simulations to be of size 1"
+            relatedSimulation=relatedSimulations[0]
+            if relatedSimulation.value :
+                if str(relatedSimulation.value)=='hasControlSimulation':
                     #capture relationship as a control reference
                     controlElement=ET.SubElement(simElement,'controlSimulation')
                     self.addCIMReference(relatedSimulation.sto,controlElement,description=relatedSimulation.description)
-                else:
-                    # I am stored as a genealogy relationhip
-                    pass
-            ''' authorsList '''
+            ''' authorsList [0..1] '''
             alElement=ET.SubElement(simElement,'authorsList')
             assert simClass.authorList!='', "Error authorList must have some content"
             ET.SubElement(alElement,'list').text=simClass.authorList
@@ -628,17 +743,32 @@ class Translator:
             confClassSet=Conformance.objects.filter(simulation=simClass)
             for confClass in confClassSet:
                 if (confClass.ctype) : # I have a conformance specified
+                    conf1Element=ET.SubElement(simElement,'conformance')
                     if confClass.ctype.name=='Not Conformant' :
-                        confElement=ET.SubElement(simElement,'conformance',{'conformant':'false'})
+                        conformant='false'
                     else :
-                        confElement=ET.SubElement(simElement,'conformance',{'conformant':'true'})
+                        conformant='true'
+                    ''' description [0..1] '''
+                    mappedConformanceType=string.lower(confClass.ctype.name)
+                    if mappedConformanceType=='via combination' :
+                        mappedConformanceType='combination'
+                    confElement=ET.SubElement(conf1Element,'conformance',{'conformant':conformant,'type':mappedConformanceType})
+                    ET.SubElement(confElement,'description').text=confClass.description
+                    ''' frequency [0..1] '''
+                    ''' requirement [1..inf] '''
                     reqElement=ET.SubElement(confElement,'requirement')
                     # get experiment class as the reference
                     ExperimentSet=Experiment.objects.filter(requirements=confClass.requirement)
                     assert len(ExperimentSet)==1, 'A requirement should have one and only one parent experiment.'
                     experiment=ExperimentSet[0]
                     assert confClass.requirement, 'There should be a requirement associated with a conformance'
-                    self.addCIMReference(experiment,reqElement,argName=confClass.requirement.name,argType='NumericalRequirement')
+                    if confClass.option :
+                        # we have chosen a requirement option so use this ID in our reference
+                        reqID=confClass.option.docid
+                    else :
+                        # we have chosen a requirement so use this ID in our reference
+                        reqID=confClass.requirement.docid
+                    self.addCIMReference(experiment,reqElement,argName=reqID,argType='NumericalRequirement')
                     # for each modelmod modification
                     for modClassBase in confClass.mod.all() :
                         modClass=modClassBase.get_child_object()
@@ -660,40 +790,30 @@ class Translator:
                         self.addCIMReference(couplingClass.targetInput.owner,sourceElement,argName=couplingClass.targetInput.abbrev,argType="componentProperty")
 
                     #ET.SubElement(confElement,'description').text='Conformance type: "'+confClass.ctype.name+'". Notes: "'+confClass.description+'".'
-                    confElement.append(ET.Comment('Conformance type : '+confClass.ctype.name))
-                    ET.SubElement(confElement,'description').text=confClass.description
 
                 elif (confClass.description and confClass.description!='') or len(confClass.mod.all())>0 or len(confClass.coupling.all())>0 :
                     # confClass.ctype is mot mandatory in the CIM but is required for a conformance so output something purely for validation purposes if other fields have been set without confClass.ctype being set
-                    ET.SubElement(simElement,"conformance",{'type':'invalid'})
+                    ET.SubElement(conf1Element,"conformance",{'type':'invalid'})
             ''' deployment [0..1] '''
             dep2Element=ET.SubElement(simElement,'deployment')
             ET.SubElement(dep2Element,'description').text='The resources(deployment) on which this simulation ran'
             platElement=ET.SubElement(dep2Element,'platform')
             self.addCIMReference(simClass.platform,platElement)
-            ''' startPoint [1] '''
-            ET.SubElement(simElement,'startPoint').text=str(simClass.duration.startDate)
-            ''' endPoint [0..1] '''
-            if simClass.duration.endDate!=None:
-                ET.SubElement(simElement,'endPoint').text=str(simClass.duration.endDate)
-            ''' duration [0..1] '''
-            if simClass.duration.length!=None:
-                # we are using the standard schema duration type in the CIM here,
-                # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
-                # more details
-                units={'Years':'Y','Days':'D'}
-                durationElement=ET.SubElement(simElement,'duration',).text='P'+str(int(simClass.duration.length.period))+units[simClass.duration.length.units]
+            ''' dateRange [1]'''
+            self.addDateRange(simClass.duration,simElement)
             ''' model [1] '''
             modelElement=ET.SubElement(simElement,'model')
             refElement=self.addCIMReference(simClass.numericalModel,modelElement)
             # now add in all mods associated with the simulation
-            # to the reference
+            # to the model reference
             for modelMod in simClass.codeMod.all() :
                 self.addModelMod(modelMod,refElement)
             # input mods are not relevant here as they are included directly in the model description as composition information
-
-            self.addDocumentInfo(simClass,simElement)
-
+            ''' documentAuthor, documentCreationDate, documentID, documentVersion, externalID, metadataID and metadataVersion '''
+            externalIDs=[]
+            if simClass.ensembleMembers==1:
+                externalIDs.append((simClass.drsMember,'DRS_CMIP5_ensembleType'))
+            self.addDocumentInfo(simClass,simElement,externalIDs=externalIDs)
             ''' documentGenealogy [0..inf] '''
             #relatedSimulations=simClass.relatedSimulations.all()
             relatedSimulations=SimRelationship.objects.filter(sfrom=simClass)
@@ -719,6 +839,34 @@ class Translator:
             ''' quality [0..inf] '''
             return rootElement
 
+    def addDateRange(self,dateObject,rootElement,topName='dateRange'):
+        if dateObject:
+            dateElement=ET.SubElement(rootElement,topName)
+            startDate=dateObject.startDate
+            endDate=dateObject.endDate
+            period=""
+            units=""
+            if dateObject.length:
+                period=dateObject.length.period
+                units=dateObject.length.units
+            if startDate and endDate or startDate and period:
+                # closed date range
+                drElement=ET.SubElement(dateElement,'closedDateRange')
+            else:
+                # open date range
+                drElement=ET.SubElement(dateElement,'openDateRange')
+            if period:
+                # we are using the standard schema duration type in the CIM here,
+                # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
+                # more details
+                mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+                length='P'+str(int(period))+mappingUnits[units]
+                ET.SubElement(drElement,'duration').text=length
+            if endDate!=None:
+                ET.SubElement(drElement,'endDate').text=str(endDate)
+            if startDate!=None:
+                ET.SubElement(drElement,'startDate').text=str(startDate)
+
     def addRequirement(self,reqClass,rootElement):
         if reqClass :
             reqElement=ET.SubElement(rootElement,'numericalRequirement')
@@ -726,16 +874,70 @@ class Translator:
             mapping={'BoundaryCondition':'boundaryCondition','InitialCondition':'initialCondition','SpatioTemporalConstraint':'spatioTemporalConstraint'}
             typeElement=ET.SubElement(reqElement,mapping[reqClass.ctype.name])
             ''' numericalRequirement [0..inf] '''
+            ''' description [0,1] '''
+            if reqClass.description:
+                ET.SubElement(typeElement,'description').text=reqClass.description
             ''' id [0..1] '''
+            if reqClass.docid:
+                ET.SubElement(typeElement,"id").text=reqClass.docid
             ''' name [1] '''
             ET.SubElement(typeElement,'name').text=reqClass.name
-            ''' description [0,1] '''
-            ET.SubElement(typeElement,'description').text=reqClass.description
+            if reqClass.ctype.name=='SpatioTemporalConstraint':
+                stcObject=reqClass.get_child_object()
+                rdElement=ET.SubElement(typeElement,'requiredDuration')
+                if stcObject.requiredDuration:
+                    #self.addDateRange(stcObject.requiredDuration,typeElement,topName='XXXX')
+                    startDate=stcObject.requiredDuration.startDate
+                    endDate=stcObject.requiredDuration.endDate
+                    period=""
+                    units=""
+                    if stcObject.requiredDuration.length:
+                        period=stcObject.requiredDuration.length.period
+                        units=stcObject.requiredDuration.length.units
+                    if startDate and endDate or startDate and period:
+                        # closed date range
+                        drElement=ET.SubElement(rdElement,'closedDateRange')
+                    else:
+                        # open date range
+                        drElement=ET.SubElement(rdElement,'openDateRange')
+                    if startDate!=None:
+                        ET.SubElement(drElement,'startDate').text=str(startDate)
+                    if endDate!=None:
+                        ET.SubElement(drElement,'endDate').text=str(endDate)
+                    if period:
+                        # we are using the standard schema duration type in the CIM here,
+                        # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
+                        # more details
+                        mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+                        length='P'+str(int(period))+mappingUnits[units]
+                        ET.SubElement(drElement,'duration').text=length
 
     def add_experiment(self,expClass,rootElement):
-
         expElement=expClass.toXML()
         self.addDocumentInfo(expClass,expElement)
+        # experiment documentGenealogy goes here
+        expName,sep,expShortName=expClass.abbrev.partition(' ')
+        assert sep!="", "Error, experiment short name does not conform to format 'id name'"
+        assert expName and expName!='', "Error, expecting an experiment name"
+        expRoot,sep,expID=expName.partition('-')
+        # if something ...
+        if expID :
+            relationshipMap={'E':'increaseEnsembleOf','I':'modifiedInputMethodOf','S':'shorterVersionOf','L':'extensionOf'}
+            assert expRoot, "We should have an experiment root if we have extracted an experiment id"
+            assert expID in relationshipMap.keys(), 'Error, unknown experiment keyword. Expecting '+expID.keys()+' but found '+expID
+            docGenElement=ET.SubElement(expElement,'documentGenealogy')
+            relationshipElement=ET.SubElement(docGenElement,'relationship')
+            # toTarget means that this relationship is about how I relate to the target
+            expRelationshipElement=ET.SubElement(relationshipElement,'experimentRelationship',{'type':relationshipMap[expID],'direction':'toTarget'})
+            relatedExperimentName=expRoot+' '+expShortName
+            ET.SubElement(expRelationshipElement,"description").text="My experimentID '"+expName+"' indicates that I am a modification of the Experiment with experimentID '"+expRoot+"' (and the same shortName '"+expShortName+"') with the relationship '"+relationshipMap[expID]+"'"
+            targetElement=ET.SubElement(expRelationshipElement,"target")
+            # create the name of the experiment we are related to
+            relatedExperiments=Experiment.objects.filter(abbrev=relatedExperimentName)
+            assert len(relatedExperiments)==1, "Expecting to find one experiment"
+            relatedExperiment=relatedExperiments[0]
+            self.addCIMReference(relatedExperiment,targetElement,argName=expShortName,argType="experiment")
+
         rootElement.append(expElement)
 
     def setComponentOptions(self,recurse,composition):
@@ -745,7 +947,7 @@ class Translator:
     
     def add_component(self,compClass,rootElement):
 
-        assert(compClass)
+        assert compClass, "add_component compClass is false"
         if compClass :
             self.addChildComponent(compClass,rootElement,1,self.recurse)
         return rootElement
@@ -760,65 +962,64 @@ class Translator:
             else :
                 shortName=platClass.abbrev+"CompilerUnspecified"
                 longName="Machine "+platClass.abbrev+" and an unspecified compiler"
-
-            ''' shortName [1] '''
+            ''' shortname [1] '''
             ET.SubElement(platformElement,'shortName').text=shortName
-            ''' longName [0..1]'''
+            ''' longName [0..1] '''
             ET.SubElement(platformElement,'longName').text=longName
-            ''' description [0..1]'''
+            ''' description [0..1] '''
             if platClass.description :
                 ET.SubElement(platformElement,'description').text=platClass.description
             ''' contact [0..inf] '''
             self.addResp(platClass.contact,platformElement,'contact','contact')
             ''' unit [1..inf] '''
             unitElement=ET.SubElement(platformElement,'unit')
-            '''   machine '''
+            ''' unit/machine [1] '''
             machineElement=ET.SubElement(unitElement,'machine')
-            '''     machineName [1] '''
+            ''' unit/machine/machineName [1] '''
             ET.SubElement(machineElement,'machineName').text=platClass.abbrev
-            '''     machineSystem '''
+            ''' unit/machine/machineSystem [0..1] '''
             if platClass.hardware:
                 ET.SubElement(machineElement,'machineSystem').text=platClass.hardware.name
-            '''     machineLibrary '''
-            '''     machineDescription '''
-            '''     machineLocation '''
-            '''     machineOperatingSystem '''
+            ''' unit/machine/machineLibrary [0..inf] '''
+            ''' unit/machine/machineDescription [0..1] '''
+            ''' unit/machine/machineLocation [0..1] '''
+            ''' unit/machine/machineOperatingSystem [0..1] '''
             if platClass.operatingSystem :
                 self.addCVValue(machineElement,'machineOperatingSystem',platClass.operatingSystem.name)
-            '''     machineVendor '''
+            ''' unit/machine/machineVendor [0..1] '''
             if platClass.vendor :
                 self.addCVValue(machineElement,'machineVendor',platClass.vendor.name)
-            '''     machineInterconnect '''
+            ''' unit/machine/machineInterconnect [0..1] '''
             if platClass.interconnect :
                 self.addCVValue(machineElement,'machineInterconnect',platClass.interconnect.name)
-            '''     machineMaximumProcessors '''
+            ''' unit/machine/machineMaximumProcessors [0..1] '''
             if platClass.maxProcessors :
                 ET.SubElement(machineElement,'machineMaximumProcessors').text=str(platClass.maxProcessors)
-            '''     machineCoresPerProcessor '''
+            ''' unit/machine/machineCoresPerProcessor [0..1] '''
             if platClass.coresPerProcessor :
                 ET.SubElement(machineElement,'machineCoresPerProcessor').text=str(platClass.coresPerProcessor)
-            '''     machineProcessorType '''
+            ''' unit/machine/machineProcessorType [0..1] '''
             if platClass.processor :
                 self.addCVValue(machineElement,'machineProcessorType',platClass.processor.name)
-            '''   compiler '''
+            ''' unit/compiler [0..inf] '''
             compilerElement=ET.SubElement(unitElement,'compiler')
-            '''     compilerName '''
-            # mandatory in the CIM
+            ''' unit/compiler/compilerName [1] '''
             if platClass.compiler :
                 ET.SubElement(compilerElement,'compilerName').text=platClass.compiler.name
             else :
                 ET.SubElement(compilerElement,'compilerName').text='unspecified'
-            '''     compilerVersion '''
+            ''' unit/compiler/compilerVersion [1] '''
             if platClass.compilerVersion :
                 ET.SubElement(compilerElement,'compilerVersion').text=platClass.compilerVersion
             else :
                ET.SubElement(compilerElement,'compilerVersion').text='unspecified' 
-            '''     compilerLanguage '''
-            '''     compilerOptions '''
-            '''     compilerEnvironmentVariables '''
-
+            ''' unit/compiler/compilerLanguage [0..1] '''
+            ''' unit/compilerType [0..1] '''
+            ''' unit/compiler/compilerOptions [0..1] '''
+            ''' unit/compiler/compilerEnvironmentVariables [0..1] '''
+            ''' documentAuthor, documentCreationDate, documentID, documentVersion, externalID, metadataID and metadataVersion '''
             self.addDocumentInfo(platClass,platformElement)
-            ''' documentGenealogy [0] '''
+            ''' documentGenealogy [0..inf] '''
             ''' quality [0..inf] '''
         return rootElement
 
@@ -830,17 +1031,38 @@ class Translator:
         #if isOpen : open='true'
         open='true'
         if controlled :
-            type=ET.SubElement(root,elementName,{'value':value,'cv':'true','open':open})
+            #type=ET.SubElement(root,elementName,{'value':value,'cv':'true','open':open})
+            type=ET.SubElement(root,elementName,{'value':value,'open':open})
         else :
             assert isOpen, "Error: CV is specified as being closed yet we have a value that is not in the vocabulary"
-            type=ET.SubElement(root,'type',{'value':'Other','cv':'true','open':open})
+            #type=ET.SubElement(root,'type',{'value':'Other','cv':'true','open':open})
+            type=ET.SubElement(root,'type',{'value':'Other','open':open})
         vocabServ=ET.SubElement(type,'controlledVocabulary')
         ET.SubElement(vocabServ,'name').text=cvName
         ET.SubElement(vocabServ,'server').text=cvURL
         if not controlled :
           type.text=value
 
-    def addDocumentInfo(self,rootClass,rootElement) :
+    def addDocumentInfo1(self,rootClass,rootElement) :
+        ''' documentAuthor [0..1] '''
+        authorElement=ET.SubElement(rootElement,'documentAuthor')
+        self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
+        ''' documentCreationDate [1] '''
+        ET.SubElement(rootElement,'documentCreationDate').text=datetime.datetime.isoformat(datetime.datetime.today())
+        
+    def addDocumentInfo2(self,rootClass,rootElement) :
+        try :
+            ''' documentID [1] '''
+            ET.SubElement(rootElement,'documentID').text=rootClass.uri
+            ''' documentVersion [1] '''
+            ET.SubElement(rootElement,'documentVersion').text=str(rootClass.documentVersion)
+            ''' externalID [0..inf]'''
+            ''' metadataID [0..1]'''
+            ''' metadataVersion [0..1] '''
+        except :
+            assert False, "Document is not of type Doc"
+
+    def addDocumentInfo(self,rootClass,rootElement,externalIDs=[]) :
         try :
             ''' documentID [1] '''
             ET.SubElement(rootElement,'documentID').text=rootClass.uri
@@ -862,14 +1084,17 @@ class Translator:
             #ET.SubElement(rootElement,'documentID').text='[TBD]'
             #ET.SubElement(rootElement,'documentVersion').text='[TBD]'
 
-        ''' documentInternalVersion '''
-        ''' metadataID '''
-        ''' metadataVersion '''
+        ''' metadataID [0..1] '''
+        ''' metadataVersion [0..1] '''
+        ''' externalID [0..inf] '''
+        for externalID in externalIDs :
+            self.addCVValue(rootElement,'externalID',externalID[0],cvName=externalID[1])
         ''' documentAuthor [0..1] '''
         authorElement=ET.SubElement(rootElement,'documentAuthor')
         self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
         ''' documentCreationDate [1] '''
         ET.SubElement(rootElement,'documentCreationDate').text=datetime.datetime.isoformat(datetime.datetime.today())
+        
 
 
     def constraintValid(self,con,constraintSet,root) :
@@ -969,10 +1194,13 @@ class Translator:
             if componentObject.isParamGroup :
                 # I am a parameter dressed as a component
                 newRootElement=ET.SubElement(rootElement,'componentProperty',{'represented':'true'})
-                '''shortName'''
-                ET.SubElement(newRootElement,'shortName').text=componentObject.abbrev
-                '''longName'''
-                ET.SubElement(newRootElement,'longName').text=componentObject.title
+                '''shortName [1]'''
+                if componentObject.abbrev:
+                    ET.SubElement(newRootElement,'shortName').text=componentObject.abbrev
+                '''longName [0..1]'''
+                if componentObject.title:
+                    ET.SubElement(newRootElement,'longName').text=componentObject.title
+                '''description [0..1]'''
                 if componentObject.description :
                     ET.SubElement(newRootElement,'description').text=componentObject.description
             else :
@@ -990,11 +1218,12 @@ class Translator:
                 componentProperty=newRootElement
               else:
                 componentProperty=ET.SubElement(newRootElement,'componentProperty',{'represented':'true'})
-
-                '''shortName'''
-                ET.SubElement(componentProperty,'shortName').text=pg.name
-                '''longName'''
-                ET.SubElement(componentProperty,'longName').text=pg.name
+                '''shortName [1]'''
+                if pg.name:
+                    ET.SubElement(componentProperty,'shortName').text=pg.name
+                '''longName [0..1]'''
+                if pg.name:
+                    ET.SubElement(componentProperty,'longName').text=pg.name
 
               # the internal questionnaire representation is that all parameters
               # are contained in a constraint group
@@ -1005,6 +1234,9 @@ class Translator:
                 if not(self.constraintValid(con,constraintSet,componentProperty)) :
                     componentProperty.append(ET.Comment('Constraint is invalid'))
                 else :
+                    #
+                    # RF: one can now get at a child object (get_child)
+                    # so we could simplify the code below, but as it works ...
                     #
                     # Needed to add .order_by('id') as the database does not guarantee
                     # to return objects in the same order, hence the order of the baseclass
@@ -1047,11 +1279,12 @@ class Translator:
                             componentProperty.append(ET.Comment('Value of OR property called '+p.name+' is N/A so skipping'))
                         else :
                             property=ET.SubElement(componentProperty,'componentProperty',{'represented': 'true'})
-                            '''shortName'''
-                            ET.SubElement(property,'shortName').text=p.name
-                            '''longName'''
-                            ET.SubElement(property,'longName').text=p.name
-                            '''description'''
+                            '''shortName [1]'''
+                            if p.name:
+                                ET.SubElement(property,'shortName').text=p.name
+                            '''longName [0..1]'''
+                            if p.name:
+                                ET.SubElement(property,'longName').text=p.name
                             '''value'''
                             if ptype=='KeyBoard':
                                 ET.SubElement(property,'value').text=p.value
@@ -1072,17 +1305,17 @@ class Translator:
 
       if c.implemented or nest==1:
         comp=ET.SubElement(root,'modelComponent')
-        '''shortName'''
+        '''shortName [1]'''
         ET.SubElement(comp,'shortName').text=c.abbrev
-        '''longName'''
+        '''longName [0..1]'''
         ET.SubElement(comp,'longName').text=c.title
-        '''description'''
-        ET.SubElement(comp,'description').text=c.description
-        '''license'''
+        '''description [0..1]'''
+        if c.description:
+            ET.SubElement(comp,'description').text=c.description
+        '''license [0..1]'''
         '''componentProperties [0..1]'''
         componentProperties=ET.SubElement(comp,'componentProperties')
         self.addProperties(c,componentProperties)
-
         # Add any coupling inputs that have been defined for this component
         Inputs=ComponentInput.objects.filter(owner=c)
         for CompInpClass in Inputs :
@@ -1097,17 +1330,16 @@ class Translator:
             '''units'''
             if CompInpClass.units :
                 ET.SubElement(cp,'units',{'value' : CompInpClass.units})
-            '''cfname'''
+            '''standardName'''
             if CompInpClass.cfname :
-                ET.SubElement(cp,'cfName').text=CompInpClass.cfname.name
+                self.addCVValue(cp,'standardName',CompInpClass.cfname.name,cvName='cfName')
         # Check whether we actually have any component properties.
         # If not, then remove this element as it is optional in the CIM
         # and if it exists it expects at least one property within it.
         if len(componentProperties)==0:
             comp.remove(componentProperties)
-        '''numericalProperties [0..1]'''
         '''scientificProperties [0..1]'''
-        '''grid'''
+        '''numericalProperties [0..1]'''
         '''responsibleParty [0..inf]'''
         self.addResp(c.author,comp,'PI')
         self.addResp(c.funder,comp,'funder')
@@ -1116,13 +1348,17 @@ class Translator:
         '''releaseDate [0..1] type:dateTime'''
         if c.yearReleased :
             ET.SubElement(comp,'releaseDate').text=str(c.yearReleased)
-        '''fundingSource'''
-        '''citation'''
+        '''previousVersion [0..1]'''
+        '''fundingSource [0..inf]'''
+        '''citation [0..inf]'''
         self.addReferences(c.references,comp)
-        '''composition'''
+        '''onlineResource [0..1]'''
+        '''componentLanguage [0..1]'''
+        '''grid [0..1]'''
+        '''composition [0..1]'''
         self.addComposition(c,comp)
         if recurse:
-            '''childComponent'''
+            '''childComponent [0..inf]'''
             for child in c.components.all():
                 if child.isParamGroup:
                     # skip as I am a parameter dressed as a component
@@ -1132,17 +1368,19 @@ class Translator:
                     self.addChildComponent(child,comp2,nest+1)
                 else : # child is not implemented
                     comp.append(ET.Comment('Component '+child.abbrev+' has implemented set to false'))
-        '''parentComponent'''
-        '''deployment'''
-        '''activity'''
-        '''type'''
+        '''parentComponent [0..1]'''
+        '''dependencies [0..1]'''
+        '''deployment [0..inf]'''
+        '''type [1..inf]'''
         # always output the metafor sciencetype
         self.addCVValue(comp,'type',c.scienceType,controlled=c.controlled,cvName='metafor')
         # if it is a realm type then output the relevant drs realm type as well
         mapping={'Atmosphere':'atmos','Ocean':'ocean','LandSurface':'land','LandIce':'landIce','SeaIce':'seaIce','OceanBiogeoChemistry':'ocnBgchem','AtmosphericChemistry':'atmosChem','Aerosols':'aerosol'}
         if c.scienceType in mapping :
             self.addCVValue(comp,'type',mapping[c.scienceType],cvName='DRS_CMIP5_componentType',isOpen=False)
-        '''component timestep info not explicitely supplied in questionnaire'''
+        '''timing [0..1]'''
+        '''activity [0..1]'''
+        ''' documentAuthor, documentCreationDate, documentID, documentVersion, externalID, metadataID and metadataVersion '''
         self.addDocumentInfo(c,comp)
         '''documentGenealogy [0..1] '''
         if c.otherVersion or c.geneology :
@@ -1158,7 +1396,6 @@ class Translator:
         '''quality [0..inf] '''
       else:
           root.append(ET.Comment('Component '+c.abbrev+' has implemented set to false'))
-        #logging.debug("component "+c.abbrev+" has implemented set to false")
       return
 
     def addReferences(self,references,rootElement,parentName='citation'):
@@ -1270,6 +1507,8 @@ class Translator:
                 if len(intclosures)>0 :
                     coupled=True
         if coupled :
+            comp.append(ET.Comment('I am coupled'))
+            assert not outputComposition, "binding information is output with the simulation not the model in CMIP5"
             if self.outputComposition :
                 composeElement=ET.SubElement(comp,'composition')
                 for coupling in couplings:
@@ -1394,27 +1633,29 @@ class Translator:
             #myType="[TBD]"
 
         targetRef=ET.SubElement(rootElement,'reference',{self.XLINK_NAMESPACE_BRACKETS+'href':'#//CIMRecord/'+myType+'[id=\''+myURI+'\']'})
-        ''' id '''
+        ''' id [0..1] '''
         ET.SubElement(targetRef,'id').text=myURI
-        ''' name '''
+        ''' name [0..1] '''
         if argName!='' :
             ET.SubElement(targetRef,'name').text=argName
         else :
             ET.SubElement(targetRef,'name').text=myName
-        ''' type '''
+        ''' type [0..1] '''
         if argType!='' :
             ET.SubElement(targetRef,'type').text=argType
         else :
             ET.SubElement(targetRef,'type').text=myType
-        ''' version '''
+        ''' version [0..1] '''
         ET.SubElement(targetRef,'version').text=str(myDocumentVersion)
-        ''' description '''
+        ''' externalID [0..inf] '''
+        ''' description [0..1] '''
         if description!='' :
             ET.SubElement(targetRef,'description').text=description
         elif argType!='' and argName!='' :
             ET.SubElement(targetRef,'description').text='Reference to a '+argType+' called '+argName+' in a '+myType+' called '+myName
         else :
             ET.SubElement(targetRef,'description').text='Reference to a '+myType+' called '+myName
+        ''' change [0..inf] '''
         if mod :
             modElement=ET.SubElement(targetRef,'change')
             ET.SubElement(modElement,'name').text=mod.mnemonic
@@ -1492,166 +1733,3 @@ class Translator:
             self.addDocumentInfo(fileClass,doElement)
             ''' documentGenealogy [0..1] '''
             ''' quality [0..1] '''
-
-    # the following methods are no longer used and have had XXX added to the start of them
-
-    def XXXaddDataRef(self,dataObjectClass,rootElement):
-        assert(dataObjectClass,'dataObject should not be null')
-        assert(dataObjectClass.container,'dataContainer should not be null')
-        dataRefElement=ET.SubElement(rootElement,"Q_DataRef")
-        ET.SubElement(dataRefElement,"Q_VariableName").text=dataObjectClass.variable
-        ET.SubElement(dataRefElement,"Q_FileName").text=dataObjectClass.container.name
-
-    def XXXadd_datacontainer(self,dataContainerClass,rootElement):
-        if dataContainerClass :
-            dataContainerElement=ET.SubElement(rootElement,"Q_dataContainer")
-            ET.SubElement(dataContainerElement,"Q_Name").text=dataContainerClass.title
-            ET.SubElement(dataContainerElement,"Q_URL").text=dataContainerClass.link
-            ET.SubElement(dataContainerElement,"Q_Description").text=dataContainerClass.description
-            formatElement=ET.SubElement(dataContainerElement,'Q_FormatVal')
-            self.addValue(dataContainerClass.format,formatElement)
-            self.addReference(dataContainerClass.reference,dataContainerElement)
-            # add any associated data
-            dataObjectsElement=ET.SubElement(dataContainerElement,'Q_DataObjects')
-            dataObjectInstanceSet=DataObject.objects.filter(container=dataContainerClass)
-            logging.info('FIXME: Currently skipping XML conversion for data objects')
-            #for dataObjectInstance in dataObjectInstanceSet:
-            #    self.addDataObject(dataObjectInstance,dataObjectsElement)
-        return rootElement
-
-    def XXXaddDataObject(self,dataObjectClass,rootElement):
-        assert(dataObjectClass,'dataObject should not be null')
-        dataElement=ET.SubElement(rootElement,"Q_DataObject")
-        ET.SubElement(dataElement,"Q_description").text=dataObjectClass.description
-        ET.SubElement(dataElement,"Q_variable").text=dataObjectClass.variable
-        ET.SubElement(dataElement,"Q_cfname").text=dataObjectClass.cftype
-        self.addReference(dataObjectClass.reference,dataElement)
-        # dataClass.featureType is unused at the moment
-        # dataClass.drsAddress is unused at the moment
-
-    def XXXaddEnsemble(self,ensembleClass,rootElement):
-
-        if ensembleClass :
-            ensembleElement=ET.SubElement(rootElement,'Q_Ensemble')
-            ET.SubElement(ensembleElement,'Q_Description').text=ensembleClass.description
-            etypeValueElement=ET.SubElement(ensembleElement,'Q_EtypeValue')
-            self.addValue(ensembleClass.etype,etypeValueElement)
-            ensMembersElement=ET.SubElement(ensembleElement,'Q_EnsembleMembers')
-            ensMemberClassSet=EnsembleMember.objects.filter(ensemble=ensembleClass)
-            for ensMemberClass in ensMemberClassSet :
-                self.addEnsMember(ensMemberClass,ensMembersElement)
-
-    def XXXaddEnsMember(self,ensMemberClass,rootElement):
-
-        if ensMemberClass :
-            ensMemberElement=ET.SubElement(rootElement,'Q_EnsembleMember')
-            ET.SubElement(ensMemberElement,'Q_Number').text=str(ensMemberClass.memberNumber)
-            # reference the modification here to avoid replication as it is stored as part of the simulation
-            self.addModificationRef(ensMemberClass.mod,ensMemberElement)
-
-    def XXXaddModificationRef(self,modClass,rootElement) :
-        if modClass :
-            modRefElement=ET.SubElement(rootElement,'Q_ModificationRef')
-            modRefElement.append(ET.Comment("WARNING: Modification information still needs to be added."))
-
-    def XXXaddModification(self,modClass,rootElement) :
-        if modClass :
-            modElement=ET.SubElement(rootElement,'Q_Modification')
-            ET.SubElement(modElement,'Q_Mnemonic').text=modClass.mnemonic
-            mtypeValueElement=ET.SubElement(modElement,'Q_MtypeValue')
-            self.addValue(modClass.mtype,mtypeValueElement)
-            ET.SubElement(modElement,'Q_Description').text=modClass.description
-
-    def XXXaddModelMod(self,modelModClass,rootElement) :
-        if modelModClass :
-            modelModElement=ET.SubElement(rootElement,'Q_ModelMod')
-            # ModelMod isa Modification
-            self.addModification(modelModClass,modelModElement)
-            if modelModClass.component :
-                compElement=ET.SubElement(modelModElement,'Q_ComponentRef')
-                ET.SubElement(compElement,'Q_ComponentName').text=modelModClass.component.abbrev
-
-    def XXXaddInputMod(self,inputModClass,rootElement) :
-        if inputModClass :
-            inputModElement=ET.SubElement(rootElement,'Q_InputMod')
-            # InputMod isa Modification
-            self.addModification(inputModClass,inputModElement)
-            ET.SubElement(inputModElement,'Q_Date').text=str(inputModClass.date)
-            couplingsElement=ET.SubElement(inputModElement,'Q_Couplings')
-            for couplingClass in inputModClass.inputs.all():
-                self.addCouplingRef(couplingClass,couplingsElement)
-
-    def XXXaddCouplingRef(self,couplingClass,rootElement):
-        if couplingClass :
-            couplingElement=ET.SubElement(rootElement,'Q_CouplingRef')
-            if couplingClass.targetInput:
-                if couplingClass.targetInput.owner:
-                    ET.SubElement(couplingElement,'Q_ComponentName').text=couplingClass.targetInput.owner.abbrev
-                if couplingClass.targetInput.realm:
-                    ET.SubElement(couplingElement,'Q_RealmName').text=couplingClass.targetInput.realm.abbrev
-                ET.SubElement(couplingElement,'Q_AttrName').text=couplingClass.targetInput.abbrev
-                if couplingClass.targetInput.ctype:
-                    ET.SubElement(couplingElement,'Q_Type').text=couplingClass.targetInput.ctype.name
-
-    def XXXaddCentre(self,centreClass,rootElement):
-        if centreClass :
-            centreElement=ET.SubElement(rootElement,'Q_Centre')
-            #centreClass is a ResponsibleParty
-            self.addResp(centreClass.party,centreElement,'centre')
-
-    def XXXaddVocab(self,vocabClass,rootElement):
-        if vocabClass :
-            vocabElement=ET.SubElement(rootElement,'Q_Vocab')
-            ET.SubElement(vocabElement,'Q_Name').text=vocabClass.name
-            ET.SubElement(vocabElement,'Q_URI').text=vocabClass.uri
-            ET.SubElement(vocabElement,'Q_Note').text=vocabClass.note
-            ET.SubElement(vocabElement,'Q_Version').text=vocabClass.version
-
-    def XXXaddValue(self,valueClass,valueElement):
-        if valueClass :
-            ET.SubElement(valueElement,'Q_Value').text=valueClass.name
-            self.addVocab(valueClass.vocab,valueElement)
-            ET.SubElement(valueElement,'Q_Definition').text=valueClass.definition
-            ET.SubElement(valueElement,'Q_Version').text=valueClass.version
-
-    def XXXaddConformance(self,confClass,rootElement):
-        if confClass :
-            confElement=ET.SubElement(rootElement,'Q_Conformance')
-            valueElement=ET.SubElement(confElement,'Q_CtypeValue')
-            self.addValue(confClass.ctype,valueElement)
-            modsElement=ET.SubElement(confElement,'Q_ModelModifications')
-            for modClass in confClass.mod.all():
-                # reference the code modification here to avoid replication as it is stored as part of the simulation
-                self.addModificationRef(modClass,modsElement)
-            coupElement=ET.SubElement(confElement,'Q_InputBindings')
-            for coupClass in confClass.coupling.all():
-                self.addCouplingRef(coupClass,coupElement)
-            ET.SubElement(confElement,'Q_Description').text=confClass.description
-
-    def XXXaddComponentDoc(self,docClass,rootElement):
-
-        if docClass :
-            docElement=ET.SubElement(rootElement,'Q_Doc')
-            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
-            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
-            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
-            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
-            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)
-
-
-    def XXXaddDoc(self,docClass,rootElement):
-
-        if docClass :
-            docElement=ET.SubElement(rootElement,'Q_Doc')
-            ET.SubElement(docElement,'Q_Title').text=docClass.title
-            ET.SubElement(docElement,'Q_Abbrev').text=docClass.abbrev
-            self.addResp(docClass.author,docElement,'author')
-            self.addResp(docClass.funder,docElement,'funder')
-            self.addResp(docClass.contact,docElement,'contact')
-            self.addResp(docClass.metadataMaintainer,docElement,'metadataMaintainer')
-            ET.SubElement(docElement,'Q_Description').text=docClass.description
-            ET.SubElement(docElement,'Q_URI').text=docClass.uri
-            ET.SubElement(docElement,'Q_MetadataVersion').text=docClass.metadataVersion
-            ET.SubElement(docElement,'Q_DocumentVersion').text=str(docClass.documentVersion)
-            ET.SubElement(docElement,'Q_Created').text=str(docClass.created)
-            ET.SubElement(docElement,'Q_Updated').text=str(docClass.updated)

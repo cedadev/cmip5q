@@ -735,8 +735,16 @@ class Experiment(Doc):
 
     def toXML(self,parent='numericalExperiment'):
         expElement=ET.Element(parent)
+        ''' responsibleParty [0..inf] '''
+        ''' fundingSource [0..inf] '''
+        ''' rationale [0..1] '''
         if self.rationale: 
             ET.SubElement(expElement,'rationale').text=self.rationale
+        ''' project [0..inf] '''
+        ''' measurementCampaign [0..inf] '''
+        ''' requires [0..inf] '''
+        ''' generates [0..inf] '''
+        ''' shortName [1] '''
         # short name is currently a concatenation of the experiment id
         # and the short name so separate these out
         expName,sep,expShortName=self.abbrev.partition(' ')
@@ -751,9 +759,9 @@ class Experiment(Doc):
         ''' description [0..1] '''
         if self.description :
             ET.SubElement(expElement,'description').text=self.description
-        ''' experimentNumber [0..1] '''
+        ''' experimentID [0..1] '''
         if expName and expName!='' :
-            ET.SubElement(expElement,'experimentNumber').text=expName
+            ET.SubElement(expElement,'experimentID').text=expName
         ''' calendar [1] '''
         if self.requiredCalendar :
             calendarElement=ET.SubElement(expElement,'calendar')
@@ -763,6 +771,7 @@ class Experiment(Doc):
         ''' numericalRequirement [1..inf] '''
         for reqObject in self.requirements.all():
             expElement.append(reqObject.toXML())
+        ''' supports [0..inf] '''
         return expElement
     
 def instantiateNumericalRequirement(experiment,elem):
@@ -826,7 +835,7 @@ class GenericNumericalRequirement(ParentModel):
         if mapping[self.ctype.name]=='spatioTemporalConstraint':
             typeElement.append(self.get_child_object().requiredDuration.xml(parent="requiredDuration"))
         for reqOptionObject in self.options.all():
-            typeElement.append(reqOptionObject.toXML())
+            typeElement.append(reqOptionObject.toXML(myType=mapping[self.ctype.name]))
         return reqElement
 
 class RequirementOption(models.Model):
@@ -844,15 +853,19 @@ class RequirementOption(models.Model):
         a = RequirementOption(name=name,description=description,docid=docid)
         a.save()
         return a
-    def toXML(self,parent='requirementOption'):
-        reqOptionElement=ET.Element(parent)
+
+    def toXML(self,parent='requirementOption',myType='boundaryCondition'):
+        # hardcoded optionRelationship attribute
+        reqOptionElement=ET.Element(parent,{'optionRelationship':'XOR'})
+        req1Element=ET.SubElement(reqOptionElement,'requirement')
+        req2Element=ET.SubElement(req1Element,'requirement')
+        typeElement=ET.SubElement(req2Element,myType)
         if self.docid:
-            ET.SubElement(reqOptionElement,'id').text=self.docid
-        ET.SubElement(reqOptionElement,'name').text=self.name
-        ET.SubElement(reqOptionElement,'description').text=self.description
+            ET.SubElement(typeElement,'id').text=self.docid
+        ET.SubElement(typeElement,'name').text=self.name
+        ET.SubElement(typeElement,'description').text=self.description
         return reqOptionElement
 
-    
 class NumericalRequirement(GenericNumericalRequirement):
     ''' A Numerical Requirement '''
     @staticmethod

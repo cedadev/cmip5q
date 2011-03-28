@@ -146,7 +146,7 @@
   </pattern>
   <pattern name="Model component AtmosAdvection constraints">
     <rule context="//modelComponent[type[@value='AtmosAdvection']]/componentProperties/componentProperty[shortName='Momentum']/componentProperty[shortName='SchemeCharacteristics']">
-      <assert test="not ( (value='staggered grid') and (string-length(../componentProperty[shortName='gridStaggeringType']/value)=0) )">Model component AtmosAdvection, Parameter Momentum: Where SchemeCharacteristics has staggered grid, a value must be specified for StaggeringType</assert>
+      <assert test="not ( (value='staggered grid') and (string-length(../componentProperty[shortName='StaggeringType']/value)=0) )">Model component AtmosAdvection, Parameter Momentum: Where SchemeCharacteristics has staggered grid, a value must be specified for StaggeringType</assert>
     </rule>
   </pattern>
   <pattern name="Model component AtmosRadiation constraints"/>
