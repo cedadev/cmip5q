@@ -608,7 +608,7 @@ class Translator:
                 #extIDElement=ET.SubElement(ensMemberElement,'externalID')
                 #ET.SubElement(extIDElement,'name').text=ensMemberClass.drsMember
                 #ET.SubElement(extIDElement,'standard',{'value':'DRS'})
-                self.addCVValue(ensMemberElement,'ensembleMemberID',ensMemberClass.drsMember,cvName='DRS_CMIP5_ensembleType')
+                self.addCVValue(ensMemberElement,'ensembleMemberID',ensMemberClass.drsMember,cvName='DRS_CMIP5_ensembleType',standard=True)
 
         myEnsembleDoc=ensembleClass.makeDoc()
         self.addDocumentInfo(myEnsembleDoc,ensembleElement)
@@ -819,8 +819,12 @@ class Translator:
             # input mods are not relevant here as they are included directly in the model description as composition information
             ''' documentAuthor, documentCreationDate, documentID, documentVersion, externalID, metadataID and metadataVersion '''
             externalIDs=[]
+            assert len(simClass.drsOutput.all())==1,"One and only one DRS string expected"
+            for drsOutput in simClass.drsOutput.all():
+                assert drsOutput, "Expecting a value for the DRS string"
+                externalIDs.append((str(drsOutput),'QN_DRS','The QN_DRS value allows mapping from data files to metadata being exported from the metadata questionnaire, and contains the insitution name, the model name on which the simulation was run, and the experiment name to which the simulation conforms. Additionally, for a non-ensemble run, a rip value will be included. The format of the string will thus be: institute_model_experiment.',True))
             if simClass.ensembleMembers==1:
-                externalIDs.append((simClass.drsMember,'DRS_CMIP5_ensembleType'))
+                externalIDs.append((simClass.drsMember,'DRS_CMIP5_ensembleType','',True))
             self.addDocumentInfo(simClass,simElement,externalIDs=externalIDs)
             ''' documentGenealogy [0..inf] '''
             #relatedSimulations=simClass.relatedSimulations.all()
@@ -1031,23 +1035,27 @@ class Translator:
             ''' quality [0..inf] '''
         return rootElement
 
-    def addCVValue(self,root,elementName,value,controlled=True,cvName='',cvURL='http://proj.badc.rl.ac.uk/svn/metafor/cmip5q/trunk',isOpen=True):
-        if cvName=='' : cvName=elementName
-
-        #hack while I learn how to output closed vocabs
-        #open='false'
-        #if isOpen : open='true'
+    def addCVValue(self,root,elementName,value,controlled=True,isOpen=True,cvName='',description='',cvURL='http://proj.badc.rl.ac.uk/svn/metafor/cmip5q/trunk',standard=False) :
+        # "controlled" means that the value is a new value in a controlled vocab
+        # "standard" means this is a standard rather than a CV.
+        if isOpen: open='true'
+        else : open='false'
+        # open must be true for some reason
         open='true'
+        if cvName=='' : cvName=elementName
         if controlled :
-            #type=ET.SubElement(root,elementName,{'value':value,'cv':'true','open':open})
             type=ET.SubElement(root,elementName,{'value':value,'open':open})
         else :
-            assert isOpen, "Error: CV is specified as being closed yet we have a value that is not in the vocabulary"
-            #type=ET.SubElement(root,'type',{'value':'Other','cv':'true','open':open})
-            type=ET.SubElement(root,'type',{'value':'Other','open':open})
-        vocabServ=ET.SubElement(type,'controlledVocabulary')
-        ET.SubElement(vocabServ,'name').text=cvName
-        ET.SubElement(vocabServ,'server').text=cvURL
+            type=ET.SubElement(root,elementName,{'value':'Other','open':open})
+        if not standard :
+            sub=ET.SubElement(type,'controlledVocabulary')
+        else:
+            sub=ET.SubElement(type,'standard')
+        ET.SubElement(sub,'name').text=cvName
+        if not standard and cvURL :
+            ET.SubElement(sub,'server').text=cvURL
+        if description:
+            ET.SubElement(sub,'description').text=description
         if not controlled :
           type.text=value
 
@@ -1096,7 +1104,7 @@ class Translator:
         ''' metadataVersion [0..1] '''
         ''' externalID [0..inf] '''
         for externalID in externalIDs :
-            self.addCVValue(rootElement,'externalID',externalID[0],cvName=externalID[1])
+            self.addCVValue(rootElement,'externalID',externalID[0],cvName=externalID[1],description=externalID[2],standard=externalID[3])
         ''' documentAuthor [0..1] '''
         authorElement=ET.SubElement(rootElement,'documentAuthor')
         self.addSimpleResp('Metafor Questionnaire',authorElement,'documentAuthor')
@@ -1337,7 +1345,8 @@ class Translator:
                 ET.SubElement(cp,'description').text=CompInpClass.description
             '''units'''
             if CompInpClass.units :
-                ET.SubElement(cp,'units',{'value' : CompInpClass.units})
+                self.addCVValue(cp,'units',CompInpClass.units,cvName='units')
+                #ET.SubElement(cp,'units',{'value' : CompInpClass.units})
             '''standardName'''
             if CompInpClass.cfname :
                 self.addCVValue(cp,'standardName',CompInpClass.cfname.name,cvName='cfName')

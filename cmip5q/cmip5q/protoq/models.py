@@ -1608,7 +1608,7 @@ class DRSOutput(models.Model):
     def __unicode__(self): 
         #return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment,self.member)
         #changing this to not include member explicitly as in an ensemble run we will include the rip meber at the ensmble level
-        return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment)
+        return '%s_%s_%s' %(self.institute,self.model,self.experiment)
 
 
 class TestDocs(object):
