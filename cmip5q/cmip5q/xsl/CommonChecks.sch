@@ -31,7 +31,7 @@
     </rule>
   </pattern>
   <pattern name="Simulation Conformances consistency and completeness requirements">
-    <rule context="//simulationRun/conformance[comment()='Conformance type : Via Inputs']">
+    <rule context="//simulationRun/conformance[comment()='type : via inputs']">
 <!--      <assert test="string-length(source)>0">
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Input conformance but does not declare any Input.
       </assert> -->
@@ -39,7 +39,7 @@
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Input conformance but has specified a Model Mod.
       </assert>
     </rule>
-    <rule context="//simulationRun/conformance[comment()='Conformance type : Via Model Mods']" >
+    <rule context="//simulationRun/conformance[comment()='type : via model mods']" >
       <assert test="string-length(source)>0">
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Model Mod conformance but does not specify any Model Mod.
       </assert>
@@ -65,13 +65,13 @@
       </assert>
     </rule>
   </pattern>
-<!--  <pattern name="Either Units or CF type must be specified for initial condition inputs">
+  <pattern name="Either Units or CF type must be specified for initial condition inputs">
     <rule context="//childComponent/modelComponent/componentProperties/componentProperty[@represented][count(componentProperty)=0]">
-      <assert test="not( (string-length(units/@value)>0) and (string-length(cfName)>0) )">
+      <assert test="not( (string-length(units[@value])>0) and (string-length(cfName)>0) )">
         Either a CF Type *or* a Units Type must be specified for <value-of select="shortName"/> initial condition inputs in Component <value-of select="../../shortName"/>.
       </assert>
     </rule>
-  </pattern> -->
+  </pattern>
   <pattern name="Document Genealogy coherence check">
     <rule context="//documentGenealogy/relationship/documentRelationship/description">
       <assert test="string-length(//documentGenealogy/relationship/documentRelationship/target/reference/name)>0">
@@ -87,7 +87,8 @@
     </rule>
   </pattern>
   <pattern name="Component Property value NA must exclude all others">
-   <rule context="//componentProperty[count(value)>1]">
+<!--   <rule context="//componentProperty[count(value)>1]"> -->
+   <rule context="//componentProperty">
       <assert test="not( value='N/A' and (count(value)>1) )">
         Component Property <value-of select="shortName"/> in Component <value-of select="../../../shortName"/> set to NA yet includes other values.
       </assert>
