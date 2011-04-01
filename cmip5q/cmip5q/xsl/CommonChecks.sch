@@ -4,12 +4,12 @@
  <ns prefix="gmd" uri="http://www.isotc211.org/2005/gmd" />
  <ns prefix="gco" uri="http://www.isotc211.org/2005/gco" />
   <pattern name="Completeness requirements">
-    <rule context="//componentProperty[count(componentProperty)=0]" >
+    <rule context="//componentProperty[count(componentProperty)=0][string-length(units[@value])>0]" >
       <assert test="string-length(shortName) > 0">
         Each leaf <name /> must possess a non-empty shortName element.
       </assert>
        <assert test="string-length(value) > 0">
-        Each leaf <name /> <value-of select="../shortName" />::<value-of select="shortName" /> must possess a non-empty value element.
+        Each leaf <name /> <value-of select="../../../shortName" />::<value-of select="../../shortName" />::<value-of select="../shortName" />::<value-of select="shortName" /> must possess a non-empty value element. 
       </assert> 
    </rule>
    <rule context="//documentAuthor[@citationContact]" >
@@ -32,9 +32,9 @@
   </pattern>
   <pattern name="Simulation Conformances consistency and completeness requirements">
     <rule context="//simulationRun/conformance[comment()='Conformance type : Via Inputs']">
-      <assert test="string-length(source)>0">
+<!--      <assert test="string-length(source)>0">
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Input conformance but does not declare any Input.
-      </assert>
+      </assert> -->
       <assert test="not(source/reference/change/detail[@type='CodeChange'])">
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Input conformance but has specified a Model Mod.
       </assert>
@@ -43,9 +43,9 @@
       <assert test="string-length(source)>0">
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Model Mod conformance but does not specify any Model Mod.
       </assert>
-      <assert test="not(source/reference/type='componentProperty')"> 
+<!--      <assert test="not(source/reference/type='componentProperty')"> 
         Simulation Conformance <value-of select="requirement/reference/name"/> claims Model Mod conformance but has specified an Input <value-of select="source/reference/name"/>.
-      </assert>
+      </assert> -->
     </rule>
   </pattern>
   <pattern name="Model initial condition inputs requirements">
