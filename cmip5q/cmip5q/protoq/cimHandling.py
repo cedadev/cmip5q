@@ -69,7 +69,9 @@ class Validator:
 
             i = 1
             for err in self.errlist:
-                HTMLresponse += "[{0}] {1}<br/>".format(i, err.text)
+                displayText = (err.text).replace("::  ::", "::")
+                #HTMLresponse += "[{0}] {1}<br/>".format(i, err.text)
+                HTMLresponse += "[{0}] {1}<br/>".format(i, displayText.replace("componentProperty   ::","componentProperty ") )
                 i += 1
 
         else:
