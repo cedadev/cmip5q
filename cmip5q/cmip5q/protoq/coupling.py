@@ -154,8 +154,7 @@ class DualClosureForm(forms.Form):
         nurl,nfname=False,False
         if 'nurl' in self.cleaned_data: nurl=self.cleaned_data['nurl'] <> ''
         if 'nfname' in self.cleaned_data: nfname=self.cleaned_data['nfname'] <> ''
-        #component=self.cleaned_data['component'] <> 'None'
-        if 'component' in self.cleaned_data: component=self.cleaned_data['component'] <> ''
+        component=self.cleaned_data['component'] <> 'None' and self.cleaned_data['component'] <> ''
         ok=True
         selected=int(efile)+int(nurl or nfname)+int(component)
         if selected>1: 
