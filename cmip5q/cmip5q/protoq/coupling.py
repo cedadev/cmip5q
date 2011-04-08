@@ -103,10 +103,23 @@ class DualClosureForm(forms.Form):
         ''' Takes the cleaned data and loads into the appropriate closure '''
         # It's not a save, because it's not a save directly to a model
         if self.selectedOption is None: return
+        
+        #FIXME This is a bit of a hack for now. In those cases where the binding is for an initial 
+        # condition request, we do not ask for timetransformation information - do for now I am 
+        # hardcoding it as 'Exact' in the 'Term' terms
+        tt=self.cleaned_data['temporalTransform']
+        v=Vocab.objects.get(name='TimeTransformation')
+                    
+        if tt == '':
+            tTransform = Term.objects.filter(vocab=v).get(name='Exact')
+        else:
+            tTransform = Term.objects.get(id=self.cleaned_data['temporalTransform'])   
+             
         if self.selectedOption=='efile':
             e=ExternalClosure(coupling=self.coupling,
                               targetFile=DataContainer.objects.get(id=self.cleaned_data['efile']),
-                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              temporalTransform=tTransform,
+                              #temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
                               spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
             e.save()
         elif self.selectedOption=='nurl':
@@ -117,14 +130,17 @@ class DualClosureForm(forms.Form):
             d.save()
             e=ExternalClosure(coupling=self.coupling,
                               targetFile=d,
-                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              temporalTransform=tTransform,
+                              #temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
                               spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
             e.save()
         elif self.selectedOption=='component':
             #create new internal closure
+            
             i=InternalClosure(coupling=self.coupling,
                               target=Component.objects.get(id=self.cleaned_data['component']),
-                              temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              #temporalTransform=Term.objects.get(id=self.cleaned_data['temporalTransform']),
+                              temporalTransform=tTransform,
                               spatialRegrid=Term.objects.get(id=self.cleaned_data['spatialRegrid']))
             i.save()
         else: raise ValueError('Unexpected condition in DualClosureForm.process %s'%self.selectedOption)
@@ -132,13 +148,14 @@ class DualClosureForm(forms.Form):
         
     def clean(self):
         ''' Need to make sure we have only one option submitted (and in the case of a new file,
-        both the url and mnemnoic '''
+        both the url and mnemonic '''
         logging.debug(self.cleaned_data)
         efile=(self.cleaned_data['efile'] <> 'None')
         nurl,nfname=False,False
         if 'nurl' in self.cleaned_data: nurl=self.cleaned_data['nurl'] <> ''
         if 'nfname' in self.cleaned_data: nfname=self.cleaned_data['nfname'] <> ''
-        component=self.cleaned_data['component'] <> 'None'
+        #component=self.cleaned_data['component'] <> 'None'
+        if 'component' in self.cleaned_data: component=self.cleaned_data['component'] <> ''
         ok=True
         selected=int(efile)+int(nurl or nfname)+int(component)
         if selected>1: 
