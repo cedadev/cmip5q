@@ -1,12 +1,31 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
+<link rel="stylesheet" type="text/css"
+	href="/css/jquery/jquery-accordian/accordian_styles.css" />
+<link rel="stylesheet" href="/css/accordian_styles.css" type="text/css" />
+
+<!-- for accordian -->
+<script type="text/javascript"
+	src="/css/jquery/jquery-accordian/jquery.nestedAccordion.js">
+</script>
+<script type="text/javascript">
+	$(function() {
+	  $("#main").accordion({
+	      objID: "#acc1", 
+	      el: ".h", 
+	      head: "h4, h5", 
+	      next: "div", 
+	      initShow : "h4 + div.outer:eq(0) div.outer:eq(0)"
+	  });
+	});
+</script>
+
 <div class="boxer">
 <table>
-    <tr>
-        <td><div class="boxer">
-            {{viewhtml|safe}}        
-        </div></td>
-    </tr>
+	<tr>
+		<td>
+		<div class="boxer">{{viewhtml|safe}}</div>
+		</td>
+	</tr>
 </table>
 </div>
 {% endblock %}

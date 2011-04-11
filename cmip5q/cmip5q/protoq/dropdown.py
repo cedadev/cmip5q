@@ -7,8 +7,8 @@ from django.template.loader import render_to_string
 
 logging=settings.LOG
 
-SCRIPT='''<script type="text/javascript">$("#id_%s").dropdownchecklist({%s});</script>'''
-SCRIPT2='''<script type="text/javascript">$("#id_%s").dropdownchecklist({%s});</script>'''
+SCRIPT='''<script type="text/javascript">$(document).ready($("#id_%s").dropdownchecklist( {icon: {placement:"right",toOpen:"ui-icon-triangle-1-s"} , %s } ));</script>'''
+
 
 def displayAttributes(**kwargs):
     if 'attrs' in kwargs:
@@ -39,7 +39,7 @@ class DropDownSingleWidget(forms.Select):
         self.stratt=displayAttributes(**kwargs)
     def render(self,name, value, attrs):
         s=forms.Select.render(self,name,value,attrs)
-        s+=mark_safe(SCRIPT%(name,self.stratt))  # not sure I think I really like these ...
+        #s+=mark_safe(SCRIPT%(name,self.stratt))  # not sure I think I really like these ...
         return s
         
 class SimDateTimeWidget(forms.TextInput):

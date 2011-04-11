@@ -532,7 +532,8 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'48'}),required=False)
+    #value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'24'}),required=False)
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(),required=False)
     class Meta(BaseParamForm.Meta):
         model=OrParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
