@@ -719,9 +719,17 @@ class Translator:
                 assert False, "Error, a calendar must exist"
             ''' input [0..inf] '''
             # add in our model bindings (couplings)
-            # inputElement=ET.SubElement(simElement,'input')
-            # self.componentWalkComposition(simClass.numericalModel,inputElement)
-            #couplings=simClass.numericalModel.couplings(simulation=simClass)
+            couplings=simClass.numericalModel.couplings(simulation=simClass)
+            for coupling in couplings:
+                # output each link separately as the questionnaire keeps information
+                # about transformations on a link by link basis
+                extclosures=ExternalClosure.objects.filter(coupling=coupling)
+                for closure in extclosures :
+                    self.addCoupling(coupling,closure,simElement,elementName='input')
+                intclosures=InternalClosure.objects.filter(coupling=coupling)
+                for closure in intclosures :
+                    self.addCoupling(coupling,closure,simElement,elementName='input')
+
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
             ''' spinupDateRange [0..1] '''
@@ -1525,7 +1533,9 @@ class Translator:
                     coupled=True
         if coupled :
             comp.append(ET.Comment('I am coupled'))
-            assert not outputComposition, "binding information is output with the simulation not the model in CMIP5"
+            # reset the value manually for the moment
+            self.outputComposition=False
+            assert not self.outputComposition, "binding information is output with the simulation not the model in CMIP5"
             if self.outputComposition :
                 composeElement=ET.SubElement(comp,'composition')
                 for coupling in couplings:
@@ -1533,15 +1543,15 @@ class Translator:
                     # about transformations on a link by link basis
                     extclosures=ExternalClosure.objects.filter(coupling=coupling)
                     for closure in extclosures :
-                        self.addCoupling(coupling,closure,composeElement,comp)
+                        self.addCoupling(coupling,closure,composeElement)
                     intclosures=InternalClosure.objects.filter(coupling=coupling)
                     for closure in intclosures :
-                        self.addCoupling(coupling,closure,composeElement,comp)
+                        self.addCoupling(coupling,closure,composeElement)
                 ET.SubElement(composeElement,'description').text='Coupling details for component '+c.abbrev
             else :
                 comp.append(ET.Comment('Coupling information exists but its output has been switched off for this CIM Object'))
 
-    def addCoupling(self,coupling,closure,composeElement,componentElement) :
+    def addCoupling(self,coupling,closure,composeElement,elementName='coupling') :
         CompInpClass=coupling.targetInput
         assert CompInpClass,'A Coupling instance must have an associated ComponentInput instance'
         assert CompInpClass.owner,'A Coupling instance must have an associated ComponentInput instance with a valid owner'
@@ -1556,9 +1566,9 @@ class Translator:
         couplingFramework=''
         # fully specified is true if we are referencing data in a file, otherwise it is not fully specified (as we are either referencing a file or a component)
         if closure.ctype=='external' and closure.target :
-            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'true'})
+            couplingElement=ET.SubElement(composeElement,elementName,{'purpose':couplingType,'fullySpecified':'true'})
         else :
-            couplingElement=ET.SubElement(composeElement,'coupling',{'purpose':couplingType,'fullySpecified':'false'})
+            couplingElement=ET.SubElement(composeElement,elementName,{'purpose':couplingType,'fullySpecified':'false'})
         '''description'''
         ET.SubElement(couplingElement,'description').text=coupling.manipulation
         '''type [0..1] '''
