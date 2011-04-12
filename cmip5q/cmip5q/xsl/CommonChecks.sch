@@ -105,6 +105,127 @@
       </assert>
     </rule>
   </pattern>
+
+
+  <pattern name="Grid Specification constraints">
+    <rule context="//gridSpec/esmModelGrid/gridTile" >
+
+      <assert test="string-length(horizontalResolution/@description) != 0">
+          In Grid <value-of select="../shortName" />, section horizontalResolution, values must be provided for both GridResolution and GridRefinementScheme.
+         <value-of select="horizontalResolution/@description" />
+      </assert>
+
+      <assert test="(string-length(extent/latMin)!=0) and (string-length(extent/latMax)!=0) and (string-length(extent/lonMin)!=0) and (string-length(extent/lonMax)!=0)" >
+        In Grid <value-of select="../shortName" />, section horizontalResolution::HorizontalExtent, values must be provided for each of LatMin, LatMax, LonMin and LonMax
+      </assert>
+
+      <assert test="not((@discretizationType='logically_rectangular') and not((../../esmModelGrid[@gridType = 'regular_gaussian']) or (../../esmModelGrid[@gridType = 'other']) or (../../esmModelGrid[@gridType = 'displaced_pole']) or (../../esmModelGrid[@gridType = 'tripolar']) or (../../esmModelGrid[@gridType = 'cubed_sphere']) or (../../esmModelGrid[@gridType = 'latitude-longitude']))) ">
+          Grid Specification: Where GridDiscretization is 'logically_rectangular', GridType must be one of 'regular_gaussian', 'displaced_pole', 'tripolar', 'cubed_sphere', 'latitude-longitude' or 'other'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'latitude-longitude']) ) and ( (string-length(horizontalResolution/property[name='NumberOfLatitudinalGridCells']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfLongitudinalGridCells']/value)=0) )  )">
+        Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'latitude-longitude', values must be provided for both 'NumberOfLatitudinalGridCells' and 'NumberOfLongitudinalGridCells'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='unstructured_polygonal') and (../../esmModelGrid[@gridType = 'reduced_gaussian']) ) and ( (string-length(horizontalResolution/property[name='NumberOfTotalGridPoints']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfLatitudePointsPoleToEquator']/value)=0) )  )">
+        Grid Specification: Where GridDiscretization is 'unstructured_polygonal' and GridType is 'reduced_gaussian', values must be provided for both 'NumberOfTotalGridPoints' and 'NumberOfLatitudePointsPoleToEquator'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'regular_gaussian']) ) and ( (string-length(horizontalResolution/property[name='NumberOfLongitudinalGridPoints']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfLatitudePointsPoleToEquator']/value)=0) )  )">
+        Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'regular_gaussian', values must be provided for both 'NumberOfLongitudinalGridPoints' and 'NumberOfLatitudePointsPoleToEquator'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'displaced_pole']) ) and ( (string-length(horizontalResolution/property[name='NumberOfCellsInSecondGridDimension']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfCellsInFirstGridDimension']/value)=0) or (string-length(horizontalResolution/property[name='FirstPoleLat']/value)=0) or (string-length(horizontalResolution/property[name='SecondPoleLat']/value)=0) or (string-length(horizontalResolution/property[name='FirstPoleLon']/value)=0) or (string-length(horizontalResolution/property[name='SecondPoleLon']/value)=0)  )  )">
+        Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'displaced pole', values must be provided for 'NumberOfCellsInFirstGridDimension', 'NumberOfCellsInSecondGridDimension', 'FirstPoleLat', 'FirstPoleLon', 'SecondPoleLat' and 'SecondPoleLon'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'cubed_sphere']) ) and ( (string-length(horizontalResolution/property[name='NumberOfCellsInFirstGridDimension']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfCellsInSecondGridDimension']/value)=0) )  )">
+        Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'cubed sphere', values must be provided for both 'NumberOfCellsInFirstGridDimension' and 'NumberOfCellsInSecondGridDimension'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='structured_triangular') and (../../esmModelGrid[@gridType = 'icosahedral']) ) and ( (string-length(horizontalResolution/property[name='NumberOfGridsCellsInFirstDimensionOfDiamond']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfGridsCellsInSecondDimensionOfDiamond']/value)=0) )  )">
+        Grid Specification: Where GridDiscretization is 'structured_triangular' and GridType is 'icosahedral', values must be provided for both 'NumberOfGridsCellsInFirstDimensionOfDiamond' and 'NumberOfGridsCellsInSecondDimensionOfDiamond'
+      </assert>
+
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'tripolar']) ) and ( (string-length(horizontalResolution/property[name='NumberOfCellsInFirstGridDimension']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfCellsInSecondGridDimension']/value)=0) or (string-length(horizontalResolution/property[name='FirstPoleLat']/value)=0) or (string-length(horizontalResolution/property[name='FirstPoleLon']/value)=0) or (string-length(horizontalResolution/property[name='SecondPoleLat']/value)=0) or (string-length(horizontalResolution/property[name='SecondPoleLon']/value)=0) or (string-length(horizontalResolution/property[name='ThirdPoleLat']/value)=0) or (string-length(horizontalResolution/property[name='ThirdPoleLon']/value)=0)  )  )">
+        Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'tripolar', values must be provided for 'NumberOfCellsInFirstGridDimension' and 'NumberOfCellsInSecondGridDimension', and for each of 'FirstPoleLat, 'FirstPoleLon', 'SecondPoleLat', 'SecondPoleLon', 'ThirdPoleLat' and 'ThirdPoleLon'
+      </assert>
+
+      <assert test="not((@discretizationType='unstructured_polygonal') and not((../../esmModelGrid[@gridType = 'reduced_gaussian']) or (../../esmModelGrid[@gridType = 'other']))) " >
+        Grid Specification: Where GridDiscretization is 'unstructured polygonal', either 'reduced gaussian' or 'other' must be specified for GridType
+      </assert>
+
+      <assert test="not((@discretizationType='structured_triangular') and not((../../esmModelGrid[@gridType = 'icosahedral']) or (../../esmModelGrid[@gridType = 'other']))) " >
+        Grid Specification: Where GridDiscretization is 'structured triangular', either 'icosahedral' or 'other' must be specified for GridType
+      </assert>
+
+<!-- Vertical Rules Begin -->
+
+      <assert test="not( (zcoords/@coordinateType='terrain-following') and not( (zcoords/@coordinateForm='sigma') or (zcoords/@coordinateForm='S-coordinate') or (zcoords/@coordinateForm='other')) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'terrain-following', 'VerticalCoordinate' must be one of 'sigma', 'S-Coordinate' or 'other'.
+      </assert>    
+
+      <assert test="not( (zcoords/@coordinateType='terrain-following') and (string-length(zcoords/property[name='SurfaceReference']/value)=0) )">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'terrain-following', a value must be provided for 'SurfaceReference'
+      </assert>
+
+      <assert test="not( (zcoords/@coordinateType='space-based') and not( (zcoords/@coordinateForm='geometric height') or (zcoords/@coordinateForm='depth') or (zcoords/@coordinateForm='sleve (smooth level)') or (zcoords/@coordinateForm='other')) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'space-based', 'VerticalCoordinate' must be one of 'geometric height', 'depth', 'sleve (smooth level)' or 'other'
+      </assert>    
+
+      <assert test="not( (zcoords/@coordinateType='mass-based') and not( (zcoords/@coordinateForm='Z*-coordinate') or (zcoords/@coordinateForm='isopycnic') or (zcoords/@coordinateForm='isentropic') or (zcoords/@coordinateForm='pressure') or (zcoords/@coordinateForm='natural log pressure') or (zcoords/@coordinateForm='pressure-height') or (zcoords/@coordinateForm='P*-coordinate') or (zcoords/@coordinateForm='Z-coordinate') or (zcoords/@coordinateForm='Z**-coordinate') or (zcoords/@coordinateForm='other') ) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'mass-based', 'VerticalCoordinate' must be one of 'isopycnic', 'isentropic', 'pressure', 'natural log pressure', 'pressure-height', 'Z*-coordinate', 'P*-coordinate', 'Z-coordinate', 'Z**-coordinate' or 'other'
+      </assert>    
+
+      <assert test="not( (zcoords/@coordinateType='mass-based') and (string-length(zcoords/property[name='SurfaceReference']/value)=0) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'mass-based', a value must be provided for 'SurfaceReference'
+      </assert>    
+
+      <assert test="not( ( (zcoords/@coordinateForm='Z*-coordinate') or (zcoords/@coordinateForm='Z-coordinate') ) and (string-length(zcoords/property[name='PartialSteps']/value)=0) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinate' is either 'Z*-coordinate' or 'Z-coordinate', a value must be provided for 'PartialSteps'
+      </assert>
+
+      <assert test="not( (zcoords/@coordinateType='hybrid') and not( (zcoords/@coordinateForm='hybrid floating Lagrangian') or (zcoords/@coordinateForm='hybrid sigma-pressure') or (zcoords/@coordinateForm='hybrid height') or (zcoords/@coordinateForm='hybrid sigma-z') or (zcoords/@coordinateForm='double sigma') or (zcoords/@coordinateForm='hybrid Z-S') or (zcoords/@coordinateForm='hybrid Z-isopycnic') or (zcoords/@coordinateForm='other') ) ) ">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'hybrid', 'VerticalCoordinate' must be one of 'hybrid floating Lagrangian', 'hybrid sigma-pressure', 'hybrid height', 'hybrid sigma-z', 'double sigma', 'hybrid Z-S', 'hybrid Z-isopycnic' or 'other' 
+      </assert>    
+
+      <assert test="not( (zcoords/@coordinateType='hybrid') and (string-length(zcoords/property[name='Hybridization']/value)=0) )">
+        In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'hybrid', a value must be provided for 'Hybridization'
+      </assert>
+
+      <assert test="not( (comment()='Vertical Domain specified as : atmospheric') and ( (string-length(verticalResolution/property[name='TopModelLevel']/value)=0) or (string-length(verticalResolution/property[name='NumberOfLevelsBelow850hPa']/value)=0) or (string-length(verticalResolution/property[name='NumberOfLevelsAbove200hPa']/value)=0) or (string-length(verticalResolution/property[name='NumberOfLevels']/value)=0)) )">
+        In Grid <value-of select="../shortName" />, section 'Vertical Extent', where <value-of select="comment()" />, values must be provided for each of 'NumberOfLevels', 'TopModelLevel', 'NumberOfLevelsBelow850hPa' and 'NumberOfLevelsAbove200hPa'
+      </assert>
+
+<assert test="not( (comment()='Vertical Domain specified as : oceanic') and ( (string-length(verticalResolution/property[name='NumberOfLevels']/value)=0) or (string-length(verticalResolution/property[name='LowerLevel']/value)=0) or (string-length(verticalResolution/property[name='UpperLevel']/value)=0) or (string-length(verticalResolution/property[name='NumberOfLevelsInUpper100m']/value)=0)) )">
+        In Grid <value-of select="../shortName" />, section 'Vertical Extent', where <value-of select="comment()" />, values must be provided for each of 'NumberOfLevels', 'LowerLevel', 'UpperLevel' and 'NumberOfLevelsInUpper100m'
+      </assert>
+<!-- Vertical Rules End -->
+
+<!-- HERE -->
+    </rule>
+    <rule context="//gridSpec/esmModelGrid/gridMosaic" >
+
+      <assert test="not((@gridtype='composite') and not((string-length(../../esmModelGrid/@gridType) = 0) )  ) " >
+        Grid Specification: Where GridDiscretization is 'composite', at least one value must be provided for 'CompositeGridDiscretization'
+      </assert>
+
+      <assert test="not((@gridType='composite') and not((../../esmModelGrid[@gridType = 'icosahedral']) or (../../esmModelGrid[@gridType = 'other']))) " >
+        Grid Specification: 'CompositeGridDiscretization'
+      </assert>
+
+    </rule>
+
+
+
+<!-- SPECTRAL TRUCATURE ERROR
+      <assert test="not((@discretizationType='spherical_harmonics') and not((../../esmModelGrid[@gridType = 'icosahedral']) or (../../esmModelGrid[@gridType = 'other']))) " >
+        Grid Specification: Where GridDiscretization is 'structured triangular', either 'icosahedral' or 'other' must be specified for GridType
+      </assert> -->
+
+  </pattern>
+
+
   <pattern name="Model component AerosolTransport constraints">
     <rule context="//modelComponent[type[@value='AerosolTransport']]/componentProperties/componentProperty[shortName='General Attributes']/componentProperty[shortName='Method']">
       <assert test="not ( (value='specific transport scheme') and (string-length(../componentProperty[shortName='SchemeType']/value)=0) )">Model component AerosolTransport, Parameter General Attributes: Where Method is specific transport scheme, a value must be specified for SchemeType</assert>
