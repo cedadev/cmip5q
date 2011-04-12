@@ -62,9 +62,9 @@
                 </tr>
               {% else %}
             	{% if isModel %}
-                <tr><td class="inputH1">Short Name*:&nbsp;{{cform.abbrev.errors}}</td>
+                <tr><td class="inputH1">Short Name:&nbsp;* {{cform.abbrev.errors}}</td>
                 {% else %}
-                <tr><td class="inputH1">Short Name:&nbsp;{{cform.abbrev.errors}}</td>
+                <tr><td class="inputH1">Short Name:&nbsp;* {{cform.abbrev.errors}}</td>
                 {% endif %}
                 <td colspan="4">
                   {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
@@ -91,7 +91,7 @@
               
               {% endif %}
               
-                <tr><td>Long Name:&nbsp;{{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
+                <tr><td>Long Name:&nbsp;* {{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
                 {% if isParamGroup %}
                 {% else %}
 	                <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
@@ -112,8 +112,9 @@
         {% if isRealm or isModel %}
         <div class="boxer">
         <h4>Genealogy</h4>
-        <p>Year First  Released:&nbsp;{{cform.yearReleased.errors}}{{cform.yearReleased}}</p>
-        <p class="guidance"> The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade.</p>
+        <p>Year First  Released:&nbsp;{{cform.yearReleased.errors}}<img
+				src="/css/icons/information-icon.png"
+				title="The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade. " /> {{cform.yearReleased}}</p>
         <center>
         <p> Previous Version (name):&nbsp;{{cform.otherVersion.errors}}{{cform.otherVersion}} </p>
         <p class="guidance">Please tell us how this component has been improved from that previous version. </p>

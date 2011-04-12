@@ -89,21 +89,21 @@
               <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>
               <table>
                 <tr>
-                  <td>Short Name: </td>
+                  <td>Short Name:* </td>
                   <td>{{simform.abbrev}}</td>
                   <td>{{simform.abbrev.errors}}</td>
                 </tr>
             <tr><td>Long Name:{{simform.title.errors}} </td><td colspan="3">{{simform.title}}</td></tr>
              
-            <tr><td> Simulation used:  </td><td colspan="3"><b>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
+            <tr><td> Simulation used:*  </td><td colspan="3"><b>Model</b>&nbsp;{{simform.numericalModel.errors}}{{simform.numericalModel}} running
             on <b> Platform </b> {{simform.platform.errors}}{{simform.platform}}.</td></tr>
             <br/>
             
-            <tr><td>Ensemble Members: </td><td colspan="3">{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
+            <tr><td>Ensemble Members:* </td><td colspan="3">{{simform.ensembleMembers.errors}}{{simform.ensembleMembers}}
             </td></tr>
             <tr><td>Description (notes){{simform.description.errors}}</td><td colspan="3">{{simform.description}}</td></tr> 
             <tr><td colspan="4">Responsible Parties (use the parties tab to add more choices here): </td></tr>
-            <tr><td></td><td>Contact:&nbsp;{{simform.contact.errors}}{{simform.contact}}</td>
+            <tr><td></td><td>Contact:*&nbsp;{{simform.contact.errors}}{{simform.contact}}</td>
                         <td>Lead Author:&nbsp;{{simform.author.errors}}{{simform.author}}</td>
                         <td>Funder:&nbsp;{{simform.funder.errors}}{{simform.funder}}</td></tr>
             </table>
@@ -115,7 +115,7 @@
             <p class="guidance">In this section, we ask you what the rip value is for this particular simulation (see <a href="http://cmip-pcmdi.llnl.gov/cmip5/output_req.html" target="_blank">here</a>)</p>
               <table>
                 <tr>
-                  <td>rip value:{{simform.drsMember.errors}} </td>
+                  <td>rip value:* {{simform.drsMember.errors}} </td>
                   <td colspan="3">{{simform.drsMember}}</td>
                 </tr>
               </table>
@@ -130,17 +130,21 @@
             {% with simform.duration as d  %} {% include 'closed_date.html' %} {% endwith %}
             {% endcomment %}
             <br/>
-            <h4> Related Simulation </h4>
-            <p> If this simulation has a related control simulation or extends another, please identify it here. {% if ensemble %} (Such relationships may extend between ensembles too.){% endif %} </p>
+            <h4> Related Simulation 
+            <img src="/css/icons/information-icon.png"
+				title="If this simulation has a related control simulation or extends another, please identify it here. {% if ensemble %} (Such relationships may extend between ensembles too.){% endif %}" />
+            </h4>
             <p>Simulation {{s}} {{rform.value}}{{rform.value.errors}} simulation {{rform.sto}}{{rform.sto.errors}}</p>
             {% if rform.non_field_errors %} <p>{{rform.non_field_errors}}</p>{% endif %}
             <table><tr><td>Details (if necessary):</td><td> {{rform.description.errors}}{{rform.description}}</td></tr></table>
             </div>
             <div class="boxer">
-            <h4> Authorship </h4>
+            <h4> Authorship* </h4>
             <center>
-            <p>Please enter the list of authors you wish to appear in a DOI for this simulation.<br/>
-            (The lead author should be indicated using the "parties" tab and the "lead author" drop down list above.)
+            <p>Please enter the list of authors you wish to appear in a DOI for this simulation.
+            <img src="/css/icons/information-icon.png"
+				title="The lead author should be indicated using the 'parties' tab and the 'lead author' drop down list above." />
+            <br/>
             {{simform.authorList.errors}}:</p><p>{{simform.authorList}}</p>
             </center>
             </div>
@@ -177,18 +181,24 @@
     
     
     {% if ensemble %}<div class="boxer">
-        <h4> Ensemble Characteristics </h4>
+        <h4> Ensemble Characteristics 
+        <img src="/css/icons/information-icon.png"
+				title="You can modify these Ensemble Characteristics using the 'Describe Ensemble' button on the left hand menu." />
+        </h4>
         <p>Description:{{ensemble.set.description}}</p>
         <table>
         {% for m in ensemble.members %}
         <tr class="{%cycle  'row2' 'row1'%}"><td>Member {{m.memberNumber}} ({{m.drsMember}}) uses code modification: {{m.cmod}} and input modification {{m.imod}}</td></tr>
         {% endfor %}
         </table>
-        <p> (You can modify these Ensemble Characteristics using the "Describe Ensemble" button on the left hand menu.)
     </div>{% endif %}
             
     <div class="boxer">
-        <h4> Required Inputs and Couplings </h4>
+        <h4> Required Inputs and Couplings 
+        <img src="/css/icons/information-icon.png"
+				title="You can modify these using the 'Input Coupling' button on the left hand menu." />
+        </h4>
+        
         {% ifnotequal label "Update" %}
             <p class="red"> This section cannot be filled in until the
             general characteristics have been saved </p>
@@ -200,16 +210,17 @@
             </tr>
             {% endfor %}
             </table>
-                <p>(You can modify these using the "Input Coupling" button on the left hand menu.)</p>
         {% endifnotequal %}
     </div>
     
     <div class="boxer backgrey">
-        <h4> Conformance: How this simulation conforms to the numerical requirements of experiment {{exp}}</h4>
+        <h4> Conformance: How this simulation conforms to the numerical requirements of experiment {{exp}}
+        <img src="/css/icons/information-icon.png"
+				title="You can modify these using the 'conformance' button on the left hand menu." />
+        </h4>
         {% ifnotequal label "Update" %}
         <p class="red"> This section cannot be filled in until the general characteristics have been saved </p>
         {% else %}
-        <p>(You can modify these using the "conformance" button on the left hand menu.)</p>
         <table>
         {% for con in coset %}
         <tr class="{% cycle 'row1' 'row2'%}"><td>{{con.requirement}}</td><td>{% if con.ctype %} {% include 'pretty_conformance.html'%} {% else %} <span class="red">Not conformant?</span>{% endif %}</tr>

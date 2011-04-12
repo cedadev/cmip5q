@@ -21,7 +21,6 @@ CLIENT_CODEJS = """
             minchars: 3,
             max: 500,
             cacheLength: 40,
-            width: 500,
             selectFirst: false,
             parse: function(data) {
                 return $.map(data, function(row) {

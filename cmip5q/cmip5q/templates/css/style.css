@@ -1,7 +1,7 @@
 /* CSS numbers reminder 0,0,0,0 corresponds to top right bottom left */
 /* Generic css */
 
-* {margin:0;padding:0;font-family:"Times New Roman", Arial, Helvetica, sans-serif;
+* {margin:0;padding:0;font-family: Arial, Verdana, Helvetica, sans-serif;
    line-height:1.7;color:#333;font-size:12px;}
 
 h1 {font-size:16px;}
