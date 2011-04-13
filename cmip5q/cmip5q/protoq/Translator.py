@@ -1715,7 +1715,7 @@ class Translator:
                     name='ASCII'
                 else :
                     name=fileClass.format.name
-                ET.SubElement(lfElement,'dataFormat',{'value':name})
+                self.addCVValue(lfElement,'dataFormat',name,cvName='dataFormatType')
             ''' protocol [0..1] '''
             #ET.SubElement(lfElement,'protocol')
             ''' host [0..1] '''
@@ -1731,11 +1731,13 @@ class Translator:
                     name='ASCII'
                 else :
                     name=fileClass.format.name
-                ET.SubElement(distElement,'distributionFormat',{'value':name})
+                self.addCVValue(distElement,'distributionFormat',name,cvName='dataFormatType')
             ''' childObject [0..inf]'''
             ''' parentObject [0..1]'''
             ''' citation [0..inf]'''
-            self.addReference(fileClass.reference,doElement)
+            if fileClass.reference:
+                citationElement=ET.SubElement(doElement,'citation')
+                self.addReference(fileClass.reference,citationElement)
             ''' content [0..inf]'''
             for variable in DataObject.objects.filter(container=fileClass) :
                 contentElement=ET.SubElement(doElement,'content')
@@ -1751,12 +1753,12 @@ class Translator:
                 if variable.description :
                     ET.SubElement(topicElement,'description').text=variable.description
                 '''    unit [0..1] '''
-                ''' aggregation [1] '''
-                ET.SubElement(contentElement,'aggregation')
-                ''' frequency [1] '''
-                ET.SubElement(contentElement,'frequency')
+                ''' aggregation [0..1] '''
+                ''' frequency [0..1] '''
                 ''' citation [0..inf] '''
-                self.addReference(variable.reference,contentElement)
+                if variable.reference:
+                    citationElement=ET.SubElement(contentElement,'citation')
+                    self.addReference(variable.reference,citationElement)
             ''' extent [0..1]'''
             ''' generic document elements '''
             self.addDocumentInfo(fileClass,doElement)
