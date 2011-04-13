@@ -1574,13 +1574,14 @@ class Translator:
         '''type [0..1] '''
         if coupling.inputTechnique and couplingType=='boundaryCondition' :
             if coupling.inputTechnique.name!='' :
-                ET.SubElement(couplingElement,'type',{'value':coupling.inputTechnique.name})
+                #ET.SubElement(couplingElement,'type',{'value':coupling.inputTechnique.name})
+                self.addCVValue(couplingElement,'type',coupling.inputTechnique.name,cvName="CouplingType")
         '''timeProfile'''
         units=''
         if coupling.FreqUnits :
             units=str(coupling.FreqUnits.name)
         if units!='' or coupling.couplingFreq!=None :
-            tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units})
+            tpElement=ET.SubElement(couplingElement,'timeProfile',{'units':units,'variableRate':'false'})
             #ET.SubElement(tpElement,'start')
             #ET.SubElement(tpElement,'end')
             ET.SubElement(tpElement,'rate').text=str(coupling.couplingFreq)
@@ -1588,19 +1589,17 @@ class Translator:
         '''spatialRegridding'''
         if closure.spatialRegrid :
             regridValue=closure.spatialRegrid.name
-            if regridValue=='Conservative' :
-                sr=ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'true'})
-                ET.SubElement(sr,'spatialRegriddingOrder').text='TBD'
-            elif regridValue=='Non-Conservative' :
-                sr=ET.SubElement(couplingElement,'spatialRegridding',{'conservativeSpatialRegridding':'false'})
-                ET.SubElement(sr,'spatialRegriddingOrder').text='TBD'
-            # else do nothing as the value is 'None'
+            if not regridValue=='None Used' :
+                sr=ET.SubElement(couplingElement,'spatialRegridding')
+                ET.SubElement(sr,'spatialRegriddingStandardMethod').text=regridValue.lower()
+            # else do nothing as the value is 'None Used'
         '''timeTransformation'''
         if closure.temporalTransform :
             tt=ET.SubElement(couplingElement,'timeTransformation')
-            ET.SubElement(tt,'mappingType',{'value': closure.temporalTransform.name})
+            self.addCVValue(tt,'mappingType',closure.temporalTransform.name)
         '''couplingSource'''
         sourceElement=ET.SubElement(couplingElement,'couplingSource')
+        sourceElement=ET.SubElement(sourceElement,'dataSource')
         if closure.ctype=='internal' and closure.target :
             # reference to component
             self.addCIMReference(closure.target,sourceElement)
@@ -1616,6 +1615,7 @@ class Translator:
 
         '''couplingTarget'''          
         targetElement=ET.SubElement(couplingElement,'couplingTarget')
+        targetElement=ET.SubElement(targetElement,'dataSource')
         self.addCIMReference(CompInpClass.owner,targetElement)
         '''priming'''
         '''connection'''
@@ -1623,12 +1623,14 @@ class Translator:
         if closure.ctype=='external' and closure.target :
             # we are referencing data in a file
             sourceElement=ET.SubElement(connectionElement,'connectionSource')
+            sourceElement=ET.SubElement(sourceElement,'dataSource')
             self.addCIMReference(closure.targetFile,sourceElement,argName=closure.target.variable,argType='fileVariable')
         else :
             connectionElement.append(ET.Comment('this coupling has no connection source specified'))
         # we know that we always have a connectionTarget as we create it
         # we know that we never have a connectionSource as there is no such concept in the Questionnaire
         targetElement=ET.SubElement(connectionElement,'connectionTarget')
+        targetElement=ET.SubElement(targetElement,'dataSource')
         self.addCIMReference(CompInpClass.owner,targetElement,argName=CompInpClass.abbrev,argType='componentProperty')
 
 
