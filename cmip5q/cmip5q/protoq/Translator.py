@@ -342,6 +342,8 @@ class Translator:
                                     HorizGridChildNames.append(term.name)
                             elif bp.name=="CompositeGrid" :
                                 HorizGridCompositeName=str(p.value)
+                            elif bp.name=="SpectralTruncatureNumber" :
+                                HorizResProps[str(bp.name)]=str(p.value)
                             else :
                                 assert False, "Error : Unknown grid property found: "+bp.name
                         elif HorizGridType!="" and str(con.constraint).find(HorizGridType)!=-1 and str(con.constraint).find("GridType")!=-1 :
@@ -460,7 +462,7 @@ class Translator:
             ET.SubElement(esmModelGridElement,'mnemonic').text=MnemonicValue
         ''' gridMosaic or gridTile '''
         CVHorizGridType=HorizGridType.replace(' ','_')
-        mappingHorizDiscretizationType={'logically rectangular':'logically_rectangular','structured triangular':'structured_triangular','unstructured triangular':'unstructured_triangular','unstructured polygonal':'unstructured_polygonal','pixel-based catchment':'pixel-based_catchment','other':'other'}
+        mappingHorizDiscretizationType={'logically rectangular':'logically_rectangular','structured triangular':'structured_triangular','unstructured triangular':'unstructured_triangular','unstructured polygonal':'unstructured_polygonal','pixel-based catchment':'pixel-based_catchment','spherical harmonics':'spherical_harmonics','other':'other','composite':'composite'}
         if HorizGridDiscretization!="composite" :
             esmModelGridElement.set('isLeaf','true')
             esmModelGridElement.set('numTiles','1')
