@@ -1220,6 +1220,7 @@ class Translator:
     def addProperties(self,componentObject,rootElement):
 
         if componentObject.implemented :
+            componentProperty=None
             if componentObject.isParamGroup :
                 # I am a parameter dressed as a component
                 newRootElement=ET.SubElement(rootElement,'componentProperty',{'represented':'true'})
@@ -1329,6 +1330,15 @@ class Translator:
                                         ET.SubElement(property,'value').text=value.name
                 if con.constraint!='' :
                     componentProperty.append(ET.Comment('Constraint end: '+con.constraint))
+
+              if componentProperty:
+                  if componentProperty.tag=="componentProperty" :
+                      # I should not be a leaf property
+                      if not componentProperty.find("componentProperty"):
+                          # All children must have been declared as N/A so remove me
+                          parent=componentProperty.getparent()
+                          parent.remove(componentProperty)
+                          parent.append(ET.Comment('Property '+pg.name+' removed as it has no children'))
 
     def addChildComponent(self,c,root,nest,recurse=True):
 
