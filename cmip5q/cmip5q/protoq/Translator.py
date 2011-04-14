@@ -725,12 +725,15 @@ class Translator:
             for coupling in couplings:
                 # output each link separately as the questionnaire keeps information
                 # about transformations on a link by link basis
-                extclosures=ExternalClosure.objects.filter(coupling=coupling)
-                for closure in extclosures :
-                    self.addCoupling(coupling,closure,simElement,elementName='input')
-                intclosures=InternalClosure.objects.filter(coupling=coupling)
-                for closure in intclosures :
-                    self.addCoupling(coupling,closure,simElement,elementName='input')
+                if coupling.notInUse :
+                    pass # the user has asked us to skip this binding
+                else:
+                    extclosures=ExternalClosure.objects.filter(coupling=coupling)
+                    for closure in extclosures :
+                        self.addCoupling(coupling,closure,simElement,elementName='input')
+                    intclosures=InternalClosure.objects.filter(coupling=coupling)
+                    for closure in intclosures :
+                        self.addCoupling(coupling,closure,simElement,elementName='input')
 
             ''' output [0..inf] '''
             ''' restart [0..inf] '''
