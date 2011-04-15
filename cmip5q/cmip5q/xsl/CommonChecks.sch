@@ -106,6 +106,25 @@
     </rule>
   </pattern>
 
+<!-- GRID RULES BEGIN -->
+
+<pattern name="General Grid Rules">
+  <rule context="//gridSpec/esmModelGrid">
+    <assert test="string-length(shortName)!=0">
+      Grid: A value must be provided for Grid Short Name.
+    </assert>
+    <assert test="string-length(longName)!=0">
+      Grid <value-of select="shortName" />: A value must be provided for Grid Long Name.
+    </assert>
+    <assert test="string-length(description)!=0">
+      Grid <value-of select="shortName" />: A value must be provided for Grid Description.
+    </assert>
+    <assert test="string-length(gridTile/@discretizationType)!=0">
+      Grid <value-of select="shortName" />: A value must be provided for GridDiscretization.
+    </assert>
+  </rule>
+</pattern>
+
 
   <pattern name="Grid Specification constraints">
     <rule context="//gridSpec/esmModelGrid/gridTile" >
@@ -159,7 +178,15 @@
         Grid Specification: Where GridDiscretization is 'structured triangular', either 'icosahedral' or 'other' must be specified for GridType
       </assert>
 
+      <assert test="not((@discretizationType='spherical_harmonics') and (string-length(horizontalResolution/property[name='SpectralTruncatureNumber']/value)=0) ) " >
+        Grid Specification: Where GridDiscretization is 'spherical_harmonics', a value must be provided for 'SpectralTruncatureNumber'
+      </assert>
+
 <!-- Vertical Rules Begin -->
+
+      <assert test="not( string-length(zcoords/@coordinateType)=0)">
+        In Grid <value-of select="../shortName" />, a value must be provided for 'VerticalCoordinateType'.
+      </assert>
 
       <assert test="not( (zcoords/@coordinateType='terrain-following') and not( (zcoords/@coordinateForm='sigma') or (zcoords/@coordinateForm='S-coordinate') or (zcoords/@coordinateForm='other')) ) ">
         In Grid <value-of select="../shortName" />, section Vertical Coordinate System, where 'VerticalCoordinateType' is 'terrain-following', 'VerticalCoordinate' must be one of 'sigma', 'S-Coordinate' or 'other'.
@@ -214,15 +241,8 @@
         Grid Specification: 'CompositeGridDiscretization'
       </assert>
 
+
     </rule>
-
-
-
-<!-- SPECTRAL TRUCATURE ERROR
-      <assert test="not((@discretizationType='spherical_harmonics') and not((../../esmModelGrid[@gridType = 'icosahedral']) or (../../esmModelGrid[@gridType = 'other']))) " >
-        Grid Specification: Where GridDiscretization is 'structured triangular', either 'icosahedral' or 'other' must be specified for GridType
-      </assert> -->
-
   </pattern>
 
 
