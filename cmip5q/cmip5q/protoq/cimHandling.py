@@ -290,7 +290,7 @@ class CIMViewer:
         #etree=ET.parse(CIMdoc, parser)
         #root=CIMdoc.getroot() # "CIMRecordSet" or "CIMRecord" element
         if CIMdoc.tag=='CIMDocumentSet':
-            qnModels = CIMdoc.findall('CIMRecord/CIMRecord/modelComponent')
+            qnModels = CIMdoc.findall('modelComponent')
             #qnExps = CIMdoc.findall('CIMRecord/CIMRecord/numericalExperiment')
             #qnSims = CIMdoc.findall('CIMRecord/CIMRecord/simulationRun')
             #qnData = root.findall('{%s}CIMRecord/{%s}CIMRecord/{%s}dataObject' %(cimns,cimns,cimns))
