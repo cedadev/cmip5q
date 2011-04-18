@@ -429,6 +429,8 @@ class Translator:
                             VertResProps[str(bp.name)]=str(p.value)
                         else : # VertDomain should be other or n/a
                             pass
+            elif pg.name=="General Attributes" :
+                pass
             else :
                 assert False, "Found an unknown param group in vertical coordinates"
         
@@ -784,11 +786,16 @@ class Translator:
                     experiment=ExperimentSet[0]
                     assert confClass.requirement, 'There should be a requirement associated with a conformance'
                     if confClass.option :
-                        # we have chosen a requirement option so use this ID in our reference
-                        reqID=confClass.option.docid
+                        #we have chosen a requirement option so use this ID in our reference
+                        if confClass.option.docid:
+                            reqID=confClass.option.docid
+                        else:
+                            #temporary until ids exist on all options
+                            reqID='temporaryid'
                     else :
                         # we have chosen a requirement so use this ID in our reference
                         reqID=confClass.requirement.docid
+                        
                     self.addCIMReference(experiment,reqElement,argName=reqID,argType='NumericalRequirement')
                     # for each modelmod modification
                     for modClassBase in confClass.mod.all() :
@@ -832,6 +839,14 @@ class Translator:
             # input mods are not relevant here as they are included directly in the model description as composition information
             ''' documentAuthor, documentCreationDate, documentID, documentVersion, externalID, metadataID and metadataVersion '''
             externalIDs=[]
+            
+            #drsOutput was introduced post simulations already existing, so in the short term we need to add drs info in those 
+            # cases where the simulation already exists. Usually this info will be generated upon creation of a simulation.
+            #if len(simClass.drsOutput.all())==0:
+                #d=DRSOutput(institute=self.centre,model=self.numericalModel,member=self.drsMember,experiment=self.experiment)
+                #d.save()
+                #self.drsOutput.add(d)
+            
             assert len(simClass.drsOutput.all())==1,"One and only one DRS string expected"
             for drsOutput in simClass.drsOutput.all():
                 assert drsOutput, "Expecting a value for the DRS string"

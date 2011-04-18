@@ -316,9 +316,18 @@ class Doc(Fundamentals):
         # first redo validation to make sure this really is ok
         if self.isComplete:
             return False,'This document has already been exported',None
+        
+        #TODO Remove temporary validation bypass for met office
+        centre=Centre.objects.get(id=self.centre_id)
+        
         valid,html=self.validate()
-        #logging.info('WARNING Exporting document for ESG regardless of validation state')
-        #valid=True # FIXME
+        
+        if centre.abbrev == 'MOHC':
+            logging.info('WARNING Exporting document for ESG regardless of validation state')
+            valid=True
+        else:
+            pass    
+            
         self.isComplete=valid
         self.save(complete=self.isComplete) # make that completeness status last.
         if self.isComplete: 

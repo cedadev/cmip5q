@@ -62,6 +62,11 @@ class simulationHandler(object):
             ensemble={'set':eset[0],'members':members}
         else: ensemble=None
         
+        #check that drsoutput info exists and if not create some
+        x = s.drsOutput.all()
+        if not x:
+            s.updateDRS()
+        
         urls={'url':url}
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
@@ -90,6 +95,7 @@ class simulationHandler(object):
             simform=SimulationForm(request.POST,instance=s,prefix='sim')
             simform.specialise(self.centre)
             if simform.is_valid():
+                                 
                 simok=True
                 if label=='Add':
                     oldmodel=None
