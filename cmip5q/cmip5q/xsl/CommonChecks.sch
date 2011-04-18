@@ -23,6 +23,7 @@
       </assert>
     </rule>
   </pattern>
+<!-- 
   <pattern name="Simulation Conformances fulfilment requirements">
     <rule context="numericalRequirement/*/name">
       <assert test="//simulationRun/conformance/requirement/reference[name = current()]">
@@ -30,6 +31,7 @@
       </assert>
     </rule>
   </pattern>
+-->
   <pattern name="Simulation Conformances consistency and completeness requirements">
     <rule context="//simulationRun/conformance[comment()='type : via inputs']">
 <!--      <assert test="string-length(source)>0">
