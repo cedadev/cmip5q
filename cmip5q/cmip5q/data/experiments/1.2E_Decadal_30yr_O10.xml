@@ -123,68 +123,68 @@
 	</numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
-		<name xsi:type="Identifier">1.2E.bc.wmg</name>
+		<name xsi:type="Identifier">1.2E.bc.rcp45_wmg</name>
 		<description>Imposed changing concentrations or emissions of RCP4.5 well mixed gases, including CO2</description>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.025</id>
-			<name xsi:type="Identifier">1.2E.bc.wmg_conc</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_wmg_conc</name>
 			<description>Concentrations</description>			
 		</requirementOption>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.029</id>
-			<name xsi:type="Identifier">1.2E.bc.wmg_em</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_wmg_em</name>
 			<description>Emissions</description>			
 		</requirementOption>
 	</numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
-		<name xsi:type="Identifier">1.2E.bc.sls</name>
+		<name xsi:type="Identifier">1.2E.bc.rcp45_sls</name>
 		<description>Imposed changing concentrations or emissions of RCP4.5 short lived gas species </description>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.026</id>
-			<name xsi:type="Identifier">1.2E.bc.sls_conc</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_sls_conc</name>
 			<description>Concentrations</description>			
 		</requirementOption>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.030</id>
-			<name xsi:type="Identifier">1.2E.bc.sls_em</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_sls_em</name>
 			<description>Emissions</description>			
 		</requirementOption>
 	</numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
-		<name xsi:type="Identifier">1.2E.bc.aer</name>
+		<name xsi:type="Identifier">1.2E.bc.rcp45_aer</name>
 		<description>Imposed changing concentrations or emissions of RCP4.5 aerosols</description>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.027</id>
-			<name xsi:type="Identifier">1.2E.bc.aer_conc</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_aer_conc</name>
 			<description>Concentrations</description>			
 		</requirementOption>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.031</id>
-			<name xsi:type="Identifier">1.2E.bc.aer_em</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_aer_em</name>
 			<description>Emissions</description>			
 		</requirementOption>
 	</numericalRequirement>
 	
 	<numericalRequirement xsi:type="BoundaryCondition">
-		<name xsi:type="Identifier">1.2E.bc.aer_pre</name>
+		<name xsi:type="Identifier">1.2E.bc.rcp45_aer_pre</name>
 		<description>Imposed changing concentrations or emissions of RCP4.5 aerosol precursors</description>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.028</id>
-			<name xsi:type="Identifier">1.2E.bc.aer_pre_conc</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_aer_pre_conc</name>
 			<description>Concentrations</description>			
 		</requirementOption>
 		<requirementOption>
 			<id xsi:type="Identifier">bc.032</id>
-			<name xsi:type="Identifier">1.2E.bc.aer_pre_em</name>
+			<name xsi:type="Identifier">1.2E.bc.rcp45_aer_pre_em</name>
 			<description>Emissions</description>			
 		</requirementOption>
 	</numericalRequirement> 
     
     <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.033</id>
-        <name xsi:type="Identifier">1.2E.bc.LU</name>
+        <name xsi:type="Identifier">1.2E.bc.rcp45_LU</name>
         <description>Imposed changing RCP4.5 land use</description>
     </numericalRequirement>
     
