@@ -62,11 +62,7 @@ class simulationHandler(object):
             ensemble={'set':eset[0],'members':members}
         else: ensemble=None
         
-        #check that drsoutput info exists and if not create some
-        x = s.drsOutput.all()
-        if not x:
-            s.updateDRS()
-        
+                
         urls={'url':url}
         if label=='Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
@@ -134,6 +130,14 @@ class simulationHandler(object):
             relform=SimRelationshipForm(s,instance=r,prefix='rel')
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
+            
+            #check that drsoutput info exists and if not create some - this should only be temporary as drsOutput 
+            #only began being used after some simulatiuons were already in place
+            if s.id:
+                x = s.drsOutput.all()
+                if not x:
+                    s.updateDRS()
+            
         
         # work out what we want to say about couplings
         cset=[]
@@ -214,7 +218,7 @@ class simulationHandler(object):
         csims=Simulation.objects.filter(centre=c).filter(isDeleted=False)
         cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
 
-        eset=Experiment.objects.all()
+        eset=Experiment.objects.all().filter(isDeleted=False)
         exp=[]
         for e in eset:
             sims=e.simulation_set.filter(centre=c.id).filter(isDeleted=False)
