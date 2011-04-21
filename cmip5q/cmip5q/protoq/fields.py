@@ -142,9 +142,9 @@ class DateRange(object):
         else:
             e=ET.SubElement(top,"openDateRange")
         
-        if self.startDate is not None: e.append(self.startDate.xml('startDate'))
-        if self.endDate is not None: e.append(self.endDate.xml('endDate'))
         if self.length is not None: e.append(self.length.xml('duration'))
+        if self.endDate is not None: e.append(self.endDate.xml('endDate'))
+        if self.startDate is not None: e.append(self.startDate.xml('startDate'))
         if self.description is not None: ET.SubElement(e,'description').text=self.description
         return top
     def strxml(self,parent='DateRange'):

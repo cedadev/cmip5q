@@ -441,6 +441,9 @@ class Translator:
         CVHorizGridType=HorizGridType.replace(' ','_')
         # quick bug fix. Should change CV in the questionnaire.
         if CVHorizGridType=='ying_yang' : CVHorizGridType='yin_yang'
+        # another CV mapping fix due to CV/CIM mismatch
+        if CVHorizGridType=='latitude-longitude' : CVHorizGridType='regular_lat_lon'
+
         esmModelGridElement=ET.SubElement(gridElement,'esmModelGrid',{'gridType':CVHorizGridType,'id':''})
         # before the simple replacement solution I did an explicit mapping
         #MappingHorizGridType={'displaced pole':'displaced_pole','ying yang':'ying_yang'}
@@ -470,8 +473,8 @@ class Translator:
             esmModelGridElement.set('numTiles','1')
             esmModelGridElement.set('numMosaics','0')
             gridTileElement=ET.SubElement(esmModelGridElement,"gridTile",{"discretizationType":mappingHorizDiscretizationType[HorizGridDiscretization]}) #,"verticalGridDiscretization":vertCoordType})
-            self.addGridExtent(gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
             self.addGridTileDescription(gridTileElement,horizontalPropertiesObject,verticalPropertiesObject)
+            self.addGridExtent(gridTileElement,HorizExtentLatMin,HorizExtentLatMax,HorizExtentLonMin,HorizExtentLonMax)
             self.addGridTileHorizRes(gridTileElement,HorizGridResolution,HorizGridRefinement,HorizResProps)
             self.addGridTileVertRes(gridTileElement,VertResProps,VertDomain)
             self.addGridTileVertCoords(gridTileElement,vertCoordType,vertCoord,vertCoordProps)
@@ -924,33 +927,33 @@ class Translator:
             ET.SubElement(typeElement,'name').text=reqClass.name
             if reqClass.ctype.name=='SpatioTemporalConstraint':
                 stcObject=reqClass.get_child_object()
-                rdElement=ET.SubElement(typeElement,'requiredDuration')
+                #rdElement=ET.SubElement(typeElement,'requiredDuration')
                 if stcObject.requiredDuration:
-                    #self.addDateRange(stcObject.requiredDuration,typeElement,topName='XXXX')
-                    startDate=stcObject.requiredDuration.startDate
-                    endDate=stcObject.requiredDuration.endDate
-                    period=""
-                    units=""
-                    if stcObject.requiredDuration.length:
-                        period=stcObject.requiredDuration.length.period
-                        units=stcObject.requiredDuration.length.units
-                    if startDate and endDate or startDate and period:
-                        # closed date range
-                        drElement=ET.SubElement(rdElement,'closedDateRange')
-                    else:
-                        # open date range
-                        drElement=ET.SubElement(rdElement,'openDateRange')
-                    if startDate!=None:
-                        ET.SubElement(drElement,'startDate').text=str(startDate)
-                    if endDate!=None:
-                        ET.SubElement(drElement,'endDate').text=str(endDate)
-                    if period:
-                        # we are using the standard schema duration type in the CIM here,
-                        # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
-                        # more details
-                        mappingUnits={'Years':'Y','Days':'D','years':'Y'}
-                        length='P'+str(int(period))+mappingUnits[units]
-                        ET.SubElement(drElement,'duration').text=length
+                    self.addDateRange(stcObject.requiredDuration,typeElement,topName='requiredDuration')
+                    #startDate=stcObject.requiredDuration.startDate
+                    #endDate=stcObject.requiredDuration.endDate
+                    #period=""
+                    #units=""
+                    #if stcObject.requiredDuration.length:
+                    #    period=stcObject.requiredDuration.length.period
+                    #    units=stcObject.requiredDuration.length.units
+                    #if startDate and endDate or startDate and period:
+                    #    # closed date range
+                    #    drElement=ET.SubElement(rdElement,'closedDateRange')
+                    #else:
+                    #    # open date range
+                    #    drElement=ET.SubElement(rdElement,'openDateRange')
+                    #if period:
+                    #    # we are using the standard schema duration type in the CIM here#,
+                    #    # see http://www.w3schools.com/Schema/schema_dtypes_date.asp for
+                    #    # more details
+                    #    mappingUnits={'Years':'Y','Days':'D','years':'Y'}
+                    #    length='P'+str(int(period))+mappingUnits[units]
+                    #    ET.SubElement(drElement,'duration').text=length
+                    #if endDate!=None:
+                    #    ET.SubElement(drElement,'endDate').text=str(endDate)
+                    #if startDate!=None:
+                    #    ET.SubElement(drElement,'startDate').text=str(startDate)
 
     def add_experiment(self,expClass,rootElement):
         expElement=expClass.toXML()
@@ -1778,7 +1781,7 @@ class Translator:
                     ET.SubElement(topicElement,'name').text=variable.variable
                 '''    standardName [0..1] '''
                 if variable.cfname :
-                    ET.SubElement(topicElement,'standardName',{'standard':'CF'}).text=variable.cfname.name
+                    self.addCVValue(topicElement,'standardName',variable.cfname.name,cvName='CF')
                 '''    description [0..1] '''
                 if variable.description :
                     ET.SubElement(topicElement,'description').text=variable.description
