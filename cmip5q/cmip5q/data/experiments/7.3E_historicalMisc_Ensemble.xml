@@ -163,7 +163,7 @@
         </requirementOption>
     </numericalRequirement>
     
-    <numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.172</id>
         <name xsi:type="Identifier">7.3E.Misc.ensemble</name>
         <description>Create multi-member ensembles initialised from different points in the control run</description>

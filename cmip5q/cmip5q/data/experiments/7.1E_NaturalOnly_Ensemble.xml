@@ -104,7 +104,7 @@
         <description>Imposed historical changing land use</description>
     </numericalRequirement>    
     
-    <numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.100</id>
         <name xsi:type="Identifier">7.1E.ensemble</name>
         <description>Create multi-member ensembles initialised from different points in the control run</description>

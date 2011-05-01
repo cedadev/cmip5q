@@ -84,7 +84,7 @@
         <description>Imposed constant background volcanic aerosol</description>
     </numericalRequirement>
     
-    <numericalRequirement>
+    <numericalRequirement xsi:type="BoundaryCondition">
         <id xsi:type="Identifier">bc.095</id>
         <name xsi:type="Identifier">4.3L.bc.ext2300</name>
         <description>RCP2.6 conditions extended through year 2300</description>
