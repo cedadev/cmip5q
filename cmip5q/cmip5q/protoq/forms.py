@@ -508,7 +508,7 @@ class GridForm(forms.ModelForm):
     
     class Meta:
         model=Grid
-        exclude=('centre','uri','topGrid','istopGrid','references','grids','paramGroup')   
+        exclude=('centre','uri','topGrid','istopGrid','references','grids','paramGroup','isParamGroup')   
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         #concatenate to allow the centre to be shown as well as the other parties tied to it.

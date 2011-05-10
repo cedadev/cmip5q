@@ -1069,6 +1069,7 @@ class Simulation(Doc):
             myCouplings=self.numericalModel.couplings(self)
             myOriginals=[i.original for i in myCouplings]
             logging.debug('Existing Couplings: %s'%myCouplings)
+            # Copy any new model couplings
             for m in modelCouplings:
                 if m not in myOriginals: 
                     r=m.copy(cgs)
