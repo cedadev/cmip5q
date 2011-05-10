@@ -27,70 +27,100 @@
     {% endif %}
 {% endblock %}
 
+<!--The main panel of a component page -->
 {% block mainpanel %}
-    <div class="boxer2">
-    <form action="{{urls.form}}" method='post' onsubmit="myProject.bypassConfirm()">
-        <div class="boxer">    
-            <table>
-                <tr>
-                  {% if c.isParamGroup %}
-                 	    <h1>{{c.abbrev}} </h1>
-                 	{% else %}
-                	<td class="inputH1">
-                		Short Name:&nbsp;{{cform.abbrev.errors}}
-                	</td>
-                	<td colspan="4">
-	                    {{cform.abbrev}}
-                	</td>
-               	  {% endif %}
-                </tr>
-                <tr>
-                  <td>Long Name:&nbsp;{{cform.title.errors}}</td>
-                  <td colspan="3">{{cform.title}}</td>
-                </tr>
-                <tr></tr>               
-            </table>
-        </div>
+  <div class="boxer2">
+    <form action="{{ urls.form }}" method='post' onsubmit="myProject.bypassConfirm()">
+      <div class="boxer">    
+        <table>
+          {% if c.isParamGroup %}
+            <tr>
+              <td class="inputH1">
+                {{ c.abbrev }} 
+                <div style="display: none;">
+                  <h1>
+                    {{ cform.abbrev }} 
+                  </h1>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td class="inputH1">
+                Short Name:&nbsp;{{ cform.abbrev.errors }}
+              </td>
+              <td colspan="4">
+	            {{ cform.abbrev }}
+              </td>
+            </tr>
+          {% endif %}
+          
+          <tr>
+            <td>
+              Long Name:&nbsp;{{ cform.title.errors }}
+            </td>
+            <td colspan="3">
+              {{ cform.title }}
+            </td>
+          </tr>
+          <tr>
+          </tr>               
+        </table>
+      </div>
         
-         {% if c.istopGrid %}
-	         <div style="display:none">
-	     {% else %}
-	         <div class="boxer">
-	     {% endif %}
+      {% if c.istopGrid %}
+        <div style="display:none">
+      {% else %}
+        <div class="boxer">
+      {% endif %}   
 	     
-	     
-	          <h4> Grid Attributes </h4>
-	          <p> In this section enter parameters and attributes associated with this grid.  <br>
-						
-	       	  {% include 'gridattributeform.html' %}
-	      
-	       	</div>
+        <h4> 
+          Grid Attributes 
+        </h4>
+        <p> 
+          In this section enter parameters and attributes associated with this grid.  
+        </p>
+		
+        {% include 'gridattributeform.html' %}
+   
+      </div>
       
-	      
-        
-        <div class="boxer"> 
-        
-        	{% if c.istopGrid %}
-        		 <h4> Description</h4>
-            	<center>
-            	<p class="guidance">Please provide a description for this grid.</p>
-            	<p>{{cform.description}}</p> 
-            	</center> 
-        	
-        	{% else %}
-        	
-	            <h4> Additional Information</h4>
-	            <center>
-	            <p class="guidance">Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
-	            <p>{{cform.description}}</p> 
-	            </center> 
-        	{% endif %}
+      <div class="boxer"> 
+        {% if c.istopGrid %}
+          <h4> 
+            Description
+          </h4>
+          <center>
+            <p class="guidance">
+              Please provide a description for this grid.
+            </p>
+            <p>
+              {{ cform.description }}
+            </p> 
+          </center>
+        {% else %}
+	      <h4> 
+	        Additional Information
+	      </h4>
+	      <center>
+	        <p class="guidance">
+	          Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).
+	        </p>
+	        <p>
+	          {{ cform.description }}
+	        </p> 
+	      </center> 
+        {% endif %}
            
-        </div>
-        <center><input id="updateButton1" type="submit" value="Save"/>
-        </center>
+      </div>
+       
+      <center>
+        <input id="updateButton1" type="submit" value="Save"/>
+      </center>
     </form>
-    </div><!-- boxer2 div -->
+  </div>
+  
+  <!-- boxer2 div -->
     
     {% if c.istopGrid %}
     <div class="boxer">
@@ -113,13 +143,13 @@
    
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
-        var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
-        var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
-        var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
-        var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
-        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
-        var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
-        var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
+  var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
+  var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
+  var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+  var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
+  var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
+  var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
+  var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
 </script>
 <!-- end of button javascript -->
 
