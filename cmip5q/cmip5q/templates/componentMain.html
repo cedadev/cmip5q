@@ -1,170 +1,313 @@
 {% extends "twopanel.html" %}
 
 {% block titlerow %}
-<table  width="100%"  class="{{c.qstatus}}">
-<tr >
-<td ><h1> Model {%if not c.isModel%} {% if c.isRealm %}Realm {% else %}Component{% endif%} {%endif%} {{c.abbrev }} </h1> </td> 
-    {% if c.controlled %} 
-       <td> {% if c.isComplete %} 
-            Complete and Submitted 
-        {% else %} Validation Status: {{c.status}} {% endif%}</td>
+<table width="100%" class="{{ c.qstatus }}">
+  <tr>
+    <td>
+      <h1> Model 
+            {% if not c.isModel %} 
+              {% if c.isRealm %} Realm {% else %} Component {% endif %} 
+            {% endif %} 
+            {{ c.abbrev }} 
+      </h1> 
+    </td>
+    {% if c.controlled %}
+      <td> 
+        {% if c.isComplete %} 
+          Complete and Submitted 
+        {% else %} 
+          Validation Status: {{ c.status }} 
+        {% endif %}
+      </td>
     {% else %}
-        <td>
-        <form action="{{urls.form}}" method="POST" onsubmit="myProject.bypassConfirm()">&nbsp;&nbsp;
-            <input type="hidden" name="deleteMe" value="1"/>
-            <input id="deleteButton" type="submit" value="Delete">
-        </form></td>
+      <td>
+        <form action="{{ urls.form }}" method="POST" onsubmit="myProject.bypassConfirm()">&nbsp;&nbsp;
+          <input type="hidden" name="deleteMe" value="1"/>
+          <input id="deleteButton" type="submit" value="Delete">
+        </form>
+      </td>
     {% endif %}
-    </tr></table>
+  </tr>
+</table>
 {% endblock %}
 
 {% block leftcolumn %}
-    <div class="boxer">
-        <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
-        <div class="boxer"><h4> Available Models </h4><div id="treeDiv"> {{navtree|safe}}</div>
-        <h4>Component {{c.abbrev}}</h4>
-        <p class="guidance"> Please add details of any other relevant
-        subcomponents of this component <p>
-        <p><form action="{{urls.subcomp}}" method="POST" onsubmit="myProject.bypassConfirm()">
-            <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/></form></p>
+  <div class="boxer">
+    <p class="red"> 
+      All buttons and links above and in this column navigate away from this page. Save your work first!
+    </p>
+  </div>
+  <div class="boxer">
+    <h4> 
+      Available Models 
+    </h4>
+    <div id="treeDiv"> 
+      {{ navtree|safe }}
     </div>
-    {% if isParamGroup %}
-    	<div class="boxer">
-	        <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
-	        <p><a id="txtlinkbut" href="{{urls.text}}">Export Text</a></p>
-	        {% include 'docbuttons.html' %}
-	    </div>
-    {% else %}
-	    <div class="boxer"> 
-	    <p> The button(s) in this box navigate to pages which further describe this <b>component</b>.</p>
-	        {% if not isModel %}<p><a id="inplinkbut" href="{{urls.inputs}}">Inputs Needed</a></p>{% endif %}
-	        <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
-	    </div>
-	    <div class="boxer">
-	        <p> The buttons in this box navigate to pages for this <b>model</b>.</p>
-	        <p><a id="cuplinkbut" href="{{urls.coupling}}"> Default Inputs</a></p> 
-	        <p><a id="txtlinkbut" href="{{urls.text}}">Export Text</a></p>
-	        {% include 'docbuttons.html' %}
-	    </div>
-    {% endif %}
+    <h4>
+      Component {{ c.abbrev }}
+    </h4>
+    <p class="guidance"> 
+      Please add details of any other relevant subcomponents of this component 
+    <p>
+    <p>
+      <form action="{{ urls.subcomp }}" method="POST" onsubmit="myProject.bypassConfirm()">
+        <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/>
+      </form>
+    </p>
+  </div>
+  
+  {% if isParamGroup %}
+    <div class="boxer">
+      <p> 
+        The buttons in this box navigate to pages for this <b>model</b>.
+      </p>
+	  <p>
+	    <a id="txtlinkbut" href="{{ urls.text }}">Export Text</a>
+  	  </p>
+	  {% include 'docbuttons.html' %}
+    </div>
+  {% else %}
+	<div class="boxer"> 
+	  <p> 
+	    The button(s) in this box navigate to pages which further describe this <b>component</b>.
+	  </p>
+	  {% if not isModel %}
+	    <p>
+	      <a id="inplinkbut" href="{{ urls.inputs }}">Inputs Needed</a>
+	    </p>
+	  {% endif %}
+	  <p>
+	    <a id="reflinkbut" href="{{ urls.refs }}"> References</a>
+	  </p>
+	</div>
+	<div class="boxer">
+	  <p> 
+	    The buttons in this box navigate to pages for this <b>model</b>.
+	  </p>
+	  <p>
+	    <a id="cuplinkbut" href="{{ urls.coupling }}"> Default Inputs</a>
+	  </p> 
+	  <p>
+	    <a id="txtlinkbut" href="{{ urls.text }}">Export Text</a>
+	  </p>
+	  {% include 'docbuttons.html' %}
+	</div>
+  {% endif %}
 {% endblock %}
 
+
+<!--The main panel of a component page -->
 {% block mainpanel %}
-    <div class="boxer2">
-    <form action="{{urls.form}}" method='post' onsubmit="myProject.bypassConfirm()">
-        <div class="boxer">    
-            <table>
-              {% if isParamGroup %}
+  <div class="boxer2">
+    <form action="{{ urls.form }}" method='post' onsubmit="myProject.bypassConfirm()">
+      <div class="boxer">    
+        <table>
+          {% if isParamGroup %}
+            <tr>
+              <td class="inputH1">
+                {{ c.abbrev }}
+                <div style="display: none;">
+                  <h1>
+                    {{ cform.abbrev }} 
+                  </h1>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td class="inputH1">
+                Short Name:&nbsp;* {{ cform.abbrev.errors }}
+              </td>
+              <td colspan="4">
+                {{cform.abbrev}}&nbsp;(type:&nbsp;{{ cform.scienceType }} {{ cform.viewableScienceType }})
+              </td>
+            </tr>
+              
+            {% if isModel %}
+              <tr>
+          	    <td colspan="4">
+          	      *The short name must match the official model name chosen for cmip5 - see <a href="http://esg-pcmdi.llnl.gov/internal/esg-data-node-documentation/cmip5_controlled_vocab.txt/view" target="_blank">here</a>
+          	    </td>
+          	  </tr>
+            {% endif %}
+              
+            {% if cform.showImplemented %}
+              {% if isModel %} 
+                {{ cform.implemented.as_hidden }}
+              {% else %} 
                 <tr>
                   <td>
-                    <h1>{{c.scienceType}} </h1>
+                    Implemented:&nbsp;{{ cform.implemented.errors }}
                   </td>
-                </tr>
-              {% else %}
-            	{% if isModel %}
-                <tr><td class="inputH1">Short Name:&nbsp;* {{cform.abbrev.errors}}</td>
-                {% else %}
-                <tr><td class="inputH1">Short Name:&nbsp;* {{cform.abbrev.errors}}</td>
-                {% endif %}
-                <td colspan="4">
-                  {{cform.abbrev}}&nbsp;(type:&nbsp;{{cform.scienceType}}{{cform.viewableScienceType}})
-                </td>
-                </tr>
-                
-                {% if isModel %}
-            	<tr>
-            	<td colspan="4">*The short name must match the official model name chosen for cmip5 - see <a href="http://esg-pcmdi.llnl.gov/internal/esg-data-node-documentation/cmip5_controlled_vocab.txt/view" target="_blank">here</a></td>
-            	</tr>
-                {% endif %}
-                
-                {% if cform.showImplemented %}
-                    {% if isModel %} {{cform.implemented.as_hidden}}
-                    {% else %} <tr><td>Implemented:&nbsp;{{cform.implemented.errors}}</td>
-                    <td colspan="3">{{cform.implemented}} 
-                        {% if cform.instance.implemented %} 
-                        Untick the box if there is no representation of {{cform.instance.scienceType}} in your model.
-                        {% else %} Tick the box to describe an implementation of {{cform.instance.scienceType}} 
-                        {% endif %}
-                    </td></tr> 
+                  <td colspan="3">
+                    {{ cform.implemented }} 
+                    {% if cform.instance.implemented %} 
+                      Untick the box if there is no representation of {{ cform.instance.scienceType }} in your model.
+                    {% else %} 
+                      Tick the box to describe an implementation of {{ cform.instance.scienceType }} 
                     {% endif %}
-                {% else %}{{cform.implemented.as_hidden}}{% endif %}
-              
+                  </td>
+                </tr> 
               {% endif %}
-              
-                <tr><td>Long Name:&nbsp;* {{cform.title.errors}}</td><td colspan="3">{{cform.title}}</td></tr> 
-                {% if isParamGroup %}
-                {% else %}
-	                <tr><td>Responsible Parties</td><td colspan="3">(Use the parties tab to add more choices here): </td></tr>
-	                <tr><td></td><td>Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}</td>
-	                             <td>Principal Investigator:&nbsp;{{cform.author.errors}}{{cform.author}}</td>
-	                             <td>Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}</td>
-	                             {% if isModel %}
-	                             {% else %}
-	                             <td>Copy Parties to sub-components <input type="checkbox" name="filterdown"/> </td>
-	                             {% endif %}
-	                </tr>
-	            {% endif %}
-                
-            </table>
-            <!-- Following is hidden -->
-            {{cform.controlled}} 
-        </div>
-        {% if isRealm or isModel %}
-        <div class="boxer">
-        <h4>Genealogy</h4>
-        <p>Year First  Released:&nbsp;{{cform.yearReleased.errors}}<img
-				src="/css/icons/information-icon.png"
-				title="The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade. " /> {{cform.yearReleased}}</p>
-        <center>
-        <p> Previous Version (name):&nbsp;{{cform.otherVersion.errors}}{{cform.otherVersion}} </p>
-        <p class="guidance">Please tell us how this component has been improved from that previous version. </p>
-        <p>{{cform.geneology.errors}}{{cform.geneology}}</p>
-            </center>
-        </div>
-        {% endif %}
-        <div class="boxer">
-			{% if isParamGroup %}
-				<h4> Component Attributes </h4>
-				<p> In this section enter parameters and attributes associated with this component</p>
-			{% endif %}
-            {% if isModel %}
-				<h4> Model Attributes </h4>
-				<p> In this section enter parameters and attributes associated with this model</p>
-			{% endif %}
-			{% if isRealm %}
-			<h4> Realm Attributes </h4>
-	        <p> In this section select a grid and enter parameters and attributes associated with this 
-	        {% if c.isModel %} model {% endif %}{% if c.isRealm %} realm {% endif %}
-	        {% if not c.isModel %} component {% endif %}</p>
-			{% endif %}
-        	
-        	
-        	{% if isParamGroup %}
             {% else %}
-            	{% if isModel %}
-            	{% else %}
-		            <div class="boxer">
-		            <h4> Grid </h4>
-		            <p> Please select an appropriate grid from those you have described using the grid tab </p>
-		            <p>Grid: {{cform.grid.errors}}{{cform.grid}}
-		            Copy Grid to sub-components <input type="checkbox" name="filterdowngrid"/>
-		            </p>
-		            </div>
-		        {% endif %}
+              {{cform.implemented.as_hidden}}
             {% endif %}
-            {% include 'attributeform.html' %}
+          {% endif %}
+            
+          <tr>
+            <td>
+              Long Name:&nbsp;* {{cform.title.errors}}
+            </td>
+            <td colspan="3">
+              {{cform.title}}
+            </td>
+          </tr> 
+          
+          {% if isParamGroup %}
+          {% else %}
+            <tr>
+              <td>
+                Responsible Parties
+              </td>
+              <td colspan="3">
+                (Use the parties tab to add more choices here): 
+              </td>
+            </tr>
+            <tr>
+              <td>
+              </td>
+              <td>
+                Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}
+              </td>
+              <td>
+                Principal Investigator:&nbsp;{{cform.author.errors}}{{cform.author}}
+              </td>
+              <td>
+                Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}
+              </td>
+              {% if isModel %}
+              {% else %}
+                <td>
+                  Copy Parties to sub-components <input type="checkbox" name="filterdown"/> 
+                </td>
+              {% endif %}
+            </tr>
+          {% endif %}
+              
+        </table>
+            
+        <!-- Following is hidden -->
+        {{cform.controlled}} 
+      </div>
+        
+        
+      {% if isRealm or isModel %}
+        <div class="boxer">
+          <h4>
+            Genealogy
+          </h4>
+          <p>
+            Year First Released:&nbsp;
+            {{ cform.yearReleased.errors }}
+            <img src="/css/icons/information-icon.png"
+            title="The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade." /> 
+	        {{ cform.yearReleased }}
+	      </p>
+	      <center>
+	        <p> 
+	          Previous Version (name):&nbsp;
+	          {{ cform.otherVersion.errors }}
+	          {{ cform.otherVersion }} 
+	        </p>
+	        <p class="guidance">
+	          Please tell us how this component has been improved from that previous version. 
+	        </p>
+	        <p>
+	          {{ cform.geneology.errors }}
+	          {{ cform.geneology }}
+	        </p>
+	      </center>
         </div>
+      {% endif %}
+        
+       <div class="boxer">
+      {% if isParamGroup %}
+		<h4> 
+		  Component Attributes 
+		</h4>
+		<p> 
+		  In this section enter parameters and attributes associated with this component
+		</p>
+	  {% endif %}
+         
+         {% if isModel %}
+		<h4> 
+		  Model Attributes 
+		</h4>
+		<p> 
+		  In this section enter parameters and attributes associated with this model
+		</p>
+	  {% endif %}
+	  
+	  {% if isRealm %}
+		<h4> 
+		  Realm Attributes 
+		</h4>
+        <p> 
+          In this section select a grid and enter parameters and attributes associated with this 
+          {% if c.isModel %} 
+            model 
+          {% endif %}
+          {% if c.isRealm %} 
+            realm 
+          {% endif %}
+          {% if not c.isModel %} 
+            component 
+          {% endif %}
+        </p>
+	  {% endif %}
+       	
+         {% if isParamGroup %}
+         {% else %}
+           {% if isModel %}
+           {% else %}
+	      <div class="boxer">
+	        <h4> 
+	          Grid 
+	        </h4>
+	        <p> 
+	          Please select an appropriate grid from those you have described using the grid tab 
+	        </p>
+	        <p>
+	          Grid: {{ cform.grid.errors }}{{ cform.grid }}
+	          Copy Grid to sub-components <input type="checkbox" name="filterdowngrid"/>
+	        </p>
+	      </div>
+	    {% endif %}
+         {% endif %}
+         
+         {% include 'attributeform.html' %}
+       
+       </div>
        
         <div class="boxer"> 
-            <h4> Additional Information</h4>
-            <center>
-            <p class="guidance">Please provide any further information that will help describe this component (in particular, if you have chosen "other" anywhere above, please provide details here).</p>
-            <p>{{cform.description}}</p> 
-            </center> 
+          <h4> 
+            Additional Information
+          </h4>
+          <center>
+            <p class="guidance">
+              Please provide any further information that will help describe this component (in particular, if you have chosen "other" anywhere above, please provide details here).
+            </p>
+            <p>
+              {{ cform.description }}
+            </p> 
+          </center> 
         </div>
-        <center><input id="updateButton1" type="submit" value="Save"/>
+        <center>
+          <input id="updateButton1" type="submit" value="Save"/>
         </center>
-    </form>
+      </form>
     </div><!-- boxer2 div -->
     
     {% if isParamGroup %}
@@ -207,26 +350,36 @@
     
     
     {% if isModel %}
-    <div class="boxer">
-        <h4> Required Inputs and Couplings </h4>
+      <div class="boxer">
+        <h4> 
+          Required Inputs and Couplings 
+        </h4>
         <table>
-        {% for bc in cset %}
-        <tr class="{%cycle  'row2' 'row1'%}"><td>{{bc.targetInput.ctype}}</td><td>{{bc}} uses {{bc.internalclosure_set.all|length}} internal link(s) and {{bc.externalclosure_set.all|length}} file link(s) by default.</tr>
-        {% endfor %}
+          {% for bc in cset %}
+            <tr class="{%cycle  'row2' 'row1'%}">
+              <td>
+                {{ bc.targetInput.ctype }}
+              </td>
+              <td>
+                {{ bc }} uses {{ bc.internalclosure_set.all|length }} internal link(s) and {{ bc.externalclosure_set.all|length }} file link(s) by default.
+              </td>
+            </tr>
+          {% endfor %}
         </table>
-    </div>
+      </div>
     {% endif %}
+<!--End of main panel of a component page -->
 
 
 <!-- button specific javascript follows -->
-<script  type="text/javascript"> 
-        var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
-        var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
-        var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
-        var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
-        var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
-        var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
-        var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
+<script type="text/javascript"> 
+  var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
+  var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
+  var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+  var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
+  var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
+  var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
+  var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
 </script>
 <!-- end of button javascript -->
 
