@@ -1,33 +1,48 @@
 {% extends "twopanel.html" %}
 
 {% block titlerow %}
-<table  width="100%"  class="{{c.qstatus}}">
-	<tr >
-		<td >
-			<h1> 
-				Grid {{c.abbrev }} 
-			</h1> 
-		</td> 
-	</tr>
+<table  width="100%"  class="{{ c.qstatus }}">
+  <tr>
+	<td>
+	  <h1> 
+		Grid {{c.abbrev }} 
+	  </h1> 
+	</td> 
+  </tr>
 </table>
 {% endblock %}
 
 {% block leftcolumn %}
-    <div class="boxer">
-        <p class="red"> All buttons and links above and in this column navigate away from this page. Save your work first!</p></div>
-        <div class="boxer"><h4> Grid Structure </h4><div id="treeDiv"> {{navtree|safe}}</div>
-        <h4>Grid {{c.abbrev}}</h4>
-    </div>
-    {% if c.istopGrid %}
-    <div class="boxer"> 
-    	<p> The button(s) in this box navigate to pages which further describe this <b>grid</b>.</p>
-        <p><a id="reflinkbut" href="{{urls.refs}}"> References</a></p>
-    </div>
-    {% else %}
-    {% endif %}
+<div class="boxer">
+  <p class="red">
+    All buttons and links above and in this column navigate away from this page. Save your work first!
+  </p>
+</div>
+<div class="boxer">
+  <h4> 
+    Grid Structure 
+  </h4>
+  <div id="treeDiv"> 
+    {{ navtree|safe }}
+  </div>
+  <h4>
+    Grid {{ c.abbrev }}
+  </h4>
+</div>
+
+{% if c.istopGrid %}
+  <div class="boxer"> 
+    <p> 
+      The button(s) in this box navigate to pages which further describe this <b>grid</b>.
+    </p>
+    <p>
+      <a id="reflinkbut" href="{{ urls.refs }}"> References</a>
+    </p>
+  </div>
+{% endif %}
 {% endblock %}
 
-<!--The main panel of a component page -->
+<!--The main panel of a grid page -->
 {% block mainpanel %}
   <div class="boxer2">
     <form action="{{ urls.form }}" method='post' onsubmit="myProject.bypassConfirm()">
@@ -37,7 +52,7 @@
             <tr>
               <td class="inputH1">
                 {{ c.abbrev }} 
-                <div style="display: none;">
+                <div style="display: none;">                  
                   <h1>
                     {{ cform.abbrev }} 
                   </h1>
@@ -85,8 +100,8 @@
    
       </div>
       
-      <div class="boxer"> 
-        {% if c.istopGrid %}
+      {% if c.istopGrid %}
+        <div class="boxer">
           <h4> 
             Description
           </h4>
@@ -98,21 +113,9 @@
               {{ cform.description }}
             </p> 
           </center>
-        {% else %}
-	      <h4> 
-	        Additional Information
-	      </h4>
-	      <center>
-	        <p class="guidance">
-	          Please provide any further information that will help describe this grid (in particular, if you have chosen "other" anywhere above, please provide details here).
-	        </p>
-	        <p>
-	          {{ cform.description }}
-	        </p> 
-	      </center> 
-        {% endif %}
+        </div>
+      {% endif %}
            
-      </div>
        
       <center>
         <input id="updateButton1" type="submit" value="Save"/>
@@ -122,23 +125,42 @@
   
   <!-- boxer2 div -->
     
-    {% if c.istopGrid %}
+  {% if c.istopGrid %}
     <div class="boxer">
-        <h4> References (associated with this grid) </h4>
-        {% if refs|length_is:0 %} 
-        <p class="guidance"> No references are yet associated with this grid. Use the "References" button (left menu) to add references.</p>
-        {% else %}
-        <p class="guidance"> Update this list using the reference button.</p>
+      <h4> 
+        References (associated with this grid) 
+      </h4>
+      {% if refs|length_is:0 %} 
+        <p class="guidance"> 
+          No references are yet associated with this grid. Use the "References" button (left menu) to add references.
+        </p>
+      {% else %}
+        <p class="guidance"> 
+          Update this list using the reference button.
+        </p>
         <table width="100%" class="backgrey">
-            <tr><th> Citation</th><th>Source</th></tr>
-            {% for r in refs%}
-            <tr><td >{{r.citation}}</td><td width="10%">(<a href="{{r.link}}">link</a>)</td></tr>
-            {% endfor %}
+          <tr>
+            <th> 
+              Citation
+            </th>
+            <th>
+              Source
+            </th>
+          </tr>
+          {% for r in refs %}
+            <tr>
+              <td>
+                {{ r.citation }}
+              </td>
+              <td width="10%">
+                (<a href="{{ r.link }}">link</a>)
+              </td>
+            </tr>
+          {% endfor %}
         </table>
-        {% endif %}
+      {% endif %}
     </div>
-    {% else %}
-    {% endif %}
+  {% endif %}
     
    
 <!-- button specific javascript follows -->
