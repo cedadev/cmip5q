@@ -8,7 +8,7 @@ from django.views.generic.simple import direct_to_template
 from django.contrib import admin
 admin.autodiscover()
 
-from cmip5q.protoq.models import DocFeed
+from cmip5q.protoq.feeds import DocFeed
 
 # this is not actually correct, since strictly we need hexadecimal following this pattern
 uuid='\w\w\w\w\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w\w\w\w\w\w\w\w\w'
@@ -144,9 +144,9 @@ urlpatterns = patterns('',
         
     # Atom Feeds
     (r'^feeds/(.*)/$', "django.contrib.syndication.views.feed", {
-        "feed_dict": {
-            "cmip5": DocFeed,
-        }}),
+        "feed_dict": {"cmip5": DocFeed,}
+        }
+    ),
 
     # Uncomment the next line to enable the admin:
     #(r'^admin/(.*)', admin.site.root),
