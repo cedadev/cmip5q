@@ -90,10 +90,9 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    #"/home/bnl/meta4q/cmip5q/templates"
-    #"/home/rupert/proj/metafor/venv/cmip5q/templates"
-    os.path.join(thisDir, "templates") 
+    os.path.join(thisDir, "templates")
             )
+
 TEMPLATE_STRING_IF_INVALID = 'what happened here?'
 
 STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css")
