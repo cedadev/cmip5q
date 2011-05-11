@@ -116,7 +116,7 @@ class DocFeed(Feed):
         return self._myurl(model)
     
     def feed_title(self, model):
-        return 'CMIP5 model %s metadata'%model
+        return 'CMIP5 %s metadata'%model
     
     def feed_subtitle(self,model):
         return 'Metafor questionnaire - completed %s documents'%model
