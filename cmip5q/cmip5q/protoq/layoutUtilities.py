@@ -45,16 +45,17 @@ class tabs(list):
         if 'Grid' not in request.session:request.session['Grid']=0
         #This is the list of tabs '''
         self.tablist=[#('Intro','cmip5q.protoq.views.intro',(centre_id,)),
-                 ('Summary','cmip5q.protoq.views.centre',(centre_id,),'left'),
-                 ('Experiments','cmip5q.protoq.views.simulationList',(centre_id,),'left'),
-                 ('Model','cmip5q.protoq.views.componentEdit',(centre_id,request.session['Model'],),'left'),
-                 ('Grid','cmip5q.protoq.views.gridEdit',(centre_id,request.session['Grid'],),'left'),
-                 ('Simulation','cmip5q.protoq.views.simulationEdit',(centre_id,request.session['Simulation'],),'left'),
-                 ('Files','cmip5q.protoq.views.list',(centre_id,'file',),'left'),
-                 ('References','cmip5q.protoq.views.list',(centre_id,'reference',),'left'),
-                 ('Parties','cmip5q.protoq.views.list',(centre_id,'parties',),'left'),
-                 ('Help','cmip5q.protoq.views.help',(centre_id,),'right'),
-                 ('About','cmip5q.protoq.views.about',(centre_id,),'right'),
+                 ('Summary', 'cmip5q.protoq.views.centre', (centre_id,), 'left'),
+                 ('Experiments', 'cmip5q.protoq.views.simulationList', (centre_id,), 'left'),
+                 ('Model', 'cmip5q.protoq.views.componentEdit', (centre_id, request.session['Model'],), 'left'),
+                 ('Grid', 'cmip5q.protoq.views.gridEdit', (centre_id, request.session['Grid'],) ,'left'),
+                 ('Simulation', 'cmip5q.protoq.views.simulationEdit', (centre_id, request.session['Simulation'],), 'left'),
+                 ('Files', 'cmip5q.protoq.views.list', (centre_id, 'file',), 'left'),
+                 ('References', 'cmip5q.protoq.views.list', (centre_id, 'reference',), 'left'),
+                 ('Parties', 'cmip5q.protoq.views.list', (centre_id, 'parties',), 'left'),
+                 ('Help', 'cmip5q.protoq.views.help', (centre_id,), 'right'),
+                 ('About', 'cmip5q.protoq.views.about', (centre_id,), 'right'),
+                 ('Log Out', 'right'),
                  ]
         for item in self.tablist:
             self.append(self.tabify(item,page))
@@ -64,7 +65,13 @@ class tabs(list):
     def tabify(self,item,page):
         if item[0] not in ['Simulation','Model','Grid']:
             #it's easy:
-            return tab(item[0],reverse(item[1],args=item[2]),page==item[0],item[3])
+            if item[0] not in ['Log Out']:
+                return tab(item[0], reverse(item[1], args=item[2]), 
+                           page==item[0], item[3])
+            else:
+                return tab(item[0], 
+                           'http://q.cmip5.ceda.ac.uk/logout?ndg.security.r=http%3A//q.cmip5.ceda.ac.uk/', 
+                           page==item[0], item[1])
         else:
             if item[2][1]==0:
                 return tab(item[0],'',-1, item[3])

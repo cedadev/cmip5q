@@ -1,9 +1,7 @@
-
 <html xmlns="http://www.w3.org/1999/xhtml" >
     <head>
         <link rel="stylesheet" href="/css/style.css" type="text/css" />
         <title>{% block title %}CMIP5 Model Metadata Questionnaire{% endblock %}</title>
-        <!-- YUI treeview stuff for head -->
         <!-- Connection Manager -->
         <script type="text/javascript" src="/css/yui/build/yahoo/yahoo-min.js"></script>
         <script type="text/javascript" src="/css/yui/build/event/event-min.js"></script>
@@ -22,19 +20,13 @@
         <script type="text/javascript" src="/css/jquery/jquery-checkformsave/jquery.checkformsave.js"></script>
         <script type="text/javascript" src="/css/jquery/jquery-dropdown-checklist/ui.dropdownchecklist-1.1-min.js"></script>
                
-        <!-- -->
         <link rel="stylesheet" type="text/css" href="/css/yui/build/treeview/assets/skins/sam/treeview.css">
         <link rel="stylesheet" type="text/css" href="/css/yui/build/button/assets/skins/sam/button.css"> 
         <link rel="stylesheet" type="text/css" href="/css/yui/build/container/assets/skins/sam/container.css" />
-        <link rel="stylesheet" href="/css/jquery/jquery-ui/jquery-ui-1.8.11.custom.css" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-ui/jquery-ui-1.8.11.custom.css" />
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-autocomplete/jquery.autocomplete.css"/>
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-collapsible/jquery.collapsible.css"/>
-        <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-dropdown-checklist/css/ui.dropdownchecklist.standalone.css"/>
-        
-        
-        <!-- end of YUI treeview stuff for head -->
-		
-        
+        <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-dropdown-checklist/css/ui.dropdownchecklist.standalone.css"/>       
     </head>
     <body class="yui-skin-sam">
         <div id="page">
@@ -50,7 +42,6 @@
                 <td width="100px" align="center"><img height="60" src="/css/icons/enes_logo.png"/></td>
                 </tr>
                 </table>
-                
             </div>
             <div id="banner">
                 <center class="red">The Questionnaire Support Team can be contacted on our dedicated email: <a href="mailto:cmip5qhelp@stfc.ac.uk">cmip5qhelp@stfc.ac.uk</a>  </center>
@@ -62,16 +53,16 @@
                 <td width="850px">
                 <div class="tabnav">
                     <ul>
-                    {% for tab in tabs %}
-                    {% ifequal tab.pos "left" %}
-                    <li {% ifequal tab.active 1 %} class="selected"{% endifequal %}{% ifequal tab.active -1 %} class="subdue"{% endifequal %}>
+                        {% for tab in tabs %}
+                            {% ifequal tab.pos "left" %}
+                                <li {% ifequal tab.active 1 %} class="selected"{% endifequal %}{% ifequal tab.active -1 %} class="subdue"{% endifequal %}>
                     <a href="{{tab.url}}">{{tab.name}}</a></li>
                     {% endifequal %}
                     {% endfor %}
                     </ul>
                 </div>
                 </td>
-                <td width="150px" align="right">
+                <td width="200px" align="right">
                 <div class="tabnav">
                     <ul>
                     {% for tab in tabs %}
