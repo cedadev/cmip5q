@@ -26,9 +26,9 @@
 .accordion a {...}
 */    
 
-a.trigger {border: 1px solid #dcdcdc; font-size: 13px; display:block; padding-left:20px; background-image: url(/css/images/plus.gif); background-repeat: no-repeat; background-position: 1px 50%;  font-weight:500}
+a.trigger {border: 1px solid #dcdcdc; font-size: 13px; display:block; padding-left:20px; background-image: url(/css/icons/plus.gif); background-repeat: no-repeat; background-position: 1px 50%;  font-weight:500}
 
-a.trigger.open {background-image: url(/css/images/minus.gif)}
+a.trigger.open {background-image: url(/css/icons/minus.gif)}
 
 #main a.trigger {background-color:transparent}
 
