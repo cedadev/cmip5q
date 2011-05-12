@@ -7,6 +7,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 from cmip5q.protoq.models import *
+from cmip5q.protoq.feeds import DocFeed
+
 from cmip5q.protoq.forms import *
 
 from cmip5q.protoq.yuiTree import *
@@ -74,25 +76,45 @@ def genericDoc(request,cid,docType,pkid,method):
     logging.debug('made it')
     return cmethod()
 
-def persistedDoc(request,docType,uri,version=0):
-    ''' persisted document handling'''
-    if docType not in ('platform','experiment','simulation','component','datacontainer'):
-            return HttpResponseBadRequest('Invalid document type requests - %s'%docType)
-    set=CIMObject.objects.filter(uri=uri)
-    if len(set)==0:
-        return render_badrequest('error.html',{'message':'Document with uri - %s - not found'%uri})
-    if version<>0:
+
+def persistedDoc(request, docType, uri, version=0):
+    ''' 
+       Persisted document handling : 
+       Will retrieve an xml document with a given uri and version number  
+    '''
+    
+    if docType not in ('platform', 'experiment', 'simulation', 'component', 
+                       'datacontainer'):
+        return HttpResponseBadRequest('Invalid document type requests - %s' 
+                                      %docType)
+    
+    set = CIMObject.objects.filter(uri=uri)
+    # Document doesn't exist in the database scenario
+    if len(set) == 0:
+        return render_badrequest('error.html', 
+                                 {'message':'Document with uri %s not found' %uri})
+    
+    # Handling different versions 
+    if version <> 0:
         try:
-            set=set.filter(documentVersion=version)
-            if len(set)<>1: 
-                logging.info('CIM Document Inconsistency - %s identical versions'%len(set))
+            set = set.filter(documentVersion=version)
+            # Should only be one version per uri
+            if len(set) <> 1: 
+                logging.info('CIM Document Inconsistency - %s identical versions'
+                             %len(set))
             obj=set.get(documentVersion=version)
         except:
-            logging.info('Attempt to retrieve %s with version %s failed'%(uri,version))
-            return render_badrequest('error.html',{'message':'Document with uri - %s - has no version %s'%(uri,version)})
+            logging.info('Attempt to retrieve %s with version %s failed' 
+                         %(uri, version))
+            return render_badrequest('error.html', 
+                                     {'message':'Document with uri %s has no version %s' 
+                                      %(uri, version)})
     else:
         obj=set[len(set)-1]
-    return HttpResponse(obj.xmlfile.read(),mimetype='application/xml')
+    
+    # generate an xml 
+    return HttpResponse(obj.xmlfile.read(), mimetype='application/xml')
+
     
 def exportFiles(request,cen_id):
     ''' Used to export all files to CMIP5 in one go '''

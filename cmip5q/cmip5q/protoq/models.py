@@ -178,49 +178,66 @@ class EditHistoryEvent(models.Model):
     # following will only means something to whatever creates the event.
     eventIdentifier=models.CharField(max_length=128)
 
+
 class Fundamentals(models.Model):
-    ''' These is an abstract class carrying fundamentals in common between CIM documents
-    as currently described in the questionnaire, and CIM documents as exported from the
-    questionnaire. It's a convenience class for the questionnaire alone '''
+    ''' 
+        These is an abstract class carrying fundamentals in common between 
+        CIM documents as currently described in the questionnaire, and CIM 
+        documents as exported from the questionnaire. It's a convenience class 
+        for the questionnaire alone 
+    '''
+    
     # The URI should only change if the thing described by the document changes.
-    # That is, once assigned, the URI never changes, and once exported, the document should persist.
-    # If the thing itself changes, we should copy the document, give it a new URI, and update it ...
-    # The uri appears in subclasses, because it needs to be unique in the Doc children, but is
-    # allowed to be duplicated in the CIMObjects (albeit not with the same metadataversion and 
-    # document version.
+    # That is, once assigned, the URI never changes, and once exported, the 
+    # document should persist. If the thing itself changes, we should copy the 
+    # document, give it a new URI, and update it ...
+    # The uri appears in subclasses, because it needs to be unique in the Doc 
+    # children, but is allowed to be duplicated in the CIMObjects (albeit not 
+    # with the same metadataversion anddocument version.
     #
-    # However, we can have descriptions which differ because the way we describe it has changed,
-    # if that happens, we should modify the version identifier which follows AND the documentVersion.
-    metadataVersion=models.CharField(max_length=128,editable=False)
-    # The following should only be updated when the document is valid, and the document has
-    # been exported as a new version. However, note that while it is possible in principle for
-    # this to change with subcomponents, it's not likely as currently implemented.
-    documentVersion=models.IntegerField(default=1,editable=False)
+    # However, we can have descriptions which differ because the way we
+    # describe it has changed, if that happens, we should modify the version 
+    # identifier which follows AND the documentVersion.
+    metadataVersion = models.CharField(max_length=128, editable=False)
+    
+    # The following should only be updated when the document is valid, and the 
+    # document has been exported as a new version. However, note that while it 
+    # is possible in principle for this to change with subcomponents, it's not 
+    # likely as currently implemented.
+    documentVersion = models.IntegerField(default=1, editable=False)
     
     class Meta:
         abstract=True
  
+ 
 class CIMObject(Fundamentals):
-    ''' This is an exported CIM object. Once exported, the questionnaire can't molest it,
-    but it's included here, because the questionnaire can return it '''
-    uri=models.CharField(max_length=64,editable=False)    
-    cimtype=models.CharField(max_length=64,editable=False)
-    xmlfile=models.FileField(upload_to='PersistedXML')
+    ''' 
+        This is an exported CIM object. Once exported, the questionnaire can't 
+        molest it, but it's included here, because the questionnaire can return 
+        it 
+    '''
+    
+    uri = models.CharField(max_length=64, editable=False)    
+    cimtype = models.CharField(max_length=64, editable=False)
+    xmlfile = models.FileField(upload_to='PersistedXML')
     #xmlfile=models.FileField(upload_to='../../../PersistedXML')
     # These are update by the parent doc, which is why they're not "fundamentals"
-    created=models.DateField(editable=False)
-    updated=models.DateField(editable=False)
+    created = models.DateField(editable=False)
+    updated = models.DateField(editable=False)
     # The following attributes are needed to provide "discovery" via atom entries:
-    author=models.ForeignKey('ResponsibleParty',blank=True,null=True,related_name='%(class)s_author')
-    title=models.CharField(max_length=128,blank=True,null=True)
-    description=models.TextField(blank=True)
+    author = models.ForeignKey('ResponsibleParty', blank=True, null=True, 
+                               related_name='%(class)s_author')
+    title = models.CharField(max_length=128, blank=True, null=True)
+    description = models.TextField(blank=True)
+    
     @models.permalink
     def get_absolute_url(self):
-        return ('cmip5q.protoq.views.persistedDoc',(self.cimtype,self.uri,self.documentVersion))
-    def save(self,*args,**kwargs):
-        ''' We should have a local save method to ensure the version policy is not broken '''
-        # FIXME
-        return Fundamentals.save(self,*args,**kwargs)
+        return ('cmip5q.protoq.views.persistedDoc', 
+                (self.cimtype, self.uri, self.documentVersion))
+    def save(self, *args, **kwargs):
+        # FIXME: We should have a local save method to ensure the version policy 
+        # is not broken
+        return Fundamentals.save(self, *args, **kwargs)
     
     
 class Doc(Fundamentals):
