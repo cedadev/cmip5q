@@ -1,59 +1,119 @@
 /* CSS numbers reminder 0,0,0,0 corresponds to top right bottom left */
 /* Generic css */
 
-* {margin:0;padding:0;font-family: Arial, Verdana, Helvetica, sans-serif;
-   line-height:1.7;color:#333;font-size:12px;}
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+    line-height: 1.7;
+    color: #333;
+    font-size: 12px;
+  }
 
-h1 {font-size:16px;}
+h1 {
+	font-size: 16px;
+	}
 
 body {
-    background-color:#aaa;
-    background-image:url(icons/hilbert.gif);
+    background-color: #aaa;
+    background-image: url(icons/hilbert.gif);
     width: 1120px; 
-    margin:auto; 
+    margin: auto; 
     height: 100%;
     }
     
-table,form {margin: 0; padding: 0; width:100%;}
-p {padding: 2px; }
-ol {padding-left:20px;}
-ul {padding-left:20px;}
+table,form {
+	margin: 0; 
+	padding: 0; 
+	width:100%;
+	}
+	
+p {
+	padding: 2px; 
+	}
+	
+ol {
+	padding-left: 20px;
+	}
+	
+ul {
+	padding-left:20px;
+	}
 
     
 /* metafor page layout follows, ie. header and footer */
 /* 5 px margin needed in header if we don't have the nifty corners, otherwise 0 (first one on the margin list */
-#header {text-align:center; padding: 5px 5px 5px 0px;
-margin: 5px 5px 5px 5px;  border-left: 1px solid  #3c78b5; border-right:1px solid  #3c78b5 ; border-bottom:1px solid  #3c78b5;clear:both; 
-}
-#subtitle {font-size:14px}
 
-#banner {text-align:center; border:1px; padding:2px;margin:5px;
-background-color:#FFFFFF;}
-#banner p {font-size:14px}
+#header {
+	text-align: center; 
+	padding: 5px 5px 5px 0px;
+    margin: 5px 5px 5px 5px;  
+    border-left: 1px solid #3c78b5; 
+    border-right: 1px solid  #3c78b5; 
+    border-bottom: 1px solid #3c78b5;
+    clear: both; 
+    }
+
+#subtitle {
+	font-size: 14px
+	}
+
+#banner {
+	text-align: center; 
+	border: 1px; 
+	padding: 2px; 
+	margin: 5px;
+    background-color: #FFFFFF;
+    }
     
-#footer {text-align:center; padding: 0px 0px 0px 0px;
-margin: 5px 5px 0px 5px; clear:both; 
-/*border-left: 1px solid #3c78b5; border-right: 1px solid #3c78b5; border-top: 1px solid #3c78b5; */
-font-weight:italic;
+#banner p {
+	font-size: 14px
+	}
+    
+#footer {
+	text-align: center; 
+	padding: 0px 0px 0px 0px;
+    margin: 5px 5px 0px 5px; 
+    clear: both; 
+	/*border-left: 1px solid #3c78b5; border-right: 1px solid #3c78b5; border-top: 1px solid #3c78b5; */
+    font-weight: italic;
 }
 
-.tabcontent {background-color:#FFFFFF;}
+.tabcontent {
+	background-color: #FFFFFF;
+	}
 
-.stfc {background-color:#003153}    
-.stfc td {color:white;}
-.stfc a.blue:link, a.blue:visited {color:white;border-bottom:0px}
-.stfc a.blue:hover {color:black;}
-.stfc h1 {color:white;}
-.stfc p {color:white}
+.stfc {
+	background-color:#003153
+	}    
+.stfc td {
+	color:white;
+	}
+.stfc a.blue:link, a.blue:visited {
+	color: white;
+	border-bottom: 0px
+	}
+.stfc a.blue:hover {
+	color: black;
+	}
+.stfc h1 {
+	color: white;
+	}
+.stfc p {
+	color:white
+	}
 
-#footer td {font-weight:bold;padding: 5px;}
+#footer td {
+	font-weight: bold;
+	padding: 5px;
+	}
 
 .main {
-background-color:#003153;
-border:1px solid #3C78B5;
-clear:both;
-margin:5px;
-padding:2px 2px 7px 2px;
+    background-color: #003153;
+    border: 1px solid #3C78B5;
+    clear: both;
+    margin: 5px;
+    padding: 2px 2px 7px 2px;
 }
 
 .inner {
