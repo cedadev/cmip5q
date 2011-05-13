@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+#coding:utf-8
+
+
 """
     External Script to tidy up the example and test centres of the CMIP5 
     questionnaire:
@@ -14,15 +18,14 @@
 
 import os
 import sys
-import datetime
 
 # putting project and application into sys.path  
-sys.path.insert(0, os.path.expanduser('../protoq'))
-sys.path.insert(1, os.path.expanduser('../../cmip5q'))
+sys.path.insert(0, os.path.expanduser('..\protoq'))
+sys.path.insert(1, os.path.expanduser('..\..\cmip5q'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
-from django.conf import settings
-logging=settings.LOG
+#from django.conf import settings #@UnresolvedImport
+#logging=settings.LOG
 
 from cmip5q.protoq.models import *
 
@@ -60,7 +63,7 @@ def copyToExCen():
     source.copy(TargetCentre)
    
 
-def tidytestarea():
+def tidyTestArea():
     """
     Tidy up the test area of the cmip5 questionnaire by:
     1. clearing out all info in test and example centres
@@ -81,4 +84,5 @@ def tidytestarea():
         
            
 if __name__ == '__main__':
-    tidytestarea()
+    tidyTestArea()
+
