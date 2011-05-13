@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 #coding:utf-8
 
-
 """
     External Script to tidy up the example and test centres of the CMIP5 
     questionnaire:
@@ -10,7 +9,7 @@
     2. Copy HadGEM2-ES model from met office to example centre
     
     TO USE: from cmip5q directory issue:
-       > python scripts/Tidy_example.py
+       > ./py scripts/Tidy_example.py (./py is the local badc directory python)
      
     Author: Gerard Devine, University of Reading
     Date: 12/05/2011
