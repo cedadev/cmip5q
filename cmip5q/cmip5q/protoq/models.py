@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from django import forms
-from django.forms.util import ErrorList
-from django.core.urlresolvers import reverse
-from django.db.models.query import CollectedObjects, delete_objects
-from django.db.models.fields.related import ForeignKey
-from django.contrib.sites.models import Site, RequestSite
+from django.contrib.contenttypes.models import ContentType #@UnresolvedImport
+from django.contrib.contenttypes import generic #@UnresolvedImport
+from django import forms #@UnresolvedImport
+from django.forms.util import ErrorList #@UnresolvedImport
+from django.core.urlresolvers import reverse #@UnresolvedImport
+from django.db.models.query import CollectedObjects, delete_objects #@UnresolvedImport
+from django.db.models.fields.related import ForeignKey #@UnresolvedImport
+from django.contrib.sites.models import Site, RequestSite #@UnresolvedImport
 
-from lxml import etree as ET
+from lxml import etree as ET #@UnresolvedImport
 
-from django.core import exceptions
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.core import exceptions #@UnresolvedImport
+from django.utils.translation import ugettext_lazy, ugettext as _ #@UnresolvedImport
 
-from django.db.models import permalink
-from django.core.files import File
+from django.db.models import permalink #@UnresolvedImport
+from django.core.files import File #@UnresolvedImport
 
 from atom import Feed
 from cmip5q.protoq.cimHandling import *
@@ -25,11 +25,11 @@ from cmip5q.XMLutilities import *
 from cmip5q.protoq.fields import *
 from cmip5q.protoq.dropdown import TimeLengthWidget
 
-from django.conf import settings
+from django.conf import settings #@UnresolvedImport
 logging=settings.LOG
-from django.core.files.base import ContentFile
-from django.db.models.query import QuerySet
-import types
+from django.core.files.base import ContentFile #@UnresolvedImport
+from django.db.models.query import QuerySet #@UnresolvedImport
+import types #@UnresolvedImport
 
 cimv='http://www.metaforclimate.eu/cim/1.4'
 gmd='http://www.isotc211.org/2005/gmd'
@@ -952,9 +952,9 @@ class OutputRequirement(GenericNumericalRequirement):
                  'averagingUnits':'FreqUnits',
                  'spatialResolutionUnits':'SpatialResolutionTypes'}
         for a in ['temporalAveraging','outputFrequency']:
-            self.__setattr__(a,getTextN(elem,a))
+            self.__setattr__(a, getTextN(elem,a))
         for a in ['frequencyUnits','averagingUnits','spatialResolution']:
-            vv=getTextN(elem,a)
+            vv = getTextN(elem,a)
             if vv:
                 v=Vocab.objects.get(name=myvocab[a])
                 try:
@@ -965,11 +965,11 @@ class OutputRequirement(GenericNumericalRequirement):
     
     
 class SpatialResolution(models.Model):
-    '''FIXME: This is currently unused and untested '''
+    # FIXME: This is currently unused and untested '''
     units=models.ForeignKey('Term',blank=True,null=True,related_name='sr_units')
     value=models.ForeignKey('Term',blank=True,null=True,related_name='sr_value')
     def __unicode__(self):
-        return '%s %s'%(value,units)
+        return '%s %s' % value, units
 
 class TimeAverage(models.Model):
     units=models.ForeignKey('Term')
@@ -1277,74 +1277,116 @@ class DataContainer(Doc):
         ordering=('centre','title')
             
 class DataObject(models.Model):
-    ''' Holds a variable within a data container '''
-    container=models.ForeignKey(DataContainer)
-    description=models.TextField()
-    # if the data object is a variable within a dataset at the target uri, give the variable
-    variable=models.CharField(max_length=128,blank=True)
+    ''' 
+    Holds a variable within a data container 
+    '''
+    container = models.ForeignKey(DataContainer)
+    description = models.TextField()
+    
+    # if the data object is a variable within a dataset at the target 
+    # uri, give the variable
+    variable = models.CharField(max_length=128, blank=True)
+    
     # and if possible the CF name
-    cfname=models.ForeignKey('Term',blank=True,null=True,related_name='data_cfname')
+    cfname=models.ForeignKey('Term', blank=True, null=True, 
+                             related_name='data_cfname')
+    
     # references (including web pages)
-    reference=models.ForeignKey(Reference,blank=True,null=True)
+    reference = models.ForeignKey(Reference, blank=True, null=True)
+    
     # not using this at the moment, but keep for later: csml/science type
-    featureType=models.ForeignKey('Term',blank=True,null=True)
+    featureType = models.ForeignKey('Term', blank=True, null=True)
+    
     # not using this at the moment, but keep for later:
-    drsAddress=models.CharField(max_length=256,blank=True)
-    def __unicode__(self): return self.variable
+    drsAddress = models.CharField(max_length=256, blank=True)
+    
+    def __unicode__(self): 
+        return self.variable
+    
     class Meta:
-        ordering=('variable',)
+        ordering = ('variable', )
+    
     
 class Dataset(Doc):
-    ''' Used to aggregate data containers together in the questionnaire.
-    It's a convenience class, not a full map into a CIM dataset '''
+    ''' 
+    Used to aggregate data containers together in the questionnaire.
+    It's a convenience class, not a full map into a CIM dataset 
+    '''
     # Expect to use this to aggregate the various files needed by a 
     # simulation into the number of datasets 
-    children=models.ManyToManyField(DataContainer)
-    # The following is not serialised, but helps discriminate internal to the questionnaire
-    usage=models.ForeignKey(Term)
-    # Either the dataset is associated with a simulation or an EnsembleMember, but
-    # they know that, the dataset is agnostic
+    children = models.ManyToManyField(DataContainer)
+    
+    # The following is not serialised, but helps discriminate internal to 
+    # the questionnaire
+    usage = models.ForeignKey(Term)
+    
+    # Either the dataset is associated with a simulation or an 
+    # EnsembleMember, but they know that, the dataset is agnostic
     def __unicode__(self): 
-        return '%s(%s)'%(self.usage,len(self.children.all().order_by('id')))
+        return '%s (%s)' %(self.usage, len(self.children.all().order_by('id')))
+
 
 class CouplingGroup(models.Model):
-    ''' This class is used to help manage the couplings in terms of presentation and
-    their copying between simulations '''
+    ''' 
+    This class is used to help manage the couplings in terms of presentation 
+    and their copying between simulations 
+    '''
     # parent component, must be a model for CMIP5:
-    component=models.ForeignKey(Component)
-    # may also be associated with a simulation, in which case there is an original
-    simulation=models.ForeignKey(Simulation,blank=True,null=True)
-    original=models.ForeignKey('CouplingGroup',blank=True,null=True)
+    component = models.ForeignKey(Component)
+    
+    # may also be associated with a simulation, in which case there is 
+    # an original
+    simulation = models.ForeignKey(Simulation, blank=True, null=True)
+    original = models.ForeignKey('CouplingGroup', blank=True, null=True)
+    
     # to limit the size of drop down lists, we have a list of associated files
-    associatedFiles=models.ManyToManyField(DataContainer,blank=True,null=True)
+    associatedFiles = models.ManyToManyField(DataContainer, 
+                                             blank=True,
+                                             null=True)
+    
     def duplicate4sim(self,simulation):
-        '''Make a copy of self, and associate with a simulation'''
+        ''' 
+        Make a copy of self, and associate with a simulation
+        '''
         # first make a copy of self
-        args=['component',]
-        kw={'original':self,'simulation':simulation}
-        for a in args:kw[a]=self.__getattribute__(a)
-        new=CouplingGroup(**kw)
+        args = ['component', ]
+        kw = {'original':self, 'simulation':simulation}
+        for a in args:
+            kw[a] = self.__getattribute__(a)
+        new = CouplingGroup(**kw)
         new.save()
+        
         #can't do the many to manager above, need to do them one by one
-        for af in self.associatedFiles.all().order_by('id'):new.associatedFiles.add(af)
+        for af in self.associatedFiles.all().order_by('id'):
+            new.associatedFiles.add(af)
+            
         # now copy all the individual couplings associated with this group
-        cset=self.coupling_set.all().order_by('id')
-        for c in cset: c.copy(new)
+        cset = self.coupling_set.all().order_by('id')
+        for c in cset: 
+            c.copy(new)
+            
         return new
+    
     def propagateClosures(self):
-        ''' This is a one stop shop to update all the closures from an original source
-        model coupling group to a simulation coupling group '''
-        if self.original is None:raise ValueError('No original coupling group available')
+        ''' 
+        This is a one stop shop to update all the closures from an 
+        original source model coupling group to a simulation coupling group 
+        '''
+        if self.original is None:
+            raise ValueError('No original coupling group available')
+        
         #start by finding all the couplings in this coupling set.
-        myset=self.coupling_set.all().order_by('id')
+        myset = self.coupling_set.all().order_by('id')
         for coupling in myset:
             # find all the relevant closures and copy them
             coupling.propagateClosures()          
-        return '%s couplings updated '%len(myset)
+        return '%s couplings updated' %len(myset)
     class Meta:
-        ordering=['component']
+        ordering = ['component']
     def __unicode__(self):
-        return 'Coupling Group for %s (simulation %s)'%(self.component,self.simulation)
+        return 'Coupling Group for %s (simulation %s)' %(self.component,
+                                                        self.simulation)
+
 
 class Coupling(models.Model):
     # parent coupling group
