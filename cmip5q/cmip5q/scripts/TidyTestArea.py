@@ -76,8 +76,8 @@ def copyPlatToNewCen(sourcePlat):
     # Retrieve and copy platform responsible parties
     platContact = copyRPToNewCen(sourcePlat.contact) 
     
-    p = Platform(abbrev = 'Example Platform',
-                 title = 'Example centre platform',
+    p = Platform(abbrev = sourcePlat.abbrev,
+                 title = sourcePlat.title + ' (Example version)',
                  centre = targetCentre,   
                  contact = platContact,                      
                  compiler = sourcePlat.compiler,
@@ -158,8 +158,8 @@ def copyCompToNewCen(sourceComp, model=None, realm=None):
         compContact = None      
     
     m = Component(
-              abbrev = 'Example Model',
-              title = 'Example centre model (Based on MOHC HADGEM2-ES)',
+              abbrev = sourceComp.abbrev,
+              title = sourceComp.title + ' (Example centre version)',
               centre = targetCentre,
               documentVersion = sourceComp.documentVersion,
               description = sourceComp.description,
@@ -229,6 +229,31 @@ def copyCompToNewCen(sourceComp, model=None, realm=None):
     return m
 
 
+def getDuplicatesForSim(s, origcoupling):
+    ''' 
+    Make a copy of self, and associate with a simulation
+    '''
+    cg = CouplingGroup(component = s.numericalModel, 
+                       simulation = s)
+    cg.save()
+    
+    cg.original = cg
+    cg.save()
+    
+    #can't do the many to manager above, need to do them one by one
+    for af in origcoupling.associatedFiles.all().order_by('id'):
+        cg.associatedFiles.add(af)
+        
+    # now copy all the individual couplings associated with this group
+    '''
+    cset = self.coupling_set.all().order_by('id')
+    for c in cset: 
+        c.copy(new)
+        
+    return new
+    '''
+
+
 def copyToNewCen():
     """
     Copy a full simulation from one centre to the targetCentre
@@ -248,8 +273,8 @@ def copyToNewCen():
     sourceComp = sourceSim.numericalModel
     newMod = copyCompToNewCen(sourceComp)
               
-    s = Simulation(abbrev ='Example_Sim', 
-                 title ='Example Simulation', 
+    s = Simulation(abbrev = sourceSim.abbrev, 
+                 title = sourceSim.title + ' (Example Version)', 
                  contact = sourceSim.contact, 
                  author = sourceSim.author, 
                  funder = sourceSim.funder,
@@ -263,6 +288,27 @@ def copyToNewCen():
                  drsMember = sourceSim.drsMember, 
                  centre = targetCentre)
     s.save()
+    
+    #now we need to get all the other stuff related to this simulation
+    # every simulation has it's own date range:
+    s.duration = sourceSim.duration.copy()
+    
+    for mm in sourceSim.inputMod.all().order_by('id'):
+        s.inputMod.add(mm)
+    for mm in sourceSim.codeMod.all().order_by('id'):
+        s.codeMod.add(mm)
+    
+    s._resetIO()
+    
+    s.save()
+    
+    # Get the current couplings for this simulation:
+    myCouplings = CouplingGroup.objects.filter(component=\
+        sourceSim.numericalModel).filter(simulation=sourceSim).order_by('id')
+    for coupling in myCouplings:
+        # Having to do this manually as opposed to using questionnaire code as
+        # we need to use the new component created
+        getDuplicatesForSim(s, coupling)
 
 
 def delElem(elem):
