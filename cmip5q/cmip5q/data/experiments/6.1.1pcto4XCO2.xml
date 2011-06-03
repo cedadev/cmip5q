@@ -32,7 +32,7 @@
             3.1_piControl concentration to quadrupling </description>
     </numericalRequirement>
 
-    <shortName> 6.1 1pctCo2 </shortName>
+    <shortName> 6.1 1pctCO2 </shortName>
     <longName> 6.1 1 percent per year CO2 </longName>
 
     <calendar>

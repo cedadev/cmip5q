@@ -113,7 +113,7 @@
         <description> Imposed 4XCO2 on the control experiment 6.7a</description>
     </numericalRequirement>
 
-    <shortName> 6.7b aqua4xco2 </shortName>
+    <shortName> 6.7b aqua4xCO2 </shortName>
     <longName> 6.7b 4xCO2 aqua planet </longName>
 
     <calendar>
