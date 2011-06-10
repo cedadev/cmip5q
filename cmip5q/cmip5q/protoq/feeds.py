@@ -138,7 +138,7 @@ class DocFeed(Feed):
         return 'urn:uuid:%s'%item.uri
     
     def item_title(self,item):
-        return item.title
+        return '%s - Version %s' %(item.title, item.documentVersion)
     
     def item_authors(self,item):
         if item.author is not None:
