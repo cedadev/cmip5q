@@ -93,7 +93,7 @@ class ComponentForm(forms.ModelForm):
     class Meta:
         model=Component
         exclude=('centre','uri','model','realm','isRealm','isModel','isParamGroup','visited',
-                 'references','components','paramGroup')
+                 'references','components','paramGroup', 'isComplete')
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         #concatenate to allow the centre to be shown as well as the other parties tied to it.

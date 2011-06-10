@@ -125,16 +125,19 @@ def soft_delete(obj,simulate=False):
     if not simulate: delete_objects(on_death_row)
     return True,{}
 
+
 class ChildQuerySet(QuerySet):
     ''' Used to support the queryset options on ParentModel'''
     def iterator(self):
         for obj in super(ChildQuerySet, self).iterator():
             yield obj.get_child_object()
 
+
 class ChildManager(models.Manager):
     ''' Used to provide a manager for children of a ParentModel '''
     def get_query_set(self):
         return ChildQuerySet(self.model)
+
 
 class ParentModel(models.Model):
     
@@ -334,18 +337,11 @@ class Doc(Fundamentals):
         if self.isComplete:
             return False,'This document has already been exported',None
         
-        #TODO Remove temporary validation bypass for met office
-        centre=Centre.objects.get(id=self.centre_id)
+        centre = Centre.objects.get(id=self.centre_id)
         
-        valid,html=self.validate()
-        
-        if centre.abbrev == 'MOHC':
-            logging.info('WARNING Exporting document for ESG regardless of validation state')
-            valid=True
-        else:
-            pass    
+        valid, html = self.validate()
             
-        self.isComplete=valid
+        self.isComplete = valid
         self.save(complete=self.isComplete) # make that completeness status last.
         if self.isComplete: 
             # now store the document ... 
@@ -354,8 +350,9 @@ class Doc(Fundamentals):
             for key in keys: attrs[key]=self.__getattribute__(key)
             cfile=CIMObject(**attrs)
             cfile.cimtype=self._meta.module_name
-            cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype,self.uri,self.documentVersion),
-                               ContentFile(self.xml()),save=False)
+            cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype, self.uri, 
+                                                self.documentVersion),
+                               ContentFile(self.xml()), save=False)
             cfile.title='%s (%s)'%(self.abbrev,self.title)
             cfile.save()
             return True,'Version %s of %s document %s has been permanently stored'%(self.documentVersion,cfile.cimtype,self.uri),cfile.get_absolute_url()
@@ -366,7 +363,7 @@ class Doc(Fundamentals):
     def __unicode__(self):
         return self.abbrev
    
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         ''' Used to decide what to do about versions. We only increment the document version
         number with changes once the document is considered to be complete and valid '''
         if 'complete' in kwargs:
@@ -1040,7 +1037,7 @@ class Simulation(Doc):
         s=Simulation(abbrev=self.abbrev+' dup',title='copy', 
                      contact=self.contact, author=self.author, funder=self.funder,
                      description=self.description, authorList=self.authorList,
-                     uri=atomuri(),
+                     uri=atomuri(), drsMember= self.drsMember, 
                      experiment=experiment,numericalModel=self.numericalModel,
                      ensembleMembers=1, platform=self.platform, centre=self.centre)
         s.save()

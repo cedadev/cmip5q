@@ -47,7 +47,7 @@ class cimHandler(object):
 
     def export(self):
         ''' Mark as complete and export to an atom feed '''
-        ok,msg,url=self.obj.export()
+        ok, msg, url = self.obj.export()
         html='<p>%s</p>'%msg
         urls=commonURLs(self.obj,{'persisted':url})
         del urls['export']
