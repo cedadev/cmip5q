@@ -774,8 +774,10 @@ class Translator:
                         conformant='false'
                     else :
                         conformant='true'
+                    
                     ''' description [0..1] '''
                     mappedConformanceType=string.lower(confClass.ctype.name)
+                    
                     if mappedConformanceType=='via combination' :
                         mappedConformanceType='combination'
                     confElement=ET.SubElement(conf1Element,'conformance',{'conformant':conformant,'type':mappedConformanceType})
@@ -784,22 +786,27 @@ class Translator:
                     ''' requirement [1..inf] '''
                     reqElement=ET.SubElement(confElement,'requirement')
                     # get experiment class as the reference
-                    ExperimentSet=Experiment.objects.filter(requirements=confClass.requirement)
+                    ExperimentSet=Experiment.objects.filter(requirements=confClass.requirement).filter(isDeleted=False)
                     assert len(ExperimentSet)==1, 'A requirement should have one and only one parent experiment.'
                     experiment=ExperimentSet[0]
                     assert confClass.requirement, 'There should be a requirement associated with a conformance'
+                    
                     if confClass.option :
                         #we have chosen a requirement option so use this ID in our reference
                         if confClass.option.docid:
                             reqID=confClass.option.docid
-                        else:
-                            #temporary until ids exist on all options
-                            reqID='temporaryid'
                     else :
                         # we have chosen a requirement so use this ID in our reference
                         reqID=confClass.requirement.docid
+                    
+                    # below to deal with situations where a user marks a 
+                    # conformance as 'not applicable' and does not choose one 
+                    # of the requirement options      
+                    #if len(reqID) == 0:
+                    if mappedConformanceType == 'not applicable' and len(reqID) == 0:
+                        reqID = GenericNumericalRequirement.objects.get(id=confClass.requirement.id).options.all()[0].docid
                         
-                    self.addCIMReference(experiment,reqElement,argName=reqID,argType='NumericalRequirement')
+                    self.addCIMReference(experiment, reqElement, argName=reqID, argType='NumericalRequirement')
                     # for each modelmod modification
                     for modClassBase in confClass.mod.all() :
                         modClass=modClassBase.get_child_object()
