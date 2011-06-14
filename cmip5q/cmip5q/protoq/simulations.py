@@ -208,26 +208,31 @@ class simulationHandler(object):
        
         #little class to monkey patch up the stuff needed for the template
         class etmp:
-            def __init__(self,abbrev,values,id):
-                self.abbrev=abbrev
-                self.values=values
-                self.id=id
-                self.url=reverse('cmip5q.protoq.views.viewExperiment',args=(c.id,id,))
-                self.new=reverse('cmip5q.protoq.views.simulationAdd',args=(c.id,id,))
+            def __init__(self, abbrev, values, id):
+                self.abbrev = abbrev
+                self.values = values
+                self.id = id
+                self.url = reverse('cmip5q.protoq.views.viewExperiment',
+                                 args=(c.id, id,))
+                self.new = reverse('cmip5q.protoq.views.simulationAdd', 
+                                 args=(c.id, id,))
                 
-        csims=Simulation.objects.filter(centre=c).filter(isDeleted=False)
-        cpurl=reverse('cmip5q.protoq.views.simulationCopy',args=(c.id,))
+        csims = Simulation.objects.filter(centre=c).filter(isDeleted=False)
+        cpurl = reverse('cmip5q.protoq.views.simulationCopy', args=(c.id, ))
 
         eset=Experiment.objects.all().filter(isDeleted=False)
         exp=[]
         for e in eset:
-            sims=e.simulation_set.filter(centre=c.id).filter(isDeleted=False)
-            for s in sims: s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id,))    
-            exp.append(etmp(e.abbrev,sims,e.id))
+            sims = e.simulation_set.filter(centre=c.id).filter(isDeleted=False)
+            for s in sims: 
+                s.url = reverse('cmip5q.protoq.views.simulationEdit', 
+                                args=(c.id,s.id,))    
+            exp.append(etmp(e.abbrev, sims, e.id))
 
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,'csims':csims,'cpurl':cpurl,
-            'tabs':tabs(request,c.id,'Experiments'),'notAjax':not request.is_ajax()})
+            'tabs':tabs(request,c.id,'Experiments'),
+            'notAjax':not request.is_ajax()})
  
     def conformanceMain(self,request):
         ''' Displays the main conformance view '''
