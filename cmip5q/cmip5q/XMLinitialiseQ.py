@@ -52,10 +52,18 @@ VocabList={'Realms':
                         'NUMAlink','SP Switch','Cray Interconnect','Fat Tree','Other'),
     
     #geneology 
-    'relations':('higherResoutionVersionOf','lowerResolutionVersionOf','laterVersionOf','fixedVersionOf'),
+    'relations':('higherResoutionVersionOf', 
+                 'lowerResolutionVersionOf', 
+                 'laterVersionOf', 
+                 'fixedVersionOf'),
 
     #types of conformance, just allow one.
-    'ConformanceTypes':('Standard Config','Via Inputs','Via Model Mods', 'Via Combination','Not Conformant'),
+    'ConformanceTypes':('Standard Config', 
+                        'Via Inputs', 
+                        'Via Model Mods', 
+                        'Via Combination', 
+                        'Not Conformant', 
+                        'Not Applicable'),
 
     # types of modification
     'ModificationTypes':('ModelMod','InputMod'),
