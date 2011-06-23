@@ -140,11 +140,11 @@
         In Grid <value-of select="../shortName" />, section horizontalResolution::HorizontalExtent, values must be provided for each of LatMin, LatMax, LonMin and LonMax
       </assert>
 
-      <assert test="not((@discretizationType='logically_rectangular') and not((../../esmModelGrid[@gridType = 'regular_gaussian']) or (../../esmModelGrid[@gridType = 'other']) or (../../esmModelGrid[@gridType = 'displaced_pole']) or (../../esmModelGrid[@gridType = 'tripolar']) or (../../esmModelGrid[@gridType = 'cubed_sphere']) or (../../esmModelGrid[@gridType = 'latitude-longitude']))) ">
+      <assert test="not((@discretizationType='logically_rectangular') and not((../../esmModelGrid[@gridType = 'regular_gaussian']) or (../../esmModelGrid[@gridType = 'other']) or (../../esmModelGrid[@gridType = 'displaced_pole']) or (../../esmModelGrid[@gridType = 'tripolar']) or (../../esmModelGrid[@gridType = 'cubed_sphere']) or (../../esmModelGrid[@gridType = 'regular_lat_lon']))) ">
           Grid Specification: Where GridDiscretization is 'logically_rectangular', GridType must be one of 'regular_gaussian', 'displaced_pole', 'tripolar', 'cubed_sphere', 'latitude-longitude' or 'other'
       </assert>
 
-      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'latitude-longitude']) ) and ( (string-length(horizontalResolution/property[name='NumberOfLatitudinalGridCells']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfLongitudinalGridCells']/value)=0) )  )">
+      <assert test="not( ( (@discretizationType='logically_rectangular') and (../../esmModelGrid[@gridType = 'regular_lat_lon']) ) and ( (string-length(horizontalResolution/property[name='NumberOfLatitudinalGridCells']/value)=0) or (string-length(horizontalResolution/property[name='NumberOfLongitudinalGridCells']/value)=0) )  )">
         Grid Specification: Where GridDiscretization is 'logically_rectangular' and GridType is 'latitude-longitude', values must be provided for both 'NumberOfLatitudinalGridCells' and 'NumberOfLongitudinalGridCells'
       </assert>
 
