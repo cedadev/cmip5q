@@ -131,8 +131,9 @@ class simulationHandler(object):
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
             
-            #check that drsoutput info exists and if not create some - this should only be temporary as drsOutput 
-            #only began being used after some simulatiuons were already in place
+            #check that drsoutput info exists and if not create some - this 
+            # should only be temporary as drsOutput only began being used 
+            # after some simulatiuons were already in place
             if s.id:
                 x = s.drsOutput.all()
                 if not x:
@@ -287,4 +288,3 @@ class simulationHandler(object):
         url=reverse('cmip5q.protoq.views.simulationCup',
                     args=(self.centreid,s.id,))
         return HttpResponseRedirect(url)
-                
