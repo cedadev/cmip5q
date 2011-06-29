@@ -108,6 +108,14 @@
     </rule>
   </pattern>
 
+  <pattern name="Simulation authorsList">
+    <rule context="//simulationRun/authorsList">
+      <assert test="string-length(list)!=0">
+        Values must be provided for the list element of a Simulation authorsList.
+      </assert>
+    </rule>
+  </pattern>
+
 <!-- GRID RULES BEGIN -->
 
 <pattern name="General Grid Rules">
