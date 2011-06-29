@@ -80,8 +80,8 @@ class simulationHandler(object):
             #urls['ics']=reverse('cmip5q.protoq.views.assign',
             #         args=(self.centreid,'inputmod','simulation',s.id,))        
         
-        # A the moment we're only assuming one related simulation so we don't have to
-        # deal with a formset
+        # A the moment we're only assuming one related simulation so we don't 
+        # have to deal with a formset
         rsims=s.related_from.all()
         if len(rsims):
             r=rsims[0]
@@ -101,13 +101,15 @@ class simulationHandler(object):
                     olddrs=s.drsMember
                     
                 news=simform.save()
-                logging.debug('model before %s, after %s'%(oldmodel,news.numericalModel))      
+                logging.debug('model before %s, after %s' %(oldmodel,news.numericalModel))      
                 
                 if news.numericalModel!=oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
                     
-                if news.drsMember!=olddrs:
+                logging.debug('drs before %s, after %s'%(olddrs, news.drsMember))
+                    
+                if news.drsMember!=olddrs or s.drsOutput.all().count() == 0:
                     s.updateDRS()
                 
             elif not simform.is_valid():
@@ -130,14 +132,6 @@ class simulationHandler(object):
             relform=SimRelationshipForm(s,instance=r,prefix='rel')
             simform=SimulationForm(instance=s,prefix='sim')
             simform.specialise(self.centre)
-            
-            #check that drsoutput info exists and if not create some - this 
-            # should only be temporary as drsOutput only began being used 
-            # after some simulatiuons were already in place
-            if s.id:
-                x = s.drsOutput.all()
-                if not x:
-                    s.updateDRS()
             
         
         # work out what we want to say about couplings

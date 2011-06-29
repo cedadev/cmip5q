@@ -1118,7 +1118,7 @@ class Simulation(Doc):
                      description = self.description, 
                      authorList = self.authorList,
                      uri = atomuri(), 
-                     drsMember = self.drsMember, 
+                     #drsMember = self.drsMember, 
                      experiment = experiment, 
                      numericalModel = self.numericalModel,
                      ensembleMembers = 1, 
@@ -1280,7 +1280,7 @@ class Simulation(Doc):
             for e in ecset:
                 if e.targetFile not in d.children.all().order_by('id'): d.children.add(e.targetFile)        
                 
-    def updateDRS(self, expname):
+    def updateDRS(self):
         ''' 
         Collect and store the information to be put in the drs string
         '''
@@ -1867,7 +1867,8 @@ class Grid(Doc):
     
 class DRSOutput(models.Model):
     ''' 
-    This is a holding class for how a simulation relates to it's output in the DRS 
+    This is a holding class for how a simulation relates to it's output in the 
+    DRS 
     '''
     activity = models.CharField(max_length=64)
     product = models.CharField(max_length=64)
@@ -1876,16 +1877,16 @@ class DRSOutput(models.Model):
     experiment = models.ForeignKey(Experiment)
     frequency = models.ForeignKey(Term, blank=True, null=True, 
                                   related_name='drs_frequency')
-    #frequency=models.CharField(max_length=64)
     realm = models.ForeignKey(Term, blank=True, null=True, 
                               related_name='drs_realm')
-    #realm=models.CharField(max_length=64)
     # the rip member value
     member = models.CharField(max_length=64)
     # we don't need to point to simulations, they point to this ...
     def __unicode__(self): 
-        #return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment,self.member)
-        #changing this to not include member explicitly as in an ensemble run we will include the rip meber at the ensmble level
+        #return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment, 
+        #self.member)
+        #changing this to not include member explicitly as in an ensemble run 
+        #we will include the rip meber at the ensmble level
          
         # In the case of decadal/noVolc experiments we want to first capture the 
         # date into the experiment name   
@@ -1893,7 +1894,8 @@ class DRSOutput(models.Model):
         if exptype in ["decadal", "noVolc"]:
             #get sim duration date
             expdate = str(self.simulation.duration.startDate.year)
-            return '%s_%s_%s' %(self.institute, self.model,str(self.experiment)+expdate)
+            return '%s_%s_%s' %(self.institute, self.model, 
+                                str(self.experiment)+expdate)
         else:
             return '%s_%s_%s' %(self.institute,self.model,self.experiment)
     
