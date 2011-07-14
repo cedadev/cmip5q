@@ -183,7 +183,7 @@ def centre(request,centre_id):
     for p in platforms:
         p.url=reverse('cmip5q.protoq.views.platformEdit',args=(c.id,p.id))
     
-    sims=Simulation.objects.filter(centre=c.id).filter(isDeleted=False)
+    sims=Simulation.objects.filter(centre=c.id).filter(isDeleted=False).order_by('abbrev')
     for s in sims:
         s.url=reverse('cmip5q.protoq.views.simulationEdit',args=(c.id,s.id))
     
@@ -206,7 +206,7 @@ def centre(request,centre_id):
     return render_to_response('centre.html',
         {'centre':c,'models':models,'platforms':platforms,
          'grids':grids,'refs':refs,'files':files,'parties':parties,
-        'newmod':newmodURL,'newplat':newplatURL,'newgrid':newgridURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
+        'newmod':newmodURL,'newplat':newplatURL,'newgrid':newgridURL,'sims':sublist(sims,1),'viewsimurl':viewsimURL,
         'tabs':tabs(request,c.id,'Summary'),'notAjax':not request.is_ajax()})
       
 #### COMPONENT HANDLING ###########################################################

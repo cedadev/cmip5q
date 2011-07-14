@@ -348,13 +348,24 @@ class CodeModForm(ModForm):
         ivocab=Vocab.objects.get(name='ModelModTypes')
         self.fields['mtype'].queryset=Term.objects.filter(vocab=ivocab)
 
+
 class PlatformForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'class':'optin','cols':"80",'rows':"4"}),required=False)
-    maxProcessors=forms.IntegerField(widget=forms.TextInput(attrs={'class':'optin','size':5}),required=False)
-    coresPerProcessor=forms.IntegerField(widget=forms.TextInput(attrs={'class':'optin','size':5}),required=False)
+    '''
+    Form for a computing platform
+    '''       
+    description = forms.CharField(widget=forms.Textarea(attrs={
+                                'class':'optin', 'cols':"60", 'rows':"4"}), 
+                                required=False)
+    maxProcessors = forms.IntegerField(widget=forms.TextInput(attrs={
+                                'class':'optin','size':10}), 
+                                required=False)
+    coresPerProcessor = forms.IntegerField(widget=forms.TextInput(attrs={
+                                'class':'optin', 'size':10}), 
+                                required=False)
     class Meta:
         model=Platform
-        exclude=('centre','uri','metadataMaintainer')        
+        exclude=('centre', 'uri', 'metadataMaintainer')        
+     
         
 class ReferenceForm(forms.ModelForm):
     citation=forms.CharField(widget=forms.Textarea({'cols':'140','rows':'2'}))
