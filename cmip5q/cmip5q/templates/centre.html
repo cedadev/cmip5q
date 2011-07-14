@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block content %}
 
-<div class="boxer">
-<h1> Summary: {{centre.name}} ({{centre.abbrev}}) </h1>
-</div>
-<div class="boxer">
-<h4> Introduction </h4>
-<p>Each CMIP5 modelling centre performs <em> Simulations </em> which run <em> Models </em> on <em> 
+{% block content %}
+  <div class="boxer titlerow">
+    Summary page for <b>{{centre.name}} ({{centre.abbrev}})</b>
+  </div>
+  <div class="boxer">
+    <h4> Introduction </h4>
+      <p>Each CMIP5 modelling centre performs <em> Simulations </em> which run <em> Models </em> on <em> 
 Platforms</em>. The purpose of this questionnaire is to glean information about these platforms, models and simulations and how the simulations conformed to the CMIP5 experiment requirements. We expect each centre to describe at least one platform, one model and multiple simulations following the workflow listed below: 
 <ol><li>Describe a Platform</li><li>Describe a Model and Grid</li><li>Describe some Simulations</li></ol>
 It is not possible to start entering simulation information until at least one model and one platform 
@@ -156,22 +156,33 @@ have been described. <br>  Each new platform, grid and model you create will be 
     <div class="boxer">
       <table width="100%">
         <thead>
-        <tr><th>Simulations associated with {{centre.abbrev}}</th><tr>
+          <tr>
+            <th>Simulations associated with {{centre.abbrev}}</th>
+          </tr>
         </thead>
         <tbody>
-        {% for sgroup in sims %}
-        <tr class="{% cycle 'row2' 'row1'%}"><td>{% for s in sgroup %} 
-           <span class="{{s.qstatus}}">
-           <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a></span>
-           <script type="text/javascript">
-                var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
-           </script>
-           {% endfor %}
-        {% endfor %}
-        <tr class="row3"><td><a id="viewSimBut" href="{{viewsimurl}}"> Manage Simulations (add new)</a></td></tr>
+          {% for sgroup in sims %}
+            <tr class="{% cycle 'row2' 'row1'%}">
+              <td>
+                {% for s in sgroup %} 
+                  <span class="{{s.qstatus}}">
+                    <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
+                  </span>
+                  <script type="text/javascript">
+                    var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
+                  </script>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+          <tr class="row3">
+            <td>
+              <a id="viewSimBut" href="{{viewsimurl}}"> Manage Simulations (add new)</a>
+            </td>
+          </tr>
         </tbody>
         <script type="text/javascript">
-            var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
+          var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
         </script>
       </table>
     </div>

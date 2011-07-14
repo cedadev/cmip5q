@@ -1,43 +1,47 @@
 {% extends "twopanel.html" %}
 
-{% block titlerow %}
-<table width="100%" class="{{ c.qstatus }}">
-  <tr>
-    <td>
-      <h1> Model 
-            {% if not c.isModel %} 
-              {% if c.isRealm %} Realm {% else %} Component {% endif %} 
-            {% endif %} 
-            {{ c.abbrev }} 
-      </h1> 
-    </td>
-    {% if c.controlled %}
-      <td> 
-        {% if c.isComplete %} 
-          Complete and Submitted 
-        {% else %} 
-          Validation Status: {{ c.status }} 
-        {% endif %}
-      </td>
-    {% else %}
-      <td>
-        <form action="{{ urls.form }}" method="POST" onsubmit="myProject.bypassConfirm()">&nbsp;&nbsp;
-          <input type="hidden" name="deleteMe" value="1"/>
-          <input id="deleteButton" type="submit" value="Delete">
-        </form>
-      </td>
+
+{% block titlerow %} 
+  Edit model
+  {% if not c.isModel %}
+    {% if c.isRealm %} 
+      realm 
+    {% else %} 
+      component {% endif %} 
+    {% endif %} 
+    <b>{{ c.abbrev }}</b>
+    for centre <b>{{c.centre}}</b>
+    
+  {% if c.controlled %}
+    {% if c.isComplete %} 
+      <p> Complete and Submitted </p>
+    {% else %} 
+      <!-- 
+      <p> Validation Status: {{ c.status }}</p>
+      -->
     {% endif %}
-  </tr>
-</table>
+  {% else %}
+    <td>
+      <form action="{{ urls.form }}" method="POST" 
+          onsubmit="myProject.bypassConfirm()">&nbsp;&nbsp;
+        <input type="hidden" name="deleteMe" value="1"/>
+        <input id="deleteButton" type="submit" value="Delete">
+      </form>
+    </td>
+  {% endif %}
 {% endblock %}
 
+
 {% block leftcolumn %}
+  
   <div class="boxer">
     <p class="red"> 
-      All buttons and links above and in this column navigate away from this page. Save your work first!
+      All buttons and links above and in this column navigate away from this 
+      page. Save your work first!
     </p>
   </div>
-  <div class="boxer">
+  
+  <div class="boxer sidebarbut">
     <h4> 
       Available Models 
     </h4>
@@ -52,47 +56,49 @@
     <p>
     <p>
       <form action="{{ urls.subcomp }}" method="POST" onsubmit="myProject.bypassConfirm()">
-        <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/>
+        <center>
+          <input id="sublinkbut" type="submit" name="CreateSub" value="Add Subcomponent"/>
+        </center>
       </form>
     </p>
   </div>
   
   {% if isParamGroup %}
-    <div class="boxer">
-      <p> 
-        The buttons in this box navigate to pages for this <b>model</b>.
-      </p>
-	  <p>
-	    <a id="txtlinkbut" href="{{ urls.text }}">Export Text</a>
-  	  </p>
+    <div class="boxer">  
 	  {% include 'docbuttons.html' %}
     </div>
   {% else %}
-	<div class="boxer"> 
+    <div class="boxer sidebarbut">
 	  <p> 
 	    The button(s) in this box navigate to pages which further describe this <b>component</b>.
 	  </p>
 	  {% if not isModel %}
 	    <p>
-	      <a id="inplinkbut" href="{{ urls.inputs }}">Inputs Needed</a>
+          <center>
+	        <a id="inplinkbut" href="{{ urls.inputs }}">Inputs Needed</a>
+          </center>
 	    </p>
 	  {% endif %}
 	  <p>
-	    <a id="reflinkbut" href="{{ urls.refs }}"> References</a>
+        <center> 
+	      <a id="reflinkbut" href="{{ urls.refs }}"> Attach References</a>
+        </center> 
 	  </p>
-	</div>
-	<div class="boxer">
-	  <p> 
-	    The buttons in this box navigate to pages for this <b>model</b>.
-	  </p>
+    </div>
+  
+    <div class="boxer sidebarbut">
+      <p> 
+        The buttons in this box navigate to pages for this <b>model</b>.
+      </p>
 	  <p>
-	    <a id="cuplinkbut" href="{{ urls.coupling }}"> Default Inputs</a>
-	  </p> 
-	  <p>
-	    <a id="txtlinkbut" href="{{ urls.text }}">Export Text</a>
+        <center> 
+	      <a id="cuplinkbut" href="{{ urls.coupling }}"> Default Inputs</a>
+        </center>
 	  </p>
+    </div>
+    <div class="boxer">  
 	  {% include 'docbuttons.html' %}
-	</div>
+    </div>
   {% endif %}
 {% endblock %}
 
@@ -101,248 +107,336 @@
 {% block mainpanel %}
   <div class="boxer2">
     <form action="{{ urls.form }}" method='post' onsubmit="myProject.bypassConfirm()">
-      <div class="boxer">    
+      
+      <!-- Error notification panel -->
+      {% if cform.errors %}
+        <div class="error_boxer">
+          <p>
+            This page contains errors. Please correct these before saving 
+          </p>
+        </div>
+      {% endif %}
+      
+      <!-- Main component information box --> 
+      <div class="boxer formbox">
+        <h3>
+          Top level information
+        </h3>
         <table>
           {% if isParamGroup %}
             <tr>
-              <td class="inputH1">
-                {{ c.abbrev }}
-                <div style="display: none;">
-                  <h1>
-                    {{ cform.abbrev }} 
-                  </h1>
-                </div>
-              </td>
+              <td width="3%"></td>
+              <td width="20%">Short Name*</td>
+              <td width="52%" class="inputH1">{{c.abbrev}}</td>
+              <td width="20%"></td>
+            </tr>    
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Long Name*</td>
+              <td width="52%">{{cform.title}}</td>
+              <td width="20%">{{cform.title.errors}}</td>
             </tr>
           {% else %}
             <tr>
-              <td class="inputH1">
-                Short Name:&nbsp;* {{ cform.abbrev.errors }}
-              </td>
-              <td colspan="4">
-                {{cform.abbrev}}&nbsp;(type:&nbsp;{{ cform.scienceType }} {{ cform.viewableScienceType }})
-              </td>
-            </tr>
-              
-            {% if isModel %}
-              <tr>
-          	    <td colspan="4">
-          	      *The short name must match the official model name chosen for cmip5 - see <a href="http://esg-pcmdi.llnl.gov/internal/esg-data-node-documentation/cmip5_controlled_vocab.txt/view" target="_blank">here</a>
-          	    </td>
-          	  </tr>
-            {% endif %}
+              <td width="3%"></td>
+              <td width="20%">Short Name*</td>
+              <td width="52%">{{cform.abbrev}} Type: {{ cform.scienceType }} {{ cform.viewableScienceType }}</td>
+              <td width="20%">{{cform.abbrev.errors}}</td>
+            </tr>  
+
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Long Name*</td>
+              <td width="52%">{{cform.title}}</td>
+              <td width="20%">{{cform.title.errors}}</td>
+            </tr>  
               
             {% if cform.showImplemented %}
               {% if isModel %} 
                 {{ cform.implemented.as_hidden }}
               {% else %} 
                 <tr>
-                  <td>
-                    Implemented:&nbsp;{{ cform.implemented.errors }}
+                  <td width="3%"> 
+                    {% if cform.instance.implemented %}
+                      <center>
+                        <img src="/css/icons/information-icon.png"
+                        title="Untick the box if there is no representation of {{ cform.instance.scienceType }} in your model" />
+                      </center>
+                    {% else %}
+                      <center>
+                        <img src="/css/icons/information-icon.png"
+                        title="Tick the box to describe an implementation of {{ cform.instance.scienceType }}" />
+                      </center> 
+                    {% endif %}  
                   </td>
-                  <td colspan="3">
-                    {{ cform.implemented }} 
-                    {% if cform.instance.implemented %} 
-                      Untick the box if there is no representation of {{ cform.instance.scienceType }} in your model.
-                    {% else %} 
-                      Tick the box to describe an implementation of {{ cform.instance.scienceType }} 
-                    {% endif %}
+                  <td width="20%">
+                    Implemented
                   </td>
+                  <td width="52%"> {{ cform.implemented }} </td>
+                  <td width="20%">{{cform.implemented.errors}}</td>
                 </tr> 
               {% endif %}
             {% else %}
               {{cform.implemented.as_hidden}}
             {% endif %}
           {% endif %}
-            
-          <tr>
-            <td>
-              Long Name:&nbsp;* {{cform.title.errors}}
-            </td>
-            <td colspan="3">
-              {{cform.title}}
-            </td>
-          </tr> 
-          
-          {% if isParamGroup %}
-          {% else %}
-            <tr>
-              <td>
-                Responsible Parties
-              </td>
-              <td colspan="3">
-                (Use the parties tab to add more choices here): 
-              </td>
-            </tr>
-            <tr>
-              <td>
-              </td>
-              <td>
-                Contact:&nbsp;{{cform.contact.errors}}{{cform.contact}}
-              </td>
-              <td>
-                Principal Investigator:&nbsp;{{cform.author.errors}}{{cform.author}}
-              </td>
-              <td>
-                Funder:&nbsp;{{cform.funder.errors}}{{cform.funder}}
-              </td>
-              {% if isModel %}
-              {% else %}
-                <td>
-                  Copy Parties to sub-components <input type="checkbox" name="filterdown"/> 
-                </td>
-              {% endif %}
-            </tr>
-          {% endif %}
-              
         </table>
-            
-        <!-- Following is hidden -->
-        {{cform.controlled}} 
-      </div>
-        
-        
-      {% if isRealm or isModel %}
-        <div class="boxer">
-          <h4>
-            Genealogy
-          </h4>
-          <p>
-            Year First Released:&nbsp;
-            {{ cform.yearReleased.errors }}
-            <img src="/css/icons/information-icon.png"
-            title="The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade." /> 
-	        {{ cform.yearReleased }}
-	      </p>
-	      <center>
-	        <p> 
-	          Previous Version (name):&nbsp;
-	          {{ cform.otherVersion.errors }}
-	          {{ cform.otherVersion }} 
-	        </p>
-	        <p class="guidance">
-	          Please tell us how this component has been improved from that previous version. 
-	        </p>
-	        <p>
-	          {{ cform.geneology.errors }}
-	          {{ cform.geneology }}
-	        </p>
-	      </center>
+        {% if isModel %}
+	      <div class="helper_boxer">
+	        *The short name must match the official model name chosen 
+	        for cmip5 - see <a href="http://esg-pcmdi.llnl.gov/internal/esg-data-node-documentation/cmip5_controlled_vocab.txt/view" target="_blank">here</a>
+	      </div>
+	    {% endif %}
+      </div>      
+      
+      {% if isParamGroup %}
+      {% else %} 
+        <div class="boxer formbox">
+          <h3>
+            Responsible Parties
+          </h3>
+          
+          <p class="subheading">
+            Use the parties tab to add more choices here
+          </p>
+
+          <table>
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Contact</td>
+              <td width="52%">{{cform.contact}}</td>
+              <td width="20%">{{cform.contact.errors}}</td>
+            </tr>
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Principal Investigator</td>
+              <td width="52%">{{cform.author}}</td>
+              <td width="20%">{{cform.author.errors}}</td>
+            </tr>
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Funder</td>
+              <td width="52%">{{cform.funder}}</td>
+              <td width="20%">{{cform.funder.errors}}</td>
+            </tr> 
+          </table>
+          <table>
+            <tr>
+              <td width="3%">
+                <center>
+                  <img src="/css/icons/information-icon.png"
+                   title="Ticking the box will copy each of the described responsible parties to all child components of the current component" />
+                </center>
+              </td>
+              <td width="20%">Copy Parties to sub-components </td>
+              <td width="52%"> 
+                <input type="checkbox" name="filterdown"/>
+              </td>
+              <td width="20%"></td>
+            </tr>
+          </table>        
+          <!-- Following is hidden -->
+          {{cform.controlled}} 
         </div>
       {% endif %}
         
-       <div class="boxer">
-      {% if isParamGroup %}
-		<h4> 
-		  Component Attributes 
-		</h4>
-		<p> 
-		  In this section enter parameters and attributes associated with this component
-		</p>
-	  {% endif %}
-         
-         {% if isModel %}
-		<h4> 
-		  Model Attributes 
-		</h4>
-		<p> 
-		  In this section enter parameters and attributes associated with this model
-		</p>
-	  {% endif %}
-	  
-	  {% if isRealm %}
-		<h4> 
-		  Realm Attributes 
-		</h4>
-        <p> 
-          In this section select a grid and enter parameters and attributes associated with this 
-          {% if c.isModel %} 
-            model 
-          {% endif %}
-          {% if c.isRealm %} 
-            realm 
-          {% endif %}
-          {% if not c.isModel %} 
-            component 
-          {% endif %}
-        </p>
-	  {% endif %}
-       	
-         {% if isParamGroup %}
-         {% else %}
-           {% if isModel %}
-           {% else %}
-	      <div class="boxer">
-	        <h4> 
-	          Grid 
-	        </h4>
-	        <p> 
-	          Please select an appropriate grid from those you have described using the grid tab 
-	        </p>
-	        <p>
-	          Grid: {{ cform.grid.errors }}{{ cform.grid }}
-	          Copy Grid to sub-components <input type="checkbox" name="filterdowngrid"/>
-	        </p>
-	      </div>
-	    {% endif %}
-         {% endif %}
-         
-         {% include 'attributeform.html' %}
-       
-       </div>
-       
-        <div class="boxer"> 
-          <h4> 
-            Additional Information
-          </h4>
-          <center>
-            <p class="guidance">
-              Please provide any further information that will help describe this component (in particular, if you have chosen "other" anywhere above, please provide details here).
-            </p>
-            <p>
-              {{ cform.description }}
-            </p> 
-          </center> 
+        
+      {% if isRealm or isModel %}
+        <div class="boxer formbox">
+          <h3>
+            Genealogy
+          </h3>
+          <table>
+            <tr>
+              <td width="3%">
+                <center> 
+                  <img src="/css/icons/information-icon.png"
+                  title="The year first released applies to the version you are describing in this questionnaire. If this version is a substantial upgrade to a previous version, please provide the name of that previous version and some key scientific details of the upgrade." />
+                </center>
+              </td>
+              <td width="20%">Year First Released</td>
+              <td width="52%">{{cform.yearReleased}}</td>
+              <td width="20%">{{cform.yearReleased.errors}}</td>
+            </tr>
+            <tr>
+              <td width="3%"></td>
+              <td width="20%">Previous Version/Name</td>
+              <td width="52%">{{cform.otherVersion}}</td>
+              <td width="20%">{{cform.otherVersion.errors}}</td>
+            </tr>
+            <tr>
+              <td width="3%"> 
+                <center>
+                  <img src="/css/icons/information-icon.png"
+                  title="Please tell us how this component has been improved from that previous version" /> 
+                </center>
+              </td>
+              <td width="20%">Description</td>
+              <td width="52%">{{cform.geneology}}</td>
+              <td width="20%">{{cform.geneology.errors}}</td>
+            </tr> 
+          </table>    
         </div>
-        <center>
-          <input id="updateButton1" type="submit" value="Save"/>
-        </center>
-      </form>
-    </div><!-- boxer2 div -->
+      {% endif %}
+        
+
+      <div class="boxer formbox">  
+        {% if isParamGroup %}
+		  <h3> 
+		    Component Attributes 
+		  </h3>
+		  <p class="subheading"> 
+		    In this section enter parameters and attributes associated with this component
+		  </p>
+	    {% endif %}
+         
+        {% if isModel %}
+		  <h3> 
+            Model Attributes 
+		  </h3>
+		  <p class="subheading"> 
+		    In this section enter parameters and attributes associated with this model
+		  </p>
+	    {% endif %}
+	  
+	    {% if isRealm %}
+		  <h3> 
+		    Realm Attributes 
+		  </h3>
+          <p class="subheading"> 
+            In this section select a grid and enter parameters and attributes associated with this realm 
+          </p>
+	    {% endif %}
+       	
+        {% if isParamGroup %}
+        {% else %}
+          {% if isModel %}
+          {% else %}
+            <div class="innerboxer formbox">
+              <h3> Grid </h3>
+              <p class="subheading">
+                Please select an appropriate grid from those you have described 
+                using the grid tab
+              </p>
+              <table>
+                <tr>
+                  <td width="3%"></td>
+                  <td width="20%">Grid</td>
+                  <td width="52%">{{cform.grid}}</td>
+                  <td width="20%">{{cform.grid.errors}}</td>
+                </tr>
+              </table>
+              <table>
+                <tr>
+                  <td width="3%">
+                  <center>
+                    <img src="/css/icons/information-icon.png"
+                      title="Ticking the box will copy the selected grid to all child components of the current component" />
+                  </center>
+                  </td>
+                  <td width="20%"> 
+                    Copy Grid to sub-components 
+                  </td>
+                  <td width="52%">                
+                    <input type="checkbox" name="filterdowngrid"/>
+                  </td>
+                  <td width="20%"></td>
+                </tr>  
+              </table>
+            </div>
+          {% endif %}
+        {% endif %}   
+      
+        {% include 'attributeform.html' %}
+      
+    </div>
+       
+    <div class="boxer formbox"> 
+      <h3> 
+        Additional Information
+      </h3>
+      <center>
+        <div class="helper_boxer">
+          Please provide any further information that will help describe 
+          this component (in particular, if you have chosen "other" 
+          anywhere above, please provide details here).
+        </div>
+        <p>
+          {{ cform.description }}
+        </p> 
+      </center> 
+    </div>
+    <center>
+      <input class="saveBut" type="submit" value="Save"/>
+    </center>
+
+  </form>
+</div><!-- boxer2 div -->
     
     {% if isParamGroup %}
     {% else %}
-	    <div class="boxer">
-	        <h4> Inputs required by this component</h4>
-	        {% if inps|length %}
-	            <table>
-	            <tr><th> Type </th><th> Short Name </th><th>Description </th></tr>
-	            {% for i in inps %}
-	            <tr class="{%cycle  'row2' 'row1'%}">
-	            <td>{{i.ctype}}</td><td>{{i.abbrev}}</td><td>{{i.description}}</td><tr>
-	            {% endfor %} 
-	            </table>
-	            <p class="guidance"> Update this list using the "Inputs Needed" button </p>
-	        {% else %}
-	            <p class="guidance"> No inputs are yet associated with this component. Use the "Inputs Needed" (left menu) button to add required inputs as necessary.</p>
-	        {% endif %}
-	        {% if isRealm %}
-	            <p> It is possible that the components below this "realm" do not provide a sensible place to
-	            put all the scientifically important inputs which might be required by this realm. If so, please describe them here!</p>
-	        {% endif %}
+	  <div class="boxer">
+	    <h4> Inputs required by this component</h4>
+        <p class="subheading"> 
+          Update this list using the "Inputs Needed" button 
+        </p>
+	    {% if inps|length %}
+	      <table>
+	        <tr>
+              <th> Type </th>
+              <th> Short Name </th>
+              <th>Description </th>
+            </tr>
+	        {% for i in inps %}
+	          <tr class="{%cycle  'row2' 'row1'%}">
+	            <td> {{i.ctype}} </td>
+                <td> {{i.abbrev}} </td>
+                <td> {{i.description}} </td>
+              <tr>
+	        {% endfor %} 
+	      </table>
+	    {% else %}
+	      <div class="helper_boxer"> 
+            No inputs are yet associated with this component. Use the "Inputs 
+            Needed" (left menu) button to add required inputs as necessary.
+          </div>
+	    {% endif %}
+	    {% if isRealm %}
+	      <div class="helper_boxer"> 
+            It is possible that the components below this "realm" do not 
+            provide a sensible place to put all the scientifically important 
+            inputs which might be required by this realm. If so, please describe 
+            them here!
+          </div>
+	    {% endif %}
 	    </div>
 	    
 	    <div class="boxer">
 	        <h4> References (associated with this component) </h4>
+	        <p class="subheading"> 
+              Update this list using the reference button.
+            </p>
 	        {% if refs|length_is:0 %} 
-	        <p class="guidance"> No references are yet associated with this component. Use the "References" button (left menu) to add references.</p>
+	        <div class="helper_boxer"> 
+              No references are yet associated with this component. Use the 
+              "References" button (left menu) to add references.
+            </div>
 	        {% else %}
-	        <p class="guidance"> Update this list using the reference button.</p>
 	        <table width="100%" class="backgrey">
-	            <tr><th> Citation</th><th>Source</th></tr>
-	            {% for r in refs%}
-	            <tr><td >{{r.citation}}</td><td width="10%">(<a href="{{r.link}}">link</a>)</td></tr>
-	            {% endfor %}
+	          <tr>
+                <th> Citation</th>
+                <th>Source</th>
+              </tr>
+	          {% for r in refs%}
+	            <tr>
+                  <td >{{r.citation}}</td>
+                  <td width="10%">
+                    <center>
+                      <a href="{{r.link}}">link</a>
+                    </center>
+                  </td>
+                </tr>
+	          {% endfor %}
 	        </table>
 	        {% endif %}
 	    </div>
@@ -375,7 +469,6 @@
 <script type="text/javascript"> 
   var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
   var oLinkButton6 = new YAHOO.widget.Button("cuplinkbut"); 
-  var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
   var oLinkButton8 = new YAHOO.widget.Button("inplinkbut"); 
   var oLinkButton4 = new YAHOO.widget.Button("sublinkbut",{value:"sublinkbutValue"}); 
   var oSubmitButton1 = new YAHOO.widget.Button("updateButton1",{value:"updateButton1value"}); 
