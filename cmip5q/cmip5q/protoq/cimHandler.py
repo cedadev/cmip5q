@@ -6,8 +6,11 @@ from django.core.urlresolvers import reverse
 
 def commonURLs(obj,dictionary):
     '''Add urls for the common methods to a dictionary for use in a template '''
-    for key in ['validate','xml','cimView','export']:
+    for key in ['validate','xml','cimView']:
         dictionary[key]=reverse('cmip5q.protoq.views.genericDoc',args=(obj.centre.id,obj._meta.module_name,obj.id,key))
+    
+    if str(obj.centre) not in ['1. Example', '2. Test Centre',]:
+        dictionary['export']=reverse('cmip5q.protoq.views.genericDoc',args=(obj.centre.id,obj._meta.module_name,obj.id,'export'))
     return dictionary
     
 class cimHandler(object):
