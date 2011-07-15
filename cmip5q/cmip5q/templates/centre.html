@@ -42,16 +42,29 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tbody>
           {% for m in platforms %}
 	        <tr class="{% cycle 'row2' 'row1'%}" >
-	          <td width="65%">{{m.abbrev}}</td>
-	          <td><span class="{{m.qstatus}}"><a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">Edit</a></span></td>
+	          <td width="70%">{{m.abbrev}}</td>
+	          <td width="15%">
+                <center>
+                  <span class="{{m.qstatus}}">
+                    <a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">
+                      Edit
+                    </a>
+                  </span>
+                </center>
+                <td width="15%" />
+              </td>
 	        </tr>
 	        <script type="text/javascript">
 	            var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
 	        </script>
           {% endfor %}
         </tbody>
-        <tr class="row3"><td colspan="2"><a id="newPlatButton" href="{{newplat}}">Add a new Platform</a></td></tr>
       </table>
+      
+      <center>
+        <a class="addnewbut" id="newPlatButton" href="{{newplat}}">Add a new Platform</a>
+      </center>
+      
       <script type="text/javascript">
         var newplatButton = new YAHOO.widget.Button("newPlatButton"); 
       </script>
@@ -71,23 +84,39 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tbody> 
 	      {% for g in grids %}
 	        <tr class="{% cycle 'row2' 'row1'%}">
-	            <td width="65%">{{g.abbrev}}</td>
-	            <td><span class="{{g.qstatus}}"> <a id="edGridButton{{forloop.counter}}" href="{{g.url}}">Edit</a></span></td>
-	            <td><form action="{{g.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()"><input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+	            <td width="70%">{{g.abbrev}}</td>
+	            <td width="15%">
+                  <center>
+                    <span class="{{g.qstatus}}" style="width:70%"> 
+                      <a style="width:70%" id="edGridButton{{forloop.counter}}" href="{{g.url}}">
+                        Edit
+                      </a>
+                    </span>
+                  </center>
+                </td>
+	            <td width="15%">
+                  <center>
+                    <form action="{{g.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
+                      <input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy">
+                    </form>
+                  </center>
+                </td>
 	        </tr>
 	        <script type="text/javascript">
 	            var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edGridButton{{forloop.counter}}");
 	            var ogridSubButtom{{forloop.counter}}= new YAHOO.widget.Button("gridcopySubmit{{forloop.counter}}",
 	                    {value:"gridcopySubmit{{forloop.counter}}value"});
 	        </script>    
-	      {% endfor %} 
-        <tr class="row3"><td><a id="newGridButton" href="{{newgrid}}">Add a new grid</a></td></tr>
+	      {% endfor %}
         </tbody>
-    </table>
+      </table>
+      <center>
+        <a class="addnewbut" id="newGridButton" href="{{newgrid}}">Add a new Grid</a>
+      </center>
    
-    <script type="text/javascript">
+      <script type="text/javascript">
         var newmodButton = new YAHOO.widget.Button("newGridButton");
-    </script>
+      </script>
     </div>
     
     <p/>
@@ -103,34 +132,51 @@ have been described. <br>  Each new platform, grid and model you create will be 
         </thead>
         <tbody> 
         {% for m in models %}
-        <tr class="{% cycle 'row2' 'row1'%}">
-            <td width="65%">{{m.abbrev}}</td>
-            <td><span class="{{m.qstatus}}"> <a id="edModButton{{forloop.counter}}" href="{{m.url}}">Edit</a></span></td>
-            <td><form action="{{m.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()"><input id="copySubmit{{forloop.counter}}" type="submit" value="Copy"></form></td>
+          <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="70%">{{m.abbrev}}</td>
+            <td width="15%">
+              <center> 
+                <span class="{{m.qstatus}}"> 
+                  <a id="edModButton{{forloop.counter}}" href="{{m.url}}">
+                    Edit
+                  </a>
+                </span>
+              </center>
+            </td>
+            <td width="15%">
+              <center>
+                <form action="{{m.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
+                  <input id="copySubmit{{forloop.counter}}" type="submit" value="Copy">
+                </form>
+              </center>
+            </td>
             
             <!-- Removing the 'status/% complete' from models for now - not sure it makes sense to include it (also code above)-->
             <!-- <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td> -->
             
-        </tr>
-        <script type="text/javascript">
+          </tr>
+          <script type="text/javascript">
             var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");
             var oSubButtom{{forloop.counter}}= new YAHOO.widget.Button("copySubmit{{forloop.counter}}",
                   {value:"copySubmit{{forloop.counter}}value"});
-        </script>    
-        {% endfor %} 
-        <tr class="row3"><td><a id="newModButton" href="{{newmod}}">Add a new model</a></td><td colspan="3">It can take some time (minutes) to create a new model or copy an existing one ... be patient!</td></tr>
-        <tbody>
+          </script>    
+        {% endfor %}
       </table>
-   
-    <script type="text/javascript">
+      <center>
+        <a id="newModButton" href="{{newmod}}">Add a new Model</a>
+      </center>
+      <div class="helper_boxer">
+        It can take some time (minutes) to create a new model or copy an existing one ... be patient!   
+      </div>
+      <script type="text/javascript">
         var newmodButton = new YAHOO.widget.Button("newModButton");
-    </script>
-    <!-- 
-    <p class="guidance"> The status column provides an indication of how much of the model description has
-    been completed.
-    -->
+      </script>
+      <!-- 
+      <p class="guidance"> The status column provides an indication of how much of the model description has
+      been completed.
+      -->
     
-     <!--CopyAsNew should be used to describe variants of already described models.--></p>
+      <!--CopyAsNew should be used to describe variants of already described models.--></p>
     </div>
   </td>
   
@@ -155,38 +201,42 @@ have been described. <br>  Each new platform, grid and model you create will be 
     
     <div class="boxer">
       <table width="100%">
-        <thead>
           <tr>
-            <th>Simulations associated with {{centre.abbrev}}</th>
+            <th>
+              <center>
+                Simulations associated with {{centre.abbrev}}
+              </center>
+            </th>
           </tr>
-        </thead>
+      </table>
+      <table>
         <tbody>
           {% for sgroup in sims %}
             <tr class="{% cycle 'row2' 'row1'%}">
-              <td>
-                {% for s in sgroup %} 
-                  <span class="{{s.qstatus}}">
-                    <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
-                  </span>
-                  <script type="text/javascript">
-                    var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
-                  </script>
-                {% endfor %}
-              </td>
+              {% for s in sgroup %}
+                <td width="25%">
+                  <center>
+                    <span class="{{s.qstatus}}">
+                      <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
+                    </span>
+                    <script type="text/javascript">
+                      var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
+                    </script>
+                  </center>
+                </td>
+              {% endfor %}
             </tr>
           {% endfor %}
-          <tr class="row3">
-            <td>
-              <a id="viewSimBut" href="{{viewsimurl}}"> Manage Simulations (add new)</a>
-            </td>
-          </tr>
         </tbody>
-        <script type="text/javascript">
-          var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
-        </script>
       </table>
+      <center>
+        <a class="addnewbut" id="viewSimBut" href="{{viewsimurl}}">Manage/Add Simulations</a>
+      </center>
+      <script type="text/javascript">
+        var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
+      </script>
     </div>
-</td>        
+  </td>        
 </tr>
 </tbody>
 </table>

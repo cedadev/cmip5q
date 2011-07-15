@@ -41,7 +41,7 @@
     </p>
   </div>
   
-  <div class="boxer sidebarbut">
+  <div class="boxer">
     <h4> 
       Available Models 
     </h4>
@@ -68,7 +68,7 @@
 	  {% include 'docbuttons.html' %}
     </div>
   {% else %}
-    <div class="boxer sidebarbut">
+    <div class="boxer">
 	  <p> 
 	    The button(s) in this box navigate to pages which further describe this <b>component</b>.
 	  </p>
@@ -86,7 +86,7 @@
 	  </p>
     </div>
   
-    <div class="boxer sidebarbut">
+    <div class="boxer">
       <p> 
         The buttons in this box navigate to pages for this <b>model</b>.
       </p>
@@ -375,7 +375,7 @@
     
     {% if isParamGroup %}
     {% else %}
-	  <div class="boxer">
+	  <div class="boxer infobox">
 	    <h4> Inputs required by this component</h4>
         <p class="subheading"> 
           Update this list using the "Inputs Needed" button 
@@ -383,15 +383,15 @@
 	    {% if inps|length %}
 	      <table>
 	        <tr>
-              <th> Type </th>
-              <th> Short Name </th>
-              <th>Description </th>
+              <th width="15%"> Type </th>
+              <th width="25%"> Short Name </th>
+              <th width="60%">Description </th>
             </tr>
 	        {% for i in inps %}
 	          <tr class="{%cycle  'row2' 'row1'%}">
-	            <td> {{i.ctype}} </td>
-                <td> {{i.abbrev}} </td>
-                <td> {{i.description}} </td>
+	            <td width="15%"> {{i.ctype}} </td>
+                <td width="25%"> {{i.abbrev}} </td>
+                <td width="60%"> {{i.description}} </td>
               <tr>
 	        {% endfor %} 
 	      </table>
@@ -411,7 +411,7 @@
 	    {% endif %}
 	    </div>
 	    
-	    <div class="boxer">
+	    <div class="boxer infobox">
 	        <h4> References (associated with this component) </h4>
 	        <p class="subheading"> 
               Update this list using the reference button.
@@ -444,7 +444,7 @@
     
     
     {% if isModel %}
-      <div class="boxer">
+      <div class="boxer infobox">
         <h4> 
           Required Inputs and Couplings 
         </h4>
