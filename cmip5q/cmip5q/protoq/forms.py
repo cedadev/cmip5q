@@ -129,33 +129,44 @@ class ComponentInputForm(forms.ModelForm):
            
        
 class DataContainerForm(forms.ModelForm):
-    ''' This is the form used to edit "files" ... '''
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
-    link=forms.URLField(widget=forms.TextInput(attrs={'size':'45'}),required=False)
-    description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'4'}),required=False)
+    ''' 
+    This is the form used to edit "files" ... 
+    '''
+    title = forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
+    link = extURLField(widget=forms.TextInput(attrs={'size':'45'}), 
+                          required=False)
+    description = forms.CharField(widget=forms.Textarea
+                                  ({'cols':'50', 'rows':'4'}), required=False)
+    
     class Meta:
-        model=DataContainer
-        exclude=('centre','dataObject','funder','author','contact','metadataMaintainer')
-    def __init__(self,*args,**kwargs):
-        forms.ModelForm.__init__(self,*args,**kwargs)
-        v=Vocab.objects.get(name='FileFormats')
-        self.fields['format'].widget=DropDownSingleWidget()
-        self.fields['format'].queryset=Term.objects.filter(vocab=v)
-        self.fields['experiments'].widget=DropDownWidget()
-        self.fields['experiments'].queryset=Experiment.objects.all().filter(isDeleted=False)
+        model = DataContainer
+        exclude = ('centre', 'dataObject', 'funder', 'author', 'contact', 
+                   'metadataMaintainer')
+    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        v= Vocab.objects.get(name='FileFormats')
+        self.fields['format'].widget = DropDownSingleWidget()
+        self.fields['format'].queryset = Term.objects.filter(vocab=v)
+        self.fields['experiments'].widget = DropDownWidget()
+        self.fields['experiments'].queryset = Experiment.objects.all().filter(isDeleted=False)
         self.hostCentre=None
+    
     def specialise(self,centre):
-        self.fields['reference'].widget=DropDownSingleWidget()
-        self.fields['reference'].queryset=Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
+        self.fields['reference'].widget = DropDownSingleWidget()
+        self.fields['reference'].queryset = Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
+    
     def save(self):
         ''' Need to add the centre, and save the subform too '''
         o=forms.ModelForm.save(self,commit=False)
         o.centre=self.hostCentre
         o.save()
         return o
+    
     def clean(self):
         ''' Needed to ensure name uniqueness within a centre, and handle the subform '''
         return uniqueness(self,self.hostCentre,'title')
+
 
 class DataObjectForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
@@ -169,6 +180,7 @@ class DataObjectForm(forms.ModelForm):
         self.hostCentre=None
     def specialise(self,centre):
         self.fields['reference'].queryset=Reference.objects.filter(centre=centre)|Reference.objects.filter(centre=None)
+        
         
 class DataHandlingForm(object):
     ''' This is a fudge to allow baseview to think it's dealing with one form, 
@@ -212,6 +224,7 @@ class DataHandlingForm(object):
     errors=property(handleError,None)
     hostCentre=property(getCentre,setCentre)
 
+
 class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}),required=False)
     class Meta:
@@ -222,12 +235,15 @@ class EnsembleForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         self.fields['etype'].queryset=Term.objects.filter(vocab=Vocab.objects.get(name='EnsembleTypes'))
 
+
 class EnsembleMemberForm(forms.ModelForm):
     drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
     # Currently not asking for data file version information
     #dataVersion=forms.IntegerField(widget=forms.TextInput(attrs={'size':'16'}),required=False)
+    
     class Meta:
         model=EnsembleMember
+    
     def __init__(self,*args,**kwargs):
         forms.ModelForm.__init__(self,*args,**kwargs)
         logging.debug('initialising ensemble set')
@@ -237,6 +253,7 @@ class EnsembleMemberForm(forms.ModelForm):
             vet=Vocab.objects.get(name='EnsembleTypes')
             self.fields['cmod'].queryset=CodeMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
             self.fields['imod'].queryset=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
+    
     def clean_drsMember(self):
         # needs to parse into DRS member format
         value=self.cleaned_data['drsMember']
@@ -247,14 +264,18 @@ class EnsembleMemberForm(forms.ModelForm):
             return value
         except:
             raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
+    
     def specialise(self,requirementset):
         ''' Limit the numerical requirements to only those within the requirement set '''
         if requirementset:
             self.fields['requirement'].queryset=requirementset.members.all()
 
+
 class BaseEnsembleMemberFormSet(BaseModelFormSet):
     def clean(self):
-        ''' Checks that no two ensemble members have the same drs string '''
+        ''' 
+        Checks that no two ensemble members have the same drs string 
+        '''
         if any(self.errors):
             # Don't bother validating the formset unless each form is valid on its own
             return
@@ -266,6 +287,7 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
             if drsn in drsnums:
                 raise ValidationError('Ensemble members must have distinct drs numbers')
             drsnums.append(drsn)
+
 
 class ModForm(forms.ModelForm):
     mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))

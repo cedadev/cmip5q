@@ -4,11 +4,16 @@
 # Holds all the field forms needed for my special types ... extended from django types.
 #
 from django import forms
+from django.forms.fields import URLField
 
 from django.db import models
 #from django.core.exceptions import ValidationError
 from django.forms.util import ValidationError
 from django.conf import settings
+
+import re
+import urlparse
+
 
 from cmip5q.XMLutilities import *
 from cmip5q.protoq.dropdown import DurationWidget, SDTwidget, TimeLengthWidget
@@ -425,8 +430,44 @@ class DateRangeFieldForm2(forms.MultiValueField):
             d=DateRange(startDate=data_list[0],endDate=data_list[1],length=data_list[2])
         return d
         
+try:
+    from django.conf import settings
+    URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
+except ImportError:
+    # It's OK if Django settings aren't configured.
+    URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
 
+#pulling in an extended regex list to allow for ftp urls (which are not 
+# available at current django version)     
+url_re = re.compile(
+r'^(?:http|ftp)s?://' # http:// or https://
+#r'^https?://' # http:// or https://
+#r'^ftps?://' # http:// or https://
+r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|' #domain...
+r'localhost|' #localhost...
+r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+r'(?::\d+)?' # optional port
+r'(?:/?|/\S+)$', re.IGNORECASE)
+
+
+class extURLField(URLField):
+    '''
+    extends URLField to allow ftp prefixes
+    '''
+    default_error_messages = {
+        'invalid': 'Enter a valid URL.',
+        'invalid_link': 'This URL appears to be a broken link.',
+    }
+
+    def __init__(self, max_length=None, min_length=None, verify_exists=False,
+            validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
+        super(URLField, self).__init__(url_re, max_length, min_length, *args,
+                                       **kwargs)
+        self.verify_exists = verify_exists
+        self.user_agent = validator_user_agent
+  
+    
 
 ## South needs information on custom fields:
 #from south.modelsinspector import add_introspection_rules
