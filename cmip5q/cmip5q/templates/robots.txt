@@ -1,2 +1,3 @@
 User-agent: *
 Disallow: /cmip5/15/
+Disallow: /cmip5/39/
