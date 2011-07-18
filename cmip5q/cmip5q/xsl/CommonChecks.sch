@@ -8,7 +8,7 @@
       <assert test="string-length(shortName) > 0">
         Each leaf <name /> must possess a non-empty shortName element.
       </assert>
-       <assert test="string-length(value) > 0">
+       <assert test="(string-length(shortName) > 0) or (string-length(value) > 0)">
         Each leaf <name /> <value-of select="../../../shortName" />::<value-of select="../../shortName" />::<value-of select="../shortName" />::<value-of select="shortName" /> must possess a non-empty value element. 
       </assert> 
    </rule>
