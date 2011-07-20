@@ -225,8 +225,8 @@ class CIMObject(Fundamentals):
     xmlfile = models.FileField(upload_to='PersistedXML')
     #xmlfile=models.FileField(upload_to='../../../PersistedXML')
     # These are update by the parent doc, which is why they're not "fundamentals"
-    created = models.DateField(editable=False)
-    updated = models.DateField(editable=False)
+    created = models.DateTimeField(editable=False)
+    updated = models.DateTimeField(editable=False)
     # The following attributes are needed to provide "discovery" via atom entries:
     author = models.ForeignKey('ResponsibleParty', blank=True, null=True, 
                                related_name='%(class)s_author')
@@ -345,9 +345,17 @@ class Doc(Fundamentals):
         self.save(complete=self.isComplete) # make that completeness status last.
         if self.isComplete: 
             # now store the document ... 
-            keys=['uri','metadataVersion','documentVersion','created','updated','author','description']
+            keys=['uri', 
+                  'metadataVersion', 
+                  'documentVersion', 
+                  'updated', 
+                  'author',
+                  'description']            
             attrs={}
-            for key in keys: attrs[key]=self.__getattribute__(key)
+            for key in keys: 
+                attrs[key]=self.__getattribute__(key)                
+            attrs['created'] = datetime.today()
+            
             cfile=CIMObject(**attrs)
             cfile.cimtype=self._meta.module_name
             cfile.xmlfile.save('%s_%s_v%s.xml'%(cfile.cimtype, self.uri, 
@@ -1550,7 +1558,12 @@ class Coupling(models.Model):
         # We don't copy all the individual closures by default. Currently we
         # imagine that can happen in two ways but both are under user control.
         # Either they to it individually, or they do it one by one.
+        # ....as well as the closures
+        extclosset = self.externalclosure_set.all().order_by('id')
+        for c in extclosset: 
+            c.makeNewCopy(new)
         return new
+    
     def propagateClosures(self):
         ''' Update my closures from an original if it exists '''
         if self.original is None:raise ValueError('No original coupling available')
@@ -1560,6 +1573,7 @@ class Coupling(models.Model):
         return '%s updated from %s'%(self,self.original)
     class Meta:
         ordering=['targetInput']
+    
     
 class CouplingClosure(models.Model):
     ''' Handles a specific closure to a component '''
@@ -1586,20 +1600,27 @@ class InternalClosure(CouplingClosure):
         new.save()
     
 class ExternalClosure(CouplingClosure):
-    ''' AKA boundary condition '''
-    target=models.ForeignKey(DataObject,blank=True,null=True)
-    targetFile=models.ForeignKey(DataContainer,blank=True,null=True)
+    ''' 
+    AKA boundary condition 
+    '''
+    target = models.ForeignKey(DataObject, blank=True, null=True)
+    targetFile = models.ForeignKey(DataContainer, blank=True, null=True)
     ctype='external'
+    
     def __unicode__(self):
-        return 'eClosure %s'%self.target    
-    def makeNewCopy(self,coupling):
-        ''' Copy closure to a new coupling '''
-        kw={'coupling':coupling}
-        for key in ['spatialRegrid','temporalTransform','target','targetFile']:
-            kw[key]=self.__getattribute__(key)
-        new=self.__class__(**kw)
+        return 'eClosure %s' %self.target    
+    
+    def makeNewCopy(self, coupling):
+        ''' 
+        Copy closure to a new coupling 
+        '''
+        kw = {'coupling':coupling}
+        for key in ['spatialRegrid', 'temporalTransform', 'target', 
+                    'targetFile']:
+            kw[key] = self.__getattribute__(key)
+        new = self.__class__(**kw)
         new.save()
-
+    
 
 class EnsembleDoc(Doc):
     ''' This class is only used to create an ensemble doc by the makeDoc method of an Ensemble '''
@@ -1893,7 +1914,10 @@ class DRSOutput(models.Model):
         exptype = self.experiment.abbrev.partition(' ')[2]
         if exptype in ["decadal", "noVolc"]:
             #get sim duration date
-            expdate = str(self.simulation.duration.startDate.year)
+            sim = Simulation.objects.filter(numericalModel=self.model)\
+                                    .filter(experiment=self.experiment)\
+                                    .filter(isDeleted=False)
+            expdate = str(sim[0].duration.startDate.year)
             return '%s_%s_%s' %(self.institute, self.model, 
                                 str(self.experiment)+expdate)
         else:

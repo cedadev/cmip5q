@@ -412,6 +412,7 @@ class ReferenceForm(forms.ModelForm):
         ''' Needed to ensure reference name uniqueness within a centre '''
         return uniqueness(self,self.hostCentre,'name')
         
+        
 class ResponsiblePartyForm(forms.ModelForm):
     email=forms.EmailField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
     webpage=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
