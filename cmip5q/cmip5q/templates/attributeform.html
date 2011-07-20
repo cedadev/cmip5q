@@ -9,13 +9,22 @@
     {% endif %}
 
     {% for cg in pg.cgset %}
-      <table>
+      
         {% if cg.constraint %}
+          <table>
           <tr>
-            <td>{{cg.constraint}}</td>
+            <td>
+              {{cg.constraint}}
+            </td>
+          </table>
+          <table>
           </tr>
-        {% endif %}
+          <tr>
+            <td width="5%"/>
+        {% else %}
+        <table>
         <tr>
+        {% endif %}
           <td>
             <table width="100%">
             {% for r in cg.forms %}
@@ -48,8 +57,7 @@
                 </td>               
                 <td width="57%">
                   {{r.value}}
-                </td>            
-
+                </td>    
               </tr>
             {% endfor %}
             </table>
