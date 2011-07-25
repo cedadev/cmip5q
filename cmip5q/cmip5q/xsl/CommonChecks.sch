@@ -4,11 +4,12 @@
  <ns prefix="gmd" uri="http://www.isotc211.org/2005/gmd" />
  <ns prefix="gco" uri="http://www.isotc211.org/2005/gco" />
   <pattern name="Completeness requirements">
-    <rule context="//componentProperty[count(componentProperty)=0][string-length(units/@value)=0]" >
+    <rule context="//componentProperty[count(componentProperty)=0][string-length(units/@value)=0][value]" >
       <assert test="string-length(shortName) > 0">
         Each leaf <name /> must possess a non-empty shortName element.
       </assert>
-       <assert test="(string-length(shortName) > 0) or (string-length(value) > 0)">
+<!--       <assert test="(string-length(shortName) > 0) or (string-length(value) > 0)"> -->
+       <assert test="string-length(value) > 0">
         Each leaf <name /> <value-of select="../../../shortName" />::<value-of select="../../shortName" />::<value-of select="../shortName" />::<value-of select="shortName" /> must possess a non-empty value element. 
       </assert> 
    </rule>
