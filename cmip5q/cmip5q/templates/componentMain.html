@@ -129,6 +129,14 @@
               <td width="20%">Short Name*</td>
               <td width="52%" class="inputH1">{{c.abbrev}}</td>
               <td width="20%"></td>
+              <!-- Dealing with necessary hidden fields -->
+              <div style="display: none;">
+	            <h1>
+	              {{ cform.abbrev }}
+                  {{ cform.controlled }}
+		          {{ cform.implemented }}
+	            </h1>
+              </div>
             </tr>    
             <tr>
               <td width="3%"></td>
