@@ -582,7 +582,7 @@ class ViewHandler(BaseViewHandler):
         if self.resource['type'] in ['reference','file']:
             #objects=objects.filter(centre__in=[None,self.centre]) doesn't work
             objects=objects.filter(centre=None)|objects.filter(centre=self.centre)
-            oby={'reference':'name','file':'title'}[self.resource['type']]
+            oby={'reference':'name','file':'abbrev'}[self.resource['type']]
             if self.target:
                 #d={self.target['type']+'__id':str(self.target['instance'].id)}
                 #objects=objects.filter(**d)
