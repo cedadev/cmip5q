@@ -25,6 +25,8 @@ from cmip5q.XMLutilities import *
 from cmip5q.protoq.fields import *
 from cmip5q.protoq.dropdown import TimeLengthWidget
 
+from cmip5q.viewer.view_manager import render_view
+
 from django.conf import settings #@UnresolvedImport
 logging=settings.LOG
 from django.core.files.base import ContentFile #@UnresolvedImport
@@ -325,10 +327,13 @@ class Doc(Fundamentals):
 #        return schematron.validate(CIMFragment)
 
     def cimView(self):
-        ''' All document types should be viewable in the CIM View interface '''
-        cv=CIMViewer()
+        ''' 
+        All document types should be viewable in the CIM View interface 
+        '''
+        # get an lxml version of myself
         self.XMLO=self.xmlobject()
-        return cv.cimViewDoc(self.XMLO)
+        # ...and pass this to be rendered
+        return render_view(self.XMLO)
     
         
     def export(self):
@@ -582,7 +587,7 @@ class Component(Doc):
             raise ValueError('Invalid centre passed to component copy')
         
         attrs=['title','abbrev','description',
-               'scienceType','controlled','isRealm','isModel','isParamGroup',
+               'scienceType','controlled','implemented','isRealm','isModel','isParamGroup',
                'author','contact','funder']
         kwargs={}
         for i in attrs: kwargs[i]=self.__getattribute__(i)

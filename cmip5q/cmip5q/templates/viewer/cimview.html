@@ -1,0 +1,38 @@
+{% extends "base.html" %} 
+
+{% block pagehead %}
+
+<!-- Page specific css/javascript -->
+<link rel="stylesheet" type="text/css" href="/css/page/viewer/accordian_styles.css" />
+
+<script type="text/javascript" src="/css/jquery/page/viewer/jquery.nestedAccordion.js">
+</script>
+
+<script type="text/javascript">
+	$(function() {
+	  $("#main").accordion({
+	      objID: "#acc1", 
+	      el: ".h", 
+	      head: "h4, h5", 
+	      next: "div", 
+	      initShow : "h4 + div.outer:eq(0) div.outer:eq(0)"
+	  });
+	});
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="boxer">
+  <table>
+	<tr>
+	  <td>
+		<div class="boxer">{{viewhtml|safe}}</div>
+	  </td>
+	</tr>
+  </table>
+</div>
+
+{% endblock %}

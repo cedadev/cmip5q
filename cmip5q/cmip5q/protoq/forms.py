@@ -61,55 +61,75 @@ class CouplingForm(forms.ModelForm):
 class InternalClosureForm(forms.ModelForm):
     class Meta:
         model=InternalClosure
+    
     def specialise(self):
         pass
+
 
 class ExternalClosureForm(forms.ModelForm):
     class Meta:
         model=ExternalClosure
+        
     def specialise(self):
         # GD - making sure targetfiles are only within the current centre
-        self.fields['targetFile'].queryset=DataContainer.objects.filter(centre=self.instance.targetFile.centre)
+        self.fields['targetFile'].queryset = DataContainer.objects.filter(
+                                        centre=self.instance.targetFile.centre)
         if self.instance.targetFile:
-            self.fields['target'].queryset=DataObject.objects.filter(container=self.instance.targetFile)
+            self.fields['target'].queryset = DataObject.objects.filter(
+                                        container=self.instance.targetFile)
 
 
 class ComponentForm(forms.ModelForm):
-    #it appears that when we explicitly set the layout for forms, we have to explicitly set 
-    #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
+    # it appears that when we explicitly set the layout for forms, we have to 
+    # explicitly set required=False, it doesn't inherit that from the model as 
+    # it does if we don't handle the display.
     
-    abbrev=forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    geneology=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"4"}),required=False)
-    
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=True)
-   
-    implemented=forms.BooleanField(required=False)
-    yearReleased=forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}),required=False)
-    otherVersion=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-    
-    controlled=forms.BooleanField(widget=forms.HiddenInput,required=False)
+    abbrev = forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
+    description = forms.CharField(widget=forms.Textarea(
+                            attrs={'cols':"80", 'rows':"4"}), required=False)
+    geneology = forms.CharField(widget=forms.Textarea(
+                            attrs={'cols':"80",'rows':"4"}),required=False)
+    title = forms.CharField(widget=forms.TextInput(
+                            attrs={'size':'80'}), required=True)
+    implemented = forms.BooleanField(required=False)
+    yearReleased = forms.IntegerField(widget=forms.TextInput(
+                            attrs={'size':'4'}),required=False)
+    otherVersion = forms.CharField(widget=forms.TextInput(
+                            attrs={'size':'40'}),required=False)
+    controlled = forms.BooleanField(widget=forms.HiddenInput, required=False)
     
     class Meta:
-        model=Component
-        exclude=('centre','uri','model','realm','isRealm','isModel','isParamGroup','visited',
-                 'references','components','paramGroup', 'isComplete')
-    def __init__(self,*args,**kwargs):
-        forms.ModelForm.__init__(self,*args,**kwargs)
-        #concatenate to allow the centre to be shown as well as the other parties tied to it.
-        qs=ResponsibleParty.objects.filter(centre=self.instance.centre)|ResponsibleParty.objects.filter(party=self.instance.centre)
-        for i in ['author','contact','funder']: self.fields[i].queryset=qs
-        self.fields['grid'].queryset=Grid.objects.filter(centre=self.instance.centre).filter(istopGrid=True).filter(isDeleted=False)
+        model = Component
+        exclude = ('centre', 'uri', 'model', 'realm', 'isRealm', 'isModel', 
+                   'isParamGroup', 'visited', 'references', 'components', 
+                   'paramGroup', 'isComplete')
+    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        # concatenate to allow the centre to be shown as well as the other 
+        # parties tied to it.
+        qs = ResponsibleParty.objects.filter(
+            centre=self.instance.centre)|ResponsibleParty.objects.filter(
+                                            party=self.instance.centre)
+        
+        for i in ['author', 'contact', 'funder']: 
+            self.fields[i].queryset = qs
+        
+        self.fields['grid'].queryset = Grid.objects.filter(
+            centre=self.instance.centre).filter(
+                                    istopGrid=True).filter(isDeleted=False)
+        
         if self.instance.controlled: 
             # We don't want this to be editable 
-            self.fields['scienceType'].widget=forms.HiddenInput()
-            self.viewableScienceType=self.instance.scienceType
+            self.fields['scienceType'].widget = forms.HiddenInput()
+            self.viewableScienceType = self.instance.scienceType
             # implementable only matters if it's controlled
-            self.showImplemented=True
+            self.showImplemented = True
         else:
-            self.fields['scienceType'].widget=forms.TextInput(attrs={'size':'40'})
-            self.viewableScienceType=''
-            self.showImplemented=False
+            self.fields['scienceType'].widget = forms.TextInput(
+                                                    attrs={'size':'40'})
+            self.viewableScienceType = ''
+            self.showImplemented = False
     
 
 class ComponentInputForm(forms.ModelForm):

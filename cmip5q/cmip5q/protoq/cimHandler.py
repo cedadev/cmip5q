@@ -62,7 +62,7 @@ class cimHandler(object):
         html=self.obj.cimView()
         urls=commonURLs(self.obj,{})
         del urls['cimView']  # we've just done it
-        return render_to_response('cimview.html',{'source':'cimView','obj':self.obj,'viewhtml':html,'urls':urls})
+        return render_to_response('viewer/cimview.html',{'source':'cimView','obj':self.obj,'viewhtml':html,'urls':urls})
     
    
     

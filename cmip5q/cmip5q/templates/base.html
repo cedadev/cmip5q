@@ -26,7 +26,11 @@
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-ui/jquery-ui-1.8.11.custom.css" />
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-autocomplete/jquery.autocomplete.css"/>
         <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-collapsible/jquery.collapsible.css"/>
-        <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-dropdown-checklist/css/ui.dropdownchecklist.standalone.css"/>       
+        <link rel="stylesheet" type="text/css" href="/css/jquery/jquery-dropdown-checklist/css/ui.dropdownchecklist.standalone.css"/>
+
+        {% block pagehead %}
+        {% endblock %}
+       
     </head>
     <body class="yui-skin-sam">
         <div id="page">
@@ -36,7 +40,7 @@
                 <tr>
                 <td width="100px" align="center"><img height="60" src="/css/icons/eu_fw7_logo.jpg"/></td>
                 <td width="900px" align="center">
-                <center><h1>CMIP5 Metadata Questionnaire (1.08)</h1>
+                <center><h1>CMIP5 Metadata Questionnaire (1.09)</h1>
                 <p> Completed data will be sent to the Earth System Grid for inclusion in all official CMIP5 catalogues.</p>
                 </td>
                 <td width="100px" align="center"><img height="60" src="/css/icons/enes_logo.png"/></td>
@@ -78,7 +82,7 @@
                 </table>
                 <div class="tabcontent">
                     {% block content %}
-                    {% endblock %}</p>
+                    {% endblock %}
                 </div>	 
             </div>
             <div id="footer" class="stfc" >
