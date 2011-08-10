@@ -1007,7 +1007,7 @@ class Translator:
         if platClass :
             platformElement=ET.SubElement(rootElement,'platform')
             if platClass.compiler :
-                shortName=platClass.abbrev+platClass.compiler.name
+                shortName=platClass.abbrev+"_"+platClass.compiler.name
                 longName="Machine "+platClass.abbrev+" and compiler "+platClass.compiler.name
             else :
                 shortName=platClass.abbrev+"CompilerUnspecified"

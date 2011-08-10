@@ -46,7 +46,7 @@ a.trigger {
 
 a.trigger.open {
     background-image: url('/css/img/page/viewer/viewer_minus.gif');
-    background-color: #FBEC88;
+    background-color: #e6ffa9;
     border: 1px solid #DCDCDC;
     }
 
@@ -62,7 +62,7 @@ a.trigger.open {
 */
 
 .acc_row {
-    background-color: #DFEFFC;  
+    background-color: #F5FFDC;  
     border: 1px solid #FFFFFF;
     width: 100%;
     }

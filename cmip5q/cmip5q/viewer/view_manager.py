@@ -18,6 +18,7 @@ from cmip5q.viewer.renderer_of_model_component import RendererOfModelComponent
 from cmip5q.viewer.renderer_of_numerical_experiment import RendererOfNumericalExperiment
 from cmip5q.viewer.renderer_of_simulation_run import RendererOfSimulationRun
 from cmip5q.viewer.renderer_of_gridspec import RendererOfGridspec
+from cmip5q.viewer.renderer_of_platform import RendererOfPlatform
 
 
 # Dictionary ofsupported renderers.
@@ -28,6 +29,7 @@ _renderers['modelComponent'] = RendererOfModelComponent
 _renderers['numericalExperiment'] = RendererOfNumericalExperiment
 _renderers['simulationRun'] = RendererOfSimulationRun
 _renderers['gridspec'] = RendererOfGridspec
+_renderers['platform'] = RendererOfPlatform
 
 
 def _deserialize_cim_xml(cim_xml_source):
