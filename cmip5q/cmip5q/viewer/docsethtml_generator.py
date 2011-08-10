@@ -7,6 +7,7 @@ from cmip5q.viewer.modelhtml_generator import get_modelhtml
 from cmip5q.viewer.simhtml_generator import get_simrunhtml
 from cmip5q.viewer.gridhtml_generator import get_gridhtml
 from cmip5q.viewer.datahtml_generator import get_datahtml
+from cmip5q.viewer.plathtml_generator import get_plathtml
 
 
 #namespaces used within the CIM
@@ -40,6 +41,12 @@ def find_dataobjs(elemroot):
     """
     return elemroot.findall('dataObject')
 
+def find_platforms(elemroot):
+    """
+    Find any platform documents embedded within elemroot
+    """
+    return elemroot.findall('platform')
+
 
 def get_docsethtml(cimxml):
     """
@@ -52,8 +59,10 @@ def get_docsethtml(cimxml):
     simruns = find_simulationruns(cimxml)
     #Find the gridspec(s) in the document set
     gridspecs = find_gridspecs(cimxml)
-    #Find the dataObjects(s) in the document set
+    #Find the dataObject(s) in the document set
     dataobjs = find_dataobjs(cimxml)
+    #Find the platform(s) in the document set
+    platforms = find_platforms(cimxml)
     
     #begin html text generation
     docsethtml=[]
@@ -65,6 +74,10 @@ def get_docsethtml(cimxml):
     for m in models:
         modelhtml = get_modelhtml(m)
         docsethtml += modelhtml
+    
+    for p in platforms:
+        plathtml = get_plathtml(p)
+        docsethtml += plathtml
         
     #we want an outer wrapper around the potential of many gridspecs
     docsethtml.append('<div id="acc_wrapper">')
