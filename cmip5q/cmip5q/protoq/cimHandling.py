@@ -1,7 +1,7 @@
 import os,tempfile
 from lxml import etree as ET
 from django.conf import settings
-from cimViewer import *
+#from cimViewer import *
 import sys
 import StringIO
 logging=settings.LOG
