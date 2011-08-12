@@ -41,21 +41,27 @@ have been described. <br>  Each new platform, grid and model you create will be 
         </thead>
         <tbody>
           {% for m in platforms %}
-	        <tr class="{% cycle 'row2' 'row1'%}" >
-	          <td width="70%">{{m.abbrev}}</td>
-	          <td width="15%">
+	        <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="65%">{{m.abbrev}}</td>
+            <td width="5%">
+              {% if m.isComplete %}
                 <center>
-                  <span class="{{m.qstatus}}">
-                    <a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">
-                      Edit
-                    </a>
-                  </span>
+                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
                 </center>
-                <td width="15%" />
-              </td>
+              {% endif %}
+            </td>
+	          <td width="15%">
+              <center>
+                <span>
+                  <a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">
+                    Edit
+                  </a>
+                </span>
+              </center>
+            <td width="15%"></td>
 	        </tr>
 	        <script type="text/javascript">
-	            var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
+	          var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
 	        </script>
           {% endfor %}
         </tbody>
@@ -84,10 +90,17 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tbody> 
 	      {% for g in grids %}
 	        <tr class="{% cycle 'row2' 'row1'%}">
-	            <td width="70%">{{g.abbrev}}</td>
+	            <td width="65%">{{g.abbrev}}</td>
+              <td width="5%">
+              {% if g.isComplete %}
+                <center>
+                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ g.documentVersion }}">
+                </center>
+              {% endif %}
+            </td>
 	            <td width="15%">
                   <center>
-                    <span class="{{g.qstatus}}" style="width:70%"> 
+                    <span style="width:70%"> 
                       <a style="width:70%" id="edGridButton{{forloop.counter}}" href="{{g.url}}">
                         Edit
                       </a>
@@ -133,10 +146,17 @@ have been described. <br>  Each new platform, grid and model you create will be 
         <tbody> 
         {% for m in models %}
           <tr class="{% cycle 'row2' 'row1'%}">
-            <td width="70%">{{m.abbrev}}</td>
+            <td width="65%">{{m.abbrev}}</td>
+            <td width="5%">
+              {% if m.isComplete %}
+                <center>
+                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
+                </center>
+              {% endif %}
+            </td>
             <td width="15%">
               <center> 
-                <span class="{{m.qstatus}}"> 
+                <span> 
                   <a id="edModButton{{forloop.counter}}" href="{{m.url}}">
                     Edit
                   </a>
@@ -214,14 +234,21 @@ have been described. <br>  Each new platform, grid and model you create will be 
           {% for sgroup in sims %}
             <tr class="{% cycle 'row2' 'row1'%}">
               {% for s in sgroup %}
-                <td width="25%">
+                <td width="28%">
                   <center>
-                    <span class="{{s.qstatus}}">
+                    <span>
                       <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
                     </span>
                     <script type="text/javascript">
                       var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
                     </script>
+                  </center>
+                </td>
+                <td width="5%">
+                  <center>
+                    {% if s.isComplete %}
+                      <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ s.documentVersion }}">
+                    {% endif %}
                   </center>
                 </td>
               {% endfor %}
