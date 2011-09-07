@@ -148,10 +148,12 @@ urlpatterns = patterns('',
         }
     ),
 
-    # Uncomment the next line to enable the admin:
-    #(r'^admin/(.*)', admin.site.root),
+    # Admin
+    (r'', include('cmip5q.protoq.admin.urls')),
+    (r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
     (r'^admin/', include(admin.site.urls)),
 )
+
 # now add the common document url methods
 #for doc in ['experiment','platform','component','simulation']:
 #    for key in ['validate','view','xml','html','export']:
