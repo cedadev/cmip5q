@@ -7,8 +7,8 @@ Created on 5 Sep 2011
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 
-from cmip5q.protoq.admin_forms import CompCopyForm
-from cmip5q.protoq.admin_scripts import copyCompToNewCen
+from cmip5q.protoq.admin.admin_forms import CompCopyForm
+from cmip5q.protoq.admin.admin_scripts import copyCompToNewCen
 
 from cmip5q.protoq.models import Component, Centre
 
