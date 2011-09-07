@@ -137,12 +137,6 @@
 		          {{ cform.implemented }}
 	            </h1>
               </div>
-            </tr>    
-            <tr>
-              <td width="3%"></td>
-              <td width="20%">Long Name*</td>
-              <td width="52%">{{cform.title}}</td>
-              <td width="20%">{{cform.title.errors}}</td>
             </tr>
           {% else %}
             <tr>
@@ -150,14 +144,15 @@
               <td width="20%">Short Name*</td>
               <td width="52%">{{cform.abbrev}} Type: {{ cform.scienceType }} {{ cform.viewableScienceType }}</td>
               <td width="20%">{{cform.abbrev.errors}}</td>
-            </tr>  
-
+            </tr>
+          {% endif %}
+            
             <tr>
               <td width="3%"></td>
               <td width="20%">Long Name*</td>
               <td width="52%">{{cform.title}}</td>
               <td width="20%">{{cform.title.errors}}</td>
-            </tr>  
+            </tr>
               
             {% if cform.showImplemented %}
               {% if isModel %} 
@@ -187,7 +182,7 @@
             {% else %}
               {{cform.implemented.as_hidden}}
             {% endif %}
-          {% endif %}
+
         </table>
         {% if isModel %}
 	      <div class="helper_boxer">
