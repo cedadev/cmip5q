@@ -48,15 +48,18 @@ class TestDocumentSet(object):
     def __init__(self, d, f):
         ff = os.path.join(d, f)
         ef = ET.parse(ff)
-        cimns = 'http://www.metaforclimate.eu/schema/cim/1.5'
+        cimns = 'http://www.purl.org/org/esmetadata/cim/1.5/schemas'
         cimdoclist = ['{%s}modelComponent' %cimns, 
-                      '{%s}platform' %cimns, 
-                      '{%s}CIMRecord/{%s}CIMRecord/{%s}simulationRun' 
-                       %(cimns, cimns, cimns)]
-        for cimdoc in cimdoclist:
-            if ef.getroot().find(cimdoc) is not None:
-                e=ef.getroot().find(cimdoc)
-                
+                      '{%s}platform' %cimns] 
+        
+        if ef.getroot().find('{%s}simulationRun' %cimns) is not None:
+            e=ef.getroot().find('{%s}simulationRun' %cimns)
+        else:
+            for cimdoc in cimdoclist:
+                if ef.getroot().tag == cimdoc is not None:
+                    e=ef.getroot()
+            
+        #--------------
         getter=etTxt(e)
         
         #basic document stuff for feed

@@ -247,6 +247,7 @@ class DataHandlingForm(object):
 
 class EnsembleForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}),required=False)
+    riphidden = forms.BooleanField(required=False)
     class Meta:
         model=Ensemble
         exclude=('simulation')
@@ -257,7 +258,7 @@ class EnsembleForm(forms.ModelForm):
 
 
 class EnsembleMemberForm(forms.ModelForm):
-    drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
+    drsMember=forms.CharField(max_length=12,widget=forms.TextInput(attrs={'size':'12'}))
     # Currently not asking for data file version information
     #dataVersion=forms.IntegerField(widget=forms.TextInput(attrs={'size':'16'}),required=False)
     

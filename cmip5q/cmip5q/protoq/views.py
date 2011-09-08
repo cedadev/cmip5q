@@ -437,17 +437,22 @@ def ensemble(request,cen_id,sim_id):
     e.updateMembers()  # in case members were deleted via their code mods or ics.
     members=e.ensemblemember_set.all()[1:]
         
-    EnsembleMemberFormset=modelformset_factory(EnsembleMember,form=EnsembleMemberForm,
+    EnsembleMemberFormset=modelformset_factory(EnsembleMember, 
+                                               form=EnsembleMemberForm,
                                                formset=BaseEnsembleMemberFormSet,
-                                               extra=0,exclude=('ensemble','memberNumber'))
+                                               extra=0,exclude=('ensemble',
+                                                                'memberNumber'))
     
-    urls={'self':reverse('cmip5q.protoq.views.ensemble',args=(cen_id,sim_id,)),
-          'sim':reverse('cmip5q.protoq.views.simulationEdit',args=(cen_id,sim_id,)),
+    urls={'self':reverse('cmip5q.protoq.views.ensemble',
+                         args=(cen_id,sim_id,)),
+          'sim':reverse('cmip5q.protoq.views.simulationEdit',
+                        args=(cen_id,sim_id,)),
           'mods':reverse('cmip5q.protoq.views.list',
                      args=(cen_id,'modelmod','ensemble',s.id,)),
           'ics':reverse('cmip5q.protoq.views.list',
                      args=(cen_id,'inputmod','ensemble',s.id,)),        
-                     }                 
+                     }              
+  
     if request.method=='GET':
         eform=EnsembleForm(instance=e,prefix='set')
         eformset=EnsembleMemberFormset(queryset=members,prefix='members')
@@ -459,13 +464,16 @@ def ensemble(request,cen_id,sim_id):
         ok=True
         if eform.is_valid():
             eform.save()
-        else: ok=False
+        else: 
+            ok=False
         if eformset is not None:
             if eformset.is_valid():
                 eformset.save()
             else: ok=False
+        
         logging.debug('POST to ensemble is ok - %s'%ok)
         if ok: return HttpResponseRedirect(urls['self'])
+                
     for f in eformset.forms: f.specialise(s.experiment.requirementSet)
     eform.rset=(s.experiment.requirementSet is not None)
     return render_to_response('ensemble.html',
@@ -647,10 +655,32 @@ def assign(request,cen_id,resourceType,targetType,target_id):
     return h.assign(request) 
 
 
-# For crawlers hitting redundant instances
+def ripinfo(request):
+    '''
+       Gathering rip information for a centre
+    ''' 
+    if request.method=='GET':
+        #yep we've selected something
+        try:
+            if 'centrerip' in request.GET:
+                #get centre for web display
+                centre = Centre.objects.get(id=request.GET['centrerip'])
+                ensembles = []
+                sims=Simulation.objects.filter(centre=request.GET['centrerip']).filter(isDeleted=False)
+                    #ensembles.append(s.ensemble_set.get())
+                    #if s.ensemble_set.filter(riphidden=False):
+                        #sims.delete(s)
+                        #ensembles.append(s.ensemble_set.get())
+                #ensemblemembers=[]
+                #for e in ensembles:
+                #    ensemblemembers.append(e.ensemblemember_set.all())
+                return render_to_response('ripinfo.html',{'sims':sims, "ensembles":ensembles, "centre":centre})
+                #return render_to_response('ripinfo.html',{'sims':sims, "ensembles":ensembles, "ensmems":ensemblemembers, "centre":centre})
+        except KeyError:
+            m='Unable to select requested centre %s'%request.POST['centrerip']
+            logging.info('ERROR on centres page: Unable to select requested centre %s'%request.POST['centrerip'])
+            return render_badrequest('error.html',{'message':m})    
+   
 
-#def robots(request):
-#    ''' Provides a robot.txt file to tell web crawlers which redundant info to bypass '''
-#    return HttpResponse(open('robots.txt').read(), 'text/plain')
  
     

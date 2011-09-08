@@ -12,6 +12,7 @@ DEPLOYED_SCRIPT_PATH=''
 
 ADMINS = (
     ('Gerard Devine', 'g.m.devine@reading.ac.uk'),
+    ('Paul Slavin', 'slavinp@cs.manc.ac.uk'),
     # ('Your Name', 'your_email@domain.com'),
 )
 SERVER_EMAIL = 'meta4q@neptune.badc.rl.ac.uk'
@@ -95,7 +96,7 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_STRING_IF_INVALID = 'what happened here?'
 
-STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css")
+STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css", )
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -103,6 +104,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'cmip5q.protoq.admin',
     'cmip5q.protoq'
 )
 

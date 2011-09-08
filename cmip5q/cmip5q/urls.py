@@ -150,7 +150,7 @@ urlpatterns = patterns('',
 
     # Admin
     (r'', include('cmip5q.protoq.admin.urls')),
-    (r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
+    #(r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
     (r'^admin/', include(admin.site.urls)),
 )
 

@@ -1,101 +1,122 @@
 {% extends "base.html" %}
 {% block content %}
-<center><h1> CMIP5 Model Metadata</h1></center>
 
-<table><tr>
-<td valign="top">
-<div class="boxer">
-<div class="boxer2">
-<h1>  Model Centre Metadata Entry </h1>
-<p>Choose your centre from below:</p>
-<form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
+<center>
+  <h1> CMIP5 Model Metadata</h1>
+</center>
 
+<table>
+  <tr>
+    <td valign="top">
+      <div class="boxer">
+        <div class="boxer2">
+          <h1>Model Centre Metadata Entry</h1>
+          <p>Choose your centre from below:</p>
+          
+          <form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
+            <div>
+        
+            <table class="linklike" width="100%">
+              {% for row in objects %}
+                <tr>
+                  {% for choice in row %}
+                    <td width="15%">
+                      <p>
+                        <input type="radio" name="choice" id="{{forloop.counter}}" value="{{choice.id}}"/>
+                        <label id="tt{{choice.id}}" for="choice{{forloop.counter}}">
+                          {{choice.abbrev}}
+                        </label>
+                      </p>
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </table>
+            </div>
 
+            <input type="submit" value="Choose"/>
+          </form>
+        </div>
+      </div>
+    </td>
 
-<div>
-<table class="linklike" width="100%">
+  <td valign="top" width="30%">
 
-{% for row in objects %}
+  <div class="boxer">
+    <h2> Test Area </h2>
+    <p>In this section, you can either look at an example of what is expected in 
+       terms of filling out the questionnaire, or use the test centre to'play' with 
+       the questionnaire before entering information for real
+    </p>
+    <form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
 
-<tr>
+      {% for choice in auxList %}
+        <p>
+          <input type="radio" name="auxchoice" id="{{forloop.counter}}" value="{{choice.id}}"/>
+          <label for="choice{{forloop.counter}}">
+            {{choice.abbrev}} 
+            ({{choice.name}})
+          </label>
+        </p>
+      {% endfor %}
 
-{% for choice in row %}
-<td width="15%">
+      <input type="submit" value="Choose"/>
+    </form>
+  </div>
 
-<p>
-<input type="radio" name="choice" id="{{forloop.counter}}"
-value="{{choice.id}}"/>
-<label id="tt{{choice.id}}" for="choice{{forloop.counter}}">{{choice.abbrev}}</label></p>
-
-</td>
-{% endfor %}
-
-</tr>
-{% endfor %}
-</table>
-</div>
-
-
-<input type="submit" value="Choose"/>
-</form>
-</div>
-</div></td>
-
-<td valign="top" width="30%">
-
-<div class="boxer">
-<h2> Test Area </h2>
-<p>In this section, you can either look at an example of what is expected in 
-terms of filling out the questionnaire, or use the test centre to'play' with 
-the questionnaire before entering information for real</p>
-<form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
-
-{% for choice in auxList %}
-<p>
-<input type="radio" name="auxchoice" id="{{forloop.counter}}"
-value="{{choice.id}}"/>
-<label for="choice{{forloop.counter}}">{{choice.abbrev}} ({{choice.name}})</label></p>
-{% endfor %}
-
-<input type="submit" value="Choose"/>
-</form>
-
-</div>
-
-<script type="text/javascript">
+  <script type="text/javascript">
         YAHOO.namespace("e111.container");
-	{% for choice in centreList %}
+	    {% for choice in centreList %}
             YAHOO.e111.container.ytt{{choice.id}} = new YAHOO.widget.Tooltip("ytt{{choice.id}}", { context:"tt{{choice.id}}", text:"{{choice.abbrev}}:&nbsp;{{choice.name}}" });
-    {% endfor %}
-</script>
-
-<br/>
+        {% endfor %}
+  </script>
  
-<div class="boxer">
-<h2> Metadata Feeds Available </h2>
-<p> These are atom feeds to the xml documents which have been published from the metadata entry: </p>
+  <div class="boxer">
+    <h2> Metadata Feeds Available </h2>
+    <p>These are atom feeds to the xml documents which have been published from the metadata entry: </p>
+    <div>
+      <table class="linklike" width="100%">
+        {% for f in feedobjects %}
+          <tr>
+          {% for name,url in f %}
+            <td width="15%">
+              <p>
+                <a href="{{url}}">
+                  <img src="/css/icons/atom.png"/>&nbsp;{{name}}
+                </a>
+              </p>
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div>
+      <p> XML documents are not meant for humans. Links to catalogues and portals for CMIP5 data and metadata will appear here when they are available.</p>
+    </div>
+  </div>
 
-<div >
-<table class="linklike" width="100%">
-{% for f in feedobjects %}
-<tr>
-{% for name,url in f %}
-<td width="15%">
-<p><a href="{{url}}"><img src="/css/icons/atom.png">&nbsp;{{name}}</a></p>
+  <div class="boxer">
+    <h2>Ensemble member information </h2>
+    <p>Choose a centre to view ensemble member information for each of the simulations described by that centre</p>
+
+    <form method='GET' action="/cmip5/ripinfo/" target="_blank" onsubmit="myProject.bypassConfirm()">
+      <center>
+        <select name="centrerip">
+          <option value="" selected="selected">---------</option>
+          {% for centre in centreList %}
+            <option value="{{centre.id}}">{{centre.abbrev}}</option>
+          {% endfor %}
+        </select>
+  
+        <input type="submit" value="Select"/>
+      </center>
+    </form>
+    
+  </div>
+
 </td>
-{% endfor %}
+
 </tr>
-{% endfor %}
 </table>
-</div>
-
-
-</div>
-<div>
-<p> XML documents are not meant for humans. Links to catalogues and portals for CMIP5 data and metadata will appear here when they are available.</p>
-</div>
-
-</td>
-
-</tr></table>
 {% endblock %}

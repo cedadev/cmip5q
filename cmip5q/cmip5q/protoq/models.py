@@ -1635,10 +1635,13 @@ class EnsembleDoc(Doc):
 
 
 class Ensemble(models.Model):
-    description=models.TextField(blank=True,null=True)
-    etype=models.ForeignKey(Term,blank=True,null=True)
-    simulation=models.ForeignKey(Simulation)
-    doc=models.ForeignKey(EnsembleDoc,blank=True,null=True)
+    description = models.TextField(blank=True,null=True)
+    etype = models.ForeignKey(Term,blank=True,null=True)
+    simulation = models.ForeignKey(Simulation)
+    doc = models.ForeignKey(EnsembleDoc,blank=True,null=True)
+    # wheteher to allow rip info to be shopwn through front page or not
+    riphidden = models.BooleanField(default=False)
+    
     def updateMembers(self):
         ''' Make sure we have enough members, this needs to be called if the
         simulation changes it's mind over the number of members '''
@@ -1651,7 +1654,7 @@ class Ensemble(models.Model):
                 objects[n-1-i].delete()
             elif ndif < 0:
                 e=EnsembleMember(ensemble=self,memberNumber=n+i+1)
-                e.save()
+                e.save()      
     
     def makeDoc(self):
         ''' 
