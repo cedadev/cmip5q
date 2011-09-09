@@ -151,9 +151,15 @@ def centres(request):
         try:
             if 'choice' in request.POST:
                 selected_centre=p.get(id=request.POST['choice'])
+                return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,)))
             elif 'auxchoice' in request.POST:
                 selected_centre=p_aux.get(id=request.POST['auxchoice'])
-            return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,))) 
+                return HttpResponseRedirect(reverse('cmip5q.protoq.views.centre',args=(selected_centre.id,)))
+            elif 'ripchoice' in request.POST:
+                centre = Centre.objects.get(id=request.POST['ripchoice'])
+                ensembles = []
+                sims=Simulation.objects.filter(centre=request.POST['ripchoice']).filter(isDeleted=False)
+                return render_to_response('ripinfo.html',{'sims':sims, "ensembles":ensembles, "centre":centre})
         except KeyError:
             m='Unable to select requested centre %s'%request.POST['choice']
             logging.info('ERROR on centres page: Unable to select requested centre %s'%request.POST['choice'])
@@ -662,7 +668,7 @@ def ripinfo(request):
     if request.method=='GET':
         #yep we've selected something
         try:
-            if 'centrerip' in request.GET:
+            if 'ripinfo' in request.GET:
                 #get centre for web display
                 centre = Centre.objects.get(id=request.GET['centrerip'])
                 ensembles = []

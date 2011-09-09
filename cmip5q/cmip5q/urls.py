@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     # ajax vocabulary handler
     url(r'^ajax/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper',name='ajax_value'),
     #
-    #    generic document handling
+    # generic document handling
     # 
     (r'^cmip5/(?P<cid>\d+)/(?P<docType>\D+)/doc/(?P<pkid>\d+)/(?P<method>\D+)/$','cmip5q.protoq.views.genericDoc'),  
     (r'^cmip5/(?P<docType>\D+)/(?P<uri>%s)/$'%uuid,'cmip5q.protoq.views.persistedDoc'),

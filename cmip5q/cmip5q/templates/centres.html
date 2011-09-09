@@ -100,9 +100,9 @@
     <h2>Ensemble member information </h2>
     <p>Choose a centre to view ensemble member information for each of the simulations described by that centre</p>
 
-    <form method='GET' action="/cmip5/ripinfo/" target="_blank" onsubmit="myProject.bypassConfirm()">
+    <form method='POST' action="{{curl}}" target="_blank" onsubmit="myProject.bypassConfirm()">
       <center>
-        <select name="centrerip">
+        <select name="ripchoice">
           <option value="" selected="selected">---------</option>
           {% for centre in centreList %}
             <option value="{{centre.id}}">{{centre.abbrev}}</option>
