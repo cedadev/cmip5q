@@ -19,8 +19,19 @@ enter in the text boxes.
 <div id="data" class="boxer2">
     <form action="{{urls.self}}" method="POST" onsubmit="myProject.bypassConfirm()">
     {{cform.management_form}}
+    
+    <!-- Error notification panel -->
+    {% if cform.errors %}
+      <div class="error_boxer">
+        <p>
+          This page contains errors. Please correct these before saving 
+        </p>
+      </div>
+    {% endif %}
+    
     {% for form in cform.forms %}
         <div class="boxer">
+        
         <table>
             <tr class="{% cycle 'row1' 'row2'%}">
                 <td><b>Experiment Requirement Type: {{form.instance.requirement.ctype}}</b></td>
@@ -29,8 +40,12 @@ enter in the text boxes.
             </tr>
             <tr class="{% cycle 'row1' 'row2'%}">
                 <td>
-				{% if form.showOptions %} Choose the "OR" requirement that applies to this simulation<br>
-				{{form.option}} {% endif %}</td>
+				          {% if form.showOptions %} 
+				            Choose the "OR" requirement that applies to this simulation <br>
+				            {{form.option}}
+				            {{form.option.errors}} 
+				          {% endif %}
+				        </td>
                 <td> Notes: {{form.description.errors}}{{form.description}}</td>
                 <td></td>
             </tr>

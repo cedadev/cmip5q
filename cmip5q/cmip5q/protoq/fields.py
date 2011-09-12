@@ -104,7 +104,7 @@ class TimeLength(object):
                 u=s[len(s)-1]
                 assert u in mappingUnits
                 u=mappingUnits[u]
-                logging.debug('duration '+s+' : '+l+','+u)
+                #logging.debug('duration '+s+' : '+l+','+u)
             except :
                 raise ValueError('"%s" is not a valid TimeLength'%s)
         self.s='%s %s'%(l,u)
@@ -174,10 +174,10 @@ class DateRange(object):
         if s0 is None: s0=e
         s1=getter.getN(s0,'startDate')
         if s1 is not None: s1=SimDateTime(s1)
-        logging.debug('startDate '+str(s1))
+        #logging.debug('startDate '+str(s1))
         s2=getter.getN(s0,'endDate')
         if s2 is not None: s2=SimDateTime(s2)
-        logging.debug('endDate '+str(s2))
+        #logging.debug('endDate '+str(s2))
         # length is an out of date format used by the experiment configuration documents
         tl=getter.find(s0,'length')
         if tl is not None:
@@ -187,7 +187,7 @@ class DateRange(object):
             tl=getter.find(s0,'duration')
             if tl is not None:
                 tl=TimeLength(tl.text)
-        logging.debug('timelength '+str(tl))
+        #logging.debug('timelength '+str(tl))
         dr=DateRange(startDate=s1,endDate=s2,length=tl)
         dr.description=getter.getN(e,'description')
         return dr
@@ -363,7 +363,7 @@ class SimDateTimeFieldForm2(forms.MultiValueField):
         mywidget = SDTwidget()
         forms.MultiValueField.__init__(self,fields,widget=mywidget,required=False)
     def compress(self,data_list):
-        logging.debug('compressing in SimDateTimeFieldForm2 %s'%data_list)
+        #logging.debug('compressing in SimDateTimeFieldForm2 %s'%data_list)
         if data_list == []:
             return None
         else:
@@ -378,7 +378,7 @@ class SimDateTimeFieldForm2(forms.MultiValueField):
 class DateRangeFieldForm(forms.CharField):
     ''' Used to ensure that the clean method validates date range entries '''
     def __init__(self,*args,**kwargs):
-        logging.debug('instantiating date range field form')
+        #logging.debug('instantiating date range field form')
         kwargs['max_length']=132
         forms.CharField.__init__(self,*args,**kwargs)
        

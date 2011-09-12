@@ -20,16 +20,22 @@ from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 
 
 class ConformanceForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"80",'rows':"3"}),required=False) 
-    # We need the queryset, note that the queryset is limited in the specialisation
-    q1,q2,q3,q4=CodeMod.objects.all(),Coupling.objects.all(),Term.objects.all(), RequirementOption.objects.all()
+    
+    description = forms.CharField(widget=forms.Textarea(
+                                    attrs={'cols':"80",'rows':"3"}), 
+                                  required=False) 
+    # We need the queryset, note that the queryset is limited in the 
+    # specialisation
+    q1, q2, q3, q4 = CodeMod.objects.all(), Coupling.objects.all(), Term.objects.all(), RequirementOption.objects.all()
     mod=forms.ModelMultipleChoiceField(required=False,queryset=q1,widget=DropDownWidget(attrs={'size':'3'}))
     coupling=forms.ModelMultipleChoiceField(required=False,queryset=q2,widget=DropDownWidget(attrs={'size':'3'}))
     ctype=forms.ModelChoiceField(required=False,queryset=q3,widget=DropDownSingleWidget)
     option=forms.ModelChoiceField(required=False,queryset=q4,widget=DropDownSingleWidget)
+    
     class Meta:
-        model=Conformance
-        exclude=('simulation')
+        model = Conformance
+        exclude = ('simulation')
+        
     def specialise(self,simulation):
         #http://docs.djangoproject.com/en/dev/ref/models/querysets/#in
         #relevant_components=Component.objects.filter(model=simulation.model)
@@ -47,6 +53,23 @@ class ConformanceForm(forms.ModelForm):
         self.showMod=len(self.fields['mod'].queryset)
         self.showCoupling=len(self.fields['coupling'].queryset)
         self.showOptions=len(self.fields['option'].queryset)
+    
+    def clean_option(self):
+        '''
+        adding an additional validation that checks the req option is filled out 
+        when a conformance type has been selected
+        '''
+        # get current info from cleaned data
+        cleaned_data = self.cleaned_data
+        cd_ctype = cleaned_data.get("ctype")
+        cd_option = cleaned_data.get("option")
+        # check for missing option in case of ctype and report error
+        if len(GenericNumericalRequirement.objects.get(id=self.instance.requirement_id).options.all()):
+            if cd_ctype and cd_option is None:
+                raise forms.ValidationError("A requirement option must be selected")
+        
+        return cd_option
+            
 
 class CouplingForm(forms.ModelForm):
     manipulation=forms.CharField(widget=forms.Textarea({'cols':'120','rows':'2'}),required=False)
