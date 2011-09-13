@@ -51,8 +51,18 @@ def get_mpihtml(elemroot):
     #First get non-attribute information
     platsname = elemroot.find('shortName')
     platlname = elemroot.find('longName')
+    if platlname is not None:
+        platlnametext = platlname.text
+    else:
+        platlnametext = ''
     description = elemroot.find('description')
+    if description is not None:
+        descriptiontext = description.text
+    else:
+        descriptiontext = ''
+        
     contact = elemroot.find('contact/abbreviation')
+
 
     mpihtml.append('          <table width=100%>')
     mpihtml.append('            <tr class="acc_row">')
@@ -65,13 +75,13 @@ def get_mpihtml(elemroot):
     mpihtml.append('              <td width = 20%>')
     mpihtml.append('                <p class="titletext">Long Name</p>')
     mpihtml.append('              </td>')
-    mpihtml.append('              <td><p class="bodytext">%s</p></td>' %platlname.text)
+    mpihtml.append('              <td><p class="bodytext">%s</p></td>' %platlnametext)
     mpihtml.append('            </tr> ')
     mpihtml.append('            <tr class="acc_row">')
     mpihtml.append('              <td width = 20%>')
     mpihtml.append('                <p class="titletext">Description</p>')
     mpihtml.append('              </td>')
-    mpihtml.append('              <td><p class="bodytext">%s</p></td>' %description.text)
+    mpihtml.append('              <td><p class="bodytext">%s</p></td>' %descriptiontext)
     mpihtml.append('            </tr> ')
     mpihtml.append('            <tr class="acc_row">')
     mpihtml.append('              <td width = 20%>')
@@ -125,6 +135,10 @@ def get_mihtml(elemroot):
     
     #get cores per processor
     mcpp = elemroot.find('unit/machine/machineCoresPerProcessor')
+    if mcpp is not None:
+        mcppvalue = minterc.get('value')
+    else:
+        mcppvalue = ''
     
     #get processor type
     mproctype = elemroot.find('unit/machine/machineProcessorType')
@@ -213,7 +227,7 @@ def get_mihtml(elemroot):
     mihtml.append('                <td width = 20%>')
     mihtml.append('                  <p class="titletext">Cores per Processor</p>')
     mihtml.append('                </td>')
-    mihtml.append('                <td><p class="bodytext">%s</p></td>'  %mcpp.text)
+    mihtml.append('                <td><p class="bodytext">%s</p></td>'  %mcppvalue)
     mihtml.append('                </tr> ')
     mihtml.append('            </table>')
     
