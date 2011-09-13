@@ -99,7 +99,7 @@
   </pattern>
   <pattern name="Ensemble Constraints" >
      <rule context="//ensembleMember" >
-      <assert test="string-length(description) > 0" >
+      <assert test="string-length(simulation/reference/description) > 0" >
        A description must be provided for each Ensemble member in Simulation <value-of select="current()/simulation/reference/name"/>.
       </assert>
       <assert test="count(..//ensembleMember/simulation/reference[change[1][name = current()/simulation/reference/change[1]/name]][change[last()][name = current()/simulation/reference/change[last()]/name]]/name)&lt;2" >
