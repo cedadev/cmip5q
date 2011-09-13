@@ -406,6 +406,8 @@ class InputModIndex(object):
     hostCentre=property(getCentre,setCentre)  
  
 class CodeModForm(ModForm):
+    ivocab=Vocab.objects.get(name='ModelModTypes')
+    mtype = forms.ModelChoiceField(queryset=Term.objects.filter(vocab=ivocab), required=True)
     class Meta:
         model=CodeMod
         exclude=('centre','mods')  # ignoring mods for now ...
