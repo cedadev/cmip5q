@@ -1,10 +1,15 @@
 <div class="boxer">
   <div class="msg_list">
-    {% if f.cf.instance.notInUse %} 
-      <div class="msg_head" id="inactive">
+    {% if f.FormError %}
+      <div class="msg_head" id="error">
     {% else %}
-      <div class="msg_head" id="active">
+      {% if f.cf.instance.notInUse %} 
+        <div class="msg_head" id="inactive">
+      {% else %}
+        <div class="msg_head" id="active">
+      {% endif %}
     {% endif %}
+    
 	    <table>
 	      <tr>
 	        <td>
@@ -20,6 +25,17 @@
 	  <div class="msg_body">
 	    {% if s %}
 	      <table>
+	        
+	        {% if f.FormErrorMsg %}
+	          {% for err in f.FormErrorMsg %}
+	            <tr>
+                 <td class="red">
+	                {{ err }}
+	              </td>
+               </tr>
+	          {% endfor %}
+	        {% endif %}
+	        
 	        <tr>
 	          <td align=right>
 	            {{f.cf.notInUse}} Not applicable 

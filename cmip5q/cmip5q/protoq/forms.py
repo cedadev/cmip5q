@@ -89,17 +89,31 @@ class InternalClosureForm(forms.ModelForm):
         pass
 
 
-class ExternalClosureForm(forms.ModelForm):
+class ExternalClosureForm(forms.ModelForm):    
     class Meta:
         model=ExternalClosure
         
     def specialise(self):
         # GD - making sure targetfiles are only within the current centre
-        self.fields['targetFile'].queryset = DataContainer.objects.filter(
+        if self.instance.targetFile:
+            self.fields['targetFile'].queryset = DataContainer.objects.filter(
                                         centre=self.instance.targetFile.centre)
         if self.instance.targetFile:
             self.fields['target'].queryset = DataObject.objects.filter(
                                         container=self.instance.targetFile)
+    
+    def clean(self):
+        '''
+        adding an additional validation that checks the file title is supplied
+        '''
+        # get current info from cleaned data
+        cleaned_data = self.cleaned_data
+        cd_targetfile = cleaned_data.get("targetFile")
+        # check for missing targetfile
+        if cd_targetfile is None:
+            raise forms.ValidationError("A file must be selected")
+        
+        return cleaned_data
 
 
 class ComponentForm(forms.ModelForm):

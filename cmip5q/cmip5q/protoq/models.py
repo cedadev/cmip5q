@@ -1291,7 +1291,8 @@ class Simulation(Doc):
             # avoid an extra database query to get to the files ...
             ecset=ExternalClosure.objects.select_related('targetFile').filter(coupling__in=theseCouplings).order_by('id')
             for e in ecset:
-                if e.targetFile not in d.children.all().order_by('id'): d.children.add(e.targetFile)        
+                if e.targetFile not in d.children.all().order_by('id'): 
+                    d.children.add(e.targetFile)        
                 
     def updateDRS(self):
         ''' 

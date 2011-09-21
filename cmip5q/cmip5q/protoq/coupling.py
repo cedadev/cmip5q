@@ -46,6 +46,7 @@ class ClosureReset:
             i.makeNewCopy(self.coupling)
         return HttpResponseRedirect(self.returnURL)
 
+
 class MyInternalClosures(InternalClosureFormSet):
     def __init__(self,q,data=None):
         prefix='ic%s'%q
@@ -59,6 +60,7 @@ class MyInternalClosures(InternalClosureFormSet):
             i.coupling=self.coupling
             i.save()
     
+    
 class MyExternalClosures(ExternalClosureFormSet):
     def __init__(self,q,data=None):
         prefix='ec%s'%q
@@ -67,12 +69,14 @@ class MyExternalClosures(ExternalClosureFormSet):
         ExternalClosureFormSet.__init__(self,data,queryset=qset,prefix=prefix)
         for i in self.forms:
             i.specialise()
+        
     def save(self):
         instances=ExternalClosureFormSet.save(self,commit=False)
         logging.debug('saving external closures for %s'%self.coupling)
         for i in instances:
             i.coupling=self.coupling
             i.save()
+            
             
 class DualClosureForm(forms.Form):
     ''' To replace individual closures and simplify the input entry '''
@@ -250,19 +254,39 @@ class MyCouplingFormSet:
     def is_valid(self):
         ok=True
         for f in self.forms:
+            indok=True
             r1=f.cf.is_valid()
-            if not r1: ok=False
+            if not r1: 
+                ok=False
+                indok=False
             r2=f.ec.is_valid()
-            if not r2: ok=False
+            if not r2: 
+                ok=False
+                indok=False
             r3=f.ic.is_valid()
-            if not r3: ok=False
+            if not r3: 
+                ok=False
+                indok=False
             r4=f.dc.is_valid()
-            if not r4: ok=False
+            if not r4: 
+                ok=False
+                indok=False
             #logging.debug('%s-%s-%s-%s'%(r1,r2,r3,r4))
             #logging.debug('%s[cf#%s#_ec#%s#_ic#%s#_dc#%s#]'%(ok,f.cf.errors,f.ec.errors,f.ic.errors,f.dc.errors))
+            
+            # Adding individual form level error messages
+            f.FormError = not indok
+            if not indok:
+                errorslist = []
+                for err in f.ec.errors:
+                    for key in err.itervalues():
+                        errorslist.append(key[0])
+                
+                f.FormErrorMsg = errorslist
+        
         self.FormError=not ok   # used in coupling.html
         return ok
-            
+                
     def specialise(self):
         for f in self.forms:
             for i in f.ic.forms+f.ec.forms:
@@ -272,6 +296,7 @@ class MyCouplingFormSet:
                     i.fields[key].queryset=self.closureVocabs[key]
             for i in f.ic.forms:
                 i.fields['target'].queryset=f.iqs
+                
     def save(self):
         for f in self.forms:
             # first the coupling form

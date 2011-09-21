@@ -9,7 +9,7 @@
       <table>
         {% if s %}
           <tr>
-            <td width="130">
+            <td width="160">
               <h1>
                 Simulation Inputs:
  	          </h1>
@@ -100,9 +100,15 @@
 
 <div class="boxer">
     <h4> Input Binding</h4>
-	{% if Intform.FormError %} 
-	<p class="red"> Your form has not been saved. An error has occurred. Please correct the error below. </p> 
-	{% endif %}
+	  <!-- Error notification panel -->
+    {% if Intform.FormError %}
+      <div class="error_boxer">
+        <p>
+          This page contains errors (See highlighted box). Please correct these before saving 
+        </p>
+      </div>
+    {% endif %}
+	
     {% if Intform.forms|length %}
     <div class="boxer2">
 		{% if s %}
