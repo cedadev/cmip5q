@@ -518,7 +518,7 @@ class SimulationForm(forms.ModelForm):
         #will expect them, and set them to None if they don't come back in the post ... a quiet
         #loss of information ...
         exclude=('centre','experiment','uri','codeMod','inputMod','relatedSimulations',
-                 'drsOutput','datasets')
+                 'drsOutput','datasets', 'isComplete')
 
     def clean_drsMember(self):
         # needs to parse into DRS member format

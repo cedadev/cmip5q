@@ -1,122 +1,43 @@
 {% extends "base.html" %}
+
 {% block content %}
+
+<script type="text/javascript">
+     YAHOO.namespace("e111.container");
+     {% for choice in centreList %}
+         YAHOO.e111.container.ytt{{choice.id}} = new YAHOO.widget.Tooltip("ytt{{choice.id}}", 
+        		 { context:"tt{{choice.id}}", text:"{{choice.abbrev}}:&nbsp;{{choice.name}}" });
+     {% endfor %}
+</script>
 
 <center>
   <h1> CMIP5 Model Metadata</h1>
 </center>
 
-<table>
-  <tr>
-    <td valign="top">
-      <div class="boxer">
-        <div class="boxer2">
-          <h1>Model Centre Metadata Entry</h1>
-          <p>Choose your centre from below:</p>
-          
-          <form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
-            <div>
-        
-            <table class="linklike" width="100%">
-              {% for row in objects %}
-                <tr>
-                  {% for choice in row %}
-                    <td width="15%">
-                      <p>
-                        <input type="radio" name="choice" id="{{forloop.counter}}" value="{{choice.id}}"/>
-                        <label id="tt{{choice.id}}" for="choice{{forloop.counter}}">
-                          {{choice.abbrev}}
-                        </label>
-                      </p>
-                    </td>
-                  {% endfor %}
-                </tr>
-              {% endfor %}
-            </table>
-            </div>
+<!-- Centre select Area -->
+<div class="boxer">
+{% include 'centrespage/centreselect.html' %}
+</div>
 
-            <input type="submit" value="Choose"/>
-          </form>
-        </div>
-      </div>
-    </td>
-
-  <td valign="top" width="30%">
-
-  <div class="boxer">
-    <h2> Test Area </h2>
-    <p>In this section, you can either look at an example of what is expected in 
-       terms of filling out the questionnaire, or use the test centre to'play' with 
-       the questionnaire before entering information for real
-    </p>
-    <form action="{{curl}}" method='post' onsubmit="myProject.bypassConfirm()">
-
-      {% for choice in auxList %}
-        <p>
-          <input type="radio" name="auxchoice" id="{{forloop.counter}}" value="{{choice.id}}"/>
-          <label for="choice{{forloop.counter}}">
-            {{choice.abbrev}} 
-            ({{choice.name}})
-          </label>
-        </p>
-      {% endfor %}
-
-      <input type="submit" value="Choose"/>
-    </form>
-  </div>
-
-  <script type="text/javascript">
-        YAHOO.namespace("e111.container");
-	    {% for choice in centreList %}
-            YAHOO.e111.container.ytt{{choice.id}} = new YAHOO.widget.Tooltip("ytt{{choice.id}}", { context:"tt{{choice.id}}", text:"{{choice.abbrev}}:&nbsp;{{choice.name}}" });
-        {% endfor %}
-  </script>
+<!-- Test/Example centre Area -->
+<div class="boxer">
+{% include 'centrespage/testarea.html' %}
+</div>
  
-  <div class="boxer">
-    <h2> Metadata Feeds Available </h2>
-    <p>These are atom feeds to the xml documents which have been published from the metadata entry: </p>
-    <div>
-      <table class="linklike" width="100%">
-        {% for f in feedobjects %}
-          <tr>
-          {% for name,url in f %}
-            <td width="15%">
-              <p>
-                <a href="{{url}}">
-                  <img src="/css/icons/atom.png"/>&nbsp;{{name}}
-                </a>
-              </p>
-            </td>
-          {% endfor %}
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
-    <div>
-      <p> XML documents are not meant for humans. Links to catalogues and portals for CMIP5 data and metadata will appear here when they are available.</p>
-    </div>
-  </div>
+<!-- Atom Feeds section -->
+<div class="boxer">
+{% include 'centrespage/atomfeeds.html' %}
+</div>
 
-  <div class="boxer">
-    <h2>Ensemble member information </h2>
-    <p>Choose a centre to view ensemble member information for each of the simulations described by that centre</p>
+<!-- Interim tools section -->
+<div class="boxer">
+{% include 'centrespage/inttools.html' %}
+</div>
 
-    <form method='POST' action="{{curl}}" target="_blank" onsubmit="myProject.bypassConfirm()">
-      <center>
-        <select name="ripchoice">
-          <option value="" selected="selected">---------</option>
-          {% for centre in centreList %}
-            <option value="{{centre.id}}">{{centre.abbrev}}</option>
-          {% endfor %}
-        </select>
-  
-        <input type="submit" value="Select"/>
-      </center>
-    </form>
-    
-  </div>
+<!-- Published CIM documents table -->
+<div class="boxer">
+{% include 'generic/pubtable.html' %}
+</div>
 
-</td>
 
-</tr>
-</table>
 {% endblock %}

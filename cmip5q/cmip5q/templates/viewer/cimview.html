@@ -1,12 +1,8 @@
 {% extends "base.html" %} 
 
 {% block pagehead %}
-
-<!-- Page specific css/javascript -->
-<link rel="stylesheet" type="text/css" href="/css/page/viewer/accordian_styles.css" />
-
-<script type="text/javascript" src="/css/jquery/page/viewer/jquery.nestedAccordion.js">
-</script>
+<script type="text/javascript" src="/static/jquery/jquery-nestedaccordian/jquery.nestedAccordion.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/jquery/jquery-nestedaccordian/accordian_styles.css" />
 
 <script type="text/javascript">
 	$(function() {
@@ -19,12 +15,9 @@
 	  });
 	});
 </script>
-
 {% endblock %}
 
-
 {% block content %}
-
 <div class="boxer">
   <table>
 	<tr>
@@ -34,5 +27,4 @@
 	</tr>
   </table>
 </div>
-
 {% endblock %}

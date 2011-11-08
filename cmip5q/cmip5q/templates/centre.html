@@ -5,25 +5,23 @@
     Summary page for <b>{{centre.name}} ({{centre.abbrev}})</b>
   </div>
   <div class="boxer">
-    <h4> Introduction </h4>
-      <p>Each CMIP5 modelling centre performs <em> Simulations </em> which run <em> Models </em> on <em> 
-Platforms</em>. The purpose of this questionnaire is to glean information about these platforms, models and simulations and how the simulations conformed to the CMIP5 experiment requirements. We expect each centre to describe at least one platform, one model and multiple simulations following the workflow listed below: 
-<ol><li>Describe a Platform</li><li>Describe a Model and Grid</li><li>Describe some Simulations</li></ol>
-It is not possible to start entering simulation information until at least one model and one platform 
-have been described. <br>  Each new platform, grid and model you create will be given a generic name you will need to give these more appropriate short names so they can be distinguished from each other.   
-</p>
-<h4>Definitions</h4>
-<p><em> Models </em> are made up of <em>Components</em>.</p>
-<p><em> Simulations </em> conform to the <em>Numerical Requirements</em> of <em> Experiments</em>
- via what we call <em>Conformances</em>. 
-<p><em> Conformances </em>will consist of either specific code characteristics (defined here as <em>model modifications</em>) or the use of specific boundary or initial conditions.</p>
+	  <h4> Introduction </h4>
+	  <p>Each CMIP5 modelling centre performs <em> Simulations </em> which run <em> Models </em> on <em> 
+		Platforms</em>. The purpose of this questionnaire is to glean information about these platforms, models and simulations and how the simulations conformed to the CMIP5 experiment requirements. We expect each centre to describe at least one platform, one model and multiple simulations following the workflow listed below: 
+		<ol><li>Describe a Platform</li><li>Describe a Model and Grid</li><li>Describe some Simulations</li></ol>
+		It is not possible to start entering simulation information until at least one model and one platform 
+		have been described. <br>  Each new platform, grid and model you create will be given a generic name you will need to give these more appropriate short names so they can be distinguished from each other.   
+		</p>
+		<h4>Definitions</h4>
+		<p><em> Models </em> are made up of <em>Components</em>.</p>
+		<p><em> Simulations </em> conform to the <em>Numerical Requirements</em> of <em> Experiments</em>
+		 via what we call <em>Conformances</em>. 
+    <p><em> Conformances </em>will consist of either specific code characteristics (defined here as <em>model modifications</em>) or the use of specific boundary or initial conditions.</p>
+  </div>
 
+  <div class="boxer">
 
-</div>
-
-<div class="boxer">
-
-<h4> </h4>
+    <h4> </h4>
 <table>
 <tr>
   <td width="50%">
@@ -46,7 +44,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
             <td width="5%">
               {% if m.isComplete %}
                 <center>
-                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
                 </center>
               {% endif %}
             </td>
@@ -94,7 +92,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
               <td width="5%">
               {% if g.isComplete %}
                 <center>
-                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ g.documentVersion }}">
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ g.documentVersion }}">
                 </center>
               {% endif %}
             </td>
@@ -150,7 +148,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
             <td width="5%">
               {% if m.isComplete %}
                 <center>
-                  <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
                 </center>
               {% endif %}
             </td>
@@ -247,7 +245,7 @@ have been described. <br>  Each new platform, grid and model you create will be 
                 <td width="5%">
                   <center>
                     {% if s.isComplete %}
-                      <img src="/css/icons/icon-tick.png" title="This has been successfully published at version {{ s.documentVersion }}">
+                      <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ s.documentVersion }}">
                     {% endif %}
                   </center>
                 </td>
@@ -265,7 +263,9 @@ have been described. <br>  Each new platform, grid and model you create will be 
     </div>
   </td>        
 </tr>
-</tbody>
 </table>
-</div> 
+
+</div>
+
+
 {% endblock %}

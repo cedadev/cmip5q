@@ -152,6 +152,9 @@ urlpatterns = patterns('',
     (r'', include('cmip5q.protoq.admin.urls')),
     #(r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
     (r'^admin/', include(admin.site.urls)),
+    
+    # AR5 tables included
+    (r'', include('cmip5q.ar5tables.urls')),
 )
 
 # now add the common document url methods
@@ -161,7 +164,7 @@ urlpatterns = patterns('',
                         
 if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
-        (r'^css/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
+        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
     )
     
 # To direct web crawlers to bypass potentially redundant links

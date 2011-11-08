@@ -74,7 +74,7 @@ def get_tag_uri(url, date):
 class Feed(object):
     
     
-    VALIDATE = True
+    VALIDATE = True        
     
     
     def __init__(self, slug, request):

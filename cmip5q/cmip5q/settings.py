@@ -60,7 +60,7 @@ MEDIA_ROOT = thisDir
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -96,7 +96,8 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_STRING_IF_INVALID = 'what happened here?'
 
-STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css", )
+#STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css", )
+STATIC_DOC_ROOT = os.path.join(thisDir, "static", )
 
 INSTALLED_APPS = (
     'django.contrib.auth',

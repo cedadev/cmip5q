@@ -5,30 +5,28 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.template import RequestContext
+from django import forms
+from django.conf import settings
 
 from cmip5q.protoq.models import *
 from cmip5q.protoq.feeds import DocFeed
-
 from cmip5q.protoq.forms import *
-
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.layoutUtilities import tabs
+from cmip5q.protoq.layoutUtilities import tabs, getpubs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.grids import gridHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
-from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist
-
+from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist, get_datatables_records
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
-from django import forms
-from django.conf import settings
-logging=settings.LOG
 
 import simplejson
 
+logging=settings.LOG
 MESSAGE=''
 
 def authorisation(request):
@@ -144,7 +142,9 @@ def centres(request):
     
     #for ab in ['1. Example','2. Test Centre']:
     #    p_aux.append(Centre.objects.get(abbrev=ab))
-        
+    
+    # adding url location for AR5 table button    
+    ar5URL =reverse('cmip5q.ar5tables.views.ar5tables')    
     
     if request.method=='POST':
         #yep we've selected something
@@ -171,8 +171,19 @@ def centres(request):
         feedlist=[]
         for f in sorted(feeds):
             feedlist.append((f,reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%f,))))
-        #return render_to_response('centres.html',{'objects':sublist(p,3),'centreList':p,'auxList':p_aux,'curl':curl,'feeds':feedlist})
-        return render_to_response('centres.html',{'objects':sublist(p,3),'centreList':p,'auxList':p_aux,'curl':curl,'feedobjects':sublist(feedlist,2)})
+            
+        #get publication list for front page table
+        
+        pubs = getpubs()
+        
+        return render_to_response('centres.html',{'objects':sublist(p,4),
+                                                  'centreList':p,
+                                                  'auxList':p_aux,
+                                                  'curl':curl,
+                                                  'pubs':pubs,
+                                                  'feedobjects':sublist(feedlist,4),
+                                                  'ar5URL':ar5URL}
+                                                  )
     
 def centre(request,centre_id):
     ''' Handle the top page on a centre by centre basis '''
@@ -686,7 +697,5 @@ def ripinfo(request):
             m='Unable to select requested centre %s'%request.POST['centrerip']
             logging.info('ERROR on centres page: Unable to select requested centre %s'%request.POST['centrerip'])
             return render_badrequest('error.html',{'message':m})    
-   
-
- 
+        
     
