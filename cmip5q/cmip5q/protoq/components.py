@@ -1,7 +1,7 @@
 # Create your views here.
 from django.template import Context, loader
 from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.forms.models import modelformset_factory
 
@@ -275,7 +275,7 @@ class componentHandler(object):
             Intform=MyCouplingFormSet(cg)
             Intform.specialise()
         return render_to_response('coupling.html',{'c':model,'urls':urls,
-        'Intform':Intform,'tabs':tabs(request,self.centre_id,'Coupling for %s'%c)})
+        'Intform':Intform,'tabs':tabs(request,self.centre_id,'Coupling for %s'%model)})
         
     def inputs(self,request):
         ''' Handle the construction of input requirements into a component '''
