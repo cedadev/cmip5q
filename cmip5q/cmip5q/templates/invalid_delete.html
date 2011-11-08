@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="boxer">
+<h1> Cannot delete "{{klass}}" instance: "{{instance}}" </h1>
+<p> This object cannot be deleted until other objects which point to it have been fixed so they no longer reference it </p>
+<h4> Objects which reference this one </h4>
+<p></p>
+<ul>
+{% for k,l in failed.items %}
+<li> {{k}}<ul>{% for i in l %}<li>{{i}}</li>{% endfor %}</ul></li> 
+{% endfor %}
+</ul>
+<p> Use your browser back button to return </p>
+</div>
+{% endblock %}

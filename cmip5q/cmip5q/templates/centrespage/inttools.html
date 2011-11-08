@@ -1,0 +1,43 @@
+<div class="formcontainer">
+  
+  <div class="header">
+    <h1>Tools Section</h1>
+  </div>
+  
+  <!-- Ensemble table generator -->
+  <div class="info">
+    <h3>Ensemble Member Information</h3>
+    Choose a centre to view ensemble member information for each of the 
+    simulations described by that centre  
+  </div>
+
+  <div class="content">
+    <form method='POST' action="{{curl}}" target="_blank" onsubmit="myProject.bypassConfirm()">
+		    <select name="ripchoice">
+		      <option value="" selected="selected">---------</option>
+		      {% for centre in centreList %}
+		        <option value="{{centre.id}}">{{centre.abbrev}}</option>
+		      {% endfor %}
+		    </select>
+    
+    </div>
+    <div class="buttonbar">
+      <input type="submit" class="submitBut" value="Select"/>
+    </div>
+    </form>
+    
+    
+    <!-- AR5 table generator -->
+    <div class="info">
+      <h3>AR5 Tables</h3>
+      Use this button to generate an AR5 model documentation table
+    </div>
+      
+    <div class="content">      
+      <div class="buttonbar">
+        <a target="_blank" href="{{ar5URL}}">Generate tables</a>
+      </div>
+    </div>
+
+
+</div>

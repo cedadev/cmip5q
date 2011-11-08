@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="boxer titlerow">
+    Summary page for <b>{{centre.name}} ({{centre.abbrev}})</b>
+  </div>
+  <div class="boxer">
+	  <h4> Introduction </h4>
+	  <p>Each CMIP5 modelling centre performs <em> Simulations </em> which run <em> Models </em> on <em> 
+		Platforms</em>. The purpose of this questionnaire is to glean information about these platforms, models and simulations and how the simulations conformed to the CMIP5 experiment requirements. We expect each centre to describe at least one platform, one model and multiple simulations following the workflow listed below: 
+		<ol><li>Describe a Platform</li><li>Describe a Model and Grid</li><li>Describe some Simulations</li></ol>
+		It is not possible to start entering simulation information until at least one model and one platform 
+		have been described. <br>  Each new platform, grid and model you create will be given a generic name you will need to give these more appropriate short names so they can be distinguished from each other.   
+		</p>
+		<h4>Definitions</h4>
+		<p><em> Models </em> are made up of <em>Components</em>.</p>
+		<p><em> Simulations </em> conform to the <em>Numerical Requirements</em> of <em> Experiments</em>
+		 via what we call <em>Conformances</em>. 
+    <p><em> Conformances </em>will consist of either specific code characteristics (defined here as <em>model modifications</em>) or the use of specific boundary or initial conditions.</p>
+  </div>
+
+  <div class="boxer">
+
+    <h4> </h4>
+<table>
+<tr>
+  <td width="50%">
+
+	<p/>
+	
+	<!-- Platform summary section -->
+	
+	<div class="boxer">
+      <table width="100%">
+        <thead>
+          <tr>
+            <th colspan="2"> Computing platforms associated with {{centre.abbrev}}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in platforms %}
+	        <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="65%">{{m.abbrev}}</td>
+            <td width="5%">
+              {% if m.isComplete %}
+                <center>
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
+                </center>
+              {% endif %}
+            </td>
+	          <td width="15%">
+              <center>
+                <span>
+                  <a id="edPlatButton{{forloop.counter}}" href="{{m.url}}">
+                    Edit
+                  </a>
+                </span>
+              </center>
+            <td width="15%"></td>
+	        </tr>
+	        <script type="text/javascript">
+	          var oLinkButtonEdPlat{{forloop.counter}} = new YAHOO.widget.Button("edPlatButton{{forloop.counter}}");
+	        </script>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      <center>
+        <a class="addnewbut" id="newPlatButton" href="{{newplat}}">Add a new Platform</a>
+      </center>
+      
+      <script type="text/javascript">
+        var newplatButton = new YAHOO.widget.Button("newPlatButton"); 
+      </script>
+    </div>
+    
+    <p/>
+    
+    <!-- Grid summary section -->
+    
+    <div  class="boxer">
+      <table width="100%">
+        <thead>
+          <tr>
+            <th colspan="4"> Grids associated with {{centre.abbrev}}</th>
+          </tr>
+        </thead>
+        <tbody> 
+	      {% for g in grids %}
+	        <tr class="{% cycle 'row2' 'row1'%}">
+	            <td width="65%">{{g.abbrev}}</td>
+              <td width="5%">
+              {% if g.isComplete %}
+                <center>
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ g.documentVersion }}">
+                </center>
+              {% endif %}
+            </td>
+	            <td width="15%">
+                  <center>
+                    <span style="width:70%"> 
+                      <a style="width:70%" id="edGridButton{{forloop.counter}}" href="{{g.url}}">
+                        Edit
+                      </a>
+                    </span>
+                  </center>
+                </td>
+	            <td width="15%">
+                  <center>
+                    <form action="{{g.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
+                      <input id="gridcopySubmit{{forloop.counter}}" type="submit" value="Copy">
+                    </form>
+                  </center>
+                </td>
+	        </tr>
+	        <script type="text/javascript">
+	            var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edGridButton{{forloop.counter}}");
+	            var ogridSubButtom{{forloop.counter}}= new YAHOO.widget.Button("gridcopySubmit{{forloop.counter}}",
+	                    {value:"gridcopySubmit{{forloop.counter}}value"});
+	        </script>    
+	      {% endfor %}
+        </tbody>
+      </table>
+      <center>
+        <a class="addnewbut" id="newGridButton" href="{{newgrid}}">Add a new Grid</a>
+      </center>
+   
+      <script type="text/javascript">
+        var newmodButton = new YAHOO.widget.Button("newGridButton");
+      </script>
+    </div>
+    
+    <p/>
+    
+    <!-- Model summary section -->
+    
+    <div  class="boxer">
+      <table width="100%">
+        <thead>
+            <tr><th colspan="4"> Models associated with {{centre.abbrev}}</th></tr>
+            <!-- Removing the 'status/% complete' from models for now - not sure it makes sense to include it (also code below)-->
+            <!-- <tr><th colspan="3"></th> <th width=20%> Status </th> -->
+        </thead>
+        <tbody> 
+        {% for m in models %}
+          <tr class="{% cycle 'row2' 'row1'%}">
+            <td width="65%">{{m.abbrev}}</td>
+            <td width="5%">
+              {% if m.isComplete %}
+                <center>
+                  <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ m.documentVersion }}">
+                </center>
+              {% endif %}
+            </td>
+            <td width="15%">
+              <center> 
+                <span> 
+                  <a id="edModButton{{forloop.counter}}" href="{{m.url}}">
+                    Edit
+                  </a>
+                </span>
+              </center>
+            </td>
+            <td width="15%">
+              <center>
+                <form action="{{m.cpURL}}" method="POST" onsubmit="myProject.bypassConfirm()">
+                  <input id="copySubmit{{forloop.counter}}" type="submit" value="Copy">
+                </form>
+              </center>
+            </td>
+            
+            <!-- Removing the 'status/% complete' from models for now - not sure it makes sense to include it (also code above)-->
+            <!-- <td><p class="{% ifequal m.status 100.0 %}valid{% else %}invalid{%endifequal%}">{{m.status}}% valid</p></td> -->
+            
+          </tr>
+          <script type="text/javascript">
+            var oLinkButtonEdMod{{forloop.counter}} = new YAHOO.widget.Button("edModButton{{forloop.counter}}");
+            var oSubButtom{{forloop.counter}}= new YAHOO.widget.Button("copySubmit{{forloop.counter}}",
+                  {value:"copySubmit{{forloop.counter}}value"});
+          </script>    
+        {% endfor %}
+      </table>
+      <center>
+        <a id="newModButton" href="{{newmod}}">Add a new Model</a>
+      </center>
+      <div class="helper_boxer">
+        It can take some time (minutes) to create a new model or copy an existing one ... be patient!   
+      </div>
+      <script type="text/javascript">
+        var newmodButton = new YAHOO.widget.Button("newModButton");
+      </script>
+      <!-- 
+      <p class="guidance"> The status column provides an indication of how much of the model description has
+      been completed.
+      -->
+    
+      <!--CopyAsNew should be used to describe variants of already described models.--></p>
+    </div>
+  </td>
+  
+  <td>
+  
+    <!-- Files/Refs summary section -->
+    
+    <div class="boxer">
+        <table width="100%">
+            <thead><tr><th>Files, References and Parties</th></tr></thead>
+            <tbody>
+                <tr class="row2"><td> There are {{refs|length }} references associated with {{centre}} </td></tr>
+                <tr class="row1"><td> There are {{files|length }} files associated with {{centre}} </td></tr>
+                <tr class="row2"><td> There are {{parties|length }} people and institutions associated with {{centre}} </td></tr>
+            </tbody>
+        </table> 
+    </div>
+    
+    <p/>
+    
+    <!-- Simulations summary section -->
+    
+    <div class="boxer">
+      <table width="100%">
+          <tr>
+            <th>
+              <center>
+                Simulations associated with {{centre.abbrev}}
+              </center>
+            </th>
+          </tr>
+      </table>
+      <table>
+        <tbody>
+          {% for sgroup in sims %}
+            <tr class="{% cycle 'row2' 'row1'%}">
+              {% for s in sgroup %}
+                <td width="28%">
+                  <center>
+                    <span>
+                      <a id="edSimButton{{s.id}}" href="{{s.url}}">{{s.abbrev}}</a>
+                    </span>
+                    <script type="text/javascript">
+                      var oLinkEdSimBut{{forloop.counter}} = new YAHOO.widget.Button("edSimButton{{s.id}}");
+                    </script>
+                  </center>
+                </td>
+                <td width="5%">
+                  <center>
+                    {% if s.isComplete %}
+                      <img src="/static/icons/icon-tick.png" title="This has been successfully published at version {{ s.documentVersion }}">
+                    {% endif %}
+                  </center>
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <center>
+        <a class="addnewbut" id="viewSimBut" href="{{viewsimurl}}">Manage/Add Simulations</a>
+      </center>
+      <script type="text/javascript">
+        var oViewSimBut = new YAHOO.widget.Button("viewSimBut");
+      </script>
+    </div>
+  </td>        
+</tr>
+</table>
+
+</div>
+
+
+{% endblock %}
