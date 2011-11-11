@@ -1,13 +1,12 @@
 .cycletable table {
-    font-size:0.9em;
-    font-family: Arial, Helvetica, verdana sans-serif;
-    background-color:#fff;
+    font-size:0.8em;
+    background: #ffffff;
     border-collapse: collapse;
-    width: 100%;
+    width: 1000px;
     }
 
 .cycletable caption {
-    font-size: 25px;
+    font-size: 20px;
     color: #1ba6b2;
     font-weight: bold;
     text-align: left;
@@ -22,7 +21,6 @@
     text-align:center;
     padding:2px;
     text-transform:uppercase;
-    height:25px;
     background-color: #a3c159;
     font-weight: normal;
     }

@@ -9,6 +9,30 @@ Created on 23 Sep 2011
 from cmip5q.protoq.models import *  
 
 
+def get_realmimpl(model, sciencetype):
+    '''
+    Returns whether a realm component is implemented 
+    '''
+    c = Component.objects.filter(isRealm=True).filter(
+                                    scienceType=sciencetype).get(model=model)
+        
+    return c.implemented
+
+
+def get_realmabbrev(model, sciencetype):
+    '''
+    Returns a realm component abbrev  
+    '''
+    try:
+        c = Component.objects.filter(isRealm=True).filter(
+                                    scienceType=sciencetype).get(model=model)
+        realmabbrev = c.abbrev
+    except:
+        realmabbrev = ""
+        
+    return realmabbrev
+
+
 def get_lsrivrout(model):
     '''
     Returns whether river routing is implemented
@@ -129,7 +153,7 @@ def get_sirheology(model):
 
 def get_oceanTopBC(model):
     '''
-    Retrieves the ocean free slip type
+    Retrieves the ocean top BC
     '''
     
     try:
@@ -199,7 +223,7 @@ def get_ZCoord(model, sciencetype):
 
 def get_HorGridRes(model, sciencetype, mnemonic=False):
     '''
-    Gets the horizontal grid resolution (and optionnaly the mnemonic) for a 
+    Gets the horizontal grid resolution (and optionally the mnemonic) for a 
     component of a supplied model
     '''
     
@@ -281,15 +305,15 @@ def get_atmGrid(model):
     return atmosgridmnem, atmosgridres
                 
 
-def get_atmTopLevel(model):
+def get_vertgridinfo(model, sciencetype):
     '''
-    Gets the top level for a supplied model
+    Gets the vertical grid info for a supplied component
     '''
     
     try:
         #get the atmosphere level component
         c = Component.objects.filter(isRealm=True).filter(
-                                    scienceType='Atmosphere').get(model=model)
+                                    scienceType=sciencetype).get(model=model)
         
         #get the two subgrids (hor and vert)
         grids = c.grid.grids.all()            
@@ -299,19 +323,32 @@ def get_atmTopLevel(model):
         vertgrid = grids.get(paramGroup__in=vpgs)
         #and now the actual VerticalExtent ParamGroup
         pg = ParamGroup.objects.filter(grid=vertgrid).get(name='VerticalExtent')
-        #Now get the constraint group for 'atmospheric domain'
-        cg = ConstraintGroup.objects.filter(parentGroup=pg).get(
+        #Now get the constraint group
+        if sciencetype == 'Atmosphere':
+            cg = ConstraintGroup.objects.filter(parentGroup=pg).get(
                                         constraint='if Domain is "atmospheric"')
-        #and now the individual keyboard parameter for 'TopModelLevel'
-        bp = BaseParam.objects.filter(constraint=cg).get(name='TopModelLevel')
-        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)                        
+            # now the individual keyboard parameter for 'TopModelLevel' (for atmos)
+            bp = BaseParam.objects.filter(constraint=cg).get(name='TopModelLevel')
+            kp = KeyBoardParam.objects.get(baseparam_ptr=bp)                        
+            gridtop = kp.value
+        else:
+            cg = ConstraintGroup.objects.filter(parentGroup=pg).get(
+                                        constraint='if Domain is "oceanic"')
+            # now the individual keyboard parameter for 'UpperLevel' (for ocean)
+            bp = BaseParam.objects.filter(constraint=cg).get(name='UpperLevel')
+            kp = KeyBoardParam.objects.get(baseparam_ptr=bp)                        
+            gridtop = kp.value
         
-        atmosgridtop = kp.value
+        # now the individual keyboard parameter for 'NumberOfLevels'
+        bp = BaseParam.objects.filter(constraint=cg).get(name='NumberOfLevels')
+        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)                        
+        numlevels = kp.value
         
     except:
-        atmosgridtop = ''
+        gridtop = ''
+        numlevels = ''
     
-    return atmosgridtop
+    return gridtop, numlevels
 
 
 def get_Refs(model, sciencetype):
@@ -319,7 +356,11 @@ def get_Refs(model, sciencetype):
     Returns references associated with a particular component of a model
     '''
     try:
-        c = Component.objects.filter(isRealm=True).filter(
+        if sciencetype is not "model":
+            c = Component.objects.filter(isRealm=True).filter(
+                                    scienceType=sciencetype).get(model=model)
+        else:
+            c = Component.objects.filter(isModel=True).filter(
                                     scienceType=sciencetype).get(model=model)
         refs = c.references.all()
         refslist = []

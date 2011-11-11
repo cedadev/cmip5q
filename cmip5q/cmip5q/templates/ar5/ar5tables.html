@@ -82,75 +82,148 @@
 	           <a href="#" class="jqmClose">Close</a>
 												<hr>
 												<em>READ ME</em> -->
-												This is a "vanilla plain" jqModal window. Behavior and appeareance extend far beyond this.
-												The demonstrations on this page will show off a few possibilites. I recommend walking
-												through each one to get an understanding of jqModal <em>before</em> using it.
-												
-												<br /><br />
-												You can view the sourcecode of examples by clicking the Javascript, CSS, and HTML tabs.
-												Be sure to checkout the <a href="README">documentation</a> too!
-												
-												<br /><br />
-												<em>NOTE</em>; You can close windows by clicking the tinted background known as the "overlay".
-												Clicking the overlay will have no effect if the "modal" parameter is passed, or if the
-												overlay is disabled.
+												Help text to go here
 									 </div>
 							   
 							   
 							   <table class="cycletable" >
            <thead>
              <tr>
-               <th width="20%">Model ID, Vintage</th>
-               <th width="25%">Institution, Main Reference, Flux Corrections</th>
-               <th width="10%">
+               <!-- Main Model info -->
+               <th>
+                 Model ID
+                 <br/> 
+                 Vintage
+               </th>
+               
+               <th>
+                 Institution
+                 <br/> 
+                 Main Reference(s)
+                 <br/> 
+                 Flux Correction
+               </th>
+               
+               <!-- Aerosol Column -->
+               <th>
+                 <span style="text-decoration: underline; color:white">
+                 Aerosols
+                 </span>
+                 <br/>
+                 Component Name
+                 <br/>
+                 Code Independence
+                 <br/>                 
+                 References
+               </th>
+               
+               <!-- Atmosphere Column -->
+               <th>
                  <span style="text-decoration: underline; color:white">
                  Atmosphere
                  </span>
                  <br/>
-                 Top
+                 Component Name
                  <br/>
-                 Resolution
+                 Horizontal Grid
                  <br/>
+                 Number of Vert Levels
+                 <br/>
+                 Grid Top
+                 <br/>
+                 Code Independence
+                 <br/>                 
                  References
                </th>
-               <th width="10%">
+               
+               <!-- Atmospheric chemistry Column -->
+               <th>
+                 <span style="text-decoration: underline; color:white">
+                 Atmos Chemistry
+                 </span>
+                 <br/>
+                 Component Name
+                 <br/>
+                 Code Independence
+                 <br/>                 
+                 References
+               </th>
+               
+               <!-- Land Ice Column -->
+               <th>
+                 <span style="text-decoration: underline; color:white">
+                 Land Ice
+                 </span>
+                 <br/>
+                 Component Name
+                 <br/>
+                 Code Independence
+                 <br/>                 
+                 References
+               </th>
+               
+               <!-- Land Surface Column -->
+               <th>
+                 <span style="text-decoration: underline; color:white">
+                 Land Surface
+                 </span>
+                 <br/>
+                 Component Name
+                 <br/>
+                 Code Independence
+                 <br/>                 
+                 References
+               </th>
+               
+               <!-- Ocean Biogeochemistry Column -->
+               <th>
+                 <span style="text-decoration: underline; color:white">
+                 Ocean Biogeochemistry
+                 </span>
+                 <br/>
+                 Component Name
+                 <br/>
+                 Code Independence
+                 <br/>                 
+                 References
+               </th>
+                              
+               <!-- Ocean Column -->
+               <th>
                  <span style="text-decoration: underline; color:white">
                  Ocean
                  </span>
                  <br/>
-                 Resolution
+                 Component Name
                  <br/>
-                 Z Coord., Top BC
+                 Horizontal Resolution
                  <br/>
+                 Number of Vertical Levels
+                 <br/>
+                 Top Level
+                 <br/>
+                 Z Co-ord
+                 <br/>
+                 Top BC
+                 <br/>
+                 Code Independence
+                 <br/>                 
                  References
                </th>
-               <th width="10%">
+               
+               <!-- Sea Ice Column -->
+               <th>
                  <span style="text-decoration: underline; color:white">
                  Sea Ice
                  </span>
                  <br/>
-                 Dynamics, Leads
+                 Component Name
                  <br/>
+                 Code Independence
+                 <br/>                 
                  References
                </th>
-               <th width="15%">
-                 <span style="text-decoration: underline; color:white">
-                 Coupling
-                 </span>
-                 <br/>
-                 Flux adjustments
-                 <br/>
-                 References
-               </th>
-               <th width="10%">
-                 <span style="text-decoration: underline; color:white">
-                 Land
-                 </span>
-                 <br/>
-                 Soil, Plants, Routing
-                 <br/>
-                 References
-               </th>
+               
              </tr>
            </thead>
           <tbody>
@@ -158,29 +231,160 @@
             <tr class="{%cycle 'row2' 'row1'%}">
               
               <td>
-                {{ model.abbrev }} 
+                {{ model.abbrev }}
+                <br/> 
                 {% if model.yearReleased %}
-                  ,{{ model.yearReleased }}
+                  {{ model.yearReleased }}
                 {% endif %}
               </td>
               
               <td>
-                {{ model.centre.name }} 
+                {{ model.centre.name }}
+                <br/>
+                {% for ref in model.mainrefs %}
+                  {{ ref }}; 
+                {% endfor %}
+                <br/>
+                Flux correction field
               </td>
               
+              <!-- Aerosol -->
               <td>
-                 {% if model.atmosgridtop %}
-                   top = {{ model.atmosgridtop }}
-                 {% endif %}
-                 <br/>
-                 {% if model.atmoshorgrid %}
-                   {{ model.atmoshorgrid }}
-                 {% endif %}
-                 <br/>
-                 {% for ref in model.atmosrefs %}
-                   {{ ref }}
-                 {% endfor %}
+                 {% if model.aerimplemented%}
+		                 {{ model.aerabbrev }}
+		                 <br/>
+		                 XX %
+		                 <br/>
+		                 {% for ref in model.aerrefs %}
+		                   {{ ref }}
+		                 {% endfor %}
+		               {% else %}
+		                 None
+		               {% endif %}
               </td>
+              
+              <!-- Atmosphere -->
+              <td>
+                 {% if model.atmosimplemented%}
+                   {{ model.atmosabbrev }}
+                   <br/>
+                   {{model.atmoshorgrid}}
+                   <br/>
+                   {{ model.atmosnumlevels }}
+                   <br/>
+                   {{ model.atmosgridtop }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.atmosrefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- Atmos Chemistry -->
+              <td>
+                 {% if model.atmchemimplemented%}
+                   {{ model.atmchemabbrev }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.atmchemrefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- LandIce -->
+              <td>
+                 {% if model.liceimplemented%}
+                   {{ model.liceabbrev }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.licerefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- Land Surface -->
+              <td>
+                 {% if model.lsurfimplemented%}
+                   {{ model.lsurfabbrev }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.lsurfrefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- Ocean Biogeochem -->
+              <td>
+                 {% if model.obgcimplemented%}
+                   {{ model.obgcabbrev }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.obgcrefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- Ocean -->
+              <td>
+                 {% if model.oceanimplemented%}
+                   {{ model.oceanabbrev }}
+                   <br/>
+                   {{ model.oceanhorgrid }}
+                   <br/>
+                   {{ model.oceannumlevels }}
+                   <br/>
+                   {{ model.oceantoplevel }}
+                   <br/>
+                   {{ model.zcoord }}
+                   <br/>
+                   {{ model.oceantopbc }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.oceanrefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!-- Sea Ice -->
+              <td>
+                 {% if model.seaiceimplemented%}
+                   {{ model.seaiceabbrev }}
+                   <br/>
+                   XX %
+                   <br/>
+                   {% for ref in model.seaicerefs %}
+                     {{ ref }}
+                   {% endfor %}
+                 {% else %}
+                   None
+                 {% endif %}
+              </td>
+              
+              <!--
               
               <td>
                 {% if model.oceangrid %}
@@ -223,7 +427,8 @@
               {% for ref in model.lsrefs %}
               {{ ref }}; 
               {% endfor %}
-              </td>             
+              </td>
+              -->             
             </tr>
             {% endfor %}
           </tbody>
