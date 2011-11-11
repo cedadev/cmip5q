@@ -85,8 +85,7 @@
 												Help text to go here
 									 </div>
 							   
-							   
-							   <table class="cycletable" >
+          <table class="cycletable">
            <thead>
              <tr>
                <!-- Main Model info -->
@@ -382,53 +381,7 @@
                  {% else %}
                    None
                  {% endif %}
-              </td>
-              
-              <!--
-              
-              <td>
-                {% if model.oceangrid %}
-                  {{ model.oceangrid }}
-                {% endif %}
-                <br/>
-                {% if model.zcoord %}
-                  {{ model.zcoord }}
-                {% endif %}
-                {% if model.topbc %}
-                  ,{{ model.topbc }}
-                {% endif %}
-                <br/>
-                {% for ref in model.oceanrefs %}
-                  {{ ref }}; 
-                {% endfor %}
-              </td>
-              
-              <td>
-                {% if model.sirheol %}
-                  <a href= "{{ model.sirheolurl }}" >Rheology: {{ model.sirheol }}</a>
-                {% endif %}
-                {% if model.siwaterpond %}
-                  <a href= "{{ model.siwpurl }}" >Waterponds: {{ model.siwaterpond }}</a>
-                {% endif %}
-                {% if model.siwaterpond %}
-                  <a href= "{{ model.silmurl }}" >Lateral melting: {{ model.silatmelt }}</a>
-                {% endif %}
-                <br/>
-                {% for ref in model.seaicerefs %}
-                  {{ ref }}; 
-                {% endfor %}
-              </td>
-              <td></td>
-              <td>
-                {% if model.riverrouting %}
-                   <a href= "{{ model.rrurl }}" >River routing: {{ model.riverrouting }}</a>
-                 {% endif %}
-                 <br/>
-              {% for ref in model.lsrefs %}
-              {{ ref }}; 
-              {% endfor %}
-              </td>
-              -->             
+              </td>          
             </tr>
             {% endfor %}
           </tbody>
@@ -489,10 +442,7 @@
 							   </table>
 							   
 							 </div>
-        <!-- End of Table 3 -->
-							 
-						</div>  
-     
+        <!-- End of Table 3 -->     
    </div>
 
 {% endblock %}
