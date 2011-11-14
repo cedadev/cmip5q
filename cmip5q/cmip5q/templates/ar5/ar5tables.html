@@ -53,6 +53,12 @@
 				 });
 			</script>
 			
+   <script>
+     $(function() {
+       $('#tablescroll').fixer({fixedrows:1,fixedcols:1,width:0, height:600});
+     });
+   </script>
+			
 {% endblock %}
      
      
@@ -85,11 +91,11 @@
 												Help text to go here
 									 </div>
 							   
-          <table class="cycletable">
-           <thead>
+          <table id="tablescroll" class="cycletable">
+            <thead>
              <tr>
                <!-- Main Model info -->
-               <th>
+               <th style="width:240px">
                  Model ID
                  <br/> 
                  Vintage
@@ -224,12 +230,12 @@
                </th>
                
              </tr>
-           </thead>
-          <tbody>
+            </thead>
+            <tbody>
             {% for model in table1 %}
             <tr class="{%cycle 'row2' 'row1'%}">
               
-              <td>
+              <td style="width:240px">
                 {{ model.abbrev }}
                 <br/> 
                 {% if model.yearReleased %}
@@ -386,7 +392,6 @@
             {% endfor %}
           </tbody>
          </table>
-							 </div>
 							 <!-- End of table 1 -->
 							 
         <!-- Table 2 --> 

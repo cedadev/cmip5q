@@ -3,6 +3,8 @@
     background: #ffffff;
     border-collapse: collapse;
     width: 1000px;
+    table-layout: fixed;
+    overflow: hidden;
     }
 
 .cycletable caption {
@@ -49,6 +51,13 @@
 .cycletable tbody th {
     text-align:center;
     padding:2px;
+    background-color: #a3c159;
+    border-right: 1px solid #fff;
+    color:#fff;
+    text-align:center;
+    text-transform:uppercase;
+    font-weight: normal;
+    width:300px;
     }
 
 .cycletable tbody td a, tbody th a {
@@ -74,4 +83,7 @@
     background-color:#F5FFDC; 
     }
 
-	
+/* manually added by GD for fixer script
+.cycletable .fixed {
+    background-color:#a3c159;
+    }
