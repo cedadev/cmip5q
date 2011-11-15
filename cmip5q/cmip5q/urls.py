@@ -155,6 +155,9 @@ urlpatterns = patterns('',
     
     # AR5 tables included
     (r'', include('cmip5q.ar5tables.urls')),
+    
+    # API included
+    (r'', include('cmip5q.api.urls')),
 )
 
 # now add the common document url methods
