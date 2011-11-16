@@ -102,10 +102,6 @@
       <assert test="string-length(simulation/reference/description) > 0" >
        A description must be provided for each Ensemble member in Simulation <value-of select="current()/simulation/reference/name"/>.
       </assert>
-      <assert test="count(..//ensembleMember/simulation/reference[change[1][name = current()/simulation/reference/change[1]/name]][change[last()][name = current()/simulation/reference/change[last()]/name]]/name)&lt;2" >
-<!--        Ensemble member uniqueness constraint: <value-of select="simulation/reference/change[1]/name" />  and <value-of select="simulation/reference/change[last()]/name" /> from <value-of select="count(..//ensembleMember/simulation/reference[change[1][name = current()/simulation/reference/change[1]/name]][change[last()][name = current()/simulation/reference/change[last()]/name]]/name)" /> -->
-        An Ensemble member's mods must be unique within an Ensemble: Mod combination <value-of select="simulation/reference/change[1]/name" /> and <value-of select="simulation/reference/change[last()]/name" /> occurs multiple times within Ensemble for Simulation <value-of select="current()/simulation/reference/name" />
-      </assert>
     </rule>
   </pattern>
 
