@@ -48,51 +48,25 @@ def ar5csv(request):
     writer = csv.writer(response)
     
     #write column headings
-    writer.writerow(['Model ID', 
-                     'Vintage', 
-                     'Institution',
-                     'Main references',
-                     'Flux correction',
+    writer.writerow(['Model ID| Vintage',
                      
-                     'Aerosol component name',
-                     'Aerosol code independance',
-                     'Aerosol references',
+                     'Institution| Main references| Flux correction',
                      
-                     'Atmosphere component name',
-                     'Atmosphere horizontal grid',
-                     'Atmosphere grid number of levels ',
-                     'Atmosphere grid top',
-                     'Atmosphere code independance',
-                     'Atmosphere references',
+                     'Aerosol component name| Aerosol code independance| Aerosol references',
                      
-                     'Atmos chemistry component name',
-                     'Atmos chemistry code independance',
-                     'Atmos chemistry references',
+                     'Atmosphere component name| Atmosphere horizontal grid | Atmosphere grid number of levels| Atmosphere grid top| Atmosphere code independance | Atmosphere references',
                      
-                     'land ice component name',
-                     'Land ice code independance',
-                     'Land ice references',
+                     'Atmos chemistry component name| Atmos chemistry code independance | Atmos chemistry references',
                      
-                     'Land surface component name',
-                     'Land surface code independance',
-                     'Land surface references',
+                     'land ice component name| Land ice code independance| Land ice references',
                      
-                     'Ocean biogeochem component name',
-                     'Ocean biogeochem code independance',
-                     'Ocean biogeochem references',
+                     'Land surface component name| Land surface code independance | Land surface references',
                      
-                     'Ocean component name',
-                     'Ocean horizontal grid',
-                     'Ocean number of levels',
-                     'Ocean top level',
-                     'Ocean Z coordinate',
-                     'Ocean top BC',
-                     'Ocean code independance',
-                     'Ocean references',
+                     'Ocean biogeochem component name| Ocean biogeochem code independance | Ocean biogeochem references',
                      
-                     'Sea ice component name',
-                     'Sea ice code independance',
-                     'Sea ice references',
+                     'Ocean component name| Ocean horizontal grid | Ocean number of levels| Ocean top level| Ocean Z coordinate| Ocean top BC | Ocean code independance | Ocean references',
+                     
+                     'Sea ice component name| Sea ice code independance| Sea ice references',
                      
                      ])
     
@@ -169,51 +143,25 @@ def ar5csv(request):
             seaicecits = "".join(seaicecits)
             
             
-        writer.writerow([row.abbrev, 
-                         row.yearReleased, 
-                         row.centre.name,
-                         "".join(maincits),
-                         "Flux correction field",
+        writer.writerow([row.abbrev+'| '+str(row.yearReleased), 
                          
-                         row.aerabbrev,
-                         "XX%",
-                         aercits,
+                         row.centre.name+'| '+"".join(maincits)+'| '+'Flux correction field',
                          
-                         row.atmosabbrev,
-                         row.atmoshorgrid,
-                         row.atmosnumlevels,
-                         row.atmosgridtop,
-                         "XX%",
-                         "".join(atmoscits),
+                         row.aerabbrev+'| '+'XX%'+'| '+aercits,
                          
-                         row.atmchemabbrev,
-                         "XX%",
-                         "".join(atmchemcits),
+                         row.atmosabbrev+'| '+row.atmoshorgrid+'| '+row.atmosnumlevels+'| '+row.atmosgridtop+'| '+'XX%'+'| '+"".join(atmoscits),
                          
-                         row.liceabbrev,
-                         "XX%",
-                         "".join(licecits),
+                         row.atmchemabbrev+'| '+'XX%'+'| '+"".join(atmchemcits),
                          
-                         row.lsurfabbrev,
-                         "XX%",
-                         "".join(lsurfcits),
+                         row.liceabbrev+'| '+'XX%'+'| '+"".join(licecits),
                          
-                         row.obgcabbrev,
-                         "XX%",
-                         "".join(obgccits),
+                         row.lsurfabbrev+'| '+'XX%'+'| '+"".join(lsurfcits),
                          
-                         row.oceanabbrev,
-                         row.oceanhorgrid,
-                         row.oceannumlevels,
-                         row.oceantoplevel,
-                         row.oceanzcoord,
-                         row.oceantopbc,                         
-                         "XX%",
-                         "".join(oceancits),
+                         row.obgcabbrev+'| '+'XX%'+'| '+"".join(obgccits),
                          
-                         row.seaiceabbrev,
-                         "XX%",
-                         "".join(seaicecits),
+                         row.oceanabbrev+'| '+row.oceanhorgrid+'| '+row.oceannumlevels+'| '+row.oceantoplevel+'| '+row.oceanzcoord+'| '+row.oceantopbc+'| '+'XX%'+'| '+"".join(oceancits),
+                         
+                         row.seaiceabbrev+'| '+'XX%'+'| '+"".join(seaicecits),
                          ])
     
     return response

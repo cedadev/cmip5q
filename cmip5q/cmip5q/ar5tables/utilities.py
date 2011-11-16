@@ -30,7 +30,7 @@ def get_realmabbrev(model, sciencetype):
     except:
         realmabbrev = ""
         
-    return realmabbrev
+    return str(realmabbrev)
 
 
 def get_lsrivrout(model):
@@ -52,7 +52,7 @@ def get_lsrivrout(model):
     cen = Centre.objects.get(component=c)
     myurl =reverse('cmip5q.protoq.views.componentEdit',args=(cen.id, c.id))
     
-    return riverrouting, myurl
+    return str(riverrouting), myurl
 
 
 
@@ -86,7 +86,7 @@ def get_silatmelt(model):
     cen = Centre.objects.get(component=c)
     myurl =reverse('cmip5q.protoq.views.componentEdit',args=(cen.id, c.id))
     
-    return silatmelt, myurl
+    return str(silatmelt), myurl
 
 
 def get_siwaterpond(model):
@@ -117,7 +117,7 @@ def get_siwaterpond(model):
     cen = Centre.objects.get(component=c)
     myurl =reverse('cmip5q.protoq.views.componentEdit',args=(cen.id, c.id))
     
-    return siwaterpond, myurl
+    return str(siwaterpond), myurl
 
 
 def get_sirheology(model):
@@ -148,7 +148,7 @@ def get_sirheology(model):
     cen = Centre.objects.get(component=c)
     myurl =reverse('cmip5q.protoq.views.componentEdit',args=(cen.id, c.id))
     
-    return sirheol, myurl
+    return str(sirheol), myurl
 
 
 def get_oceanTopBC(model):
@@ -174,7 +174,7 @@ def get_oceanTopBC(model):
     except:
         topbc = ''
     
-    return topbc
+    return str(topbc)
 
 
 def get_ZCoord(model, sciencetype):
@@ -218,7 +218,7 @@ def get_ZCoord(model, sciencetype):
     except:
         zcoord = ''
     
-    return zcoord
+    return str(zcoord)
 
 
 def get_HorGridRes(model, sciencetype, mnemonic=False):
@@ -261,9 +261,9 @@ def get_HorGridRes(model, sciencetype, mnemonic=False):
         gridres = ''
     
     if mnemonic:
-        return gridmnem, gridres
+        return str(gridmnem), str(gridres)
     else:
-        return gridres
+        return str(gridres)
 
 
 def get_atmGrid(model):
@@ -302,7 +302,7 @@ def get_atmGrid(model):
         atmosgridmnem = ''
         atmosgridres = ''
     
-    return atmosgridmnem, atmosgridres
+    return str(atmosgridmnem), str(atmosgridres)
                 
 
 def get_vertgridinfo(model, sciencetype):
@@ -348,7 +348,7 @@ def get_vertgridinfo(model, sciencetype):
         gridtop = ''
         numlevels = ''
     
-    return gridtop, numlevels
+    return str(gridtop), str(numlevels)
 
 
 def get_Refs(model, sciencetype):
