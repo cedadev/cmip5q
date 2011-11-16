@@ -326,9 +326,10 @@ def get_vertgridinfo(model, sciencetype):
         #Now get the constraint group
         if sciencetype == 'Atmosphere':
             cg = ConstraintGroup.objects.filter(parentGroup=pg).get(
-                                        constraint='if Domain is "atmospheric"')
-            # now the individual keyboard parameter for 'TopModelLevel' (for atmos)
-            bp = BaseParam.objects.filter(constraint=cg).get(name='TopModelLevel')
+                                 constraint='if Domain is "atmospheric"')
+            # now the individual keyboard parameter for 'TopModelLevel' (atmos)
+            bp = BaseParam.objects.filter(constraint=cg).get(
+                                                        name='TopModelLevel')
             kp = KeyBoardParam.objects.get(baseparam_ptr=bp)                        
             gridtop = kp.value
         else:
