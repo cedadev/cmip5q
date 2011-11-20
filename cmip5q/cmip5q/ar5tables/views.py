@@ -9,7 +9,7 @@ from cmip5q.ar5tables.utilities import getModels, getExps
 
 def ar5tables(request): 
     '''
-    Generate information to complete AR5 tables 
+    Generates information to complete AR5 tables 
     '''   
     
     #----- Table 1 (Models) -----
@@ -29,11 +29,37 @@ def ar5tables(request):
         
     return render_to_response('ar5/ar5tables.html',{'table1':table1info, 
                                                 'table2':table2info})
+
+
+def ar5bib(request):
+    '''
+    Generates a text file of all references used in ar5 table 1 
+    '''
     
+    #get all models
+    models = getModels()
+    #iterate through all models and pull out references
+    modelrefs = []    
+    for model in models:
+        refs = model.references.all()
+        for ref in refs:
+            #check for duplicates before adding
+            if ref.citation + '\n' + '\n' not in modelrefs:
+                modelrefs.append(ref.citation + '\n' + '\n')
+    
+    #sort alphabetically and join up into a full string
+    modelrefs.sort()
+    ar5refs = "".join(modelrefs)
+    
+    response = HttpResponse(ar5refs, mimetype="text/plain")
+    response['Content-Disposition'] = 'attachment; filename=ar5_refs.txt'
+    
+    return response
+
 
 def ar5csv(request):
     '''
-    Generate csv representation of ar5 table 1
+    Generates csv representation of ar5 table 1
     '''
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
