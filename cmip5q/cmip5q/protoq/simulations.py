@@ -183,7 +183,8 @@ class simulationHandler(object):
         s=Simulation(uri=u,experiment=e,centre=self.centre)
         
         #grab the experiment duration if we can
-        # there should be no more than one spatio temporal constraint, so let's get that one.
+        # there should be no more than one spatio temporal constraint, so let's 
+        # get that one.
         
         stcg=e.requirements.filter(ctype__name='SpatioTemporalConstraint')
         if len(stcg)<>1:
@@ -272,10 +273,40 @@ class simulationHandler(object):
         else:
             return self.list(request)
         
+        
+    def copyind(self,request):
+        '''
+        An individual copy (from main simulation table button) that copies 
+        everything across, e.g. conformances/ensembles (unlike the 
+        cross-experiment copying above)
+        '''
+        s = self.s
+        ss=s.copy(s.experiment)
+        url=reverse('cmip5q.protoq.views.simulationEdit', 
+                    args=(self.centreid, ss.id,))
+        
+        return HttpResponseRedirect(url)
+        
+            
+    def markdeleted(self, request):
+        '''
+        delete me as a simulation (i.e mark me as isDeleted)
+        '''
+        s=self.s
+        s.isDeleted = True
+        s.save()
+        # return me to the summary page
+        url=reverse('cmip5q.protoq.views.centre',args=(self.centreid, ))
+        return HttpResponseRedirect(url)
+        
+        
     def resetCouplings(self):
-        ''' This method completely resets ALL couplings and ALL closures from the 
+        ''' 
+        This method completely resets ALL couplings and ALL closures from the 
         originals in the model. Note that copy does not do the closures, but
-        this one does. One closure at a time can be done via the coupling handler. '''
+        this one does. One closure at a time can be done via the coupling 
+        handler. 
+        '''
         s=self.s
         s.resetCoupling(closures=True)
         # and return to the coupling view 

@@ -296,12 +296,13 @@ class componentHandler(object):
                                    'form':Inpform,
                                    'tabs':tabs(request,self.centre_id,'Inputs for %s'%self.component)})
     
-    def copy(self,request):
-        ''' Make a copy for later editing. Currently restricted to model components only '''
-        # Must be a post ...
-        if request.method!='POST':
-            return HttpResponse('uknown request')
-        if not self.component.isModel: return HttpResponse("Not a model, wont copy")
+    def copy(self):
+        ''' 
+        Make a copy for later editing. Currently restricted to model 
+        components only 
+        '''
+        if not self.component.isModel: 
+            return HttpResponse("Not a model, wont copy")
         centre=Centre.objects.get(id=self.centre_id)
         new=self.component.copy(centre)
         new.abbrev=self.component.abbrev+'cp'

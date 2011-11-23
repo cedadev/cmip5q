@@ -4,14 +4,13 @@
 /* Generic css */
 
 * {
-	margin: 0;
-	padding: 0;
-	/*font-family: Arial, Verdana, Helvetica, sans-serif; */
-	font-family: ‘Trebuchet MS’,Helvetica,sans-serif;
+    margin: 0;
+	   padding: 0;
+	   font-family: ‘Trebuchet MS’,Helvetica,sans-serif;
     line-height: 1.7;
     color: #333;
     font-size: 12px;
-  }
+    }
 
 h1 {
 	font-size: 16px;
@@ -33,7 +32,7 @@ body {
     height: 100%;
     }
     
-table,form {
+table, form {
 	margin: 0; 
 	padding: 0; 
 	width:100%;
@@ -388,8 +387,8 @@ a.button {text-decoration:None;padding:1px 3px 1px 3px;border:1px solid black; b
 
     
 /* support for tables */
-.row1 {background-color:#FFF8DC } /* cornsilk see http://www.somacon.com/p142.php */
-.row2 {background-color:#FFE4C4 } /* bisque */
+.row1 {background-color:#FFFAFE }
+.row2 {background-color:#FFF8DC }
 .row3 {background-color:#FFE7BA} /* wheat1 */
     
     
@@ -586,21 +585,28 @@ Country Origin: Brazil
 	   margin: 20px auto; 
 	   }
 
-.formcontainer .info{
+.formcontainer .info {
     padding: 10px; 
     font-style:italic
     }
 
-.formcontainer .content{
+.formcontainer .content {
 	   padding: 10px; 
     }
     
-.formcontainer .sidebar{
+.formcontainer .sidebar {
     }
 
-.formcontainer .buttonbar{
+.formcontainer .buttonbar {
 	   margin: 10px;
 	   text-align: center;
     }
 	   
+	
+	/* General Positional stylings */
+	
+.topalign {
+    vertical-align:top;
+    }
+     
 	

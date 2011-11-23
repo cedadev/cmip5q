@@ -1,6 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
   <head>
-  
       {% block title %}
         <title>CMIP5 Model Metadata Questionnaire</title>
       {% endblock %}
@@ -27,7 +26,7 @@
       <script type="text/javascript" src="/static/jquery/jquery-ui-1.8.16.custom.min.js"></script>
       <link rel="stylesheet" type="text/css" href="/static/jquery/themes/smoothness/jquery-ui-1.8.16.custom.css" />
       
-      <!-- Additional jquery libraries and css-->
+      <!-- Additional jquery libraries and associated css-->
       <script type="text/javascript" src="/static/jquery/jquery-autocomplete/jquery.autocomplete.js"></script>
       <link rel="stylesheet" type="text/css" href="/static/jquery/jquery-autocomplete/jquery.autocomplete.css"/>
       <script type="text/javascript" src="/static/jquery/jquery-collapsible/jquery.collapsible.js"></script>
@@ -38,6 +37,8 @@
       <script type="text/javascript" src="/static/jquery/jquery-datatables/jquery.dataTables.js"></script>
       <link rel="stylesheet" type="text/css" href="/static/jquery/jquery-datatables/datatables.css"/>
       <script type="text/javascript" src="/static/jquery/jquery-fixer/jquery.fixer.js"></script>
+      <script type="text/javascript" src="/static/jquery/jquery-confirmaction/jconfirmaction.jquery.js"></script>
+      <link rel="stylesheet" type="text/css" href="/static/jquery/jquery-confirmaction/jconfirmaction.css"/>
       
       <!-- Site-wide jquery scripts-->
       
@@ -47,12 +48,21 @@
 		          $( "input:submit, button, .buttonbar a").button();
 		         });
 		      </script>
-      
+		      
+		      <!-- Open a confirmation box on actions marked 'ask' -->
+		      
+        <script type="text/javascript">
+          $(function() {
+            $(".ask").jConfirmAction();
+          });
+        </script>
+		      
+		      
       <!-- Page specific head information...css overrides etc-->
       {% block pagehead %}
       {% endblock %}
      
-  </head>
+    </head>
     
     
     <body class="yui-skin-sam">

@@ -1108,7 +1108,7 @@ class Simulation(Doc):
     # to get to those via the ensemble member's inputmod.
     datasets=models.ManyToManyField('Dataset')    
     
-    def copy(self,experiment):
+    def copy(self, experiment):
         ''' 
         Copy this simulation into a new experiment 
         '''
@@ -1119,22 +1119,22 @@ class Simulation(Doc):
         for ab in abbrevs:
             abbrevList.append(ab.abbrev)
         abbrev = self.abbrev + ' dup'
-        if abbrev in abbrevList:
+        while (abbrev in abbrevList):
             abbrev = abbrev + 'I'
          
         s=Simulation(
                      abbrev = abbrev, 
-                     title = 'copy', 
+                     title = self.title, 
                      contact = self.contact, 
                      author = self.author, 
                      funder = self.funder,
                      description = self.description, 
                      authorList = self.authorList,
                      uri = atomuri(), 
-                     #drsMember = self.drsMember, 
+                     drsMember = self.drsMember, 
                      experiment = experiment, 
                      numericalModel = self.numericalModel,
-                     ensembleMembers = 1, 
+                     ensembleMembers = self.ensembleMembers, 
                      platform = self.platform, 
                      centre=self.centre
                      )
@@ -1176,8 +1176,34 @@ class Simulation(Doc):
         for conf in myConformances:
             conf.copytoNewSim(s)
         
-        #(2)
+        # (2)
         # s.resetConformances()
+        
+        
+        # We also want to copy across the ensemble information
+        # 1. Get the ensemble associated with the current simulation
+        eset=self.ensemble_set.all()
+        assert(len(eset)==1,'There should only be one ensemble set for %s'%s)
+        ee = eset[0]
+        
+        # 2. Copy original ensemble
+        newens = Ensemble(description=ee.description,
+                          etype=ee.etype,
+                          simulation=s,
+                          riphidden=ee.riphidden,
+                          ) 
+        newens.save()
+        
+        # 3. Get all ensemblemembers and copy them. 
+        members=eset[0].ensemblemember_set.all()
+        for member in members:
+            em=EnsembleMember(ensemble=newens, 
+                              memberNumber=member.memberNumber,
+                              cmod=member.cmod, 
+                              imod=member.imod, 
+                              requirement=member.requirement, 
+                              drsMember=member.drsMember)
+            em.save()
         
         return s
     

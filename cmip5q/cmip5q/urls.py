@@ -61,8 +61,12 @@ urlpatterns = patterns('',
                 'cmip5q.protoq.views.conformanceMain'),  
     (r'^cmip5/(?P<centre_id>\d+)/simulation/copy/$',
                 'cmip5q.protoq.views.simulationCopy'),
+    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/copyind/$',
+                'cmip5q.protoq.views.simulationCopyInd'),
     (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/resetCouplings/$',
                 'cmip5q.protoq.views.simulationCupReset'), 
+    (r'^cmip5/(?P<centre_id>\d+)/simulation/(?P<simulation_id>\d+)/delete/$',
+                'cmip5q.protoq.views.simulationDel'),
     # 
     # GRIDS:
     #   

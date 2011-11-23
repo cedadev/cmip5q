@@ -14,7 +14,7 @@ from cmip5q.protoq.feeds import DocFeed
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.layoutUtilities import tabs, getpubs
+from cmip5q.protoq.layoutUtilities import tabs, getpubs, getsims
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.grids import gridHandler
 from cmip5q.protoq.simulations import simulationHandler
@@ -173,10 +173,9 @@ def centres(request):
             feedlist.append((f,reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%f,))))
             
         #get publication list for front page table
-        
         pubs = getpubs()
         
-        return render_to_response('centres.html',{'objects':sublist(p,4),
+        return render_to_response('centres/centres.html',{'objects':sublist(p,4),
                                                   'centreList':p,
                                                   'auxList':p_aux,
                                                   'curl':curl,
@@ -186,11 +185,16 @@ def centres(request):
                                                   )
     
 def centre(request,centre_id):
-    ''' Handle the top page on a centre by centre basis '''
+    ''' 
+    Handle the top page on a centre by centre basis 
+    '''
+    
     c=Centre.objects.get(id=centre_id)
     
-    models=[]
-    models=[Component.objects.get(id=m.id) for m in c.component_set.filter(scienceType='model').filter(isDeleted=False)]
+    #models=[]
+    models=[Component.objects.get(id=m.id) for m in c.component_set.filter(
+                                                    scienceType='model').filter(
+                                                    isDeleted=False)]
     #monkey patch the urls to edit these ...
     for m in models:
         m.url=reverse('cmip5q.protoq.views.componentEdit',args=(c.id,m.id))
@@ -219,14 +223,29 @@ def centre(request,centre_id):
     files=DataContainer.objects.filter(centre=c)
     parties=ResponsibleParty.objects.filter(centre=c)
     
+    #get simulation info for sim table
+    tablesims = getsims(c)
+    
     logging.info('Viewing %s'%c.id)
-    return render_to_response('centre.html',
-        {'centre':c,'models':models,'platforms':platforms,
-         'grids':grids,'refs':refs,'files':files,'parties':parties,
-        'newmod':newmodURL,'newplat':newplatURL,'newgrid':newgridURL,'sims':sublist(sims,3),'viewsimurl':viewsimURL,
-        'tabs':tabs(request,c.id,'Summary'),'notAjax':not request.is_ajax()})
+    return render_to_response('centre/centre.html',
+                              {'centre':c, 
+                               'models':models,
+                               'platforms':platforms,
+                               'grids':grids, 
+                               'refs':refs,
+                               'files':files, 
+                               'parties':parties,
+                               'newmod':newmodURL,
+                               'newplat':newplatURL,
+                               'newgrid':newgridURL,
+                               'sims':sublist(sims,3),
+                               'viewsimurl':viewsimURL,
+                               'tabs':tabs(request,c.id, 'Summary'),
+                               'notAjax':not request.is_ajax(),
+                               'tablesims':tablesims})
       
-#### COMPONENT HANDLING ###########################################################
+      
+#### COMPONENT HANDLING ########################################################
 
 # Provide a view interface to the component object 
 def componentAdd(request,centre_id):
@@ -273,7 +292,7 @@ def componentInp(request,centre_id,component_id):
 @gracefulNotFound
 def componentCopy(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
-    return c.copy(request)
+    return c.copy()
 
 #### GRID HANDLING ###########################################################
 
@@ -298,7 +317,7 @@ def gridRefs(request,centre_id,grid_id):
 @gracefulNotFound
 def gridCopy(request,centre_id,grid_id):
     c=gridHandler(centre_id,grid_id)
-    return c.copy(request)
+    return c.copy()
    
 
 ###### REFERENCE HANDLING ######################################################
@@ -329,6 +348,10 @@ def simulationAdd(request,centre_id,experiment_id):
     s=simulationHandler(centre_id,expid=experiment_id)
     return s.add(request)
 
+def simulationDel(request, centre_id, simulation_id):
+    s=simulationHandler(centre_id, simid=simulation_id)
+    return s.markdeleted(request)
+
 def simulationList(request,centre_id):
     s=simulationHandler(centre_id)
     return s.list(request)
@@ -337,6 +360,11 @@ def simulationList(request,centre_id):
 def simulationCopy(request,centre_id):
     s=simulationHandler(centre_id)
     return s.copy(request)
+
+@gracefulNotFound
+def simulationCopyInd(request, centre_id, simulation_id):
+    s=simulationHandler(centre_id, simid=simulation_id)
+    return s.copyind(request)
 
 @gracefulNotFound
 def conformanceMain(request,centre_id,simulation_id):

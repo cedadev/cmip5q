@@ -84,6 +84,15 @@
             </div>
             <!-- End of expandable/collapsable panel -->
             
+            <!-- Error notification panel -->
+						      {% if simform.errors %}
+						        <div class="error_boxer">
+						          <p>
+						            This page contains errors. Please correct these before saving 
+						          </p>
+						        </div>
+						      {% endif %} 
+            
             <div class="boxer">
               <h1> General Characteristics of the Simulation </h1>
               <p class="guidance"> In this box you fill out the general characteristics of the simulation (or ensemble). </p>

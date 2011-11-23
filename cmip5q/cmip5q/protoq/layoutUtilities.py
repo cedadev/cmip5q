@@ -71,6 +71,25 @@ def getpubs():
     return pubs
 
 
+def getsims(centre):
+    '''
+    Return a list of centre simulations for instantiating a datatable 
+    '''
+       
+    # generate initial queryset of all simulations
+    tablesims = Simulation.objects.filter(centre=centre).filter(isDeleted=False)
+    
+    for s in tablesims:
+        s.url=reverse('cmip5q.protoq.views.simulationEdit', 
+                      args=(centre.id,s.id))        
+        s.delurl=reverse('cmip5q.protoq.views.simulationDel', 
+                         args=(centre.id,s.id))
+        s.copysimurl=reverse('cmip5q.protoq.views.simulationCopyInd', 
+                         args=(centre.id,s.id))      
+    
+    return tablesims
+
+
 class tab:
     ''' 
     This is a simple tab class to support navigation tabs 
