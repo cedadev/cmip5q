@@ -1,42 +1,44 @@
 {% extends "base.html" %}     
 
 {% block pagehead %}
-   <script type="text/javascript">
-     $(function() {
-          $( "#tabs" ).tabs();
-     });
-   </script>
+  <script type="text/javascript">
+    $(function() {
+         $( "#tabs" ).tabs();
+    });
+  </script>
    
-   <script type="text/javascript">
-     $(function() {
-	         $( "input:submit, a, button", ".toolbar" ).button();
-	    });
-   </script>
+  <script type="text/javascript">
+    $(function() {
+	        $( "input:submit, a, button", ".toolbar" ).button();
+	   });
+  </script>
       
-   <script type="text/javascript">
-     $().ready(function() {
-	      $('#dialog').dialog();
-	    })
+  <script type="text/javascript">
+    $().ready(function() {
+	     $('#dialog').dialog();
+	   })
 	    
-	    /*
-				 $(function() {
-				  var $dialog = $('<div></div>')
-				   .html('The table shown here ....')
-				   .dialog({
-				    autoOpen: false,
-				    title: 'AR5 Tables help',
-				    width: 500,
-		      modal: true,
-		      resizable: false
-				   });
+			 $(function() {
+			  var $dialog = $('<div></div>')
+			   .html('The table below gives an overview of the models being described'+ 
+				        'in the CMIP5 questionnaire, including details of the top level'+ 
+				        'realm components. You can use the toolbar buttons to export to a'+
+				        'csv format as well as a bibliography of all references included '+
+				        'within the table ')
+		   .dialog({
+		    autoOpen: false,
+		    title: 'AR5 Tables help',
+		    width: 500,
+		    modal: true,
+		    resizable: false
+		   });
 				
-				  $('#opener').click(function() {
-				   $dialog.dialog('open');
-				   // prevent the default action, e.g., following a link
-				   return false;
-				  });
+		  $('#opener').click(function() {
+				  $dialog.dialog('open');
+				  // prevent the default action, e.g., following a link
+				  return false;
 				 });
-     */
+				});
 		 </script>
 		    
    <script type="text/javascript">
@@ -53,402 +55,39 @@
 				 });
 			</script>
 			
-   <script>
-     $(function() {
-       $('#tablescroll').fixer({fixedrows:1,fixedcols:1,width:0, height:600});
-     });
-   </script>
+	  <script>
+	    $(function() {
+	      $('.tablescroll').fixer({fixedrows:1,fixedcols:1,width:0, height:600});
+	    });
+	  </script>
 			
 {% endblock %}
      
      
 {% block content %}
 
-    <div class="boxer titlerow">
-      Model description table for AR5
-    </div>
+  <div class="boxer titlerow">
+    Model description table for AR5
+  </div>
           
-						<div id="tabs">
-						  <!-- Navigation among ar5 tables -->
-						  <ul>
-								  <li><a href="#tabs-1">Model Description</a></li>
-								  <li><a href="#tabs-2">Experiment Design</a></li>
-								  <li><a href="#tabs-3">Forcings</a></li>
-								</ul>
-			   
-        <!-- Table 1 --> 
-							 <div id="tabs-1">
-							   
-							   <div class="toolbar">
-            <a href="/cmip5/ar5csv/" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
-            <a href="/cmip5/ar5bib/" class="ui-state-default ui-corner-all" title="references"><span class="ui-icon ui-icon-calculator"></span></a>
-            <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener" class="ui-icon ui-icon-help"></span></a>
-										</div>
-										
-										<div class="jqmWindow" id="dialog">
-	           <a href="#" class="jqmClose">Close</a>
-												<hr>
-												<em>READ ME</em> -->
-												Help text to go here
-									 </div>
-							   
-          <table id="tablescroll" class="cycletable">
-            <thead>
-             <tr>
-               <!-- Main Model info -->
-               <th style="width:240px">
-                 Model ID
-                 <br/> 
-                 Vintage
-               </th>
-               
-               <th>
-                 Institution
-                 <br/> 
-                 Main Reference(s)
-                 <br/> 
-                 Flux Correction
-               </th>
-               
-               <!-- Aerosol Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Aerosols
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Atmosphere Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Atmosphere
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Horizontal Grid
-                 <br/>
-                 Number of Vert Levels
-                 <br/>
-                 Grid Top
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Atmospheric chemistry Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Atmos Chemistry
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Land Ice Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Land Ice
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Land Surface Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Land Surface
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Ocean Biogeochemistry Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Ocean Biogeochemistry
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-                              
-               <!-- Ocean Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Ocean
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Horizontal Resolution
-                 <br/>
-                 Number of Vertical Levels
-                 <br/>
-                 Top Level
-                 <br/>
-                 Z Co-ord
-                 <br/>
-                 Top BC
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-               <!-- Sea Ice Column -->
-               <th>
-                 <span style="text-decoration: underline; color:white">
-                 Sea Ice
-                 </span>
-                 <br/>
-                 Component Name
-                 <br/>
-                 Code Independence
-                 <br/>                 
-                 References
-               </th>
-               
-             </tr>
-            </thead>
-            <tbody>
-            {% for model in table1 %}
-            <tr class="{%cycle 'row2' 'row1'%}">
-              
-              <td style="width:240px">
-                {{ model.abbrev }}
-                <br/> 
-                {% if model.yearReleased %}
-                  {{ model.yearReleased }}
-                {% endif %}
-              </td>
-              
-              <td>
-                {{ model.centre.name }}
-                <br/>
-                {% for ref in model.mainrefs %}
-                  {{ ref }}; 
-                {% endfor %}
-                <br/>
-                Flux correction field
-              </td>
-              
-              <!-- Aerosol -->
-              <td>
-                 {% if model.aerimplemented%}
-		                 {{ model.aerabbrev }}
-		                 <br/>
-		                 XX %
-		                 <br/>
-		                 {% for ref in model.aerrefs %}
-		                   {{ ref }}
-		                 {% endfor %}
-		               {% else %}
-		                 None
-		               {% endif %}
-              </td>
-              
-              <!-- Atmosphere -->
-              <td>
-                 {% if model.atmosimplemented%}
-                   {{ model.atmosabbrev }}
-                   <br/>
-                   {{model.atmoshorgrid}}
-                   <br/>
-                   {{ model.atmosnumlevels }}
-                   <br/>
-                   {{ model.atmosgridtop }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.atmosrefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- Atmos Chemistry -->
-              <td>
-                 {% if model.atmchemimplemented%}
-                   {{ model.atmchemabbrev }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.atmchemrefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- LandIce -->
-              <td>
-                 {% if model.liceimplemented%}
-                   {{ model.liceabbrev }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.licerefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- Land Surface -->
-              <td>
-                 {% if model.lsurfimplemented%}
-                   {{ model.lsurfabbrev }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.lsurfrefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- Ocean Biogeochem -->
-              <td>
-                 {% if model.obgcimplemented%}
-                   {{ model.obgcabbrev }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.obgcrefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- Ocean -->
-              <td>
-                 {% if model.oceanimplemented%}
-                   {{ model.oceanabbrev }}
-                   <br/>
-                   {{ model.oceanhorgrid }}
-                   <br/>
-                   {{ model.oceannumlevels }}
-                   <br/>
-                   {{ model.oceantoplevel }}
-                   <br/>
-                   {{ model.oceanzcoord }}
-                   <br/>
-                   {{ model.oceantopbc }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.oceanrefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>
-              
-              <!-- Sea Ice -->
-              <td>
-                 {% if model.seaiceimplemented%}
-                   {{ model.seaiceabbrev }}
-                   <br/>
-                   XX %
-                   <br/>
-                   {% for ref in model.seaicerefs %}
-                     {{ ref }}
-                   {% endfor %}
-                 {% else %}
-                   None
-                 {% endif %}
-              </td>          
-            </tr>
-            {% endfor %}
-          </tbody>
-         </table>
-							 <!-- End of table 1 -->
-							 
-        <!-- Table 2 --> 
-							 <div id="tabs-2">
-							   
-							   <div class="toolbar">
-            <a href="#" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
-            <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener1" class="ui-icon ui-icon-help"></span></a>
-          </div>
-	         
-	         <table class="cycletable">
-	           <thead>
-	             <tr>
-		              <th width="25%">Identifier</th>
-		              <th width="25%">Model Type(s)</th>
-		              <th width="10%">Period/Length</th>
-		              <th width="10%">Initialisation</th>
-		              <th width="10%">Solar Forcing</th>
-		              <th width="10%">Aerosol Forcing</th>
-		              <th width="10%">Volcanic Forcing</th>
-		              <th width="10%">GHG Forcing</th>
-	             </tr>
-	           </thead>
-	           <tbody>
-	             {% for exp in table2 %}
-	             <tr class="{%cycle 'row2' 'row1'%}">
-	               <td>
-	                 {{ exp.abbrev }}
-	               </td>
-	               <td></td>
-	               <td></td>
-	               <td></td>
-	               <td></td>
-	               <td></td>
-	               <td></td>             
-	               <td></td>
-	             </tr>
-	             {% endfor %}
-	           </tbody>
-	         </table>
-							 </div>							 
-        <!-- End of Table 2 -->
-        
-        <!-- Table 3 -->
-							 <div id="tabs-3">
-							  
-							   <div class="toolbar">
-            <a href="#" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
-            <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener" class="ui-icon ui-icon-help"></span></a>
-          </div>
-         
-							   <table class="cycletable">
-							   </table>
-							   
-							 </div>
-        <!-- End of Table 3 -->     
-   </div>
+		<div id="tabs">
+		
+		  <!-- Navigation among ar5 tables -->
+		  <ul>
+				  <li><a href="#tabs-1">Model Description</a></li>
+				  <li><a href="#tabs-2">Experiment Design</a></li>
+				  <li><a href="#tabs-3">Forcings</a></li>
+				</ul>
+  
+    <!-- Table 1 --> 
+			 {% include 'ar5/ar5_tab1.html' %}
+			 
+    <!-- Table 2 --> 
+    {% include 'ar5/ar5_tab2.html' %}
+			 					 
+    <!-- Table 3 --> 
+    {% include 'ar5/ar5_tab3.html' %}
+
+  </div>
 
 {% endblock %}

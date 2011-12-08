@@ -55,14 +55,13 @@ setup(
     install_requires =       ['django','lxml','simplejson'],
     packages =               find_packages(),
     package_data = {
-        'cmip5q': [
-            '000Issues', 'LICENSE', 'loadmm', '*.xml', 
+        'cmip5q': ['000Issues', 'LICENSE', 'loadmm', '*.xml', 
             'data/experiment/*.xml', 'data/model/*.xml', 
             'setupProto.sh','vocabs/*.xml'
         ],
-        'cmip5q.test.data': ['*'], 
-        'cmip5q.test.integration.wsgi.paste': ['README', '*.ini'],
-        'cmip5q.test.integration.wsgi.secured': [
+        'test.data': ['*'], 
+        'test.integration.wsgi.paste': ['README', '*.ini'],
+        'test.integration.wsgi.secured': [
             'README', '*.ini', '*.xml',
             'ca/*.0', 'ca/*.crt', 'pki/*.crt', 'pki/*.key'
         ],

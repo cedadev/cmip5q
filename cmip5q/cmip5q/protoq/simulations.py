@@ -230,6 +230,7 @@ class simulationHandler(object):
             'tabs':tabs(request,c.id,'Experiments'),
             'notAjax':not request.is_ajax()})
  
+ 
     def conformanceMain(self,request):
         ''' Displays the main conformance view '''
 
@@ -255,8 +256,15 @@ class simulationHandler(object):
             cformset=MyConformanceFormSet(s)
             cformset.specialise()
           
-        return render_to_response('conformance.html',{'s':s,'e':e,'cform':cformset,
-                    'urls':urls,'tabs':tabs(request,self.centreid,'Conformance')})
+        return render_to_response('conformance.html',{'s':s,
+                                                      'e':e,
+                                                      'cform':cformset,
+                                                      'urls':urls,
+                                                      'tabs':tabs(request, 
+                                                                  self.centreid,
+                                                                  'Conformance')
+                                                      })
+  
   
     def copy(self,request):
         if request.method=='POST':
@@ -287,7 +295,7 @@ class simulationHandler(object):
         
         return HttpResponseRedirect(url)
         
-            
+        
     def markdeleted(self, request):
         '''
         delete me as a simulation (i.e mark me as isDeleted)

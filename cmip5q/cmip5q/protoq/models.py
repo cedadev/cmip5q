@@ -1149,6 +1149,9 @@ class Simulation(Doc):
         
         for mm in self.codeMod.all().order_by('id'):
             s.codeMod.add(mm)
+        
+        for do in self.drsOutput.all().order_by('id'):
+            s.drsOutput.add(do)
             
         #simrelationships
         myrelatedSims = SimRelationship.objects.filter(sfrom=self)

@@ -7,8 +7,19 @@ from lxml import etree as ET
 import uuid
 import datetime
 import string
+import re
+
 from django.conf import settings
 logging=settings.LOG
+
+# setting up regular expression mapper for illegal xml characters
+# from http://boodebr.org/main/python/all-about-python-and-unicode#UNI_XML
+RE_XML_ILLEGAL = u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' + \
+                 u'|' + \
+                 u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' % \
+                  (unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                   unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                   unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff))
 
 
 class Translator:
@@ -323,31 +334,31 @@ class Translator:
                             first=False
                             # first set of values have no constraint
                             if bp.name=="GridMnemonic" :
-                                HorizGridMnemonic=str(p.value)
+                                HorizGridMnemonic=unicode(str(p.value))
                             if bp.name=="GridDiscretization" :
                                 if p.value!="None" :
-                                    HorizGridDiscretization=str(p.value)
+                                    HorizGridDiscretization=unicode(str(p.value))
                                 else :
                                     HorizGridDiscretization=""
                             elif bp.name=="GridResolution" :
-                                HorizGridResolution=str(p.value)
+                                HorizGridResolution=unicode(str(p.value))                                
                             elif bp.name=="GridRefinementScheme" :
-                                HorizGridRefinement=str(p.value)
+                                HorizGridRefinement=unicode(str(p.value))
                         elif HorizGridDiscretization!="" and str(con.constraint).find(HorizGridDiscretization)!=-1 and str(con.constraint).find("GridDiscretization")!=-1 :
                             if bp.name=="GridType" :
-                                HorizGridType=str(p.value)
+                                HorizGridType=unicode(str(p.value))
                             elif bp.name=="CompositeGridDiscretization" :
                                 HorizGridChildNames=[]
                                 for term in p.value.all() :
                                     HorizGridChildNames.append(term.name)
                             elif bp.name=="CompositeGrid" :
-                                HorizGridCompositeName=str(p.value)
+                                HorizGridCompositeName=unicode(str(p.value))
                             elif bp.name=="SpectralTruncatureNumber" :
-                                HorizResProps[str(bp.name)]=str(p.value)
+                                HorizResProps[str(bp.name)]=unicode(str(p.value))
                             else :
                                 assert False, "Error : Unknown grid property found: "+bp.name
                         elif HorizGridType!="" and str(con.constraint).find(HorizGridType)!=-1 and str(con.constraint).find("GridType")!=-1 :
-                            HorizResProps[str(bp.name)]=str(p.value)
+                            HorizResProps[str(bp.name)]=unicode(str(p.value))
                         else :
                             # I am called if all the information has not been filled in.
                             pass
@@ -359,13 +370,13 @@ class Translator:
                     for bp in BaseParamSet :
                         p=bp.get_child_object()
                         if bp.name=="LatMin" :
-                            HorizExtentLatMin=str(p.value)
+                            HorizExtentLatMin=unicode(str(p.value))
                         elif bp.name=="LatMax" :
-                            HorizExtentLatMax=str(p.value)
+                            HorizExtentLatMax=unicode(str(p.value))
                         elif bp.name=="LonMin" :
-                            HorizExtentLonMin=str(p.value)
+                            HorizExtentLonMin=unicode(str(p.value))
                         elif bp.name=="LonMax" :
-                            HorizExtentLonMax=str(p.value)
+                            HorizExtentLonMax=unicode(str(p.value))
                         else :
                             assert False, "Error : Unknown grid extent property found: "+bp.name
 
@@ -391,19 +402,19 @@ class Translator:
                             foundVertCoordType=True
                             # first set of values have no constraint
                             if bp.name=="VerticalCoordinateType" :
-                                vertCoordType=str(p.value)
+                                vertCoordType=unicode(str(p.value))
                         elif str(con.constraint).find(vertCoordType)!=-1 and foundVertCoordType :
                             if bp.name=="VerticalCoordinate" :
                                 assert not foundVertCoord, "Error expecting VerticalCoordinate to appear first"
                                 foundVertCoord=True
-                                vertCoord=str(p.value)
+                                vertCoord=unicode(str(p.value))
                             else:
                                 assert foundVertCoord, "Error expecting VerticalCoordinate to appear first"
                                 # pick up any other properties within this constraint
-                                vertCoordProps[bp.name]=str(p.value)
+                                vertCoordProps[bp.name]=unicode(str(p.value))
                         elif str(con.constraint).find(vertCoord)!=-1 and foundVertCoord :
                             # pick up any properties that depend on vertCoord
-                            vertCoordProps[bp.name]=str(p.value)
+                            vertCoordProps[bp.name]=unicode(str(p.value))
                         else :
                             pass
 
@@ -420,13 +431,13 @@ class Translator:
                             first=False
                             # first set of values have no constraint
                             if bp.name=="Domain" :
-                                VertDomain=str(p.value)
+                                VertDomain=unicode(str(p.value))
                             else:
                                 assert False,"Unknown parameter, expecting 'Domain' but found "+bp.name
                         elif str(con.constraint).find(VertDomain)!=-1 :
                             assert not first, "Error expecting constraint to appear first"
                             assert VertDomain=="atmospheric" or VertDomain=="oceanic", "Error, expecting either ocean or atmosphere but found constraint "+str(con.constraint)
-                            VertResProps[str(bp.name)]=str(p.value)
+                            VertResProps[str(bp.name)]=unicode(str(p.value))
                         else : # VertDomain should be other or n/a
                             pass
             elif pg.name=="General Attributes" :
@@ -1342,7 +1353,9 @@ class Translator:
                                 ET.SubElement(property,'longName').text=p.name
                             '''value'''
                             if ptype=='KeyBoard':
-                                ET.SubElement(property,'value').text=p.value
+                                #removing illegal xml characters 
+                                legalstr = re.sub(RE_XML_ILLEGAL, "", unicode(p.value))
+                                ET.SubElement(property,'value').text=legalstr
                             elif ptype=='XOR':
                                 value=''
                                 if p.value:
@@ -1482,7 +1495,9 @@ class Translator:
                 ociteElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'otherCitationDetails')
                 ET.SubElement(ociteElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.link
                 ctElement=ET.SubElement(citeElement,self.GMD_NAMESPACE_BRACKETS+'collectiveTitle')
-                ET.SubElement(ctElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text=refInstance.citation
+                #removing illegal xml characters 
+                legalstr = re.sub(RE_XML_ILLEGAL, "", unicode(refInstance.citation))
+                ET.SubElement(ctElement,self.GCO_NAMESPACE_BRACKETS+'CharacterString').text = legalstr
 
 
     def addSimpleResp(self,respName,rootElement,respType) :

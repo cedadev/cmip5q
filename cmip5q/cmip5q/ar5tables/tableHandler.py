@@ -8,6 +8,7 @@ Created on 23 Sep 2011
 '''
 
 from cmip5q.ar5tables.utilities import *
+from cmip5q.protoq.models import NumericalRequirement
 
 
 def ar5table1(models):
@@ -29,7 +30,7 @@ def ar5table1(models):
         m.aerimplemented = get_realmimpl(m, 'Aerosols')
         
         if not m.aerimplemented:
-            m.aerabbrev, m.aerrefs, m.aercits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.aerabbrev = m.aerrefs = m.aercits = 'Not Implemented' 
         else:
             #Get the abbrev
             m.aerabbrev = get_realmabbrev(m, 'Aerosols')
@@ -42,12 +43,12 @@ def ar5table1(models):
         #Check that realm is implemented
         m.atmosimplemented = get_realmimpl(m, 'Atmosphere')
         if not m.atmosimplemented:
-            m.atmosabbrev, 
-            m.atmosrefs, 
-            m.atmoscits,
-            m.atmosgridtop, 
-            m.atmosnumlevels,
-            m.atmoshorgrid =  'Not Implemented', 'Not Implemented', 'Not Implemented', 'Not Implemented', 'Not Implemented', 'Not Implemented'
+            m.atmosabbrev = \
+            m.atmosrefs = \
+            m.atmoscits = \
+            m.atmosgridtop = \
+            m.atmosnumlevels = \
+            m.atmoshorgrid =  'Not Implemented'
         else:
             #Get the abbrev
             m.atmosabbrev = get_realmabbrev(m, 'Atmosphere')
@@ -66,7 +67,7 @@ def ar5table1(models):
         #Check that realm is implemented
         m.atmchemimplemented = get_realmimpl(m, 'AtmosphericChemistry')
         if not m.atmchemimplemented:
-            m.atmchemabbrev, m.atmchemrefs, m.atmchemcits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.atmchemabbrev = m.atmchemrefs = m.atmchemcits = 'Not Implemented' 
         else:
             #Get the abbrev
             m.atmchemabbrev = get_realmabbrev(m, 'AtmosphericChemistry')
@@ -79,7 +80,7 @@ def ar5table1(models):
         #Check that realm is implemented
         m.liceimplemented = get_realmimpl(m, 'LandIce')
         if not m.liceimplemented:
-            m.liceabbrev, m.licerefs, m.licecits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.liceabbrev = m.licerefs = m.licecits = 'Not Implemented' 
         else:
             #Get the abbrev
             m.liceabbrev = get_realmabbrev(m, 'LandIce')
@@ -92,7 +93,7 @@ def ar5table1(models):
         #Check that realm is implemented
         m.lsurfimplemented = get_realmimpl(m, 'LandSurface')
         if not m.lsurfimplemented:
-            m.lsurfabbrev, m.lsurfrefs, m.lsurfcits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.lsurfabbrev = m.lsurfrefs = m.lsurfcits = 'Not Implemented'
         else:
             #Get the abbrev
             m.lsurfabbrev = get_realmabbrev(m, 'LandSurface')
@@ -105,7 +106,7 @@ def ar5table1(models):
         #Check that realm is implemented
         m.obgcimplemented = get_realmimpl(m, 'OceanBiogeoChemistry')
         if not m.obgcimplemented:
-            m.obgcabbrev, m.obgcrefs, m.obgccits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.obgcabbrev = m.obgcrefs = m.obgccits = 'Not Implemented'
         else:
             #Get the abbrev
             m.obgcabbrev = get_realmabbrev(m, 'OceanBiogeoChemistry')
@@ -148,7 +149,7 @@ def ar5table1(models):
         #Check that realm is implemented
         m.seaiceimplemented = get_realmimpl(m, 'SeaIce')
         if not m.seaiceimplemented:
-            m.seaiceabbrev, m.seaicerefs, m.seaicecits = 'Not Implemented', 'Not Implemented', 'Not Implemented' 
+            m.seaiceabbrev = m.seaicerefs = m.seaicecits = 'Not Implemented'
         else:
             #Get the abbrev
             m.seaiceabbrev = get_realmabbrev(m, 'SeaIce')
@@ -190,12 +191,106 @@ def ar5table1(models):
 def ar5table2(exps):
     '''
     Generates all information necessary for AR5 table 2 (i.e. the experiment 
-    table) 
+    description table) 
     '''
     
+    # Harvest all numerical requirements, omitting duplicates
+    reqidlist = []
+    reqlist = []
+    
     for e in exps:
-        e.message = "hello"
+        for req in e.requirements.all():
+            #first bind the req to the experiment for the template
+            # Check for duplicate using docid
+            if req.docid not in reqidlist:
+                reqidlist.append(req.docid)
+                reqlist.append(req)
+    
+    # Now assign true/false to individual experiment reqs if in global reqlist  
+    for e in exps:
+        reqsinexp = []
+        for reqid in reqidlist:
+            if reqid in e.requirements.all().values_list('docid', flat=True):
+                reqsinexp.append('True')
+            else:
+                reqsinexp.append('')
         
-    return exps
+        e.reqsinexp = reqsinexp
+        
+    return reqlist, exps
     
     
+def ar5table3(exps, model):
+    '''
+    Generates all information necessary for AR5 table 2 (i.e. the experiment 
+    description table) 
+    '''
+    
+    # Harvest all numerical requirements, omitting duplicates
+    reqidlist = []
+    reqlist = []
+    
+    for e in exps:
+        for req in e.requirements.all():
+            #first bind the req to the experiment for the template
+            # Check for duplicate using docid
+            if req.docid not in reqidlist:
+                reqidlist.append(req.docid)
+                reqlist.append(req)
+    
+    # Now assign true/false to individual experiment reqs if in global reqlist  
+    for e in exps:
+        reqsinexp = []
+        modconforms = []
+        for reqid in reqidlist:
+            if reqid in e.requirements.all().values_list('docid', flat=True):
+                reqsinexp.append('True')
+                #get the simulation using the particular model for this experiment
+                sim = Simulation.objects.filter(numericalModel=model, experiment=e)
+                sim = sim.filter(isDeleted='False')
+                # check if current model conforms if it has been run for this exp
+                if sim:
+                    #first get all reqs associated with the experiment
+                    ereqs = e.requirements.all()
+                    #get the actual requirement
+                    reqs =  GenericNumericalRequirement.objects.filter(docid=reqid)
+                    #pull out the common requirement (must be better way of doing this!)
+                    
+                    conf = Conformance.objects.filter(simulation=sim[0]).filter(requirement=req)
+                    modconforms.append('True')
+                else:
+                    modconforms.append('') 
+            else:
+                reqsinexp.append('')
+                #mark conformance line as empty (ie doesn't come into play here)
+                modconforms.append('')
+        
+        e.reqsinexp = reqsinexp
+        e.modconforms = modconforms
+        
+    return reqlist, exps
+    
+    
+    
+    # Now assign conformant/not conformant/not applicable for each model 
+    # to individual experiment reqs  
+    for e in exps:
+        #get the simulation using the particular model for this experiment
+        sim = Simulation.objects.filter(numericalModel=model, experiment=e)
+        sim = sim.filter(isDeleted='False')
+        
+        #get the confomances for this simulation
+        confs = Conformance.objects.filter(simulation=sim[0]) 
+        
+        #iterate through and tag conformance existance/type
+        modelconforms = []
+        
+        for reqid in reqidlist:
+            if reqid in e.requirements.all().values_list('docid', flat=True):
+                reqsinexp.append('True')
+            else:
+                reqsinexp.append('')
+        
+        e.reqsinexp = reqsinexp
+        
+    return reqlist, exps    

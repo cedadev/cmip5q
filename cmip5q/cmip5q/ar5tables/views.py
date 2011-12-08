@@ -3,8 +3,9 @@ import csv
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
-from cmip5q.ar5tables.tableHandler import ar5table1, ar5table2
+from cmip5q.ar5tables.tableHandler import ar5table1, ar5table2, ar5table3
 from cmip5q.ar5tables.utilities import getModels, getExps
+from cmip5q.protoq.models import Component, Centre
 
 
 def ar5tables(request): 
@@ -22,13 +23,17 @@ def ar5tables(request):
     #get current experiments
     exps = getExps()
     #generate information for ar5 table 2
-    table2info = ar5table2(exps)
+    t2reqlist, t2expslist = ar5table2(exps)
     
     #----- Table 3 (Forcings) -----
-    #TO DO
+    #temporarily using hadgem2-es model
+    #mohc = Centre.objects.get(abbrev='MOHC')
+    #hadgem = Component.objects.filter(abbrev="HadGEM2-ES").get(centre=mohc)
+    #t3reqlist, t3expslist = ar5table3(exps, hadgem)
         
-    return render_to_response('ar5/ar5tables.html',{'table1':table1info, 
-                                                'table2':table2info})
+    return render_to_response('ar5/ar5tables.html',{'table1': table1info, 
+                                                    't2explist': t2expslist,
+                                                    't2reqlist': t2reqlist})
 
 
 def ar5bib(request):

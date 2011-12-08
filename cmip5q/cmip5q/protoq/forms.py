@@ -7,6 +7,7 @@ from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
 from django.forms import ValidationError
+from django.forms.widgets import CheckboxSelectMultiple
 
 
 from cmip5q.protoq.dropdown import *
@@ -626,8 +627,8 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    #value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(attrs={'size':'24'}),required=False)
-    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(),required=False)
+    #value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(),required=False)
+    value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(), widget=forms.SelectMultiple(attrs={'size': 3}), required=False)
     class Meta(BaseParamForm.Meta):
         model=OrParam
         exclude=BaseParamForm.Meta.exclude+['vocab']
@@ -659,13 +660,19 @@ class KeyBoardParamForm(BaseParamForm):
     
     
 class ParamGroupForm:
-    ''' This is an aggregation form for handling the multiple forms that will appear
-    on a component layout page '''
-    UserFormSet=modelformset_factory(KeyBoardParam,form=KeyBoardParamForm,can_delete=True)
-    def __init__(self,component,POST=None,prefix=''):
-        self.prefix=prefix
-        self.component=component
-        self.pgset=self.component.paramGroup.all().order_by('id')
+    ''' 
+    This is an aggregation form for handling the multiple forms that will appear
+    on a component layout page 
+    '''
+    
+    UserFormSet = modelformset_factory(KeyBoardParam, 
+                                       form=KeyBoardParamForm, 
+                                       can_delete=True)
+    
+    def __init__(self, component, POST=None, prefix=''):
+        self.prefix = prefix
+        self.component =component
+        self.pgset = self.component.paramGroup.all().order_by('id')
         fid=0 # a form id, so we get unique forms for each parameter 
         for pg in self.pgset:
             pg.cgset=[]
