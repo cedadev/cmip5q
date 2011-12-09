@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<qndocs>
-    {% for doc in docs %}
-    <qndoc>
-        <doc_id>{{ doc.id }}</doc_id>
-        <doc_title>{{ doc.abbrev }} </doc_title>
-        <created>{{ note.created|date:"Y-m-d G:i T" }}</created>
-        <modified>{{ note.modified|date:"Y-m-d G:i T" }}</modified>
-    </qndoc>
-    {% endfor %}
-</qndocs>
+<qncimdocs>
+  <qncimdoc>
+    <doctype>Component</doctype>
+    <numdocs>{{numallmods}}</numdocs>
+    <utddocs>{{numutdmods}}</utddocs>
+  </qncimdoc>
+  <qncimdoc>
+    <doctype>Simulation</doctype>
+    <numdocs>{{numallsims}}</numdocs>
+    <utddocs>{{numutdsims}}</utddocs>
+  </qncimdoc>
+</qncimdocs>
