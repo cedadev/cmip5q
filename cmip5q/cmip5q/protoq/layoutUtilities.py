@@ -15,7 +15,8 @@ def esgurl(modelname=None, simname=None):
     Return a url construct for cim document viewing within the ESG portal
     ''' 
     
-    esgurl = 'http://www.earthsystemgrid.org/trackback/query.htm?id=esg%3amodel_'+modelname+'_'+simname+'&session=true'
+    esgurl = 'http://www.earthsystemgrid.org/trackback/query.htm?id=esg%3amodel_' \
+      +modelname+'_'+simname+'&session=true'
     
     return esgurl
 
@@ -51,18 +52,28 @@ def getpubs():
             # attach document centre name
             pub.centrename = document.centre
             
-            # attach a url path to esg portal view (limited to simulations)
+            # attach a url path to esg portal view (limited to most recent 
+            # version of simulations)
             try: 
                 if cimType =='simulation':
-                    modelname = str(document.numericalModel).lower()
-                    if document.ensembleMembers > 1:
-                        simname = str(document.abbrev).replace(" ","_").lower()+'basesimulation'
+                    #get most up-to-date version
+                    utdsim = (CIMObject.objects.filter(uri=pub.uri).order_by(
+                                                        '-documentVersion'))[0]
+                    if pub == utdsim:
+                        modelname = str(document.numericalModel).lower()
+                        if document.ensembleMembers > 1:
+                            simname = str(document.abbrev).replace(
+                                            " ","_").lower()+ 'basesimulation'
+                        else:
+                            simname = str(document.abbrev) \
+                              .replace(" ","_").lower()
+                        
+                        pub.esgurl = esgurl(modelname=modelname, 
+                                            simname=simname)
                     else:
-                        simname = str(document.abbrev).replace(" ","_").lower()
-                    
-                    pub.esgurl = esgurl(modelname=modelname, simname=simname)
+                        pub.esgurl = ''
             except:
-                pub.esgurl=''
+                pub.esgurl = ''
                 
         except:
             pub.centrename = ''
