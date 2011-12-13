@@ -57,17 +57,19 @@ class ConformanceForm(forms.ModelForm):
     
     def clean_option(self):
         '''
-        adding an additional validation that checks the req option is filled out 
-        when a conformance type has been selected
+        adding an additional validation that checks the req option is filled 
+        out when a conformance type has been selected
         '''
         # get current info from cleaned data
         cleaned_data = self.cleaned_data
         cd_ctype = cleaned_data.get("ctype")
         cd_option = cleaned_data.get("option")
         # check for missing option in case of ctype and report error
-        if len(GenericNumericalRequirement.objects.get(id=self.instance.requirement_id).options.all()):
-            if cd_ctype and cd_option is None:
-                raise forms.ValidationError("A requirement option must be selected")
+        if len(GenericNumericalRequirement.objects.get(
+                                id=self.instance.requirement_id).options.all()):
+            if cd_ctype and str(cd_ctype) != 'Not Applicable' and cd_option is None:
+                raise forms.ValidationError(
+                                        "A requirement option must be selected")
         
         return cd_option
             
