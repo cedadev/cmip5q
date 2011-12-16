@@ -242,7 +242,7 @@ class SimDateTimeField(models.CharField):
             
     def to_python(self, value):
         ''' Handle two cases: an instance of a date, or a string (which is what we get)'''
-        if value=='':
+        if value=='' or 'None':
             if self.blank:
                 return value
             else:
