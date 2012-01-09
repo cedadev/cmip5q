@@ -124,7 +124,7 @@ class ComponentForm(forms.ModelForm):
     # explicitly set required=False, it doesn't inherit that from the model as 
     # it does if we don't handle the display.
     
-    abbrev = forms.CharField(widget=forms.TextInput(attrs={'class':'inputH1'}))
+    abbrev = forms.CharField() #widget is speciailised below
     description = forms.CharField(widget=forms.Textarea(
                             attrs={'cols':"80", 'rows':"4"}), required=False)
     geneology = forms.CharField(widget=forms.Textarea(
@@ -158,6 +158,12 @@ class ComponentForm(forms.ModelForm):
         self.fields['grid'].queryset = Grid.objects.filter(
             centre=self.instance.centre).filter(
                                     istopGrid=True).filter(isDeleted=False)
+        
+        # allowing for name dropdown on top level model only
+        if self.instance.isModel:
+            self.fields['abbrev'].widget = forms.TextInput(attrs={'class':'inputH1'})
+        else:
+            self.fields['abbrev'].widget = forms.TextInput(attrs={'class':'inputH2'})
         
         if self.instance.controlled: 
             # We don't want this to be editable 

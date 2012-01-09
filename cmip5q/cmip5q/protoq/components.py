@@ -213,7 +213,7 @@ class componentHandler(object):
                 # don't reset the forms so the user gets an error response.
         else:
             #get some forms
-            cform=ComponentForm(instance=c,prefix='gen')
+            cform=ComponentForm(instance=c, prefix='gen')
             
             pform=ParamGroupForm(c,prefix='props')
             pform.newatt=1

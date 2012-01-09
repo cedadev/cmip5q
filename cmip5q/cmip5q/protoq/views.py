@@ -23,6 +23,7 @@ from cmip5q.protoq.XML import *
 from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist, get_datatables_records
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
+from cmip5q.vocabs import model_list
 
 import simplejson
 
@@ -34,7 +35,7 @@ def authorisation(request):
     badc@rl.ac.uk if you think this is an error. (Please include your openid id in your email.)'''
     return render_to_response('error.html',{'message':m})
 
-def completionHelper(request,vocabName):
+def completionHelper(request, vocabName):
     ''' This method provides support for ajax autocompletion within a specific vocabulary '''
     results = []
     if request.method == "GET":
@@ -51,6 +52,23 @@ def completionHelper(request,vocabName):
         json = simplejson.dumps(results)
         return HttpResponse(json, mimetype='application/json')
     return HttpResponse
+
+
+def autocomplete_model(request):
+    '''
+    returns model names for jquery/ajax autocompletion
+    '''
+    modelnames = model_list.modelnames
+    modellist=[]
+    if request.GET.has_key(u'term'): # coming in from form element 
+        for name in modelnames:
+            if name.startswith(request.GET[u'term']):
+                modellist.append(name)
+        return HttpResponse(simplejson.dumps(modellist), 
+                              mimetype="application/json")
+    else: # flat list page
+        return HttpResponse('<br/>'.join(modelnames))
+
 
 def genericDoc(request,cid,docType,pkid,method):
     ''' Handle the generic documents '''
@@ -144,7 +162,7 @@ def centres(request):
     #    p_aux.append(Centre.objects.get(abbrev=ab))
     
     # adding url location for AR5 table button    
-    ar5URL =reverse('cmip5q.ar5tables.views.ar5tables')    
+    ar5URL =reverse('cmip5q.ar5tables.views.overview')    
     
     if request.method=='POST':
         #yep we've selected something
@@ -726,4 +744,4 @@ def ripinfo(request):
             logging.info('ERROR on centres page: Unable to select requested centre %s'%request.POST['centrerip'])
             return render_badrequest('error.html',{'message':m})    
         
-    
+   

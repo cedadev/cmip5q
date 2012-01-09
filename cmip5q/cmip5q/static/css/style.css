@@ -609,4 +609,11 @@ Country Origin: Brazil
     vertical-align:top;
     }
      
+
+/* stylings for ajax loader icon */
+#loading { display:none; position:fixed; left:0; top:0; width:100%; height:100%; }
+
+
+
+
 	

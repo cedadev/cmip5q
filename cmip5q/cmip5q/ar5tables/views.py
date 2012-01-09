@@ -8,9 +8,17 @@ from cmip5q.ar5tables.utilities import getModels, getExps
 from cmip5q.protoq.models import Component, Centre
 
 
-def ar5tables(request): 
+def overview(request): 
     '''
-    Generates information to complete AR5 tables 
+    Generates landing page for AR5 tables 
+    '''   
+            
+    return render_to_response('explorer/ar5/ar5tables.html',{})
+
+
+def modeldesc(request): 
+    '''
+    Generates information to complete AR5 table 1, i.e model descriptions 
     '''   
     
     #----- Table 1 (Models) -----
@@ -19,21 +27,38 @@ def ar5tables(request):
     #generate information for ar5 table 1    
     table1info = ar5table1(models)
     
-    #----- Table 2 (Experiments) -----
+    return HttpResponse('bla bla 1')    
+    #return render_to_response('explorer/ar5/modeldesc.html',{'table1': table1info})
+
+
+def expdesign(request): 
+    '''
+    Generates information to complete AR5 table 2, i.e experiment design 
+    '''   
+    
     #get current experiments
     exps = getExps()
     #generate information for ar5 table 2
     t2reqlist, t2expslist = ar5table2(exps)
+        
+    return HttpResponse('bla bla 2')
+    #return render_to_response('explorer/ar5/expdesign.html', 
+    #                          {'t2explist': t2expslist, 't2reqlist': t2reqlist})
+
+
+def modelforcing(request): 
+    '''
+    Generates information to complete AR5 table 3, i.e model forcings 
+    '''   
     
     #----- Table 3 (Forcings) -----
     #temporarily using hadgem2-es model
     #mohc = Centre.objects.get(abbrev='MOHC')
     #hadgem = Component.objects.filter(abbrev="HadGEM2-ES").get(centre=mohc)
     #t3reqlist, t3expslist = ar5table3(exps, hadgem)
-        
-    return render_to_response('ar5/ar5tables.html',{'table1': table1info, 
-                                                    't2explist': t2expslist,
-                                                    't2reqlist': t2reqlist})
+    
+    return HttpResponse('bla bla 3')        
+    #return render_to_response('explorer/ar5/modelforcing.html',{})
 
 
 def ar5bib(request):

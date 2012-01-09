@@ -22,8 +22,9 @@ def get_datatables_records(request, querySet, columnIndexNameMap,
     Usage: 
         querySet: query set to draw data from.
         columnIndexNameMap: field names in order to be displayed.
-        jsonTemplatePath: optional template file to generate custom json from.  If not provided it will generate the data directly from the model.
-
+        jsonTemplatePath: optional template file to generate custom json from.  
+                          If not provided it will generate the data directly 
+                          from the model.
     """
     
     cols = int(request.GET.get('iColumns',0)) # Get the number of columns
@@ -187,4 +188,5 @@ def sublist(alist,n):
     if fragment:
         blist.append(alist[nsubs*n:])
     return blist
+
 

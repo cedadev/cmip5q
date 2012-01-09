@@ -87,3 +87,13 @@
 .cycletable .fixed {
     background-color:#a3c159;
     }
+    
+/* manually added by GD for ar5 tables true
+.cycletable .truecell {
+    bgcolor:#55ff55;
+    }
+    
+.cycletable .falsecell {
+    bgcolor:#ff5555;
+    }        
+    

@@ -1,5 +1,18 @@
 {% extends "twopanel.html" %}
 
+<!-- Page specific head information...css overrides etc-->
+{% block pagehead %}
+  <script type="text/javascript">
+    $(function() {
+    	  $( "input#id_gen-abbrev.inputH1" ).autocomplete({
+            source: "{% url autocomplete_model %}"
+            });
+    });
+  </script>
+{% endblock %}
+
+
+
 {% block titlerow %} 
   Edit model
   {% if not c.isModel %}

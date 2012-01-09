@@ -1,6 +1,19 @@
 {% extends "base.html" %}     
 
-{% block pagehead %}
+{% block pagehead %}  
+  
+  <script>
+    function showLoading() {
+      $("#loading").show();
+    }
+  </script>
+  
+  <script>
+    function hideLoading() {
+      $("#loading").hide();
+    }
+  </script>
+  
   <script>
 			 $(function() {
 			  $( "#tabs" ).tabs({
@@ -12,13 +25,16 @@
 			   }
 			  });
 			 });
+
 		</script>
+  
    
   <script type="text/javascript">
     $(function() {
 	        $( "input:submit, a, button", ".toolbar" ).button();
 	   });
   </script>
+  
       
   <script type="text/javascript">
     $().ready(function() {
@@ -46,32 +62,39 @@
 				  return false;
 				 });
 				});
-		 </script>
+		</script>
+		
 		    
-   <script type="text/javascript">
-				 $(function(){
-				  $('.ui-state-default').hover(
-				   function(){ $(this).addClass('ui-state-hover'); }, 
-				   function(){ $(this).removeClass('ui-state-hover'); }
-				  );
-				
-				  $('.ui-state-default').click(
-						 function(){ $(this).toggleClass('ui-state-active');
-				  });
-				
-				 });
-			</script>
+  <script type="text/javascript">
+			 $(function(){
+			  $('.ui-state-default').hover(
+			   function(){ $(this).addClass('ui-state-hover'); }, 
+			   function(){ $(this).removeClass('ui-state-hover'); }
+			  );
 			
-	  <script>
-	    $(function() {
-	      $('.tablescroll').fixer({fixedrows:1,fixedcols:1,width:0, height:600});
-	    });
-	  </script>
+			  $('.ui-state-default').click(
+					 function(){ $(this).toggleClass('ui-state-active');
+			  });
 			
+			 });
+		</script>
+		
+			
+  <script>
+    $(function() {
+      $('.tablescroll').fixer({fixedrows:1,fixedcols:1,width:0, height:600});
+    });
+  </script>
+    			
 {% endblock %}
      
      
 {% block content %}
+  
+  <!-- loading icon for ajax calls -->
+  <div id="loading">
+    <p><img src="/static/icons/ajax-loader.gif" /> Please Wait</p>
+  </div>
 
   <div class="boxer titlerow">
     Model description table for AR5
@@ -81,20 +104,16 @@
 		
 		  <!-- Navigation among ar5 tables -->
 		  <ul>
-				  <li><a href="#tabs-1">Model Description</a></li>
+				  <li><a href="#tabs-1">Overview</a></li>
+				  <li><a href="/cmip5/explorer/ar5/modeldesc">Model Description</a></li>
 				  <li><a href="/cmip5/explorer/ar5/expdesign">Experiment Design</a></li>
-				  <li><a href="/cmip5/explorer/ar5/modforcings">Model Forcings</a></li>
+				  <li><a href="/cmip5/explorer/ar5/modelforcing">Model Forcings</a></li>
 				</ul>
   
     <!-- Table 1 --> 
     <div id="tabs-1">
-      {% include 'explorer/ar5/ar5_tab1.html' %}
+      <p>This tab will give an overview of the different tabs</p>
     </div>
-			 
-			 <!--  
-    {% include 'ar5/ar5_tab2.html' %} 
-    {% include 'ar5/ar5_tab3.html' %}
-    -->
 
   </div>
 
