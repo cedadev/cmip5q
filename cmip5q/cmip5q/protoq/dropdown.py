@@ -78,7 +78,7 @@ class DurationWidget(forms.MultiWidget):
         forms.MultiWidget.__init__(self,widgets)
     def decompress(self, value):
         if value is not None:
-            return [value.startDate,value.endDate,value.length]
+            return [value.startDate, value.endDate, value.length]
         else: return [None,None,None]
     def format_output(self, rendered_widgets):
         widgetContext = {'from':rendered_widgets[0],'to':rendered_widgets[1],'for':rendered_widgets[2]}

@@ -47,7 +47,8 @@ class SimDateTime(object):
     def __init__(self,s,calendar=Calendar('realCalendar')):
         ''' Expect ISO8601 [yyyy-mm-dd hh:mm:ss] plus optional calendar '''
         #FIXME: Should validate against calendar types
-        #if s is None or s=='None': return None
+        if s is None or s=='None': 
+            return None
         self.s=s.strip()
         s=self.s
         # allow a date time without a time, and set that to 00:00:00
@@ -222,18 +223,24 @@ class SimDateTimeField(models.CharField):
     def formfield(self, **kwargs):
         return SimDateTimeFieldForm2 (*kwargs)
         
-    def clean(self,s,y=None):
+    def clean(self, s, y=None):
         if isinstance(s,list):
-            # this is a hack, it ought not be, but these nested multi widgets cause naughtiness
-            # that I haven't time to fix #FIXME
-            if s==['','','','']: return None
+            # this is a hack, it ought not be, but these nested multi widgets 
+            # cause naughtiness that I haven't time to fix #FIXME
+            if s==['','','','']: 
+                return None
             d='-'.join(s[0:3])
-            if s[3]<>'':d+='T%s'%s[3]
+            if s[3]<>'':
+                d+='T%s'%s[3]
             s=d
         elif s<> '':
             pass
-        else: return None
-        if isinstance(s,SimDateTime): return s
+        else: 
+            return None
+        
+        if isinstance(s,SimDateTime): 
+            return s
+        
         try:
             sdt=SimDateTime(s)
             return sdt
@@ -242,7 +249,7 @@ class SimDateTimeField(models.CharField):
             
     def to_python(self, value):
         ''' Handle two cases: an instance of a date, or a string (which is what we get)'''
-        if value=='' or 'None':
+        if value=='':
             if self.blank:
                 return value
             else:
