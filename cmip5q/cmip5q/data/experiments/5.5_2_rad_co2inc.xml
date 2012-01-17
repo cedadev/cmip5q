@@ -67,7 +67,7 @@
         <requirementOption>
             <id xsi:type="Identifier">bc.009</id>
             <name xsi:type="Identifier">5.5-2.bc.sl_aer_em</name>
-            <description>Concentrations</description>
+            <description>Emissions</description>
         </requirementOption>            
     </numericalRequirement>
     
