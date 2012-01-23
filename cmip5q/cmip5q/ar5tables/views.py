@@ -27,8 +27,8 @@ def modeldesc(request):
     #generate information for ar5 table 1    
     table1info = ar5table1(models)
     
-    return HttpResponse('bla bla 1')    
-    #return render_to_response('explorer/ar5/modeldesc.html',{'table1': table1info})
+    #return HttpResponse('bla bla 1')    
+    return render_to_response('explorer/ar5/modeldesc.html',{'table1': table1info})
 
 
 def expdesign(request): 
@@ -41,9 +41,9 @@ def expdesign(request):
     #generate information for ar5 table 2
     t2reqlist, t2expslist = ar5table2(exps)
         
-    return HttpResponse('bla bla 2')
-    #return render_to_response('explorer/ar5/expdesign.html', 
-    #                          {'t2explist': t2expslist, 't2reqlist': t2reqlist})
+    #return HttpResponse('bla bla 2')
+    return render_to_response('explorer/ar5/expdesign.html', 
+                              {'t2explist': t2expslist, 't2reqlist': t2reqlist})
 
 
 def modelforcing(request): 
@@ -57,8 +57,8 @@ def modelforcing(request):
     #hadgem = Component.objects.filter(abbrev="HadGEM2-ES").get(centre=mohc)
     #t3reqlist, t3expslist = ar5table3(exps, hadgem)
     
-    return HttpResponse('bla bla 3')        
-    #return render_to_response('explorer/ar5/modelforcing.html',{})
+    #return HttpResponse('bla bla 3')        
+    return render_to_response('explorer/ar5/modelforcing.html',{})
 
 
 def ar5bib(request):
