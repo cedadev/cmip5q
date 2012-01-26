@@ -18,6 +18,7 @@ from cmip5q.protoq.utilities import atomuri
 
 from cmip5q.protoq.modelUtilities import uniqueness, refLinkField
 from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
+from cmip5q.vocabs import model_list
 
 
 class ConformanceForm(forms.ModelForm):
@@ -124,7 +125,7 @@ class ComponentForm(forms.ModelForm):
     # explicitly set required=False, it doesn't inherit that from the model as 
     # it does if we don't handle the display.
     
-    abbrev = forms.CharField() #widget is speciailised below
+    abbrev = forms.CharField() #widget is specialised below
     description = forms.CharField(widget=forms.Textarea(
                             attrs={'cols':"80", 'rows':"4"}), required=False)
     geneology = forms.CharField(widget=forms.Textarea(
@@ -176,6 +177,35 @@ class ComponentForm(forms.ModelForm):
                                                     attrs={'size':'40'})
             self.viewableScienceType = ''
             self.showImplemented = False
+    
+    def clean_abbrev(self):
+        ''' 
+        validation checks for model short name
+        '''
+        value=self.cleaned_data['abbrev']
+        
+        # needs to match a name from the official cmip5 list
+        modelnames = model_list.modelnames
+        if value not in model_list.modelnames:
+            raise ValidationError('Please use an official cmip5 model name')
+    
+        # abbrev name needs to be unique within a particular centre
+        value=self.cleaned_data['abbrev']
+        m = Component.objects.filter(centre=self.instance.centre) \
+                             .filter(isDeleted=False) \
+                             .filter(isModel=True)
+        
+        ModelList=[]
+        for x in m:
+            ModelList.append(x.abbrev)
+        # In the case of a page update, ignore the currently valid component 
+        # name
+        if self.instance.abbrev in ModelList:
+            ModelList.remove(self.instance.abbrev)
+        if value in ModelList:
+            raise ValidationError('Model name must be unique from other Model names')
+        
+        return value
     
 
 class ComponentInputForm(forms.ModelForm):
