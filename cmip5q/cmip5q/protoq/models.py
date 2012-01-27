@@ -76,8 +76,8 @@ def soft_delete(obj,simulate=False):
     # objects are not simply parent objects in a non abstract class heirarchy.
     # we should allow those to be deleted happily.
     if hasattr(obj,'get_parent_model'):
-        # then we know we have at least one parent object to get rid of, and if it's the only one,
-        # delete with impunity.
+        # then we know we have at least one parent object to get rid of, and 
+        # if it's the only one, delete with impunity.
         parent=obj.get_parent_model()
         if len(on_death_row[parent])==1: 
             n=1
