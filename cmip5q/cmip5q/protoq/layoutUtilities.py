@@ -35,7 +35,19 @@ def getpubs():
              }
     
     # generate initial queryset of all CIMObjects (not including exps for now)
-    pubs = CIMObject.objects.exclude(cimtype='experiment').order_by('created')
+    allpubs = list(CIMObject.objects.exclude(cimtype='experiment').order_by('created'))
+    # only take latest version of each document
+    pubs=[]
+    for pub in allpubs:
+        # Check if I'm a duplicate
+        duplicates = list(CIMObject.objects.filter(uri=pub.uri).order_by('documentVersion'))
+        if len(duplicates)>1:
+            logging.info('length = %s' %len(duplicates))
+            # If so, include me if I'm the most recent
+            if pub == duplicates[-1]:
+                pubs.append(pub)
+        else:
+            pubs.append(pub)
     
     for pub in pubs:
         
@@ -51,9 +63,11 @@ def getpubs():
             
             # attach document centre name
             pub.centrename = document.centre
+            pub.abbreviation = document.abbrev
             
             # attach a url path to esg portal view (limited to most recent 
-            # version of simulations)
+            # version of simulations) - also get the models/exps used for 
+            # simulations
             try: 
                 if cimType =='simulation':
                     #get most up-to-date version
@@ -61,6 +75,7 @@ def getpubs():
                                                         '-documentVersion'))[0]
                     if pub == utdsim:
                         modelname = str(document.numericalModel).lower()
+                        expname = str(document.experiment).lower()
                         if document.ensembleMembers > 1:
                             simname = str(document.abbrev).replace(
                                             " ","_").lower()+ 'basesimulation'
@@ -68,12 +83,23 @@ def getpubs():
                             simname = str(document.abbrev) \
                               .replace(" ","_").lower()
                         
+                        #attach esg url link
                         pub.esgurl = esgurl(modelname=modelname, 
                                             simname=simname)
+                        #attach model name associaed with simualtion
+                        pub.usesmodel = modelname
+                        pub.forexp = expname
                     else:
                         pub.esgurl = ''
+                        pub.usesmodel = '---'
+                        pub.forexp = '---'
+                else:
+                    pub.usesmodel = '---'                    
+                    pub.forexp = '---'
             except:
                 pub.esgurl = ''
+                pub.usesmodel = '---'
+                pub.forexp = '---'
                 
         except:
             pub.centrename = ''

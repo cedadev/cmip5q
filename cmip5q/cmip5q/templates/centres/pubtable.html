@@ -41,20 +41,23 @@ $(document).ready(function() {
                 <th width="15%">
                   Date created
                 </th>
-                <th width="30%">
+                <th width="15%">
                   Abbrev
                 </th>
 				            <th width="10%">
 				              CIM type
 				            </th>
-				            <th width="20%">
+				            <th width="10%">
 				              Centre
 				            </th>
-				            <th width="10%">
-				              Version
-				            </th>
 				            <th width="15%">
-				              View full record
+                  Uses model
+                </th>
+                <th width="20%">
+                  Under experiment
+                </th>
+				            <th width="15%">
+				              View record
 				            </th>
 				          </tr>
 				        </thead>
@@ -62,10 +65,11 @@ $(document).ready(function() {
 				          {% for pub in pubs %}
 												   <tr>
                 <td>{{pub.created.date}}</td>
-												    <td>{{pub.title|slice:":30"}}...</td>
+												    <td>{{pub.abbreviation}}...</td>
 												    <td>{{pub.cimtype}}</td>
 												    <td>{{pub.centrename}}</td>
-												    <td>{{pub.documentVersion}}</td>
+												    <td>{{pub.usesmodel}}</td>
+												    <td>{{pub.forexp}}</td>
 												    <td>
 												      {% if pub.esgurl %}
 												          <a href={{pub.esgurl}} target="_blank"><img src="/static/icons/24x24/View.png"/></a>
