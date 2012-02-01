@@ -90,9 +90,10 @@ class SDTwidget(forms.MultiWidget):
                    forms.TextInput(attrs={'size':'2'}), forms.TextInput(attrs={'size':'8'}) )
         forms.MultiWidget.__init__(self,widgets)
     def decompress(self, value):
-        if value is not None:
+        try:
             return [value.year,value.mon,value.day,value.time]
-        else: return [None,None]
+        except:
+            return [None,None]
     def format_output(self, rendered_widgets):
         return '%s-%s-%s T%s'%tuple(rendered_widgets)
 

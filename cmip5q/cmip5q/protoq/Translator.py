@@ -670,8 +670,11 @@ class Translator:
     def addInputMod(self,modClass,rootElement):
         changeElement=ET.SubElement(rootElement,"change",{'type':modClass.inputTypeModified.name})
         ET.SubElement(changeElement,'name').text=modClass.mnemonic
-        if modClass.memberStartDate :
+        #if modClass.memberStartDate :
+        try:
             changeElement.append(modClass.memberStartDate.xml('changeDate'))
+        except:
+            logging.debug("input mod start date doesn't exist")
         detailElement=ET.SubElement(changeElement,'detail')
         ET.SubElement(detailElement,'description').text=modClass.description
 
