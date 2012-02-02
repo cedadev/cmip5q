@@ -36,7 +36,7 @@ def getpubs():
     
     # generate initial queryset of all CIMObjects (not including exps for now)
     allpubs = list(CIMObject.objects.exclude(cimtype='experiment').order_by('created'))
-    # only take latest version of each document
+    # only take the latest version of each document
     pubs=[]
     for pub in allpubs:
         # Check if I'm a duplicate
