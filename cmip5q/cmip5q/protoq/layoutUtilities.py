@@ -42,7 +42,6 @@ def getpubs():
         # Check if I'm a duplicate
         duplicates = list(CIMObject.objects.filter(uri=pub.uri).order_by('documentVersion'))
         if len(duplicates)>1:
-            logging.info('length = %s' %len(duplicates))
             # If so, include me if I'm the most recent
             if pub == duplicates[-1]:
                 pubs.append(pub)
