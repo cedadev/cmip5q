@@ -42,7 +42,7 @@
 
 
 <!-- <xsl:import href="file:///usr/local/cmip5q/eggs/cmip5q-1.0.0-py2.6.egg/cmip5q/xsl/skeleton1-5.xsl" /> -->
-<xsl:import href="file:///xsl/skeleton1-5.xsl" />
+<xsl:import href="file:///home/gerarddevine/dev/Django/questionnaire/cmip5q/cmip5q/xsl/skeleton1-5.xsl" />
 <xsl:param name="diagnose">yes</xsl:param>     
 
 <xsl:template name="process-prolog">

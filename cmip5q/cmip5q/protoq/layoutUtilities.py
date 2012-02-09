@@ -116,12 +116,18 @@ def getsims(centre):
     tablesims = Simulation.objects.filter(centre=centre).filter(isDeleted=False)
     
     for s in tablesims:
+        #get individual sim edit url
         s.url=reverse('cmip5q.protoq.views.simulationEdit', 
-                      args=(centre.id,s.id))        
-        s.delurl=reverse('cmip5q.protoq.views.simulationDel', 
-                         args=(centre.id,s.id))
+                      args=(centre.id,s.id))   
+        #get individual sim copy url
         s.copysimurl=reverse('cmip5q.protoq.views.simulationCopyInd', 
-                         args=(centre.id,s.id))      
+                         args=(centre.id,s.id))
+        #get individual sim delete url (for non-published sims)
+        if len(CIMObject.objects.filter(uri=s.uri)):
+            s.delurl = None
+        else:     
+            s.delurl=reverse('cmip5q.protoq.views.simulationDel', 
+                         args=(centre.id,s.id))     
     
     return tablesims
 

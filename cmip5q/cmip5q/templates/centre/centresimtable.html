@@ -1,19 +1,20 @@
-<h2>Simulations associated with {{centre.abbrev}}</h2>
-  
-  <!--  Publication info table section -->
+<!--  Publication info table section -->
 
-		<script type="text/javascript">
-				/* <![CDATA[ */
-				$(document).ready(function() {
-				 $('#sims-table').dataTable({
-				  "bJQueryUI": true,
-				  "bAutoWidth": false,
-				  'sPaginationType': 'full_numbers',
-				  'aaSorting': [[ 0, "desc" ]],
-				 });
-				} );
-				/* ]]> */
-		</script>
+<h2>Simulations associated with {{centre.abbrev}}</h2>
+
+
+<script type="text/javascript">
+	/* <![CDATA[ */
+	$(document).ready(function() {
+	 $('#sims-table').dataTable({
+	  "bJQueryUI": true,
+	  "bAutoWidth": false,
+	  'sPaginationType': 'full_numbers',
+	  'aaSorting': [[ 0, "desc" ]],
+	 });
+	} );
+	/* ]]> */
+</script>
 
 
 <div class="formcontainer">
@@ -64,17 +65,21 @@
             </thead>
             <tbody>
               {% for sim in tablesims %}
-               <tr>
-                <td>{{sim.abbrev}}</td>
-                <td>{{sim.experiment}}</td>
-                <td>{{sim.numericalModel}}</td>
-                <td>{{sim.documentVersion}}</td>
-                <td>{{sim.updated}}</td>
-                <td>{{sim.isComplete}}</td>
-                <td><a href={{sim.url}}><img src="/static/icons/24x24/Modify.png" title="Edit simulation {{sim.abbrev}}"/></a></td>
-                <td><a href={{sim.copysimurl}}><img src="/static/icons/24x24/Copy.png" title="Copy simulation {{sim.abbrev}}"/></a></td>
-                <td><a class="ask" href={{sim.delurl}}><img src="/static/icons/24x24/Erase.png" title="Delete simulation {{sim.abbrev}}"/></a></td>
-               </tr>
+                <tr>
+	                <td>{{sim.abbrev}}</td>
+	                <td>{{sim.experiment}}</td>
+	                <td>{{sim.numericalModel}}</td>
+	                <td>{{sim.documentVersion}}</td>
+	                <td>{{sim.updated}}</td>
+	                <td>{{sim.isComplete}}</td>
+	                <td><a href={{sim.url}}><img src="/static/icons/24x24/Modify.png" title="Edit simulation {{sim.abbrev}}"/></a></td>
+	                <td><a href={{sim.copysimurl}}><img src="/static/icons/24x24/Copy.png" title="Copy simulation {{sim.abbrev}}"/></a></td>
+	                {% if sim.delurl %}
+	                  <td><a class="ask" href={{sim.delurl}}><img src="/static/icons/24x24/Erase.png" title="Delete simulation {{sim.abbrev}}"/></a></td>
+	                {% else %}
+	                  <td><img src="/static/icons/24x24/Erase_Grey.png" title="Unable to delete published (or previously published) simulations"/></a></td>
+	                {% endif %} 
+                </tr>
               {% endfor %}
             </tbody>
           </table>

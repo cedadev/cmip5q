@@ -256,28 +256,29 @@ class simulationHandler(object):
             cformset=MyConformanceFormSet(s)
             cformset.specialise()
           
-        return render_to_response('conformance.html',{'s':s,
-                                                      'e':e,
-                                                      'cform':cformset,
-                                                      'urls':urls,
-                                                      'tabs':tabs(request, 
-                                                                  self.centreid,
-                                                                  'Conformance')
-                                                      })
+        return render_to_response('conformance.html',{'s':s, 'e':e, 'cform':cformset, 'urls':urls, 
+                                                      'tabs':tabs(request, self.centreid, 'Conformance')})
   
   
     def copy(self,request):
+        '''
+        Makes a copy of myself
+        '''
         if request.method=='POST':
-                #try:
-                if request.POST['targetSim']=='---':
-                    return HttpResponse('Error, please choose a simulation to copy. You can use your browser back button')
-                targetExp=request.POST['targetExp']
-                exp=Experiment.objects.get(id=targetExp)
-                targetSim=request.POST['targetSim']
-                s=Simulation.objects.get(id=targetSim)
-                ss=s.copy(exp)
-                url=reverse('cmip5q.protoq.views.simulationEdit',args=(self.centreid,ss.id,))
-                return HttpResponseRedirect(url)
+            if request.POST['targetSim'] == '---':
+                return HttpResponse('Error, please choose a simulation to \
+                                    copy. You can use your browser back button')
+            
+            targetExp = request.POST['targetExp']
+            exp = Experiment.objects.get(id=targetExp)
+            targetSim = request.POST['targetSim']
+            s = Simulation.objects.get(id=targetSim)
+            ss = s.copy(exp)
+            url = reverse('cmip5q.protoq.views.simulationEdit', 
+                        args=(self.centreid,ss.id,))
+            
+            return HttpResponseRedirect(url)
+        
         else:
             return self.list(request)
         
@@ -298,26 +299,27 @@ class simulationHandler(object):
         
     def markdeleted(self, request):
         '''
-        delete me as a simulation (i.e mark me as isDeleted)
+        Deletes me as a simulation (i.e marks me as isDeleted), having first
+        confirmed that I am not already published.
         '''
-        s=self.s
+        s = self.s
         s.isDeleted = True
         s.save()
         # return me to the summary page
-        url=reverse('cmip5q.protoq.views.centre',args=(self.centreid, ))
+        url = reverse('cmip5q.protoq.views.centre', args=(self.centreid, ))
         return HttpResponseRedirect(url)
         
         
     def resetCouplings(self):
         ''' 
-        This method completely resets ALL couplings and ALL closures from the 
-        originals in the model. Note that copy does not do the closures, but
-        this one does. One closure at a time can be done via the coupling 
-        handler. 
+        Resets ALL couplings and ALL closures from the originals in the model. 
+        Note that copy does not do the closures, but this one does. One closure 
+        at a time can be done via the coupling handler. 
         '''
-        s=self.s
+        s = self.s
         s.resetCoupling(closures=True)
         # and return to the coupling view 
-        url=reverse('cmip5q.protoq.views.simulationCup',
-                    args=(self.centreid,s.id,))
+        url = reverse('cmip5q.protoq.views.simulationCup',
+                    args=(self.centreid, s.id, ))
+        
         return HttpResponseRedirect(url)

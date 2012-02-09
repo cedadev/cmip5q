@@ -1289,8 +1289,7 @@ class Simulation(Doc):
         be called by resetCoupling 
         '''
         # see updateIO for documentation of what we're doing here.
-        itypes = Term.objects.filter(vocab=Vocab.objects
-                                     .get(name='InputTypes')).order_by('id')
+        itypes = Term.objects.filter(vocab=Vocab.objects.get(name='InputTypes')).order_by('id')
         existing = self.datasets.all().order_by('id')
         for e in existing:
             e.delete4real()
