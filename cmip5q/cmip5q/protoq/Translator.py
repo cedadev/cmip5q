@@ -696,9 +696,9 @@ class Translator:
             if simClass.ensembleMembers>1 :
                 # our simulation is really the base simulation of an ensemble
                 ''' shortName [1] '''
-                ET.SubElement(simElement,'shortName').text=simClass.abbrev+"BaseSimulation"
+                ET.SubElement(simElement,'shortName').text=simClass.abbrev
                 ''' longName [1] '''
-                ET.SubElement(simElement,'longName').text='Base Simulation of Ensemble'+simClass.title
+                ET.SubElement(simElement,'longName').text=simClass.title
             else :
                 ''' shortName [1] '''
                 if simClass.abbrev:
