@@ -541,7 +541,7 @@ class SimulationForm(forms.ModelForm):
     #it appears that when we explicitly set the layout for forms, we have to explicitly set 
     #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}),required=False)
+    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}), required=False)
     authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
     #duration=forms.CharField(widget=forms.TextInput())
     #duration=DateRangeFieldForm(widget=DateRangeWidget())
@@ -570,9 +570,19 @@ class SimulationForm(forms.ModelForm):
         except:
             raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
     
+    
     def clean_abbrev(self):
-        # abbrev name needs to be unique within a particular centre
         value=self.cleaned_data['abbrev']
+        
+        # first check that the abbreviation is not being changed when a 
+        # simulation has already been published (as this affects Curator display)
+        currentname = self.instance.abbrev
+        if currentname != '' and currentname != value: #i.e. a change
+            if CIMObject.objects.filter(uri=self.instance.uri):
+                raise ValidationError('Changing the short name of an already \
+                                   published simulation is not allowed ')
+        
+        # abbrev name needs to be unique within a particular centre
         s=Simulation.objects.filter(centre=self.instance.centre).filter(isDeleted=False)
         
         SimulList=[]
@@ -582,7 +592,22 @@ class SimulationForm(forms.ModelForm):
         if self.instance.abbrev in SimulList:
             SimulList.remove(self.instance.abbrev)
         if value in SimulList:
-            raise ValidationError('Simulation name must be unique from other simulation names')
+            raise ValidationError('Simulation name must be unique from other \
+                                   simulation names')
+        return value
+    
+    
+    def clean_title(self):
+        '''
+        Check that the title (long name) text is less than 128 characters
+        '''
+         
+        value=self.cleaned_data['title']
+        
+        if len(value) > 128:
+            raise ValidationError('Long name text must be less than 128 \
+                                   characters')
+        
         return value
     
     
