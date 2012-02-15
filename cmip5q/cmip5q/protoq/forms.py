@@ -182,12 +182,15 @@ class ComponentForm(forms.ModelForm):
         ''' 
         validation checks for model short name
         '''
-        value=self.cleaned_data['abbrev']
         
-        # needs to match a name from the official cmip5 list
-        modelnames = model_list.modelnames
-        if value not in model_list.modelnames:
-            raise ValidationError('Please use an official cmip5 model name')
+        #only active at top model level
+        if self.instance.isModel:
+            value=self.cleaned_data['abbrev']
+            
+            # needs to match a name from the official cmip5 list
+            modelnames = model_list.modelnames
+            if value not in model_list.modelnames:
+                raise ValidationError('Please use an official cmip5 model name')
     
         # abbrev name needs to be unique within a particular centre
         value=self.cleaned_data['abbrev']
