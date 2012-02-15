@@ -27,7 +27,8 @@ CENTRES=(
              ('CMCC','Centro Euro-Mediterraneo per I Cambiamenti Climatici',('')),
              ('GCESS','College of Global Change and Earth System Science, Beijing Normal University',('')),
              ('FIO','The First Institute of Oceanography, SOA, China',('')),
-             ('RSMAS','University of Miami - RSMAS',(''))
+             ('RSMAS','University of Miami - RSMAS',('')),
+             ('NOAA-NCEP','National Centres for Environmental Prediction',(''))
         )
 def loadCentres():
     for centre in CENTRES:
