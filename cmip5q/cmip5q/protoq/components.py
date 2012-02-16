@@ -15,6 +15,7 @@ from cmip5q.protoq.coupling import MyCouplingFormSet
 
 from cmip5q.protoq.Translator import Translator
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
+from cmip5q.vocabs import model_list
 
 from django import forms
 from django.conf import settings
@@ -219,9 +220,32 @@ class componentHandler(object):
             pform.newatt=1
         
         if c.isModel:
-            #we'd better decide what we want to say about couplings. Same code in simulation!
+            # We'd better decide what we want to say about couplings. Same 
+            # code in simulation!
             cset=c.couplings(None)
-        else: cset=None
+        else: 
+            cset=None
+            
+        # Need to check that the current top level model name is in agreement 
+        # with the official DRS names and sound a warning if not (as opposed 
+        # to raising a form error and halting further progress)
+        if c.isModel:
+            modname = c.abbrev
+            if modname not in model_list.modelnames:
+                warning = \
+                """
+                Warning: The model name used does not match an official cmip5
+                model name. Although this does not stop you from proceeding it 
+                will mean that you will not be able to export your metadata to 
+                CMIP5. If you believe your model name is correct, please get in 
+                touch as we update our list of accepted names only periodically   
+                """
+                
+            else:
+                warning=False
+        else:
+                warning=False
+        
         
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
         return render_to_response('componentMain.html',
@@ -233,6 +257,7 @@ class componentHandler(object):
                 'isModel':c.isModel,
                 'isParamGroup':c.isParamGroup,
                 'cset':cset,
+                'warning':warning,
                 'tabs':tabs(request,self.centre_id,'Model',self.component.model.id),
                 'notAjax':not request.is_ajax()})
             
