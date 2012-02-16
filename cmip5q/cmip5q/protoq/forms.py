@@ -106,18 +106,17 @@ class ExternalClosureForm(forms.ModelForm):
             self.fields['target'].queryset = DataObject.objects.filter(
                                         container=self.instance.targetFile)
     
-    def clean(self):
+    def clean_targetFile(self):
         '''
         adding an additional validation that checks the file title is supplied
         '''
         # get current info from cleaned data
-        cleaned_data = self.cleaned_data
-        cd_targetfile = cleaned_data.get("targetFile")
+        value=self.cleaned_data['targetFile']
         # check for missing targetfile
-        if cd_targetfile is None:
+        if value is None:
             raise forms.ValidationError("A file must be selected")
         
-        return cleaned_data
+        return value
 
 
 class ComponentForm(forms.ModelForm):
@@ -184,13 +183,13 @@ class ComponentForm(forms.ModelForm):
         '''
         
         #only active at top model level
-        if self.instance.isModel:
-            value=self.cleaned_data['abbrev']
-            
-            # needs to match a name from the official cmip5 list
-            modelnames = model_list.modelnames
-            if value not in model_list.modelnames:
-                raise ValidationError('Please use an official cmip5 model name')
+        #if self.instance.isModel:
+        #    value=self.cleaned_data['abbrev']
+        #    
+        #    # needs to match a name from the official cmip5 list
+        #    modelnames = model_list.modelnames
+        #    if value not in model_list.modelnames:
+        #        raise ValidationError('Please use an official cmip5 model name')
     
         # abbrev name needs to be unique within a particular centre
         value=self.cleaned_data['abbrev']
