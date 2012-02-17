@@ -6,7 +6,7 @@
 * {
     margin: 0;
 	   padding: 0;
-	   font-family: ‘Trebuchet MS’,Helvetica,sans-serif;
+	   font-family: ï¿½Trebuchet MSï¿½,Helvetica,sans-serif;
     line-height: 1.7;
     color: #333;
     font-size: 12px;
@@ -284,6 +284,19 @@ td.space {
 		  color: red; 
 		  text-align: center;
 		  }
+		  
+.warning_boxer  {
+		  margin:5px;
+		  padding:15px;
+		  background-color:#FFFFAA; 
+		  border: 1px solid #FF8800;
+		  }
+		  
+.warning_boxer p {
+		  font-size: 16px;
+		  color: #FF8800; 
+		  text-align: center;
+		  }
 
 .helper_boxer  {
 		  align:center;
@@ -483,7 +496,7 @@ a.atom {background-image:url(icons/atom.png);background-repeat:no-repeat;}
 /*
 Table for RIPinfo
 Tema: Soft Table - A Simple table style with the use of the soft brown color
-Author: Newton de Góes Horta
+Author: Newton de Gï¿½es Horta
 Site: --
 Country Origin: Brazil
 */
