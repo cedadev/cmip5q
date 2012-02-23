@@ -75,11 +75,7 @@ def getpubs():
                     if pub == utdsim:
                         modelname = str(document.numericalModel).lower()
                         expname = str(document.experiment).lower()
-                        if document.ensembleMembers > 1:
-                            simname = str(document.abbrev).replace(
-                                            " ","_").lower()+ 'basesimulation'
-                        else:
-                            simname = str(document.abbrev) \
+                        simname = str(document.abbrev) \
                               .replace(" ","_").lower()
                         
                         #attach esg url link
