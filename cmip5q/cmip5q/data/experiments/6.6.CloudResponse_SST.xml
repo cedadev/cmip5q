@@ -114,21 +114,21 @@
 		6.6 AMIP plus patterned anomaly
 	</longName>
      
-   <calendar>
-		<daily-360>
-			<range>
-				<closedDateRange></closedDateRange>
-			</range>
-		</daily-360>
-	</calendar>
-    <numericalRequirement xsi:type="SpatioTemporalConstraint"><name xsi:type="Identifier">6.6.stc.1850_30yr</name><id xsi:type="Identifier">stc.036</id><description>Begin in 1850 and run for 30 years </description>
-        <requiredDuration xsi:type="ClosedDateRange">
-            <!-- Idealised run so dates given here are only dummy values -->
-	 <startDate> 1850-01-01T00:00:00Z</startDate>
-            <endDate> 1880-01-01T00:00:00Z</endDate>
-            <length units="years">30</length>
-        </requiredDuration>
-    </numericalRequirement>
+  <calendar>
+    <realCalendar/>
+  </calendar>
+  <numericalRequirement xsi:type="SpatioTemporalConstraint">
+    <name xsi:type="Identifier">6.5.stc.1979_30yr</name>
+    <id xsi:type="Identifier">stc.027</id>
+    <description>Begin in 1979 and run for 30 years </description>
+    <requiredDuration xsi:type="ClosedDateRange">
+      <!-- Idealised run so dates given here are only dummy values -->
+      <startDate>1979-01-01T00:00:00Z</startDate>
+      <endDate>2008-12-30T00:00:00Z</endDate>
+      <length units="years">30</length>
+    </requiredDuration>
+  </numericalRequirement>	
+   
     <author>
 		<gmd:CI_ResponsibleParty>
 			<gmd:individualName>
