@@ -26,10 +26,10 @@ urlpatterns = patterns('',
     url(r'^cmip5/authz/$','cmip5q.protoq.views.authorisation',name='security'),
     #        
     # ajax vocabulary handler
-    url(r'^ajax/autocomplete_model/$', 'cmip5q.protoq.views.autocomplete_model', 
-                                                name='autocomplete_model'),
-    url(r'^ajax/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper', 
+    url(r'^ajax/vocabs/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper', 
                                                 name='ajax_value'),
+    url(r'^ajax/autocomplete/modelname/$', 'cmip5q.protoq.views.autocomplete_model', 
+                                                name='autocomplete_model'),
     #
     # generic document handling
     # 
