@@ -28,7 +28,7 @@ initialiseRefs()
 
 # create experiments
 
-experimentDir = './data/experiments'
+experimentDir = './static/data/experiments'
 for f in os.listdir(experimentDir):
     if f.endswith('.xml'):
 	    x=Experiment.fromXML(os.path.join(experimentDir, f))

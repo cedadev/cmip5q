@@ -97,6 +97,7 @@ class NumericalModel:
         ''' Read mindmap XML documents to build a complete model description '''
             
         mindMapDir = os.path.join(os.path.dirname(__file__), 
+                            'static',      
                             'data',
                             'mindmaps')
                                 

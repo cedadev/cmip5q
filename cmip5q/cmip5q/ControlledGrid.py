@@ -91,9 +91,11 @@ class NumericalGrid:
        
         ''' Read mindmap XML document(s) to build a complete grid description '''
             
-        mindMapDir = os.path.join(os.path.dirname(__file__), 
+        mindMapDir = os.path.join(os.path.dirname(__file__),
+                            'static', 
                             'data',
-                            'mindmaps', 'grid')
+                            'mindmaps', 
+                            'grid')
                                 
         logging.debug('Looking for grid mindmaps in %s'%mindMapDir)
         mindmaps=[os.path.join(mindMapDir, f) for f in os.listdir(mindMapDir)

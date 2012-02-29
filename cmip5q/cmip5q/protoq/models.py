@@ -763,17 +763,13 @@ class Experiment(Doc):
         getter=etTxt(root)
         #basic document stuff, note q'naire doc not identical to experiment bits ...
         doc={'description':'description','shortName':'abbrev','longName':'title','rationale':'rationale'}
-        logging.debug('AAAAAA')
         for key in doc:
             E.__setattr__(doc[key],getter.get(root,key))
 
         # load the calendar type
         calendarName=root.find("{%s}calendar"%cimv)[0].tag.split('}')[1]
-        logging.debug('BBBBBBB')
         vocab=Vocab.objects.get(name="CalendarTypes")
-        logging.debug('CCCCCC')
         term=Term(vocab=vocab,name=calendarName)
-        logging.debug('CCCCCC')
         term.save()
         E.requiredCalendar=term
        

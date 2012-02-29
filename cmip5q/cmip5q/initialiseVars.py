@@ -4,8 +4,12 @@ from django.conf import settings
 logging=settings.LOG
 
 def initialiseVars():
-    ''' This routine initialises the database with variables contained within 'standard' files for boundary conditions etc '''
-    VarsCSVinfo = csv.reader(open('data/References/Vars_CSV.csv'), delimiter=';', quotechar='|')
+    ''' 
+    This routine initialises the database with variables contained within 
+    'standard' files for boundary conditions etc 
+    '''
+    VarsCSVinfo = csv.reader(open('static/data/References/Vars_CSV.csv'), 
+                             delimiter=';', quotechar='|')
     
     # loop over all variables in spreadsheet
     for row in VarsCSVinfo:
