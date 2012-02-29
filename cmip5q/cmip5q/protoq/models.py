@@ -124,8 +124,10 @@ def soft_delete(obj,simulate=False):
                         linkdict[mname].append(referer)
         return False,linkdict
     
-    if not simulate: delete_objects(on_death_row)
-    return True,{}
+    if not simulate: 
+        delete_objects(on_death_row)
+    
+    return True, {}
 
 
 class ChildQuerySet(QuerySet):
@@ -1579,9 +1581,9 @@ class Coupling(models.Model):
     
     def __unicode__(self):
         if self.parent.simulation:
-            return 'CouplingFor:%s(in %s)'%(self.targetInput,self.parent.simulation)
+            return 'Coupling for %s (in simulation %s)'%(self.targetInput,self.parent.simulation)
         else:
-            return 'CouplingFor:%s'%self.targetInput
+            return 'Coupling for %s'%self.targetInput
     def copy(self,group):
         '''Make a copy of self, and associate with a new group'''
         # first make a copy of self
