@@ -269,7 +269,7 @@ class DataContainerForm(forms.ModelForm):
 class DataObjectForm(forms.ModelForm):
     description=forms.CharField(widget=forms.Textarea({'cols':'50','rows':'2'}),required=False)
     variable=forms.CharField(widget=forms.TextInput(attrs={'size':'45'}))
-    cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False,size=88)
+    cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False, size=50)
     class Meta:
         model=DataObject
         exclude=('featureType','drsAddress','container')
