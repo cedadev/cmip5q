@@ -48,7 +48,7 @@ class TermAutocompleteField(forms.fields.CharField):
         #self.url=reverse('cmip5q.protoq.views.completionHelper',args=(vocabname,))
         #self.url=reverse('ajax_value',args=(vocabname,))
         #FIXME: I can't work out how to make the above work without circular imports.
-        self.url='/ajax/%s'%vocabname
+        self.url='/ajax/vocabs/%s'%vocabname
         self.vocab=Term.objects.filter(vocab=Vocab.objects.get(name=vocabname))
         
         super(TermAutocompleteField, self).__init__(
