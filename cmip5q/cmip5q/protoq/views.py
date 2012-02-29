@@ -30,13 +30,23 @@ import simplejson
 logging=settings.LOG
 MESSAGE=''
 
+
 def authorisation(request):
-    m='''Access denied, you don't have appropriate permission to access this resource. Contact
-    badc@rl.ac.uk if you think this is an error. (Please include your openid id in your email.)'''
+    m = '''
+    Access denied, you don't have appropriate permission to access this 
+    resource. Contact badc@rl.ac.uk if you think this is an error. (Please 
+    include your openid id in your email.)
+    '''
+    
     return render_to_response('error.html',{'message':m})
 
+
 def completionHelper(request, vocabName):
-    ''' This method provides support for ajax autocompletion within a specific vocabulary '''
+    ''' 
+    This method provides support for ajax autocompletion within a specific 
+    vocabulary 
+    '''
+    
     results = []
     if request.method == "GET":
         if request.GET.has_key(u'q'):
@@ -45,7 +55,8 @@ def completionHelper(request, vocabName):
             if len(value) > 2:
                 try:
                     v=Vocab.objects.get(name=vocabName)
-                except: return HttpResponseBadRequest('Invalid vocab %s'%vocabName)
+                except: 
+                    return HttpResponseBadRequest('Invalid vocab %s'%vocabName)
                 model_results = Term.objects.filter(vocab=v).filter(name__startswith=value)
                 results = [ (x.__unicode__(), x.id) for x in model_results ]
    
