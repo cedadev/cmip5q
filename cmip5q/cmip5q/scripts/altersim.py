@@ -5,9 +5,18 @@ Miscellaneous script for debugging purposes.
 '''
 
 
-from django.core.management import setup_environ
-import settings
-setup_environ(settings)
+
+#from django.core.management import setup_environ
+#import settings
+#setup_environ(settings)
+#imports
+import os
+import sys
+
+# putting project and application into sys.path  
+sys.path.insert(0, os.path.expanduser('..\protoq'))
+sys.path.insert(1, os.path.expanduser('..\..\cmip5q'))
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from cmip5q.protoq.models import *
 

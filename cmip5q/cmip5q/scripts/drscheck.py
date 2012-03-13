@@ -13,7 +13,7 @@ import sys
 # putting project and application into sys.path  
 sys.path.insert(0, os.path.expanduser('..\protoq'))
 sys.path.insert(1, os.path.expanduser('..\..\cmip5q'))
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = '..\settings'
 
 from cmip5q.protoq.models import *
 
