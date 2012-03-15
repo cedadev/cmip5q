@@ -28,7 +28,8 @@ def modeldesc(request):
     table1info = ar5table1(models)
     
     #return HttpResponse('bla bla 1')    
-    return render_to_response('explorer/ar5/modeldesc.html',{'table1': table1info})
+    return render_to_response('explorer/ar5/modeldesc.html', 
+                              {'table1': table1info})
 
 
 def expdesign(request): 
@@ -201,7 +202,7 @@ def ar5csv(request):
             
         writer.writerow([row.abbrev+'| '+str(row.yearReleased), 
                          
-                         row.centre.name+'| '+"".join(maincits)+'| '+'Flux correction field',
+                         row.centre.name+'| '+"".join(maincits)+'| ' + 'Flux correction field',
                          
                          row.aerabbrev+'| '+'XX%'+'| '+aercits,
                          
