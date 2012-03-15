@@ -376,15 +376,24 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
         Checks that no two ensemble members have the same drs string 
         '''
         if any(self.errors):
-            # Don't bother validating the formset unless each form is valid on its own
+            # Don't bother validating the formset unless each form is valid on 
+            # its own
             return
         drsnums = []
+        #Start by adding the main simulation rip value
+        ensemb = self.forms[0].save(commit=False).ensemble
+        #ensemb = model_instance.ensemble
+        simrip = ensemb.simulation.drsMember
+        drsnums.append(simrip)
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             drsn = form.cleaned_data['drsMember']
             print i
             if drsn in drsnums:
-                raise ValidationError('Ensemble members must have distinct drs numbers')
+                raise ValidationError('''
+                Ensemble members must have distinct rip values. This includes 
+                the rip value given for the simulation itself. 
+                ''')
             drsnums.append(drsn)
 
 
