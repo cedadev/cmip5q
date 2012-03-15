@@ -158,14 +158,18 @@ urlpatterns = patterns('',
     # Admin
     (r'', include('cmip5q.protoq.admin.urls')),
     #(r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
-    (r'^admin/', include(admin.site.urls)),
+    (r'^cmip5/admin/', include(admin.site.urls)),
+    
+    #---------------------------------
+    # Metadata explorer url includes
     
     # AR5 tables included
-    (r'', include('cmip5q.ar5tables.urls')),
+    (r'^cmip5/explorer/ar5/', include('cmip5q.ar5tables.urls')),
     
     # API included
-    (r'', include('cmip5q.api.urls')),
+    #(r'^cmip5/api/', include('cmip5q.api.urls')),
 )
+
 
 # now add the common document url methods
 #for doc in ['experiment','platform','component','simulation']:
