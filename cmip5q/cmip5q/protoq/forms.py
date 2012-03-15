@@ -549,37 +549,59 @@ class ResponsiblePartyForm(forms.ModelForm):
                
                
 class SimulationForm(forms.ModelForm):
-    #it appears that when we explicitly set the layout for forms, we have to explicitly set 
-    #required=False, it doesn't inherit that from the model as it does if we don't handle the display.
+    # It appears that when we explicitly set the layout for forms, we have to 
+    # explicitly set required=False, it doesn't inherit that from the model as 
+    # it does if we don't handle the display.
     description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
     title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}), required=False)
     authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
-    #duration=forms.CharField(widget=forms.TextInput())
-    #duration=DateRangeFieldForm(widget=DateRangeWidget())
     duration=DateRangeFieldForm2()
     drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
-    #currently not asking for data file version information
-    #dataVersion=forms.IntegerField(widget=forms.TextInput(attrs={'size':'16'}),required=False)
+    # Currently not asking for data file version information
     
     class Meta:
         model=Simulation
-        #the first three are enforced by the workflow leading to the form, the second two are
-        #dealt with on other pages. NB: note that if you don't exclude things, then a form
-        #will expect them, and set them to None if they don't come back in the post ... a quiet
-        #loss of information ...
-        exclude=('centre','experiment','uri','codeMod','inputMod','relatedSimulations',
-                 'drsOutput','datasets', 'isComplete')
+        # The first three are enforced by the workflow leading to the form, 
+        # the second two are dealt with on other pages. NB: note that if you 
+        # don't exclude things, then a form will expect them, and set them to 
+        # None if they don't come back in the post ... a quiet
+        # loss of information ...
+        exclude=('centre', 'experiment', 'uri', 'codeMod', 'inputMod', 
+                 'relatedSimulations', 'drsOutput', 'datasets', 'isComplete')
 
     def clean_drsMember(self):
-        # needs to parse into DRS member format
+        '''
+        Checks for uniqueness and correct format
+        '''
+        # check for correct drs format
         value=self.cleaned_data['drsMember']
         p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
         try:
             m=p.search(value)
             [r,i,p]=map(int,[m.group('r'),m.group('i'),m.group('p')])
-            return value
         except:
-            raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
+            raise ValidationError('Please enter a valid CMIP5 ensemble member \
+                string of the format rLiMpN where L,M and N are integers')
+            
+        # check that no ensemble members exist with the same rip value
+        simul = self.instance
+        ensem = Ensemble.objects.get(simulation = simul)
+        allmems = EnsembleMember.objects.filter(ensemble=ensem)
+        ensrips=[]
+        for mem in allmems[1:]:
+            ensrips.append(mem.drsMember)
+        if value in ensrips:
+            raise ValidationError('This rip value is already used in one of \
+                                   the ensemble members')
+    
+        return value
+            
+            
+                
+        
+         
+        
+        
     
     
     def clean_abbrev(self):
@@ -599,7 +621,8 @@ class SimulationForm(forms.ModelForm):
         SimulList=[]
         for x in s:
             SimulList.append(x.abbrev)
-        # In the case of a page update, ignore the currently valid simulation name
+        # In the case of a page update, ignore the currently valid simulation 
+        # name
         if self.instance.abbrev in SimulList:
             SimulList.remove(self.instance.abbrev)
         if value in SimulList:
