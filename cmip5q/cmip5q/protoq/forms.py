@@ -21,6 +21,27 @@ from cmip5q.protoq.autocomplete import AutocompleteWidget, TermAutocompleteField
 from cmip5q.vocabs import model_list
 
 
+'''
+Grouping together linked cmip5 experiments to be able to map from qn exps to drs 
+exps, in particular, not allowing the reuse of rip values. These values are used
+in simulationForm and ensembleMemberform below. 
+'''
+expgroups = [
+             ["1.1 decadal", "1.1-I decadal", "1.2 decadal", "1.5 decadal"],
+             ["2.1 sst2030", "2.1-E sst2030"],
+             ["3.1 piControl", "3.1-S piControl"],
+             ["3.2 historical", "3.2-E historical"],
+             ["3.3 amip", "3.3-E amip"],
+             ["4.1 rcp45", "4.1-L rcp45"],
+             ["4.2 rcp85", "4.2-L rcp85"],
+             ["4.3 rcp26", "4.3-L rcp26"],
+             ["6.1 1pctCO2", "6.1-S 1pctCO2"],
+             ["6.3 abrupt4xCO2", "6.3-E abrupt4xCO2"],
+             ["7.1 historicalNat", "7.1-E historicalNat"],
+             ["7.2 historicalGHG", "7.2-E historicalGHG"]             
+            ]
+
+
 class ConformanceForm(forms.ModelForm):
     
     description = forms.CharField(widget=forms.Textarea(
@@ -347,11 +368,14 @@ class EnsembleMemberForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         logging.debug('initialising ensemble set')
         if self.instance:
-            # find the set of modifications which are appropriate for the current centre
+            # find the set of modifications which are appropriate for the 
+            # current centre
             etype=self.instance.ensemble.etype
             vet=Vocab.objects.get(name='EnsembleTypes')
-            self.fields['cmod'].queryset=CodeMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
-            self.fields['imod'].queryset=InputMod.objects.filter(centre=self.instance.ensemble.simulation.centre)
+            self.fields['cmod'].queryset=CodeMod.objects.filter(
+                                centre=self.instance.ensemble.simulation.centre)
+            self.fields['imod'].queryset=InputMod.objects.filter(
+                                centre=self.instance.ensemble.simulation.centre)
     
     def clean_drsMember(self):
         # needs to parse into DRS member format
@@ -362,10 +386,15 @@ class EnsembleMemberForm(forms.ModelForm):
             [r,i,p]=map(int,[m.group('r'),m.group('i'),m.group('p')])
             return value
         except:
-            raise ValidationError('Please enter a valid CMIP5 ensemble member string of the format rLiMpN where L,M and N are integers')
+            raise ValidationError('Please enter a valid CMIP5 ensemble member \
+                                   string of the format rLiMpN where L,M and \
+                                   N are integers')
     
     def specialise(self,requirementset):
-        ''' Limit the numerical requirements to only those within the requirement set '''
+        ''' 
+        Limits the numerical requirements to only those within the 
+        requirement set 
+        '''
         if requirementset:
             self.fields['requirement'].queryset=requirementset.members.all()
 
@@ -388,15 +417,63 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             drsn = form.cleaned_data['drsMember']
-            print i
             if drsn in drsnums:
                 raise ValidationError('''
                 Ensemble members must have distinct rip values. This includes 
                 the rip value given for the simulation itself. 
                 ''')
             drsnums.append(drsn)
-
-
+        
+        # Now also check for matching rip values in linked simulations (i.e. in 
+        # cmip5 drs terms
+        mysim = ensemb.simulation
+        mycentre = mysim.centre
+        mymodel = mysim.numericalModel
+        myexp = mysim.experiment
+        
+        # search through expgroups to decide if I am part of a linked experiment
+        for expgroup in expgroups:
+            #make a copy of the inner list (for possible editing) 
+            myexpgroup = list(expgroup)
+            if myexp.abbrev in myexpgroup:
+                #mark that it has been found
+                expfound=True
+                # remove the current sim from the group, then break
+                myexpgroup.remove(myexp.abbrev)
+                break
+        
+                
+        if expfound:
+            #collect all current rip values
+            linkedrips = []    
+            for exp in myexpgroup:
+                linkedsims = Simulation.objects.filter(
+                                centre=mycentre).filter(
+                                numericalModel=mymodel).filter(
+                                experiment__abbrev__exact=exp).filter(
+                                isDeleted=False)
+                
+                for simul in linkedsims:
+                    #add the rip value of the simulation
+                    linkedrips.append(simul.drsMember)
+                    #get my ensemblemember rip values
+                    ensem = Ensemble.objects.get(simulation = simul)
+                    allmems = EnsembleMember.objects.filter(ensemble=ensem)
+                    for ensmem in allmems[1:]:
+                        #add the rip value of the ensemble member
+                        linkedrips.append(ensmem.drsMember)
+                    
+            # do any of the rip values appear in this linked sim?
+            for i in range(0, self.total_form_count()):
+                form = self.forms[i]
+                drsn = form.cleaned_data['drsMember']
+                if drsn in linkedrips:
+                    raise ValidationError("This rip value is already used in \
+                                           the linked simulation '%s' being \
+                                           run for experiment '%s'" 
+                                           %(simul, simul.experiment))
+        
+        
 class ModForm(forms.ModelForm):
     mnemonic=forms.CharField(widget=forms.TextInput(attrs={'size':'25'}))
     description=forms.CharField(widget=forms.Textarea({'cols':'80','rows':'4'}))
@@ -552,11 +629,11 @@ class SimulationForm(forms.ModelForm):
     # It appears that when we explicitly set the layout for forms, we have to 
     # explicitly set required=False, it doesn't inherit that from the model as 
     # it does if we don't handle the display.
-    description=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}),required=False)
-    title=forms.CharField(widget=forms.TextInput(attrs={'size':'80'}), required=False)
-    authorList=forms.CharField(widget=forms.Textarea({'cols':"100",'rows':"4"}))
-    duration=DateRangeFieldForm2()
-    drsMember=forms.CharField(max_length=20,widget=forms.TextInput(attrs={'size':'25'}))
+    description = forms.CharField(widget=forms.Textarea({'cols': "100", 'rows': "4"}), required=False)
+    title = forms.CharField(widget=forms.TextInput(attrs={'size': '80'}), required=False)
+    authorList = forms.CharField(widget=forms.Textarea({'cols': "100", 'rows':"4"}))
+    duration = DateRangeFieldForm2()
+    drsMember = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'size': '25'}))
     # Currently not asking for data file version information
     
     class Meta:
@@ -571,44 +648,86 @@ class SimulationForm(forms.ModelForm):
 
     def clean_drsMember(self):
         '''
-        Checks for uniqueness and correct format
+        Checks for uniqueness and correct format of a simulation level rip 
+        value. The uniqueness test applies to ensemble members within the 
+        simulation itself as well as any linked simulations (by cmip5 exp)        
         '''
-        # check for correct drs format
+        # 1. check for correct drs format
         value=self.cleaned_data['drsMember']
         p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
         try:
             m=p.search(value)
-            [r,i,p]=map(int,[m.group('r'),m.group('i'),m.group('p')])
+            [r, i, p] = map(int, [m.group('r'), m.group('i'), m.group('p')])
         except:
             raise ValidationError('Please enter a valid CMIP5 ensemble member \
                 string of the format rLiMpN where L,M and N are integers')
             
-        # check that no ensemble members exist with the same rip value
+        # 2. check that no ensemble members (of this simulation) exist with the 
+        # same rip value
         simul = self.instance
         ensem = Ensemble.objects.get(simulation = simul)
         allmems = EnsembleMember.objects.filter(ensemble=ensem)
-        ensrips=[]
+        #collect all current rip values
+        ensrips = []
         for mem in allmems[1:]:
             ensrips.append(mem.drsMember)
         if value in ensrips:
             raise ValidationError('This rip value is already used in one of \
                                    the ensemble members')
-    
-        return value
-            
-            
+        
+        # 3. check that no ensemble members (of 'linked' simulations) exist with 
+        # the same rip value
+        mycentre = self.instance.centre
+        mymodel = self.instance.numericalModel
+        myexp = self.instance.experiment
+        
+        # search through expgroups to decide if I am part of a linked experiment
+        for expgroup in expgroups:
+            #make a copy of the inner list (for possible editing) 
+            myexpgroup = list(expgroup)
+            if myexp.abbrev in myexpgroup:
+                #mark that it has been found
+                expfound=True
+                # remove the current sim from the group, then break
+                myexpgroup.remove(myexp.abbrev)
+                break
+        
                 
-        
-         
-        
-        
+        if expfound:
+            #collect all current rip values
+            linkedrips = []    
+            for exp in myexpgroup:
+                linkedsims = Simulation.objects.filter(
+                                centre=mycentre).filter(
+                                numericalModel=mymodel).filter(
+                                experiment__abbrev__exact=exp).filter(
+                                isDeleted=False)
+                
+                for simul in linkedsims:
+                    #add the rip value of the simulation
+                    linkedrips.append(simul.drsMember)
+                    #get my ensemblemember rip values
+                    ensem = Ensemble.objects.get(simulation = simul)
+                    allmems = EnsembleMember.objects.filter(ensemble=ensem)
+                    for ensmem in allmems[1:]:
+                        #add the rip value of the ensemble member
+                        linkedrips.append(ensmem.drsMember)
+                    
+            #does the current current rip value appear in this linked sim?
+            if value in linkedrips:
+                raise ValidationError("This rip value is already used in the \
+                                        linked simulation '%s' being run for \
+                                    experiment '%s'" %(simul, simul.experiment))
+            
+        return value
     
     
     def clean_abbrev(self):
         value=self.cleaned_data['abbrev']
         
         # first check that the abbreviation is not being changed when a 
-        # simulation has already been published (as this affects Curator display)
+        # simulation has already been published (as this affects Curator 
+        # trackback display)
         currentname = self.instance.abbrev
         if currentname != '' and currentname != value: #i.e. a change
             if CIMObject.objects.filter(uri=self.instance.uri):
@@ -616,7 +735,8 @@ class SimulationForm(forms.ModelForm):
                                    published simulation is not allowed ')
         
         # abbrev name needs to be unique within a particular centre
-        s=Simulation.objects.filter(centre=self.instance.centre).filter(isDeleted=False)
+        s=Simulation.objects.filter(centre=self.instance.centre).filter(
+                                                                isDeleted=False)
         
         SimulList=[]
         for x in s:

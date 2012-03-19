@@ -106,8 +106,10 @@ def get_datatables_records(request, querySet, columnIndexNameMap,
 
 
 class HTMLdate:
-    ''' Handle an HTML date and convert h,m,d into seconds. Used as a mixin class to aid
-    serialisation etc, and usable in other applications too '''
+    ''' 
+    Handle an HTML date and convert h,m,d into seconds. Used as a mixin 
+    class to aid serialisation etc, and usable in other applications too 
+    '''
     def __init__(self):
         pass
     def fromstr(self,string):
