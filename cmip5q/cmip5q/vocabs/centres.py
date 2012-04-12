@@ -28,6 +28,8 @@ CENTRES=(
              ('GCESS','College of Global Change and Earth System Science, Beijing Normal University',('')),
              ('FIO','The First Institute of Oceanography, SOA, China',('')),
              ('RSMAS','University of Miami - RSMAS',('')),
+             ('NASA-GMAO','NASA Global Modeling and Assimilation Office',('')),
+             ('LASG-IAP','LASG, Institute of Atmospheric Physics, Chinese Academy of Sciences',('')),
              ('NCEP','National Centres for Environmental Prediction',(''))
         )
 def loadCentres():
