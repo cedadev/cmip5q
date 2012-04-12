@@ -24,7 +24,10 @@ from cmip5q.vocabs import model_list
 '''
 Grouping together linked cmip5 experiments to be able to map from qn exps to drs 
 exps, in particular, not allowing the reuse of rip values. These values are used
-in simulationForm and ensembleMemberform below. 
+in simulationForm and ensembleMemberform below. Note however that the rcp/rcp-L 
+(i.e. extended simulation periods) are not included as sharing of rip values 
+across these is allowed - the start year will act to uniquely identify datasets 
+in this scenario.   
 '''
 expgroups = [
              ["1.1 decadal", "1.1-I decadal", "1.2 decadal", "1.5 decadal"],
@@ -32,9 +35,6 @@ expgroups = [
              ["3.1 piControl", "3.1-S piControl"],
              ["3.2 historical", "3.2-E historical"],
              ["3.3 amip", "3.3-E amip"],
-             ["4.1 rcp45", "4.1-L rcp45"],
-             ["4.2 rcp85", "4.2-L rcp85"],
-             ["4.3 rcp26", "4.3-L rcp26"],
              ["6.1 1pctCO2", "6.1-S 1pctCO2"],
              ["6.3 abrupt4xCO2", "6.3-E abrupt4xCO2"],
              ["7.1 historicalNat", "7.1-E historicalNat"],
@@ -437,10 +437,12 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
             myexpgroup = list(expgroup)
             if myexp.abbrev in myexpgroup:
                 #mark that it has been found
-                expfound=True
+                expfound = True
                 # remove the current sim from the group, then break
-                myexpgroup.remove(myexp.abbrev)
+                #myexpgroup.remove(myexp.abbrev)
                 break
+            else:
+                expfound = False
         
                 
         if expfound:
@@ -452,6 +454,8 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
                                 numericalModel=mymodel).filter(
                                 experiment__abbrev__exact=exp).filter(
                                 isDeleted=False)
+                
+                #first remove the current sim 
                 
                 for simul in linkedsims:
                     #add the rip value of the simulation
@@ -652,8 +656,11 @@ class SimulationForm(forms.ModelForm):
         value. The uniqueness test applies to ensemble members within the 
         simulation itself as well as any linked simulations (by cmip5 exp)        
         '''
+        value = self.cleaned_data['drsMember']
+        #grab the startdate also for checking the decadal experiments in 3 below
+        startdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
+        
         # 1. check for correct drs format
-        value=self.cleaned_data['drsMember']
         p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
         try:
             m=p.search(value)
@@ -665,37 +672,41 @@ class SimulationForm(forms.ModelForm):
         # 2. check that no ensemble members (of this simulation) exist with the 
         # same rip value
         simul = self.instance
-        ensem = Ensemble.objects.get(simulation = simul)
-        allmems = EnsembleMember.objects.filter(ensemble=ensem)
-        #collect all current rip values
-        ensrips = []
-        for mem in allmems[1:]:
-            ensrips.append(mem.drsMember)
-        if value in ensrips:
-            raise ValidationError('This rip value is already used in one of \
-                                   the ensemble members')
+        try:
+            ensem = Ensemble.objects.get(simulation = simul)
+            allmems = EnsembleMember.objects.filter(ensemble=ensem)
+            #collect all current rip values
+            ensrips = []
+            for mem in allmems[1:]:
+                ensrips.append(mem.drsMember)
+            if value in ensrips:
+                raise ValidationError('This rip value is already used in one \
+                                       of the ensemble members')
+        except:
+            logging.debug('This is a new simulation, hence no ensemble members \
+                            to test as of yet ')
         
         # 3. check that no ensemble members (of 'linked' simulations) exist with 
         # the same rip value
         mycentre = self.instance.centre
-        mymodel = self.instance.numericalModel
+        mymodel = self.cleaned_data['numericalModel']
         myexp = self.instance.experiment
+        # grab the startdate also for checking the decadal experiments
+        mystartdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
         
         # search through expgroups to decide if I am part of a linked experiment
         for expgroup in expgroups:
             #make a copy of the inner list (for possible editing) 
             myexpgroup = list(expgroup)
             if myexp.abbrev in myexpgroup:
-                #mark that it has been found
-                expfound=True
-                # remove the current sim from the group, then break
-                myexpgroup.remove(myexp.abbrev)
+                #mark that it has been found and break
+                expfound = True
                 break
+            else:
+                expfound = False
         
                 
         if expfound:
-            #collect all current rip values
-            linkedrips = []    
             for exp in myexpgroup:
                 linkedsims = Simulation.objects.filter(
                                 centre=mycentre).filter(
@@ -703,21 +714,36 @@ class SimulationForm(forms.ModelForm):
                                 experiment__abbrev__exact=exp).filter(
                                 isDeleted=False)
                 
-                for simul in linkedsims:
+                # remove the current sim if it is in current queryset, i.e. if 
+                # this isn't a new sim being created
+                if simul in linkedsims:
+                    linkedsims = linkedsims.exclude(id=simul.id)
+                
+                # in the case of decadal exps, only check across sims with the 
+                # same start year, i.e. a decadal1960 can have the same rip 
+                # values as a decadal1965
+                for linkedsim in linkedsims:
+                    if exp.partition(' ')[2] == 'decadal' and \
+                      str(linkedsim.duration.startDate).partition('-')[0] != mystartdate:
+                        linkedsims = linkedsims.exclude(id=linkedsim.id)
+                
+                for sim in linkedsims:
+                    #collect all current rip values
+                    linkedrips = []
                     #add the rip value of the simulation
-                    linkedrips.append(simul.drsMember)
+                    linkedrips.append(sim.drsMember)
                     #get my ensemblemember rip values
-                    ensem = Ensemble.objects.get(simulation = simul)
+                    ensem = Ensemble.objects.get(simulation = sim)
                     allmems = EnsembleMember.objects.filter(ensemble=ensem)
                     for ensmem in allmems[1:]:
                         #add the rip value of the ensemble member
                         linkedrips.append(ensmem.drsMember)
                     
-            #does the current current rip value appear in this linked sim?
-            if value in linkedrips:
-                raise ValidationError("This rip value is already used in the \
-                                        linked simulation '%s' being run for \
-                                    experiment '%s'" %(simul, simul.experiment))
+                    #does the current current rip value appear in this linked sim?
+                    if value in linkedrips:
+                        raise ValidationError("This rip value is already used \
+                        in the linked simulation '%s' being run for \
+                        experiment '%s'" %(sim, sim.experiment))
             
         return value
     
