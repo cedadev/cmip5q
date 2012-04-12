@@ -874,7 +874,16 @@ class Translator:
             assert len(simClass.drsOutput.all())==1,"One and only one DRS string expected"
             for drsOutput in simClass.drsOutput.all():
                 assert drsOutput, "Expecting a value for the DRS string"
-                externalIDs.append((str(drsOutput),'QN_DRS','The QN_DRS value allows mapping from data files to metadata being exported from the metadata questionnaire, and contains the insitution name, the model name on which the simulation was run, and the experiment name to which the simulation conforms. Additionally, for a non-ensemble run, a rip value will be included. The format of the string will thus be: institute_model_experiment.',True))
+                externalIDs.append((str(drsOutput),'QN_DRS',
+                   '''
+                      The QN_DRS value allows mapping from data files to metadata 
+                      being exported from the metadata questionnaire, and contains 
+                      the institution name, the model name on which the simulation 
+                      was run, the experiment name to which the simulation 
+                      conforms, the simulation level base rip value, and finally 
+                      the given start year for the simulation. The format of the string will thus be: 
+                      institute_model_experiment_rip_startyear.
+                      ''', True))
             # add detail about the identifying 'rip' value used for this 
             # simulation. Used in tandem with the QN_DRS value as an identifer 
             externalIDs.append((simClass.drsMember,'DRS_CMIP5_ensembleType','',True))
