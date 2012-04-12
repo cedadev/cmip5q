@@ -18,66 +18,91 @@
     simulation description pages. 
   </p>
   <p> 
-    If you choose to copy a simulation, the copy will NOT copy ensemble 
-    member descriptions (if they exist), we assume that the new simulation 
-    will have different ensemble characteristics. 
+    If you choose to copy a simulation using the copy button on this page, the 
+    copy will NOT copy ensemble member descriptions (if they exist), we assume 
+    that the new simulation will have different ensemble characteristics. 
+    Alternatively, to copy all details of a current simulation, use the copy 
+    function on the simulation table on the main summary page 
+  </p>
+  <p>
+    Note that a number of experiments, e.g 1.1 decadal and 1.2 decadal, fall 
+    under the same experiment DRS group, i.e. decadal. Simulations that share 
+    the same model and that fall under a similar group must use different rip
+    values (at both the simulation and ensemble member level). This will allow a 
+    direct mapping to data files that are named according to DRS syntax (note 
+    this is not the case for the rcp/-L experiments where rip values can be 
+    reused - in this case the start year will allow mapping to an individual 
+    data file).    
   </p>
    <div class="backgrey">
      <table width="100%">
        <tr>
-         <th width="15%">Experiment Name</th>
-         <th width="40%"> Edit Simulations </th>
-         <th width="45%"> Add Simulations </th>
+         <th width="15%">Exp Name</th>
+         <th width="10%">Exp DRS group</th>
+         <th width="10%">Add New Simulation</th>
+         <th width="35%">Current Simulations </th>
+         <th width="30%">Copy Simulation</th>
        </tr>
        {% for e in experiments %}
          <tr>
            <td>
-             <a href="{{e.url}}">
-               {{e.abbrev}}
-             </a>
+             <center>
+               <a href="{{e.url}}">
+                 {{e.abbrev}}
+               </a>
+             </center>
+           </td>
+           <td>
+             <center>
+               {{e.group}}
+             </center>
+           </td>
+           <td>
+             <center>
+               <a id="simAddButton{{forloop.counter}}" href="{{e.new}}">
+                 New
+               </a> 
+             </center>
            </td>
            <td >
-             {% for s in e.values %}
-               <span class="{{s.qstatus}}"> 
-                 <a id="simEdButton{{s.id}}" href="{{s.url}}">
-                   {{s.abbrev}}
-                 </a>
-               </span>
-               <script type="text/javascript">
-                 var oLinkSimEdButton{{s.id}} = 
-                     new YAHOO.widget.Button("simEdButton{{s.id}}");
-               </script>
-             {% endfor %}
+             <table width="100%">
+               {% for s in e.values %}
+                 <tr>
+                   <td>
+                     <center>
+                       <a href="{{s.url}}">
+                         {{ s.abbrev }}
+                       </a>
+                     </center>
+                   </td>
+                 </tr>
+               {% endfor %}
+             </table>
            </td> 
-           <td width="40%"> 
+           <td> 
              <table>
                <tr>
                  <td>
-                   Add
+                   <center>
+                     From simulation:
+                   </center>
                  </td>
                  <td>
-                   <a id="simAddButton{{forloop.counter}}" href="{{e.new}}">
-                     New
-                   </a> 
-                 </td>
-                 <td>
-                   or, from existing:
-                 </td>
-                 <td>
-                   <form action="{{cpurl}}" method="POST" 
-                     onsubmit="myProject.bypassConfirm()">
-                     <input type="hidden" name="targetExp" value="{{e.id}}"/>
-                     <select name="targetSim" size="1" style="min-width:170px;">
-                       <option value="---" selected="true" style="min-width=150px;">-------</option>
-                         {% for s in e.values %}
-                           <option value="{{s.id}}" style="min-width:150px;">
-                             {{s.abbrev}}
-                           </option> 
-                         {% endfor %}
-                     </select>
-                     , 
-                     <input type="submit" id="cp4_{{e.id}}button" value="Copy"/>
-                   </form>
+                   <center>
+                     <form action="{{cpurl}}" method="POST" 
+                       onsubmit="myProject.bypassConfirm()">
+                       <input type="hidden" name="targetExp" value="{{e.id}}"/>
+                         <select name="targetSim" size="1" style="width:120px;">
+                           <option value="---" selected="true" style="width=120px;">-------</option>
+                           {% for s in e.values %}
+                             <option value="{{s.id}}" style="min-width:150px;">
+                               {{s.abbrev}}
+                             </option> 
+                           {% endfor %}
+                         </select>
+                       <input type="submit" id="cp4_{{e.id}}button" value="Copy"/>
+                     </form>
+                   </center>
                  </td>
                </tr>
              </table>
