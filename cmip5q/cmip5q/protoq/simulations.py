@@ -204,7 +204,7 @@ class simulationHandler(object):
        
         #little class to monkey patch up the stuff needed for the template
         class etmp:
-            def __init__(self, abbrev, values, id):
+            def __init__(self, abbrev, values, id, group):
                 self.abbrev = abbrev
                 self.values = values
                 self.id = id
@@ -212,6 +212,7 @@ class simulationHandler(object):
                                  args=(c.id, id,))
                 self.new = reverse('cmip5q.protoq.views.simulationAdd', 
                                  args=(c.id, id,))
+                self.group = group
                 
         csims = Simulation.objects.filter(centre=c).filter(isDeleted=False)
         cpurl = reverse('cmip5q.protoq.views.simulationCopy', args=(c.id, ))
@@ -220,10 +221,11 @@ class simulationHandler(object):
         exp=[]
         for e in eset:
             sims = e.simulation_set.filter(centre=c.id).filter(isDeleted=False)
+            group = e.abbrev.split()[1]
             for s in sims: 
                 s.url = reverse('cmip5q.protoq.views.simulationEdit', 
                                 args=(c.id,s.id,))    
-            exp.append(etmp(e.abbrev, sims, e.id))
+            exp.append(etmp(e.abbrev, sims, e.id, group))
 
         return render_to_response('simulationList.html',
             {'c':c,'experiments':exp,'csims':csims,'cpurl':cpurl,
@@ -290,9 +292,9 @@ class simulationHandler(object):
         cross-experiment copying above)
         '''
         s = self.s
-        ss=s.copy(s.experiment)
-        url=reverse('cmip5q.protoq.views.simulationEdit', 
-                    args=(self.centreid, ss.id,))
+        ss = s.copy(s.experiment)
+        url = reverse('cmip5q.protoq.views.simulationEdit', 
+                    args=(self.centreid, ss.id, ))
         
         return HttpResponseRedirect(url)
         
