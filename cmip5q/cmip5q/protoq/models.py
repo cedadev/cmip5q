@@ -1942,24 +1942,22 @@ class DRSOutput(models.Model):
     # the rip member value
     member = models.CharField(max_length=64)
     # we don't need to point to simulations, they point to this ...
-    def __unicode__(self): 
-        #return '%s_%s_%s_%s' %(self.institute,self.model,self.experiment, 
-        #self.member)
-        #changing this to not include member explicitly as in an ensemble run 
-        #we will include the rip meber at the ensmble level
-         
-        # In the case of decadal/noVolc experiments we want to first capture the 
-        # date into the experiment name   
-        exptype = self.experiment.abbrev.partition(' ')[2]
-        if exptype in ["decadal", "noVolc"]:
-            #get sim duration date
-            sim = Simulation.objects.filter(numericalModel=self.model)\
+    def __unicode__(self):            
+        #get sim start date and rip value 
+        sim = Simulation.objects.filter(numericalModel=self.model)\
                                     .filter(experiment=self.experiment)\
                                     .filter(isDeleted=False)
-            expdate = str(sim[0].duration.startDate.year)
-            return '%s_%s_%s' %(self.institute, self.model, 
-                                str(self.experiment)+expdate)
+        expdrs = self.experiment.abbrev.partition(' ')[2]
+        expdate = str(sim[0].duration.startDate.year)
+        
+        # In the case of decadal/noVolc experiments we want to first capture the 
+        # date into the experiment name
+        if expdrs in ["decadal", "noVolc"]:
+            return '%s_%s_%s_%s_%s' %(self.institute, self.model, 
+                                      str(expdrs)+expdate, self.member, 
+                                      expdate)
         else:
-            return '%s_%s_%s' %(self.institute,self.model,self.experiment)
+            return '%s_%s_%s_%s_%s' %(self.institute, self.model, 
+                                      expdrs, self.member, expdate)
     
     
