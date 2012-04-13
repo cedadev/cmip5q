@@ -22,7 +22,7 @@ CENTRES=(
              ('NASA-GISS','NASA Goddard Institute for Space Studies USA',('')),
              ('BCC','Beijing Climate Center, China Meteorological Administration',('BCC-CSM')),
              ('2. Test Centre','Test area',('dum')),
-             ('EC-Earth','Europe',('EC-Earth')),
+             ('EC-EARTH','Europe',('EC-Earth')),
              ('NSF-DOE-NCAR','Community Climate System Model',('')),
              ('CMCC','Centro Euro-Mediterraneo per I Cambiamenti Climatici',('')),
              ('GCESS','College of Global Change and Earth System Science, Beijing Normal University',('')),
