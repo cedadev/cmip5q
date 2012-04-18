@@ -386,7 +386,7 @@ class Doc(Fundamentals):
             del kwargs['complete']
         elif self.isComplete:
             # this is a save AFTER we've marked it complete, so it must be a change.  
-            self.isComplete=False
+            self.isComplete = False
             self.documentVersion+=1
             self.validErrors=-1   # now force a revalidation before any future document incrementing.
         if 'eventParty' in kwargs:
@@ -1815,149 +1815,153 @@ class InputMod(Modification):
 
 
 class Conformance(models.Model):
-    ''' 
-    This relates a numerical requirement to an actual solution in the 
-    simulation 
+    '''
+    This relates a numerical requirement to an actual solution in the
+    simulation
     '''
     # the identifier of the numerical requirement:
-    requirement=models.ForeignKey(GenericNumericalRequirement)
-    # simulation owning the requirement 
-    simulation=models.ForeignKey(Simulation)
+    requirement = models.ForeignKey(GenericNumericalRequirement)
+    # simulation owning the requirement
+    simulation = models.ForeignKey(Simulation)
     # conformance type from the controlled vocabulary
-    ctype=models.ForeignKey(Term,blank=True,null=True)
+    ctype = models.ForeignKey(Term, blank=True, null=True)
     #
-    mod=models.ManyToManyField('Modification',blank=True,null=True)
-    coupling=models.ManyToManyField(Coupling,blank=True,null=True)
-    option=models.ForeignKey(RequirementOption,blank=True,null=True)
+    mod = models.ManyToManyField('Modification', blank=True, null=True)
+    coupling = models.ManyToManyField(Coupling, blank=True, null=True)
+    option = models.ForeignKey(RequirementOption, blank=True, null=True)
     # notes
-    description=models.TextField(blank=True,null=True)
-    
+    description = models.TextField(blank=True, null=True)
+
     def __unicode__(self):
-        return "%s for %s"%(self.ctype, self.requirement) 
-    
+        return "%s for %s" % (self.ctype, self.requirement)
+
     def copytoNewSim(self, simulation):
-        ''' 
+        '''
         Copy current conformance to newly copied simulation
         '''
         # first make a copy of self
         args = ['requirement', 'ctype', 'option', 'description']
-        kw = {'simulation':simulation}
+        kw = {'simulation': simulation}
         for a in args:
             kw[a] = self.__getattribute__(a)
-        
+
         new = Conformance(**kw)
         new.save()
-        
+
         '''
         Need to handle that these are manytomany, i.e _sets
-        
+
         # Now handle the manytomany attributes
         for m in self.mod.all().order_by('id'):
             new.mod.add(m)
         for c in self.coupling_set.all().order_by('id'):
             new.coupling.add(c)
         '''
-            
+
         # now copy all the individual couplings associated with this group
         #cset = self.coupling_set.all().order_by('id')
-        #for c in cset: 
+        #for c in cset:
         #    c.copy(new)
-            
+
         return new
-    
-    
+
+
 class Grid(Doc):
-    topGrid = models.ForeignKey('self', blank=True, null=True, 
-                                related_name="parent_grid")    
+    '''
+    A model Grid
+    '''
+    topGrid = models.ForeignKey('self', blank=True, null=True,
+                                related_name="parent_grid")
     istopGrid = models.BooleanField(default=False)
-    
+
     # direct children components:
-    grids = models.ManyToManyField('self', blank=True, null=True, 
+    grids = models.ManyToManyField('self', blank=True, null=True,
                                    symmetrical=False)
     paramGroup = models.ManyToManyField('ParamGroup')
     references = models.ManyToManyField(Reference, blank=True, null=True)
     isDeleted = models.BooleanField(default=False)
-    
+
     #to support paramgroups dressed as components/grids
     isParamGroup = models.BooleanField(default=False)
-        
+
     def copy(self, centre, topGrid=None):
-        ''' 
-        Carry out a deep copy of a grid 
+        '''
+        Carry out a deep copy of a grid
         '''
         # currently don't copys here ...
         if centre.__class__ != Centre:
             raise ValueError('Invalid centre passed to grid copy')
-        
-        attrs=['title', 'abbrev', 'description',
+
+        attrs = ['title', 'abbrev', 'description',
                'istopGrid', 'isParamGroup', 'author', 'contact', 'funder']
         kwargs = {}
-        for i in attrs: 
+        for i in attrs:
             kwargs[i] = self.__getattribute__(i)
-        if kwargs['istopGrid']: 
+        if kwargs['istopGrid']:
             kwargs['title'] = kwargs['title'] + ' dup'
             kwargs['abbrev'] = kwargs['abbrev'] + ' dup'
         kwargs['uri'] = atomuri()
         kwargs['centre'] = centre
-        
+
         new = Grid(**kwargs)
-        new.save() # we want an id, even though we might have one already ... 
-        #if new.isModel: print '2',new.couplinggroup_set.all()
-       
+        new.save()  # we want an id, even though we might have one already ...
+
         if topGrid is None:
             if self.istopGrid:
                 topGrid = new
             else:
-                raise ValueError('Deep copy called with invalid grid' 
-                                'arguments: %s'%self)
-        
-        new.topGrid=topGrid
-       
+                raise ValueError('Deep copy called with invalid grid'
+                                'arguments: %s' % self)
+
+        new.topGrid = topGrid
+
         for c in self.grids.all().order_by('id'):
-            logging.debug('About to add a sub-grid to grid %s (in centre %s, grid %s)'%(new,centre, topGrid))
-            r=c.copy(centre,topGrid=topGrid)
+            logging.debug('About to add a sub-grid to grid %s \
+                          (in centre %s, grid %s)' % (new, centre, topGrid))
+            r = c.copy(centre, topGrid=topGrid)
             new.grids.add(r)
-            logging.debug('Added new grid %s to grid %s (in centre %s, grid %s)'%(r,new,centre, topGrid))
-            
-        for p in self.paramGroup.all().order_by('id'): 
+            logging.debug('Added new grid %s to grid %s (in \
+                           centre %s, grid %s)' % (r, new, centre, topGrid))
+
+        for p in self.paramGroup.all().order_by('id'):
             new.paramGroup.add(p.copy())
-       
-        new.save()        
+
+        new.save()
         return new
-    
+
+
 class DRSOutput(models.Model):
-    ''' 
-    This is a holding class for how a simulation relates to it's output in the 
-    DRS 
+    '''
+    Holding class for how a simulation relates to it's output in the DRS
     '''
     activity = models.CharField(max_length=64)
     product = models.CharField(max_length=64)
     institute = models.ForeignKey(Centre)
     model = models.ForeignKey(Component)
     experiment = models.ForeignKey(Experiment)
-    frequency = models.ForeignKey(Term, blank=True, null=True, 
+    frequency = models.ForeignKey(Term, blank=True, null=True,
                                   related_name='drs_frequency')
-    realm = models.ForeignKey(Term, blank=True, null=True, 
+    realm = models.ForeignKey(Term, blank=True, null=True,
                               related_name='drs_realm')
-    # the rip member value
     member = models.CharField(max_length=64)
     # we don't need to point to simulations, they point to this ...
-    def __unicode__(self):            
-        #get sim start date and rip value 
+
+    def __unicode__(self):
+        ''' returns qn_drs representation of me '''
+        # get sim start date and rip value
         sim = Simulation.objects.filter(numericalModel=self.model)\
                                     .filter(experiment=self.experiment)\
-                                    .filter(isDeleted=False)
+                                    .filter(isDeleted=False)\
+                                    .get(drsMember=self.member)
         expdrs = self.experiment.abbrev.partition(' ')[2]
-        expdate = str(sim[0].duration.startDate.year)
-        
-        # In the case of decadal/noVolc experiments we want to first capture the 
-        # date into the experiment name
+        expdate = str(sim.duration.startDate.year)
+
+        # In the case of decadal/noVolc experiments we want to first capture
+        # the date into the experiment name
         if expdrs in ["decadal", "noVolc"]:
-            return '%s_%s_%s_%s_%s' %(self.institute, self.model, 
-                                      str(expdrs)+expdate, self.member, 
+            return '%s_%s_%s_%s_%s' % (self.institute, self.model,
+                                      str(expdrs) + expdate, self.member,
                                       expdate)
         else:
-            return '%s_%s_%s_%s_%s' %(self.institute, self.model, 
+            return '%s_%s_%s_%s_%s' % (self.institute, self.model,
                                       expdrs, self.member, expdate)
-    
-    
