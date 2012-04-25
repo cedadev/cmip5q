@@ -383,29 +383,24 @@ def getModels():
     
     centres = Centre.objects.all()
     #remove CMIP5, example, and test centres
-    for ab in ['CMIP5','1. Example','2. Test Centre']:
+    for ab in ['CMIP5', '1. Example', '2. Test Centre']:
         centres = centres.exclude(abbrev=ab)
-        
+
     models = Component.objects.filter(isModel=True).filter(
                                     isDeleted=False).filter(
                                     centre__in=centres).order_by('centre')
     #remove model duplicates (assuming these are not meant to be real instances
     for abb in ['Model Template dup', 'Model Template dupcp']:
         models = models.exclude(abbrev=abb)
-    
+
     return models
 
 
 def getExps():
     '''
-    Returns the full list of current experiments 
+    Returns the full list of current experiments
     '''
-    
     exps = Experiment.objects.all().filter(
                                     isDeleted=False)
-            
+
     return exps
-
-
-
-

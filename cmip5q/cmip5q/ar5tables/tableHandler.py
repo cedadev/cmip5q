@@ -7,7 +7,7 @@ Created on 23 Sep 2011
 @author: gerard devine
 '''
 
-from cmip5q.ar5tables.utilities import *
+from cmip5q.ar5tables.dbvalues import *
 from cmip5q.protoq.models import NumericalRequirement
 
 

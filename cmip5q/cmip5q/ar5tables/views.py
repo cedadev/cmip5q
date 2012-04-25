@@ -2,89 +2,98 @@ import csv
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 
-from cmip5q.ar5tables.tableHandler import ar5table1, ar5table2, ar5table3
-from cmip5q.ar5tables.utilities import getModels, getExps
-from cmip5q.protoq.models import Component, Centre
+from cmip5q.ar5tables.tableHandler import ar5table1, ar5table2
+from cmip5q.ar5tables.dbvalues import getModels, getExps
 
 
-def overview(request): 
+def overview(request):
     '''
-    Generates landing page for AR5 tables 
-    '''   
-            
-    return render_to_response('explorer/ar5/ar5tables.html',{})
-
-
-def modeldesc(request): 
+    Generates landing page for AR5 explorer
     '''
-    Generates information to complete AR5 table 1, i.e model descriptions 
-    '''   
-    
-    #----- Table 1 (Models) -----
+    return render_to_response('explorer/ar5/ar5_explorer.html', {})
+
+
+def modeldesc(request):
+    '''
+    Generates information to complete AR5 table 1, i.e model descriptions
+    '''
     #get real models
     models = getModels()
-    #generate information for ar5 table 1    
+    #generate information for ar5 table 1
     table1info = ar5table1(models)
-    
-    #return HttpResponse('bla bla 1')    
-    return render_to_response('explorer/ar5/modeldesc.html', 
-                              {'table1': table1info})
+
+    # set up my urls ...
+    urls = {}
+    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
+    urls['ar5csv'] = reverse('cmip5q.ar5tables.views.ar5csv', args=())
+    urls['ar5bib'] = reverse('cmip5q.ar5tables.views.ar5bib', args=())
+
+    return render_to_response('explorer/ar5/modeldesc.html',
+                              {'table1': table1info,
+                               'urls': urls})
 
 
-def expdesign(request): 
+def expdesign(request):
     '''
-    Generates information to complete AR5 table 2, i.e experiment design 
-    '''   
-    
+    Generates information to complete AR5 table 2, i.e experiment design
+    '''
     #get current experiments
     exps = getExps()
     #generate information for ar5 table 2
     t2reqlist, t2expslist = ar5table2(exps)
-        
-    #return HttpResponse('bla bla 2')
-    return render_to_response('explorer/ar5/expdesign.html', 
-                              {'t2explist': t2expslist, 't2reqlist': t2reqlist})
+
+    # set up my urls ...
+    urls = {}
+    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
+
+    return render_to_response('explorer/ar5/expdesign.html',
+                              {'t2explist': t2expslist,
+                               't2reqlist': t2reqlist,
+                               'urls': urls})
 
 
-def modelforcing(request): 
+def modelforcing(request):
     '''
-    Generates information to complete AR5 table 3, i.e model forcings 
-    '''   
-    
+    Generates information to complete AR5 table 3, i.e model forcings
+    '''
     #----- Table 3 (Forcings) -----
     #temporarily using hadgem2-es model
     #mohc = Centre.objects.get(abbrev='MOHC')
     #hadgem = Component.objects.filter(abbrev="HadGEM2-ES").get(centre=mohc)
     #t3reqlist, t3expslist = ar5table3(exps, hadgem)
-    
-    #return HttpResponse('bla bla 3')        
-    return render_to_response('explorer/ar5/modelforcing.html',{})
+    #return HttpResponse('bla bla 3')
+    # set up my urls ...
+
+    urls = {}
+    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
+
+    return render_to_response('explorer/ar5/modelforcing.html', {'urls': urls})
 
 
 def ar5bib(request):
     '''
-    Generates a text file of all references used in ar5 table 1 
+    Generates a text file of all references used in ar5 table 1
     '''
-    
     #get all models
     models = getModels()
     #iterate through all models and pull out references
-    modelrefs = []    
+    modelrefs = []
     for model in models:
         refs = model.references.all()
         for ref in refs:
             #check for duplicates before adding
             if ref.citation + '\n' + '\n' not in modelrefs:
                 modelrefs.append(ref.citation + '\n' + '\n')
-    
+
     #sort alphabetically and join up into a full string
     modelrefs.sort()
     ar5refs = "".join(modelrefs)
-    
+
     response = HttpResponse(ar5refs, mimetype="text/plain")
     response['Content-Disposition'] = 'attachment; filename=ar5_refs.txt'
-    
+
     return response
 
 
@@ -95,22 +104,22 @@ def ar5csv(request):
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=ar5csv_table1.csv'
-    
+
     #----- Table 1 (Models) -----
     #get real models
     models = getModels()
-    #generate information for ar5 table 1    
+    #generate information for ar5 table 1
     table1info = ar5table1(models)
-    
+
     writer = csv.writer(response)
-    
+
     #write column headings
     writer.writerow(['Model ID| Vintage',
-                     
+
                      'Institution| Main references| Flux correction',
                      
                      'Aerosol component name| Aerosol code independance| Aerosol references',
-                     
+
                      'Atmosphere component name| Atmosphere horizontal grid | Atmosphere grid number of levels| Atmosphere grid top| Atmosphere code independance | Atmosphere references',
                      
                      'Atmos chemistry component name| Atmos chemistry code independance | Atmos chemistry references',
@@ -126,39 +135,39 @@ def ar5csv(request):
                      'Sea ice component name| Sea ice code independance| Sea ice references',
                      
                      ])
-    
+
     #write out each row of information in turn
-    for row in table1info: 
+    for row in table1info:
         # first group references into a combined string
-        maincits=[]
+        maincits = []
         for cit in row.maincits:
-            maincits.append(cit+'; ')
+            maincits.append(cit + '; ')
         maincits = "".join(maincits)
-        
+
         if not row.aerimplemented:
             aercits = 'None'
         else:
-            aercits=[]
+            aercits = []
             for cit in row.aercits:
-                aercits.append(cit+'; ')
+                aercits.append(cit + '; ')
             aercits = "".join(aercits)
-        
+
         if not row.atmosimplemented:
             atmoscits = 'None'
         else:
-            atmoscits=[]
+            atmoscits = []
             for cit in row.atmoscits:
-                atmoscits.append(cit+'; ')
+                atmoscits.append(cit + '; ')
             atmoscits = "".join(atmoscits)
-        
+
         if not row.atmchemimplemented:
             atmchemcits = 'None'
-        else:        
-            atmchemcits=[]
+        else:
+            atmchemcits = []
             for cit in row.atmchemcits:
-                atmchemcits.append(cit+'; ')
+                atmchemcits.append(cit + '; ')
             atmchemcits = "".join(atmchemcits)
-        
+
         if not row.liceimplemented:
             licecits = 'None'
         else:                
