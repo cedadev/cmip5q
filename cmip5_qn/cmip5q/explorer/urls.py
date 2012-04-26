@@ -16,4 +16,8 @@ urlpatterns = patterns('',
     (r'^strat/home/$', 'cmip5q.explorer.views_strat.home'),
     (r'^strat/modeldesc/$', 'cmip5q.explorer.views_strat.modeldesc'),
 
+    # strat description csv and bibliography links
+    (r'^strat/modeldesc/csv/$', 'cmip5q.explorer.views_strat.stratcsv'),
+    (r'^strat/modeldesc/bib/$', 'cmip5q.explorer.views_strat.stratbib'),
+
     )

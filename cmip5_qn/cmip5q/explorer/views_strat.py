@@ -27,15 +27,15 @@ def modeldesc(request):
     # set up my urls ...
     urls = {}
     urls['home'] = reverse('cmip5q.explorer.views_strat.home', args=())
-    urls['ar5csv'] = reverse('cmip5q.explorer.views_strat.stratcsv', args=())
-    urls['ar5bib'] = reverse('cmip5q.explorer.views_strat.stratbib', args=())
+    urls['stratcsv'] = reverse('cmip5q.explorer.views_strat.stratcsv', args=())
+    urls['stratbib'] = reverse('cmip5q.explorer.views_strat.stratbib', args=())
 
     return render_to_response('explorer/strat/modeldesc.html',
                               {'table1': table1info,
                                'urls': urls})
 
 
-def ar5bib(request):
+def stratbib(request):
     '''
     Generates a text file of all references used in strat table
     '''
@@ -60,7 +60,7 @@ def ar5bib(request):
     return response
 
 
-def ar5csv(request):
+def stratcsv(request):
     '''
     Generates csv representation of strat table
     '''
