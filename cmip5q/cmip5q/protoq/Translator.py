@@ -243,7 +243,18 @@ class Translator:
                 self.add_ensemble(ref,root)
             #experimentElement=self.cimRecord(root)
             #self.add_experiment(ref.experiment,experimentElement)
-            self.add_experiment(ref.experiment,root)
+            if str(ref.experiment).partition(' ')[2] in ["decadal", "noVolc"]:
+                # if start date is january 1st this will apply to a simulation
+                # for the year before
+                if str(ref.duration.startDate.mon) == '1' and str(ref.duration.startDate.day) == '1':
+                    startyear = str(ref.duration.startDate.year - 1)
+                else: 
+                    startyear = str(ref.duration.startDate.year)
+                    
+                self.add_experiment(ref.experiment, root,
+                                    startyear = startyear)
+            else:
+                self.add_experiment(ref.experiment,root)
             #platformElement=self.cimRecord(root)
             #self.add_platform(ref.platform,platformElement)
             self.add_platform(ref.platform,root)
@@ -722,7 +733,13 @@ class Translator:
                 if expShortName in ["decadal","noVolc"]:
                     # we need to append the user supplied simulation duration to get the required local experiment name
                     assert simClass.duration.startDate, "Error, simulation must have a start date specified"
-                    simStartDate=str(simClass.duration.startDate.year)
+
+                    # if start date is january 1st this will apply to a simulation
+                    # for the year before
+                    if str(simClass.duration.startDate.mon) == '1' and str(simClass.duration.startDate.day) == '1':
+                        simStartDate = str(simClass.duration.startDate.year - 1)
+                    else:
+                        simStartDate=str(simClass.duration.startDate.year)
                     self.addCIMReference(simClass.experiment,experimentElement,argName=expShortName+simStartDate,argType="experiment",description="Reference to an Experiment called "+expShortName+" with experimentNumber "+expName+" which this simulation has specialised as "+expShortName+simStartDate)
                 else:
                     # just use the experiment name
@@ -882,7 +899,11 @@ class Translator:
                       was run, the experiment name to which the simulation 
                       conforms, the simulation level base rip value, and finally 
                       the given start year for the simulation. The format of the string will thus be: 
-                      institute_model_experiment_rip_startyear.
+                      institute_model_experiment_rip_startyear. Also note, that in particular cases, 
+                      i.e. decadal and noVolc exps, the start date and expdate 
+                      may differ - this will occur in those cases where the simulation 
+                      start date is 1st january but still refers to an experiment 
+                      for the year before. - (see cmip5 experiment design document) 
                       ''', True))
             # add detail about the identifying 'rip' value used for this 
             # simulation. Used in tandem with the QN_DRS value as an identifer 
@@ -986,8 +1007,8 @@ class Translator:
                     #if startDate!=None:
                     #    ET.SubElement(drElement,'startDate').text=str(startDate)
 
-    def add_experiment(self,expClass,rootElement):
-        expElement=expClass.toXML()
+    def add_experiment(self,expClass,rootElement, startyear=None):
+        expElement=expClass.toXML(startyear=startyear)
         self.addDocumentInfo(expClass,expElement)
         # experiment documentGenealogy goes here
         expName,sep,expShortName=expClass.abbrev.partition(' ')

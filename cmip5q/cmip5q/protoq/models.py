@@ -49,7 +49,7 @@ def soft_delete(obj,simulate=False):
     is false, then the dict is a dictionary keyed by models into instances which link 
     to it, and which need to be unlinked before a delete can occur.'''
     # with help from stack overflow
-    
+
     assert obj._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (
                       obj._meta.object_name, obj._meta.pk.attname)
 
@@ -804,7 +804,7 @@ class Experiment(Doc):
         cfile.title='%s (%s)'%(E.abbrev,E.title)
         cfile.save()
 
-    def toXML(self,parent='numericalExperiment'):
+    def toXML(self, parent='numericalExperiment', startyear = None):
         expElement=ET.Element(parent)
         ''' responsibleParty [0..inf] '''
         ''' fundingSource [0..inf] '''
@@ -821,7 +821,10 @@ class Experiment(Doc):
         expName,sep,expShortName=self.abbrev.partition(' ')
         assert sep!="", "Error, experiment short name does not conform to format 'id name'"
         if expShortName and expShortName!='' :
-            ET.SubElement(expElement,'shortName').text=expShortName
+            if startyear:
+                ET.SubElement(expElement,'shortName').text = expShortName + startyear
+            else:
+                ET.SubElement(expElement,'shortName').text=expShortName
         ''' longName [1] '''
         if self.title and self.title!='' :
             dummy1,dummy2,longName=self.title.partition(' ')
@@ -1944,24 +1947,38 @@ class DRSOutput(models.Model):
     realm = models.ForeignKey(Term, blank=True, null=True,
                               related_name='drs_realm')
     member = models.CharField(max_length=64)
+    startyear = models.IntegerField()
     # we don't need to point to simulations, they point to this ...
 
     def __unicode__(self):
         ''' returns qn_drs representation of me '''
         # get sim start date and rip value
-        sim = Simulation.objects.filter(numericalModel=self.model)\
+        sims = Simulation.objects.filter(numericalModel=self.model)\
                                     .filter(experiment=self.experiment)\
                                     .filter(isDeleted=False)\
-                                    .get(drsMember=self.member)
+                                    .filter(drsMember=self.member)
+
+        if len(list(sims)) > 1:
+            simlist = list(sims)
+            for sim in simlist:
+                if str(sim.duration.startDate.year) != str(self.startyear):
+                    sims = sims.exclude(id=sim.id)
+
         expdrs = self.experiment.abbrev.partition(' ')[2]
-        expdate = str(sim.duration.startDate.year)
+        expdate = str(sims[0].duration.startDate.year)
 
         # In the case of decadal/noVolc experiments we want to first capture
         # the date into the experiment name
         if expdrs in ["decadal", "noVolc"]:
+            # need to finally check  if start date is january 1st in which case 
+            # this will apply to a simulation for the year before
+            if str(sims[0].duration.startDate.mon) == '1' and str(sims[0].duration.startDate.day) == '1':
+                expdate = str(sims[0].duration.startDate.year - 1)
+
             return '%s_%s_%s_%s_%s' % (self.institute, self.model,
                                       str(expdrs) + expdate, self.member,
                                       expdate)
+                
         else:
             return '%s_%s_%s_%s_%s' % (self.institute, self.model,
                                       expdrs, self.member, expdate)

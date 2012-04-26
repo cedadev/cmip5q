@@ -38,14 +38,16 @@ class MyComponentInputFormSet(ComponentInputFormSet):
             qset=ComponentInput.objects.filter(realm=component)
         else:
             qset=ComponentInput.objects.filter(owner=component)
-        ComponentInputFormSet.__init__(self,data,queryset=qset)
+        ComponentInputFormSet.__init__(self, data, queryset=qset)
+
     def specialise(self):
         ''' No local specialisation, yet '''
         pass
+
     def __getCouplingGroup(self):
         ''' Local method to get the appropriate coupling group '''
-        cgroupset=self.component.model.couplinggroup_set.all()
-        assert(len(cgroupset)<>0,'All models should have a coupling group, but what about %s'%self.component.model)
+        cgroupset = self.component.model.couplinggroup_set.all()
+        assert(len(cgroupset) != 0, 'All models should have a coupling group, but what about %s' % self.component.model)
         cg=cgroupset.get(simulation=None)
         return cg
         
