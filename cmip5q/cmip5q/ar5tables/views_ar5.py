@@ -4,15 +4,15 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
-from cmip5q.ar5tables.tableHandler import ar5table1, ar5table2
-from cmip5q.ar5tables.dbvalues import getModels, getExps
+from cmip5q.explorer.tableHandler import ar5table1, ar5table2
+from cmip5q.explorer.dbvalues import getModels, getExps
 
 
-def overview(request):
+def home(request):
     '''
     Generates landing page for AR5 explorer
     '''
-    return render_to_response('explorer/ar5/ar5_explorer.html', {})
+    return render_to_response('explorer/ar5/home.html', {})
 
 
 def modeldesc(request):
@@ -26,9 +26,9 @@ def modeldesc(request):
 
     # set up my urls ...
     urls = {}
-    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
-    urls['ar5csv'] = reverse('cmip5q.ar5tables.views.ar5csv', args=())
-    urls['ar5bib'] = reverse('cmip5q.ar5tables.views.ar5bib', args=())
+    urls['home'] = reverse('cmip5q.explorer.views_ar5.home', args=())
+    urls['ar5csv'] = reverse('cmip5q.explorer.views_ar5.ar5csv', args=())
+    urls['ar5bib'] = reverse('cmip5q.explorer.views_ar5.ar5bib', args=())
 
     return render_to_response('explorer/ar5/modeldesc.html',
                               {'table1': table1info,
@@ -46,7 +46,7 @@ def expdesign(request):
 
     # set up my urls ...
     urls = {}
-    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
+    urls['ar5home'] = reverse('cmip5q.ar5tables.views_ar5.home', args=())
 
     return render_to_response('explorer/ar5/expdesign.html',
                               {'t2explist': t2expslist,
@@ -67,7 +67,7 @@ def modelforcing(request):
     # set up my urls ...
 
     urls = {}
-    urls['ar5home'] = reverse('cmip5q.ar5tables.views.overview', args=())
+    urls['ar5home'] = reverse('cmip5q.ar5tables.ar5.home', args=())
 
     return render_to_response('explorer/ar5/modelforcing.html', {'urls': urls})
 
