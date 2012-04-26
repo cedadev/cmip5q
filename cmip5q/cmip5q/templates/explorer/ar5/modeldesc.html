@@ -1,8 +1,28 @@
-<div class="toolbar">
-  <a href="/cmip5/ar5csv/" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
-  <a href="/cmip5/ar5bib/" class="ui-state-default ui-corner-all" title="references"><span class="ui-icon ui-icon-calculator"></span></a>
-  <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener" class="ui-icon ui-icon-help"></span></a>
-</div>
+{% extends "explorer/base_explorer.html" %} 
+
+{% block pagetitle %}
+  <div class="boxer titlerow">
+    AR5 Model Descriptions
+  </div>
+{% endblock%} 
+
+{% block pagelinks %}
+  <div class="boxer">
+    <a href = "{{ urls.home }}">Explorer home page</a>
+  </div>
+{% endblock%} 
+
+{% block pagetools %}
+  <div class="boxer">
+    <div class="toolbar">
+      <a href="{{ urls.ar5csv }}" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
+      <a href="{{ urls.ar5bib }}" class="ui-state-default ui-corner-all" title="references"><span class="ui-icon ui-icon-calculator"></span></a>
+      <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener" class="ui-icon ui-icon-help"></span></a>
+    </div>
+  </div>
+{% endblock%} 
+
+{% block content %}
 
 <div class="jqmWindow" id="dialog">
   <a href="#" class="jqmClose">Close</a>
@@ -11,6 +31,7 @@
   Help text to go here
 </div>
 
+<div class="boxer">
 <table class="tablescroll cycletable">
   <thead>
    <tr>
@@ -314,3 +335,6 @@
 </tbody>
 
 </table>
+</div>
+
+{% endblock %}
