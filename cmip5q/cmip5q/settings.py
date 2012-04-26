@@ -106,7 +106,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'cmip5q.protoq.admin',
-    'cmip5q.protoq'
+    'cmip5q.protoq',
+    'cmip5q.explorer'
 )
 
 # ----------------------------------------------------

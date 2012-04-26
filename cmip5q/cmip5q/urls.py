@@ -159,13 +159,13 @@ urlpatterns = patterns('',
     (r'', include('cmip5q.protoq.admin.urls')),
     #(r'^admin/protoq/component/copy/$', 'cmip5q.protoq.admin.admin_views.modelcopy'),
     (r'^cmip5/admin/', include(admin.site.urls)),
-    
+
     #---------------------------------
     # Metadata explorer url includes
-    
-    # AR5 tables included
-    (r'^cmip5/explorer/ar5/', include('cmip5q.ar5tables.urls')),
-    
+
+    # metadata explorer included
+    (r'^cmip5/explorer/', include('cmip5q.explorer.urls')),
+
     # API included
     #(r'^cmip5/api/', include('cmip5q.api.urls')),
 )
@@ -175,7 +175,7 @@ urlpatterns = patterns('',
 #for doc in ['experiment','platform','component','simulation']:
 #    for key in ['validate','view','xml','html','export']:
 #        urlpatterns+=patterns('',(r'^cmip5/(?P<centre_id>\d+)/%s/(?P<%s_id>\d+)/%s/$'%(doc,doc,key),'cmip5q.protoq.views.doc'))
-                        
+                    
 if True:  # HACK HACK HACK POOR PERFORMANCE AND SECURITY.
     urlpatterns += patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
