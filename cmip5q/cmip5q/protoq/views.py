@@ -173,7 +173,8 @@ def centres(request):
     #    p_aux.append(Centre.objects.get(abbrev=ab))
     
     # adding url location for AR5 table button    
-    ar5URL =reverse('cmip5q.ar5tables.views.overview')    
+    ar5URL = reverse('cmip5q.explorer.views_ar5.home')
+    stratURL = reverse('cmip5q.explorer.views_strat.home')    
     
     if request.method=='POST':
         #yep we've selected something
@@ -210,7 +211,8 @@ def centres(request):
                                                   'curl':curl,
                                                   'pubs':pubs,
                                                   'feedobjects':sublist(feedlist,4),
-                                                  'ar5URL':ar5URL}
+                                                  'ar5URL': ar5URL,
+                                                  'stratURL': stratURL}
                                                   )
     
 def centre(request,centre_id):
