@@ -20,7 +20,7 @@ def modeldesc(request):
     Generates information to complete strat model description table
     '''
     #get real models
-    models = getModels()
+    models = getModels(pubonly=True)
     #generate information for ar5 table 1
     table1info = strattable(models)
 
