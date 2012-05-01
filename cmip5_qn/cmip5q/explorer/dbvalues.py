@@ -173,7 +173,7 @@ def get_xorvalue(model, sciencetype, pgname, bpname):
     cen = Centre.objects.get(component=c)
     myurl = reverse('cmip5q.protoq.views.componentEdit', args=(cen.id, c.id))
 
-    return xpval, myurl
+    return str(xpval), myurl
 
 
 #------------------------------------------------------------------------------

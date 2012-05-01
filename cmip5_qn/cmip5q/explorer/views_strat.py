@@ -72,48 +72,38 @@ def stratcsv(request):
     #get real models
     models = getModels()
     #generate information for ar5 table 1
-    table1info = strattable(models)
+    tableinfo = strattable(models)
 
     writer = csv.writer(response)
 
     #write column headings
     writer.writerow(['Model ID| Vintage',
 
-                     'Institution| Main references| Flux correction',
+                     'Institution| Main references',
 
-                     'Aerosol component name| Aerosol code independance| Aerosol references',
+                     'Atmosphere component name| Atmosphere horizontal grid | Atmosphere grid number of levels| Atmosphere grid top| Atmosphere references',
 
-                     'Atmosphere component name| Atmosphere horizontal grid | Atmosphere grid number of levels| Atmosphere grid top| Atmosphere code independance | Atmosphere references',
+                     'Source mechanisms| Propogation scheme | Dissipation scheme',
 
-                     'Atmos chemistry component name| Atmos chemistry code independance | Atmos chemistry references',
-
-                     'land ice component name| Land ice code independance| Land ice references',
-
-                     'Land surface component name| Land surface code independance | Land surface references',
-
-                     'Ocean biogeochem component name| Ocean biogeochem code independance | Ocean biogeochem references',
-
-                     'Ocean component name| Ocean horizontal grid | Ocean number of levels| Ocean top level| Ocean Z coordinate| Ocean top BC | Ocean code independance | Ocean references',
-
-                     'Sea ice component name| Sea ice code independance| Sea ice references',
+                     'Strat. het. chem. gas species| Strat. het. chem. aerosol',
 
                      ])
 
     #write out each row of information in turn
-    for row in table1info:
+    for row in tableinfo:
         # first group references into a combined string
         maincits = []
         for cit in row.maincits:
             maincits.append(cit + '; ')
         maincits = "".join(maincits)
 
-        if not row.aerimplemented:
-            aercits = 'None'
+        if not row.atmosimplemented:
+            oroggwsrcs = 'None'
         else:
-            aercits = []
-            for cit in row.aercits:
-                aercits.append(cit + '; ')
-            aercits = "".join(aercits)
+            srcs = []
+            for src in row.oroggwsrcs:
+                srcs.append(src + '; ')
+            oroggwsrcs = "".join(srcs)
 
         if not row.atmosimplemented:
             atmoscits = 'None'
@@ -124,73 +114,31 @@ def stratcsv(request):
             atmoscits = "".join(atmoscits)
 
         if not row.atmchemimplemented:
-            atmchemcits = 'None'
+            strathetchemgas = 'None'
         else:
-            atmchemcits = []
-            for cit in row.atmchemcits:
-                atmchemcits.append(cit + '; ')
-            atmchemcits = "".join(atmchemcits)
+            srcs = []
+            for src in row.strathetchemgas:
+                srcs.append(src + '; ')
+            strathetchemgas = "".join(srcs)
 
-        if not row.liceimplemented:
-            licecits = 'None'
+        if not row.atmchemimplemented:
+            strathetchemaer = 'None'
         else:
-            licecits = []
-            for cit in row.licecits:
-                licecits.append(cit + '; ')
-            licecits = "".join(licecits)
-
-        if not row.lsurfimplemented:
-            lsurfcits = 'None'
-        else:
-            lsurfcits = []
-            for cit in row.lsurfcits:
-                lsurfcits.append(cit + '; ')
-            lsurfcits = "".join(lsurfcits)
-
-        if not row.obgcimplemented:
-            obgccits = 'None'
-        else:
-            obgccits = []
-            for cit in row.obgccits:
-                obgccits.append(cit + '; ')
-            obgccits = "".join(obgccits)
-
-        if not row.oceanimplemented:
-            oceancits = 'None'
-        else:
-            oceancits = []
-            for cit in row.oceancits:
-                oceancits.append(cit + '; ')
-            oceancits = "".join(oceancits)
-
-        if not row.seaiceimplemented:
-            seaicecits = 'None'
-        else:
-            seaicecits = []
-            for cit in row.seaicecits:
-                seaicecits.append(cit + '; ')
-            seaicecits = "".join(seaicecits)
-
+            srcs = []
+            for src in row.strathetchemaer:
+                srcs.append(src + '; ')
+            strathetchemaer = "".join(srcs)
 
         writer.writerow([row.abbrev + '| ' + str(row.yearReleased),
 
-                         row.centre.name + '| ' + "".join(maincits) + '| ' + 'Flux correction field',
+                         row.centre.name + '| ' + "".join(maincits),
 
-                         row.aerabbrev + '| ' + 'XX%' + '| ' + aercits,
+                         row.atmosabbrev+'| ' + row.atmoshorgrid+'| ' + row.atmosnumlevels + '| ' + row.atmosgridtop + '| '+"".join(atmoscits),
 
-                         row.atmosabbrev+'| '+row.atmoshorgrid+'| '+row.atmosnumlevels+'| '+row.atmosgridtop+'| '+'XX%'+'| '+"".join(atmoscits),
+                         oroggwsrcs+'| '+row.oroggwprop +'| '+row.oroggwdiss,
 
-                         row.atmchemabbrev+'| '+'XX%'+'| '+"".join(atmchemcits),
+                         strathetchemgas + '| ' + strathetchemaer
 
-                         row.liceabbrev+'| '+'XX%'+'| '+"".join(licecits),
-
-                         row.lsurfabbrev+'| '+'XX%'+'| '+"".join(lsurfcits),
-
-                         row.obgcabbrev+'| '+'XX%'+'| '+"".join(obgccits),
-
-                         row.oceanabbrev+'| '+row.oceanhorgrid+'| '+row.oceannumlevels+'| '+row.oceantoplevel+'| '+row.oceanzcoord+'| '+row.oceantopbc+'| '+'XX%'+'| '+"".join(oceancits),
-
-                         row.seaiceabbrev+'| '+'XX%'+'| '+"".join(seaicecits),
                          ])
 
     return response

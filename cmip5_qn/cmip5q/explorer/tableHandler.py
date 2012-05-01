@@ -28,7 +28,7 @@ def ar5table1(models):
         
         #Check that realm is implemented
         m.aerimplemented = is_realmimpl(m, 'Aerosols')
-        
+
         if not m.aerimplemented:
             m.aerabbrev = m.aerrefs = m.aercits = 'Not Implemented' 
         else:
@@ -36,20 +36,12 @@ def ar5table1(models):
             m.aerabbrev = get_realmabbrev(m, 'Aerosols')
             #Get the component references
             m.aerrefs, m.aercits = get_Refs(m, 'Aerosols')                
-        
-        
+
         # 2. Get atmosphere column information
-        
+
         #Check that realm is implemented
         m.atmosimplemented = is_realmimpl(m, 'Atmosphere')
-        if not m.atmosimplemented:
-            m.atmosabbrev = \
-            m.atmosrefs = \
-            m.atmoscits = \
-            m.atmosgridtop = \
-            m.atmosnumlevels = \
-            m.atmoshorgrid =  'Not Implemented'
-        else:
+        if m.atmosimplemented:
             #Get the abbrev
             m.atmosabbrev = get_realmabbrev(m, 'Atmosphere')
             #Get the component references
