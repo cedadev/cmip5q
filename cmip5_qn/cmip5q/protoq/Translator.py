@@ -352,7 +352,8 @@ class Translator:
                                 else :
                                     HorizGridDiscretization=""
                             elif bp.name=="GridResolution" :
-                                HorizGridResolution=unicode(str(p.value))                                
+                                #HorizGridResolution=unicode(str(p.value))                                
+                                HorizGridResolution = p.value
                             elif bp.name=="GridRefinementScheme" :
                                 HorizGridRefinement=unicode(str(p.value))
                         elif HorizGridDiscretization!="" and str(con.constraint).find(HorizGridDiscretization)!=-1 and str(con.constraint).find("GridDiscretization")!=-1 :
