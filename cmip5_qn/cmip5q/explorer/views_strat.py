@@ -77,17 +77,22 @@ def stratcsv(request):
     writer = csv.writer(response)
 
     #write column headings
-    writer.writerow(['Model ID| Vintage',
-
-                     'Institution| Main references',
-
-                     'Atmosphere component name| Atmosphere horizontal grid | Atmosphere grid number of levels| Atmosphere grid top| Atmosphere references',
-
-                     'Source mechanisms| Propogation scheme | Dissipation scheme',
-
-                     'Strat. het. chem. gas species| Strat. het. chem. aerosol',
-
-                     ])
+    writer.writerow(['Model ID',
+                     'Vintage',
+                     'Institution',
+                     'Main references',
+                     'Atmosphere component name',
+                     'Atmosphere horizontal grid',
+                     'Atmosphere grid number of levels',
+                     'Atmosphere grid top',
+                     'Atmosphere references',
+                     'Source mechanisms',
+                     'Propogation scheme',
+                     'Dissipation scheme',
+                     'Strat. het. chem. gas species',
+                     'Strat. het. chem. aerosol',
+                     'Levels above 200hPa',
+                    ])
 
     #write out each row of information in turn
     for row in tableinfo:
@@ -98,7 +103,7 @@ def stratcsv(request):
         maincits = "".join(maincits)
 
         if not row.atmosimplemented:
-            oroggwsrcs = 'None'
+            oroggwsrcs = 'Not Implemented'
         else:
             srcs = []
             for src in row.oroggwsrcs:
@@ -106,7 +111,7 @@ def stratcsv(request):
             oroggwsrcs = "".join(srcs)
 
         if not row.atmosimplemented:
-            atmoscits = 'None'
+            atmoscits = 'Not Implemented'
         else:
             atmoscits = []
             for cit in row.atmoscits:
@@ -114,7 +119,7 @@ def stratcsv(request):
             atmoscits = "".join(atmoscits)
 
         if not row.atmchemimplemented:
-            strathetchemgas = 'None'
+            strathetchemgas = 'Not Implemented'
         else:
             srcs = []
             for src in row.strathetchemgas:
@@ -122,23 +127,28 @@ def stratcsv(request):
             strathetchemgas = "".join(srcs)
 
         if not row.atmchemimplemented:
-            strathetchemaer = 'None'
+            strathetchemaer = 'Not Implemented'
         else:
             srcs = []
             for src in row.strathetchemaer:
                 srcs.append(src + '; ')
             strathetchemaer = "".join(srcs)
 
-        writer.writerow([row.abbrev + '| ' + str(row.yearReleased),
-
-                         row.centre.name + '| ' + "".join(maincits),
-
-                         row.atmosabbrev+'| ' + row.atmoshorgrid+'| ' + row.atmosnumlevels + '| ' + row.atmosgridtop + '| '+"".join(atmoscits),
-
-                         oroggwsrcs+'| '+row.oroggwprop +'| '+row.oroggwdiss,
-
-                         strathetchemgas + '| ' + strathetchemaer
-
-                         ])
+        writer.writerow([row.abbrev,
+                         str(row.yearReleased),
+                         row.centre.name,
+                         "".join(maincits),
+                         row.atmosabbrev,
+                         row.atmoshorgrid,
+                         row.atmosnumlevels,
+                         row.atmosgridtop,
+                         "".join(atmoscits),
+                         oroggwsrcs,
+                         row.oroggwprop,
+                         row.oroggwdiss,
+                         strathetchemgas,
+                         strathetchemaer,
+                         row.levsabove200
+                        ])
 
     return response

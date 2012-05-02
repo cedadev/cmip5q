@@ -38,7 +38,7 @@ def ar5table1(models):
             m.aerrefs, m.aercits = get_Refs(m, 'Aerosols')                
 
         # 2. Get atmosphere column information
-
+          
         #Check that realm is implemented
         m.atmosimplemented = is_realmimpl(m, 'Atmosphere')
         if m.atmosimplemented:
@@ -295,7 +295,7 @@ def strattable(models):
         # Get the main model reference(s)
         m.mainrefs, m.maincits = get_Refs(m, 'model')
 
-        # Atmosphere column information
+        # Atmosphere information
         m.atmosimplemented = is_realmimpl(m, 'Atmosphere')
         if m.atmosimplemented:
             # Get the abbrev
@@ -339,5 +339,10 @@ def strattable(models):
                                         sciencetype='StratosphericHeterChem',
                                         pgname='Species',
                                         bpname='Aerosol')
+
+        # Grid info
+        if m.atmosimplemented:
+            # Get vertical atmosphere grid info
+            m.numlevels, m.topmodellevel, m.levsbelow850, m.levsabove200 = get_atmosvertgridinfo(m)
 
     return models

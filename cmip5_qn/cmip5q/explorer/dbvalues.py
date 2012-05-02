@@ -177,6 +177,69 @@ def get_xorvalue(model, sciencetype, pgname, bpname):
 
 
 #------------------------------------------------------------------------------
+# Grid values
+#------------------------------------------------------------------------------
+
+def get_atmosvertgridinfo(model):
+    '''
+    Gets the atmosphere vertical grid info for a supplied atmosphere component
+
+    This function returns (1) Number of levels
+                          (2) Top Model Level
+                          (3) Number of levels below 850hPa
+                          (4) Number of levels below 200hPa
+    '''
+    try:
+        #get the atmosphere level component
+        c = Component.objects.filter(isRealm=True).filter(
+                                    scienceType='Atmosphere').get(model=model)
+
+        #get the two subgrids (hor and vert)
+        grids = c.grid.grids.all()
+        #identify all vertical grid paramgroups
+        vpgs = ParamGroup.objects.filter(name='VerticalExtent')
+        #narrow down the selection to specific vertical grid
+        vertgrid = grids.get(paramGroup__in=vpgs)
+        # get the actual VerticalExtent ParamGroup
+        pg = ParamGroup.objects.filter(grid=vertgrid).get(
+                                                        name='VerticalExtent')
+        # get the constraint group
+        cg = ConstraintGroup.objects.filter(parentGroup=pg).get(
+                             constraint='if Domain is "atmospheric"')
+
+        # get the individual keyboard parameter for 'NumberOfLevels'
+        bp = BaseParam.objects.filter(constraint=cg).get(name='NumberOfLevels')
+        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)
+        numlevels = str(kp.value)
+
+        # get the individual keyboard parameter for 'TopModelLevel'
+        bp = BaseParam.objects.filter(constraint=cg).get(
+                                                    name='TopModelLevel')
+        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)
+        topmodellevel = str(kp.value)
+
+        # get the individual keyboard parameter for 'NumberOfLevelsBelow850hPa'
+        bp = BaseParam.objects.filter(constraint=cg).get(
+                                            name='NumberOfLevelsBelow850hPa')
+        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)
+        levsbelow850 = str(kp.value)
+
+        # get the individual keyboard parameter for 'NumberOfLevelsAbove200hPa'
+        bp = BaseParam.objects.filter(constraint=cg).get(
+                                            name='NumberOfLevelsAbove200hPa')
+        kp = KeyBoardParam.objects.get(baseparam_ptr=bp)
+        levsabove200 = str(kp.value)
+
+    except:
+        numlevels = ''
+        topmodellevel = ''
+        levsbelow850 = ''
+        levsabove200 = ''
+
+    return numlevels, topmodellevel, levsbelow850, levsabove200
+
+
+#------------------------------------------------------------------------------
 # Land Surface values
 #------------------------------------------------------------------------------
 

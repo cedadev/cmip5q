@@ -89,6 +89,15 @@
        (2) Aerosol Species
      </th>
      
+     <!-- Atmos Grid Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Atmospheric Grid
+       </span>
+       <br/>
+       (1) Levels above 200 hPa
+     </th>
+     
    </tr>
   </thead>
   <tbody>
@@ -169,6 +178,16 @@
          {% for val in model.strathetchemaer %}
            {{ val }},
          {% endfor %}
+       {% else %}
+         Component not implemented
+       {% endif %}
+    </td>
+    
+    <!-- Atmos Grid -->
+    <td>
+       {% if model.atmosimplemented%}
+         (1)
+         {{ model.levsabove200 }}
        {% else %}
          Component not implemented
        {% endif %}
