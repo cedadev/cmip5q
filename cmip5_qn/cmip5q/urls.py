@@ -167,7 +167,7 @@ urlpatterns = patterns('',
     (r'^cmip5/explorer/', include('cmip5q.explorer.urls')),
 
     # API included
-    #(r'^cmip5/api/', include('cmip5q.api.urls')),
+    (r'^cmip5/api/', include('cmip5q.api.urls')),
 )
 
 
