@@ -50,21 +50,24 @@ class simulationHandler(object):
         else:
             self.s=None
             self.Klass='Unknown as yet by simulation handler'
-        
+
     def __handle(self,request,s,e,url,label):
-        ''' This method handles the form itself for both the add and edit methods '''
+        '''
+        This method handles the form itself for both the add and edit methods
+        '''
+
         logging.debug('entering simulation handle routine')
-        
-        if s.ensembleMembers>1:
-            eset=s.ensemble_set.all()
-            assert(len(eset)==1,'There can only be one ensemble set for %s'%s)
-            members=eset[0].ensemblemember_set.all()
-            ensemble={'set':eset[0],'members':members}
-        else: ensemble=None
-        
-                
-        urls={'url':url}
-        if label=='Update':
+
+        if s.ensembleMembers > 1:
+            eset = s.ensemble_set.all()
+            assert(len(eset)==1, 'There can only be one ensemble set for %s' % s)
+            members = eset[0].ensemblemember_set.all()
+            ensemble = {'set':eset[0], 'members':members}
+        else:
+            ensemble = None
+
+        urls = {'url':url}
+        if label == 'Update':
             urls['ic']=reverse('cmip5q.protoq.views.assign',
                     args=(self.centreid,'initialcondition','simulation',s.id,))
             urls['bc']=reverse('cmip5q.protoq.views.simulationCup',
@@ -82,40 +85,49 @@ class simulationHandler(object):
         
         # A the moment we're only assuming one related simulation so we don't 
         # have to deal with a formset
-        rsims=s.related_from.all()
+        rsims = s.related_from.all()
         if len(rsims):
-            r=rsims[0]
-        else: r=None
-        if request.method=='POST':
-            # do the simualation first ... 
-            simform=SimulationForm(request.POST,instance=s,prefix='sim')
+            r = rsims[0]
+        else:
+            r = None
+
+        if request.method == 'POST':
+            # do the simualation first ...
+            simform = SimulationForm(request.POST,
+                                     instance=s,
+                                     prefix='sim')
             simform.specialise(self.centre)
             if simform.is_valid():
-                                 
-                simok=True
-                if label=='Add':
-                    oldmodel=None
-                    olddrs=None
-                else: 
-                    oldmodel=s.numericalModel
-                    olddrs=s.drsMember
-                    
-                news=simform.save()
-                logging.debug('model before %s, after %s' %(oldmodel,news.numericalModel))      
-                
-                if news.numericalModel!=oldmodel:
+                simok = True
+                if label == 'Add':
+                    oldmodel = None
+                    olddrs = None
+                else:
+                    oldmodel = s.numericalModel
+                    olddrs = s.drsMember
+
+                news = simform.save()
+                logging.debug('model before %s, after %s' % (oldmodel,
+                                                        news.numericalModel))
+
+                if news.numericalModel != oldmodel:
                     news.resetConformances()
                     news.resetCoupling()
-                    
-                logging.debug('drs before %s, after %s'%(olddrs, news.drsMember))
-                    
-                if news.drsMember!=olddrs or s.drsOutput.all().count() == 0:
+                    news.updateDRS()
+
+                logging.debug('drs before %s, after %s' % (olddrs,
+                                                           news.drsMember))
+
+                if news.drsMember != olddrs or s.drsOutput.all().count() == 0:
                     s.updateDRS()
-                
+
             elif not simform.is_valid():
-                simok=False
-                logging.info('SIMFORM not valid [%s]'%simform.errors)
-            relform=SimRelationshipForm(s,request.POST,instance=r,prefix='rel') 
+                simok = False
+                logging.info('SIMFORM not valid [%s]' % simform.errors)
+            relform = SimRelationshipForm(s,
+                                          request.POST,
+                                          instance=r,
+                                          prefix='rel')
 
             if relform.is_valid():
                 if simok: 

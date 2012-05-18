@@ -1144,86 +1144,91 @@ class Simulation(Doc):
                      centre=self.centre
                      )
         s.save()
-        
+
         #now we need to get all the other stuff related to this simulation
         # every simulation has it's own date range:
         s.duration = self.duration.copy()
-        
+
         for mm in self.inputMod.all().order_by('id'):
             s.inputMod.add(mm)
-        
+
         for mm in self.codeMod.all().order_by('id'):
             s.codeMod.add(mm)
-        
-        for do in self.drsOutput.all().order_by('id'):
-            s.drsOutput.add(do)
-            
+
+        # make a new DRSOutput and attach it
+        d = DRSOutput(institute=s.centre,
+                      model=s.numericalModel,
+                      member=s.drsMember,
+                      experiment=s.experiment,
+                      startyear=s.duration.startDate.year)
+        d.save()
+        s.drsOutput.add(d)
+
         #simrelationships
         myrelatedSims = SimRelationship.objects.filter(sfrom=self)
         for rs in myrelatedSims:
             rs.copytoNewSim(s)
-        
-        #IO        
+
+        #IO
         s._resetIO()
-        s.save() # I don't think I need to do this ... but to be sure ...
-        
+        s.save()  # I don't think I need to do this ... but to be sure ..
+
         #couplings:
         myCouplings = CouplingGroup.objects\
                                    .filter(component=self.numericalModel)\
                                    .filter(simulation=self).order_by('id')
         for m in myCouplings:
             m.duplicate4sim(s)
-        
+
         # conformance:
-        # We can either copy the confomances across as in (1) or not (and just 
-        # reset) as in case (2)        
-        
+        # We can either copy the confomances across as in (1) or not (and just
+        # reset) as in case (2)
+
         #(1)
         myConformances = Conformance.objects.filter(simulation=self) \
                                             .order_by('id')
         for conf in myConformances:
             conf.copytoNewSim(s)
-        
+
         # (2)
         # s.resetConformances()
-        
-        
+
         # We also want to copy across the ensemble information
         # 1. Get the ensemble associated with the current simulation
-        eset=self.ensemble_set.all()
-        assert(len(eset)==1,'There should only be one ensemble set for %s'%s)
+        eset = self.ensemble_set.all()
+        assert(len(eset)==1, 'There should only be one ensemble set for %s' %s)
         ee = eset[0]
-        
+
         # 2. Copy original ensemble
         newens = Ensemble(description=ee.description,
                           etype=ee.etype,
                           simulation=s,
                           riphidden=ee.riphidden,
-                          ) 
+                          )
         newens.save()
-        
-        # 3. Get all ensemblemembers and copy them. 
-        members=eset[0].ensemblemember_set.all()
+
+        # 3. Get all ensemblemembers and copy them.
+        members = eset[0].ensemblemember_set.all()
         for member in members:
-            em=EnsembleMember(ensemble=newens, 
+            em = EnsembleMember(ensemble=newens,
                               memberNumber=member.memberNumber,
-                              cmod=member.cmod, 
-                              imod=member.imod, 
-                              requirement=member.requirement, 
+                              cmod=member.cmod,
+                              imod=member.imod,
+                              requirement=member.requirement,
                               drsMember=member.drsMember)
             em.save()
-        
+
         return s
-    
+
     def resetConformances(self):
-        ''' 
-            We need to set up the conformances or reset them from time to time 
+        '''
+            We need to set up the conformances or reset them from time to time
         '''
         existingConformances = Conformance.objects.filter(simulation=self)\
                                                   .order_by('id')
         for c in existingConformances:
             c.delete()
-        
+
         ctypes = Vocab.objects.get(name='ConformanceTypes')
         defaultConformance = None 
         #Value.objects.filter(vocab=ctypes).get(value='Via Inputs')
@@ -1332,16 +1337,15 @@ class Simulation(Doc):
         Collect and store the information to be put in the drs string
         '''
         #really should only be one drs output? So deleting any current drs first....
-        dels = self.drsOutput.all()    
-        dels.delete()
-               
-        #now generate the new one
-        d = DRSOutput(institute=self.centre, 
-                      model=self.numericalModel, 
-                      member=self.drsMember, 
-                      experiment=self.experiment)
-        d.save()
-        self.drsOutput.add(d)
+        mydrs = self.drsOutput.all()[0]    
+        
+        #now update all values
+        mydrs.institute = self.centre 
+        mydrs.model = self.numericalModel 
+        mydrs.member = self.drsMember
+        mydrs.experiment = self.experiment
+        mydrs.startyear = self.duration.startDate.year
+        mydrs.save()
         
                 
 class PhysicalProperty(Term):
@@ -1451,6 +1455,7 @@ class DataContainer(Doc):
         else: return self.title[0:44]  # truncation ...
     class Meta:
         ordering=('centre','title')
+            
             
 class DataObject(models.Model):
     ''' 
@@ -1662,9 +1667,12 @@ class ExternalClosure(CouplingClosure):
     
 
 class EnsembleDoc(Doc):
-    ''' This class is only used to create an ensemble doc by the makeDoc method of an Ensemble '''
-    # we have both classes as a hack to avoid problems saving forms and because the ensemble
-    # properties mostly come from the simulation.
+    ''' 
+    This class is only used to create an ensemble doc by the makeDoc method 
+    of an Ensemble 
+    '''
+    # we have both classes as a hack to avoid problems saving forms and 
+    # because the ensemble properties mostly come from the simulation.
     etype=models.ForeignKey(Term,blank=True,null=True)
 
 
@@ -1970,7 +1978,7 @@ class DRSOutput(models.Model):
         # In the case of decadal/noVolc experiments we want to first capture
         # the date into the experiment name
         if expdrs in ["decadal", "noVolc"]:
-            # need to finally check  if start date is january 1st in which case 
+            # need to finally check  if start date is january 1st in which case
             # this will apply to a simulation for the year before
             if str(sims[0].duration.startDate.mon) == '1' and str(sims[0].duration.startDate.day) == '1':
                 expdate = str(sims[0].duration.startDate.year - 1)
@@ -1978,7 +1986,21 @@ class DRSOutput(models.Model):
             return '%s_%s_%s_%s_%s' % (self.institute, self.model,
                                       str(expdrs) + expdate, self.member,
                                       expdate)
-                
+
         else:
             return '%s_%s_%s_%s_%s' % (self.institute, self.model,
                                       expdrs, self.member, expdate)
+
+    def copytoNewSim(self, sfrom):
+        '''
+        Copy current DRS to newly copied simulation
+        '''
+        args = ['activity', 'product', 'institute', 'model', 'experiment',
+                'frequency', 'realm', 'member', 'startyear']
+
+        kw = {}
+        for a in args:
+            kw[a] = self.__getattribute__(a)
+
+        new = DRSOutput(**kw)
+        new.save()
