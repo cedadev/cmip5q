@@ -1,16 +1,17 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 '''
 Miscellaneous script for adding start years to modified DRSOutput instances
-
 '''
+
 
 import os
 import sys
-import logging
 
 # putting project and application into sys.path
-sys.path.insert(0, os.path.expanduser(
-                        '/home/gerarddevine/dev/django/questionnaire/cmip5q/'))
+sys.path.append('/home/gerarddevine/dev/django/qn/cmip5q')
+sys.path.append('/home/gerarddevine/dev/django/qn/cmip5q/protoq')
+#sys.path.insert(1, os.path.expanduser('\home\gerarddevine\dev\django\qn\cmip5q'))
+#sys.path.insert(0, os.path.expanduser('/home/gerarddevine/dev/django/qn/cmip5q/'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'cmip5q.settings'
 
 from django.core.management import setup_environ
