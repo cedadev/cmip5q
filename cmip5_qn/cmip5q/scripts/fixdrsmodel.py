@@ -38,6 +38,9 @@ for drs in DRSOutput.objects.all().order_by('id'):
             f.write('Sim model = %s \n' % simmodel)
             f.write('Drs model = %s \n' % drsmodel)
             f.write('\n')
+
+            drs.model = simmodel
+            drs.save()
     else:
         print 'Got zero or more than one drs associated, %s' % len(basesims)
         for x in Simulation.objects.filter(drsOutput__id=drs.id):
