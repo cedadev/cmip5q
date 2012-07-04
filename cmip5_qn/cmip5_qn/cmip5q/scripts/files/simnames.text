@@ -1,0 +1,1191 @@
+total number of simulations exported = 295
+
+
+Sim name 
+---------------------------------------------------------------------------------- 
+1pctCo2
+piControl
+rcp45
+rcp85
+piControl
+rcp60
+rcp26
+historical
+rcp85
+amip4xCO2-LR
+esmControl
+decadal1985-LR
+decadal1960-LR
+decadal1965-LR
+historical-LR
+abrupt4xCO2-LR
+1pctCO2-LR
+sstClim4xCO2-LR
+sstClim-LR
+amip-LR
+rcp26-LR
+rcp85-LR
+rcp45-LR
+piControl-LR
+piControl-P
+midHolocene-P
+lgm-P
+past1000-P
+abrupt4xCO2-P
+rcp45
+abrupt4xco2
+decadal2006-LR
+1pctCO2-P
+esmFdbk1-LR
+esmFixClim1-LR
+decadal_anomaly
+decadal1970-LR
+decadal1980-LR
+sstClim4xco2
+esmrcp85
+decadal2010-LR
+decadal2005_30a-LR
+decadal2001-LR
+decadal2002-LR
+decadal2003-LR
+decadal2004-LR
+decadal2007-LR
+decadal2008-LR
+decadal2009-LR
+decadal1980_30a-LR
+decadal1995-LR
+decadal1990-LR
+decadal1960_30a-LR
+decadal1975-LR
+1pctCO2
+decadal2005-LR
+decadal2000-LR
+sstClim
+esmHistorical
+esmControl
+decadal1960
+decadal1960-MR
+PICTL
+decadal1961-LR
+decadal1962-LR
+decadal1963-LR
+decadal1964-LR
+decadal1966-LR
+decadal1967-LR
+decadal1968-LR
+decadal1969-LR
+decadal1971-LR
+decadal1972-LR
+decadal1973-LR
+decadal1974-LR
+decadal1976-LR
+decadal1977-LR
+decadal1978-LR
+decadal1979-LR
+decadal1981-LR
+decadal1982-LR
+decadal1983-LR
+decadal1984-LR
+decadal1986-LR
+decadal1987-LR
+decadal1988-LR
+decadal1989-LR
+decadal1991-LR
+decadal1992-LR
+decadal1993-LR
+decadal1994-LR
+decadal1996-LR
+decadal1997-LR
+decadal1998-LR
+decadal1999-LR
+b40.1850.track1.1deg.006
+b40.20th.track1.1deg.008
+f40.1979_amip.track1.1deg.001
+b40.mh6ka.1deg.003
+b40.lm850-1850.1deg.001
+b40.rcp4_5.1deg.001
+b40.rcp8_5.1deg.001
+b40.rcp2_6.1deg.001
+b40.rcp6_0.1deg.001
+b40.1850_ramp.track1.1deg.001
+piControl esm2m
+esmControl esm2m
+1pctCO2 esm2m
+1pctCO2_4x esm2m
+historical GISS-E2-R p2
+esmrcp85
+abrupt4xCO2 esm2m
+historical esm2m
+esmHistorical esm2m
+rcp26 esm2m
+rcp45 esm2m
+rcp60 esm2m
+historical GISS-E2-H p2
+rcp85 esm2m
+esmrcp85 esm2m
+esmFdbk1 esm2m
+esmFdbk2 esm2m
+esmFixClim1 esm2m
+esmFixClim2 esm2m
+historicalNat esm2m
+historicalMiscHCH esm2m
+historicalMiscHCP esm2m
+historicalMiscHEP esm2m
+historicalGHG esm2m
+historicalMiscHOA esm2m
+piControl GISS-E2-R p141
+historicalMiscHOL esm2m
+historicalMiscHOS esm2m
+historicalMiscHOV esm2m
+historicalExt
+historicalNat
+historicalGHG
+esmHistorical
+esmFixClim1
+esmFixClim2
+esmFdbk1
+esmFdbk2
+sstClim
+sstClim4xCO2
+sstClimAerosol
+sstClimSulfate
+aquaControl
+aqua4xCO2
+aqua4K
+rcp45_HadCM3
+decadal_fullfield
+historical_HadCM3
+historicalExt
+piControl_HadGEM2-CC
+piControl cm3
+historical cm3
+rcp26 cm3
+rcp45 cm3
+rcp45ext cm3
+rcp60 cm3
+rcp85 cm3
+historicalNat cm3
+historicalGHG cm3
+historicalMisc Aer cm3
+historicalMisc Anth cm3
+1pctCO2 cm3
+abrupt4xCO2 cm3
+abrupt4xCO2-E cm3
+piControl GISS-E2-R p1
+piControl GISS-E2-R p2
+piControl GISS-E2-R p3
+piControl GISS-E2-H p1
+piControl GISS-E2-H p2
+piControl GISS-E2-H p3
+historical GISS-E2-R p1
+historical GISS-E2-H p1
+historical GISS-E2-H p3
+rcp45 GISS-E2-R p1
+historical GISS-E2-R p3
+amip GISS-E2 p1
+rcp26 GISS-E2-R p1
+rcp85 GISS-E2-R p1
+piControl
+historical_HadGEM2-CC
+rcp45_HadGEM2-CC
+rcp85_HadGEM2-CC
+decadal1961 CM2.1
+decadal1962 CM2.1
+decadal1963 CM2.1
+decadal1964 CM2.1
+decadal1965 CM2.1
+decadal1966 CM2.1
+decadal1967 CM2.1
+decadal1968 CM2.1
+decadal1969 CM2.1
+decadal1970 CM2.1
+decadal1971 CM2.1
+decadal1972 CM2.1
+decadal1973 CM2.1
+decadal1974 CM2.1
+decadal1975 CM2.1
+decadal1976 CM2.1
+decadal1977 CM2.1
+decadal1978 CM2.1
+decadal1979 CM2.1
+decadal1980 CM2.1
+decadal1981 CM2.1
+1pctCO2
+decadal1982 CM2.1
+decadal1983 CM2.1
+decadal1984 CM2.1
+decadal1985 CM2.1
+decadal1986 CM2.1
+decadal1987 CM2.1
+decadal1988 CM2.1
+decadal1989 CM2.1
+decadal1990 CM2.1
+piControl esm2g
+amip4K
+amip
+amipFuture
+rcp45
+rcp85
+amip4xCO2
+esmControl esm2g
+historical
+decadal1991 CM2.1
+decadal1992 CM2.1
+decadal1993 CM2.1
+decadal1994 CM2.1
+decadal1995 CM2.1
+decadal1996 CM2.1
+decadal1997 CM2.1
+amip
+decadal1998 CM2.1
+decadal1999 CM2.1
+rcp26
+rcp60
+decadal200 CM2.1
+decadal2000 CM2.1
+decadal2001 CM2.1
+decadal2002 CM2.1
+decadal2003 CM2.1
+decadal2004 CM2.1
+decadal2005 CM2.1
+decadal2006 CM2.1
+decadal2007 CM2.1
+decadal2008 CM2.1
+decadal2009 CM2.1
+decadal2010 CM2.1
+decadal2011 CM2.1 dup
+decadal2011 CM2.1
+historical esm2g
+esmHistorical esm2g
+historicalNat
+historicalGHG
+historicalMisc
+1pctCO2 esm2g
+1pctCO2_4x esm2g
+abrupt4xCO2
+abrupt4xCO2 esm2g
+abrupt4xCO2
+amip hiram-c180
+amip hiram-c360
+rcp45 esm2g
+rcp85 esm2g
+rcp26 esm2g
+rcp60 esm2g
+esmrcp85 esm2g
+historicalMiscHCP esm2g
+historicalMiscHEP esm2g
+sst2030 hiram-c180
+sst2030 hiram-c360
+midHolocene_HadGEM2-CC
+midHolocene
+amip4K-LR
+amipFuture-LR
+piControl-MR
+historical-MR
+rcp45-MR
+rcp85-MR
+rcp26-MR
+historical-P
+sstClim-P
+sstClim4xCO2-P
+esmrcp85-LR
+esmHistorical-LR
+esmControl-LR
+1pctCO2
+CMCC-CM_piControl
+CMCC-CM_historical
+CMCC-CM_amip
+CMCC-CM_rcp45
+CMCC-CM_rcp85
+CMCC-CM_1pctCO2
+
+
+Sim Centre    Sim name     Sim name length      First letter     Last letter   
+---------------------------------------------------------------------------------- 
+INM      1pctCo2      7      1      2
+
+
+MOHC      piControl      9      p      l
+
+
+MOHC      rcp45      5      r      5
+
+
+MOHC      rcp85      5      r      5
+
+
+INM      piControl      9      p      l
+
+
+MOHC      rcp60      5      r      0
+
+
+MOHC      rcp26      5      r      6
+
+
+MOHC      historical      10      h      l
+
+
+INM      rcp85      5      r      5
+
+
+MPI-M      amip4xCO2-LR      12      a      R
+
+
+INM      esmControl      10      e      l
+
+
+MPI-M      decadal1985-LR      14      d      R
+
+
+MPI-M      decadal1960-LR      14      d      R
+
+
+MPI-M      decadal1965-LR      14      d      R
+
+
+MPI-M      historical-LR      13      h      R
+
+
+MPI-M      abrupt4xCO2-LR      14      a      R
+
+
+MPI-M      1pctCO2-LR      10      1      R
+
+
+MPI-M      sstClim4xCO2-LR      15      s      R
+
+
+MPI-M      sstClim-LR      10      s      R
+
+
+MPI-M      amip-LR      7      a      R
+
+
+MPI-M      rcp26-LR      8      r      R
+
+
+MPI-M      rcp85-LR      8      r      R
+
+
+MPI-M      rcp45-LR      8      r      R
+
+
+MPI-M      piControl-LR      12      p      R
+
+
+MPI-M      piControl-P      11      p      P
+
+
+MPI-M      midHolocene-P      13      m      P
+
+
+MPI-M      lgm-P      5      l      P
+
+
+MPI-M      past1000-P      10      p      P
+
+
+MPI-M      abrupt4xCO2-P      13      a      P
+
+
+INM      rcp45      5      r      5
+
+
+INM      abrupt4xco2      11      a      2
+
+
+MPI-M      decadal2006-LR      14      d      R
+
+
+MPI-M      1pctCO2-P      9      1      P
+
+
+MPI-M      esmFdbk1-LR      11      e      R
+
+
+MPI-M      esmFixClim1-LR      14      e      R
+
+
+MOHC      decadal_anomaly      15      d      y
+
+
+MPI-M      decadal1970-LR      14      d      R
+
+
+MPI-M      decadal1980-LR      14      d      R
+
+
+INM      sstClim4xco2      12      s      2
+
+
+INM      esmrcp85      8      e      5
+
+
+MPI-M      decadal2010-LR      14      d      R
+
+
+MPI-M      decadal2005_30a-LR      18      d      R
+
+
+MPI-M      decadal2001-LR      14      d      R
+
+
+MPI-M      decadal2002-LR      14      d      R
+
+
+MPI-M      decadal2003-LR      14      d      R
+
+
+MPI-M      decadal2004-LR      14      d      R
+
+
+MPI-M      decadal2007-LR      14      d      R
+
+
+MPI-M      decadal2008-LR      14      d      R
+
+
+MPI-M      decadal2009-LR      14      d      R
+
+
+MPI-M      decadal1980_30a-LR      18      d      R
+
+
+MPI-M      decadal1995-LR      14      d      R
+
+
+MPI-M      decadal1990-LR      14      d      R
+
+
+MPI-M      decadal1960_30a-LR      18      d      R
+
+
+MPI-M      decadal1975-LR      14      d      R
+
+
+MOHC      1pctCO2      7      1      2
+
+
+MPI-M      decadal2005-LR      14      d      R
+
+
+MPI-M      decadal2000-LR      14      d      R
+
+
+INM      sstClim      7      s      m
+
+
+INM      esmHistorical      13      e      l
+
+
+MOHC      esmControl      10      e      l
+
+
+CNRM-CERFACS      decadal1960      11      d      0
+
+
+MPI-M      decadal1960-MR      14      d      R
+
+
+CNRM-CERFACS      PICTL      5      P      L
+
+
+MPI-M      decadal1961-LR      14      d      R
+
+
+MPI-M      decadal1962-LR      14      d      R
+
+
+MPI-M      decadal1963-LR      14      d      R
+
+
+MPI-M      decadal1964-LR      14      d      R
+
+
+MPI-M      decadal1966-LR      14      d      R
+
+
+MPI-M      decadal1967-LR      14      d      R
+
+
+MPI-M      decadal1968-LR      14      d      R
+
+
+MPI-M      decadal1969-LR      14      d      R
+
+
+MPI-M      decadal1971-LR      14      d      R
+
+
+MPI-M      decadal1972-LR      14      d      R
+
+
+MPI-M      decadal1973-LR      14      d      R
+
+
+MPI-M      decadal1974-LR      14      d      R
+
+
+MPI-M      decadal1976-LR      14      d      R
+
+
+MPI-M      decadal1977-LR      14      d      R
+
+
+MPI-M      decadal1978-LR      14      d      R
+
+
+MPI-M      decadal1979-LR      14      d      R
+
+
+MPI-M      decadal1981-LR      14      d      R
+
+
+MPI-M      decadal1982-LR      14      d      R
+
+
+MPI-M      decadal1983-LR      14      d      R
+
+
+MPI-M      decadal1984-LR      14      d      R
+
+
+MPI-M      decadal1986-LR      14      d      R
+
+
+MPI-M      decadal1987-LR      14      d      R
+
+
+MPI-M      decadal1988-LR      14      d      R
+
+
+MPI-M      decadal1989-LR      14      d      R
+
+
+MPI-M      decadal1991-LR      14      d      R
+
+
+MPI-M      decadal1992-LR      14      d      R
+
+
+MPI-M      decadal1993-LR      14      d      R
+
+
+MPI-M      decadal1994-LR      14      d      R
+
+
+MPI-M      decadal1996-LR      14      d      R
+
+
+MPI-M      decadal1997-LR      14      d      R
+
+
+MPI-M      decadal1998-LR      14      d      R
+
+
+MPI-M      decadal1999-LR      14      d      R
+
+
+NCAR      b40.1850.track1.1deg.006      24      b      6
+
+
+NCAR      b40.20th.track1.1deg.008      24      b      8
+
+
+NCAR      f40.1979_amip.track1.1deg.001      29      f      1
+
+
+NCAR      b40.mh6ka.1deg.003      18      b      3
+
+
+NCAR      b40.lm850-1850.1deg.001      23      b      1
+
+
+NCAR      b40.rcp4_5.1deg.001      19      b      1
+
+
+NCAR      b40.rcp8_5.1deg.001      19      b      1
+
+
+NCAR      b40.rcp2_6.1deg.001      19      b      1
+
+
+NCAR      b40.rcp6_0.1deg.001      19      b      1
+
+
+NCAR      b40.1850_ramp.track1.1deg.001      29      b      1
+
+
+GFDL      piControl esm2m      15      p      m
+
+
+GFDL      esmControl esm2m      16      e      m
+
+
+GFDL      1pctCO2 esm2m      13      1      m
+
+
+GFDL      1pctCO2_4x esm2m      16      1      m
+
+
+NASA GISS      historical GISS-E2-R p2      23      h      2
+
+
+MOHC      esmrcp85      8      e      5
+
+
+GFDL      abrupt4xCO2 esm2m      17      a      m
+
+
+GFDL      historical esm2m      16      h      m
+
+
+GFDL      esmHistorical esm2m      19      e      m
+
+
+GFDL      rcp26 esm2m      11      r      m
+
+
+GFDL      rcp45 esm2m      11      r      m
+
+
+GFDL      rcp60 esm2m      11      r      m
+
+
+NASA GISS      historical GISS-E2-H p2      23      h      2
+
+
+GFDL      rcp85 esm2m      11      r      m
+
+
+GFDL      esmrcp85 esm2m      14      e      m
+
+
+GFDL      esmFdbk1 esm2m      14      e      m
+
+
+GFDL      esmFdbk2 esm2m      14      e      m
+
+
+GFDL      esmFixClim1 esm2m      17      e      m
+
+
+GFDL      esmFixClim2 esm2m      17      e      m
+
+
+GFDL      historicalNat esm2m      19      h      m
+
+
+GFDL      historicalMiscHCH esm2m      23      h      m
+
+
+GFDL      historicalMiscHCP esm2m      23      h      m
+
+
+GFDL      historicalMiscHEP esm2m      23      h      m
+
+
+GFDL      historicalGHG esm2m      19      h      m
+
+
+GFDL      historicalMiscHOA esm2m      23      h      m
+
+
+NASA GISS      piControl GISS-E2-R p141      24      p      1
+
+
+GFDL      historicalMiscHOL esm2m      23      h      m
+
+
+GFDL      historicalMiscHOS esm2m      23      h      m
+
+
+GFDL      historicalMiscHOV esm2m      23      h      m
+
+
+MOHC      historicalExt      13      h      t
+
+
+MOHC      historicalNat      13      h      t
+
+
+MOHC      historicalGHG      13      h      G
+
+
+MOHC      esmHistorical      13      e      l
+
+
+MOHC      esmFixClim1      11      e      1
+
+
+MOHC      esmFixClim2      11      e      2
+
+
+MOHC      esmFdbk1      8      e      1
+
+
+MOHC      esmFdbk2      8      e      2
+
+
+MOHC      sstClim      7      s      m
+
+
+MOHC      sstClim4xCO2      12      s      2
+
+
+MOHC      sstClimAerosol      14      s      l
+
+
+MOHC      sstClimSulfate      14      s      e
+
+
+MOHC      aquaControl      11      a      l
+
+
+MOHC      aqua4xCO2      9      a      2
+
+
+MOHC      aqua4K      6      a      K
+
+
+MOHC      rcp45_HadCM3      12      r      3
+
+
+MOHC      decadal_fullfield      17      d      d
+
+
+MOHC      historical_HadCM3      17      h      3
+
+
+NCC      historicalExt      13      h      t
+
+
+MOHC      piControl_HadGEM2-CC      20      p      C
+
+
+GFDL      piControl cm3      13      p      3
+
+
+GFDL      historical cm3      14      h      3
+
+
+GFDL      rcp26 cm3      9      r      3
+
+
+GFDL      rcp45 cm3      9      r      3
+
+
+GFDL      rcp45ext cm3      12      r      3
+
+
+GFDL      rcp60 cm3      9      r      3
+
+
+GFDL      rcp85 cm3      9      r      3
+
+
+GFDL      historicalNat cm3      17      h      3
+
+
+GFDL      historicalGHG cm3      17      h      3
+
+
+GFDL      historicalMisc Aer cm3      22      h      3
+
+
+GFDL      historicalMisc Anth cm3      23      h      3
+
+
+GFDL      1pctCO2 cm3      11      1      3
+
+
+GFDL      abrupt4xCO2 cm3      15      a      3
+
+
+GFDL      abrupt4xCO2-E cm3      17      a      3
+
+
+NASA GISS      piControl GISS-E2-R p1      22      p      1
+
+
+NASA GISS      piControl GISS-E2-R p2      22      p      2
+
+
+NASA GISS      piControl GISS-E2-R p3      22      p      3
+
+
+NASA GISS      piControl GISS-E2-H p1      22      p      1
+
+
+NASA GISS      piControl GISS-E2-H p2      22      p      2
+
+
+NASA GISS      piControl GISS-E2-H p3      22      p      3
+
+
+NASA GISS      historical GISS-E2-R p1      23      h      1
+
+
+NASA GISS      historical GISS-E2-H p1      23      h      1
+
+
+NASA GISS      historical GISS-E2-H p3      23      h      3
+
+
+NASA GISS      rcp45 GISS-E2-R p1      18      r      1
+
+
+NASA GISS      historical GISS-E2-R p3      23      h      3
+
+
+NASA GISS      amip GISS-E2 p1      15      a      1
+
+
+NASA GISS      rcp26 GISS-E2-R p1      18      r      1
+
+
+NASA GISS      rcp85 GISS-E2-R p1      18      r      1
+
+
+NCC      piControl      9      p      l
+
+
+MOHC      historical_HadGEM2-CC      21      h      C
+
+
+MOHC      rcp45_HadGEM2-CC      16      r      C
+
+
+MOHC      rcp85_HadGEM2-CC      16      r      C
+
+
+GFDL      decadal1961 CM2.1      17      d      1
+
+
+GFDL      decadal1962 CM2.1      17      d      1
+
+
+GFDL      decadal1963 CM2.1      17      d      1
+
+
+GFDL      decadal1964 CM2.1      17      d      1
+
+
+GFDL      decadal1965 CM2.1      17      d      1
+
+
+GFDL      decadal1966 CM2.1      17      d      1
+
+
+GFDL      decadal1967 CM2.1      17      d      1
+
+
+GFDL      decadal1968 CM2.1      17      d      1
+
+
+GFDL      decadal1969 CM2.1      17      d      1
+
+
+GFDL      decadal1970 CM2.1      17      d      1
+
+
+GFDL      decadal1971 CM2.1      17      d      1
+
+
+GFDL      decadal1972 CM2.1      17      d      1
+
+
+GFDL      decadal1973 CM2.1      17      d      1
+
+
+GFDL      decadal1974 CM2.1      17      d      1
+
+
+GFDL      decadal1975 CM2.1      17      d      1
+
+
+GFDL      decadal1976 CM2.1      17      d      1
+
+
+GFDL      decadal1977 CM2.1      17      d      1
+
+
+GFDL      decadal1978 CM2.1      17      d      1
+
+
+GFDL      decadal1979 CM2.1      17      d      1
+
+
+GFDL      decadal1980 CM2.1      17      d      1
+
+
+GFDL      decadal1981 CM2.1      17      d      1
+
+
+NCC      1pctCO2      7      1      2
+
+
+GFDL      decadal1982 CM2.1      17      d      1
+
+
+GFDL      decadal1983 CM2.1      17      d      1
+
+
+GFDL      decadal1984 CM2.1      17      d      1
+
+
+GFDL      decadal1985 CM2.1      17      d      1
+
+
+GFDL      decadal1986 CM2.1      17      d      1
+
+
+GFDL      decadal1987 CM2.1      17      d      1
+
+
+GFDL      decadal1988 CM2.1      17      d      1
+
+
+GFDL      decadal1989 CM2.1      17      d      1
+
+
+GFDL      decadal1990 CM2.1      17      d      1
+
+
+GFDL      piControl esm2g      15      p      g
+
+
+MOHC      amip4K      6      a      K
+
+
+MOHC      amip      4      a      p
+
+
+MOHC      amipFuture      10      a      e
+
+
+NCC      rcp45      5      r      5
+
+
+NCC      rcp85      5      r      5
+
+
+MOHC      amip4xCO2      9      a      2
+
+
+GFDL      esmControl esm2g      16      e      g
+
+
+NCC      historical      10      h      l
+
+
+GFDL      decadal1991 CM2.1      17      d      1
+
+
+GFDL      decadal1992 CM2.1      17      d      1
+
+
+GFDL      decadal1993 CM2.1      17      d      1
+
+
+GFDL      decadal1994 CM2.1      17      d      1
+
+
+GFDL      decadal1995 CM2.1      17      d      1
+
+
+GFDL      decadal1996 CM2.1      17      d      1
+
+
+GFDL      decadal1997 CM2.1      17      d      1
+
+
+NCC      amip      4      a      p
+
+
+GFDL      decadal1998 CM2.1      17      d      1
+
+
+GFDL      decadal1999 CM2.1      17      d      1
+
+
+NCC      rcp26      5      r      6
+
+
+NCC      rcp60      5      r      0
+
+
+GFDL      decadal200 CM2.1      16      d      1
+
+
+GFDL      decadal2000 CM2.1      17      d      1
+
+
+GFDL      decadal2001 CM2.1      17      d      1
+
+
+GFDL      decadal2002 CM2.1      17      d      1
+
+
+GFDL      decadal2003 CM2.1      17      d      1
+
+
+GFDL      decadal2004 CM2.1      17      d      1
+
+
+GFDL      decadal2005 CM2.1      17      d      1
+
+
+GFDL      decadal2006 CM2.1      17      d      1
+
+
+GFDL      decadal2007 CM2.1      17      d      1
+
+
+GFDL      decadal2008 CM2.1      17      d      1
+
+
+GFDL      decadal2009 CM2.1      17      d      1
+
+
+GFDL      decadal2010 CM2.1      17      d      1
+
+
+GFDL      decadal2011 CM2.1 dup      21      d      p
+
+
+GFDL      decadal2011 CM2.1      17      d      1
+
+
+GFDL      historical esm2g      16      h      g
+
+
+GFDL      esmHistorical esm2g      19      e      g
+
+
+NCC      historicalNat      13      h      t
+
+
+NCC      historicalGHG      13      h      G
+
+
+NCC      historicalMisc      14      h      c
+
+
+GFDL      1pctCO2 esm2g      13      1      g
+
+
+GFDL      1pctCO2_4x esm2g      16      1      g
+
+
+NCC      abrupt4xCO2      11      a      2
+
+
+GFDL      abrupt4xCO2 esm2g      17      a      g
+
+
+MOHC      abrupt4xCO2      11      a      2
+
+
+GFDL      amip hiram-c180      15      a      0
+
+
+GFDL      amip hiram-c360      15      a      0
+
+
+GFDL      rcp45 esm2g      11      r      g
+
+
+GFDL      rcp85 esm2g      11      r      g
+
+
+GFDL      rcp26 esm2g      11      r      g
+
+
+GFDL      rcp60 esm2g      11      r      g
+
+
+GFDL      esmrcp85 esm2g      14      e      g
+
+
+GFDL      historicalMiscHCP esm2g      23      h      g
+
+
+GFDL      historicalMiscHEP esm2g      23      h      g
+
+
+GFDL      sst2030 hiram-c180      18      s      0
+
+
+GFDL      sst2030 hiram-c360      18      s      0
+
+
+MOHC      midHolocene_HadGEM2-CC      22      m      C
+
+
+MOHC      midHolocene      11      m      e
+
+
+MPI-M      amip4K-LR      9      a      R
+
+
+MPI-M      amipFuture-LR      13      a      R
+
+
+MPI-M      piControl-MR      12      p      R
+
+
+MPI-M      historical-MR      13      h      R
+
+
+MPI-M      rcp45-MR      8      r      R
+
+
+MPI-M      rcp85-MR      8      r      R
+
+
+MPI-M      rcp26-MR      8      r      R
+
+
+MPI-M      historical-P      12      h      P
+
+
+MPI-M      sstClim-P      9      s      P
+
+
+MPI-M      sstClim4xCO2-P      14      s      P
+
+
+MPI-M      esmrcp85-LR      11      e      R
+
+
+MPI-M      esmHistorical-LR      16      e      R
+
+
+MPI-M      esmControl-LR      13      e      R
+
+
+CMA-BCC      1pctCO2      7      1      2
+
+
+CMCC      CMCC-CM_piControl      17      C      l
+
+
+CMCC      CMCC-CM_historical      18      C      l
+
+
+CMCC      CMCC-CM_amip      12      C      p
+
+
+CMCC      CMCC-CM_rcp45      13      C      5
+
+
+CMCC      CMCC-CM_rcp85      13      C      5
+
+
+CMCC      CMCC-CM_1pctCO2      15      C      2
+
+
+Sim Centre    Sim name     Sim name length      First letter     Last letter   
+---------------------------------------------------------------------------------- 
