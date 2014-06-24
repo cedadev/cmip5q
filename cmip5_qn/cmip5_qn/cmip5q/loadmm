@@ -1,7 +1,0 @@
-source ~/meta4q/bin/activate
-python manage.py shell << EOF
-from protoq.models import *
-from XMLVocabReader import *
-x=XMLVocabReader('Atmosphere.xml','MOHC')
-x.doParse()
-
