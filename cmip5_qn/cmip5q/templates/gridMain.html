@@ -165,8 +165,11 @@
       {% endif %}
     </div>
   {% endif %}
+  
+{% endblock %}
     
-   
+    
+{% block childpagejs %}   
 <!-- button specific javascript follows -->
 <script  type="text/javascript"> 
   var oLinkButton3 = new YAHOO.widget.Button("reflinkbut"); 
@@ -178,6 +181,16 @@
   var deleteButton = new YAHOO.widget.Button("deleteButton",{value:"deleteButtonvalue"}); 
 </script>
 <!-- end of button javascript -->
+<!-- Doc buttons -->
+<script type="text/javascript">  
+    var cimLinkButton2 = new YAHOO.widget.Button("cimValBut"); 
+    var cimLinkbutton3 = new YAHOO.widget.Button("cimXMLBut");
+    var cimLinkbutton4 = new YAHOO.widget.Button("cimHTMLBut");
+    var cimLinkbutton5 = new YAHOO.widget.Button("cimViewBut");
+    var cimLinkbutton6 = new YAHOO.widget.Button("cimESGBut");
+    var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+</script>
+<!-- end of Doc buttons -->
 
 <!-- YUI treeview stuff for body -->
 <script type="text/javascript">

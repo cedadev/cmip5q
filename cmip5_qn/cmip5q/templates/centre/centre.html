@@ -46,3 +46,18 @@
 </div>
 
 {% endblock %}
+
+{% block pagejs %}
+<script type="text/javascript">
+    /* <![CDATA[ */
+    $(document).ready(function() {
+     $('#sims-table').dataTable({
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      'sPaginationType': 'full_numbers',
+      'aaSorting': [[ 0, "desc" ]],
+     });
+    } );
+    /* ]]> */
+</script>
+{% endblock %} 

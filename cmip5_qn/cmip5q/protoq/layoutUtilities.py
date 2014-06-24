@@ -19,6 +19,16 @@ def esgurl(modelname=None, simname=None):
       +modelname+'_'+simname+'&session=true'
     
     return esgurl
+  
+  
+def cimviewer(drs):
+    ''' 
+    '''
+    splitter = str(drs).split('_')
+    idString = 'cmip5/' + splitter[0].lower().replace(' ', '-')  + '/' + splitter[1].lower() + '/' + splitter[2] + '/' + splitter[3] + '/' + splitter[4]
+    
+    return idString
+    
 
 
 def getpubs():
@@ -61,12 +71,14 @@ def getpubs():
                                                                     uri=pub.uri)
             
             # attach document centre name
-            pub.centrename = document.centre
+            #replace any spaces with - to bring in line with drs
+            pub.centrename = str(document.centre).replace(' ', '-')
             pub.abbreviation = document.abbrev
             
             # attach a url path to esg portal view (limited to most recent 
             # version of simulations) - also get the models/exps used for 
             # simulations
+            # - also get the cimviewID qndrs id for the link out to the CIM viewer plugin 
             try: 
                 if cimType =='simulation':
                     #get most up-to-date version
@@ -81,11 +93,14 @@ def getpubs():
                         #attach esg url link
                         pub.esgurl = esgurl(modelname=modelname, 
                                             simname=simname)
-                        #attach model name associaed with simualtion
+                        #attach qndrs for cim viewer
+                        pub.cimviewID = cimviewer(document.drsOutput.all()[0])
+                        #attach model name associated with simulation
                         pub.usesmodel = modelname
                         pub.forexp = expname
                     else:
                         pub.esgurl = ''
+                        pub.cimviewID= ''
                         pub.usesmodel = '---'
                         pub.forexp = '---'
                 else:
@@ -93,15 +108,72 @@ def getpubs():
                     pub.forexp = '---'
             except:
                 pub.esgurl = ''
+                pub.cimviewID = ''
                 pub.usesmodel = '---'
                 pub.forexp = '---'
                 
         except:
             pub.centrename = ''
             pub.esgurl = ''
+            pub.cimviewID = ''
             
     return pubs
 
+
+def getdoidocs(institute, modelname, expname):
+    '''
+    Return a list of published simulation CIM documents for a doi landing page  
+    '''
+        
+    # generate initial queryset of all simulation CIMObjects
+    allsimpubs = list(CIMObject.objects.filter(cimtype='simulation').order_by('created'))
+    # only take the latest version of each document
+    simpubs = []
+    for simpub in allsimpubs:
+        # Check if I'm a duplicate
+        duplicates = list(CIMObject.objects.filter(uri=simpub.uri).order_by('documentVersion'))
+        if len(duplicates)>1:
+            # If so, include my simulation instance if I'm the most recent
+            if simpub == duplicates[-1]:
+                mysim = Simulation.objects.filter(isDeleted=False).get(uri=simpub.uri)
+                simpubs.append(mysim)
+        else:
+            # I'm the only version so add me
+            mysim = Simulation.objects.filter(isDeleted=False).get(uri=simpub.uri)
+            simpubs.append(mysim)
+            
+    # now filter me by given institute, model, and experiment to make a list for the doi page
+    simdoipubs = []
+    for sim in simpubs:
+        # In the case of 'decadal' and 'noVolc' experiments we need to append the start year
+        if str(sim.experiment).split(' ')[1] in ["decadal", "noVolc"]:
+            # need to finally check  if start date is january 1st in which case
+            # this will apply to a simulation for the year before (see cmip5 
+            # experiment design document)
+            if str(sim.duration.startDate.mon) == '1' and str(sim.duration.startDate.day) == '1':
+                expupdated = str(sim.experiment).split(' ')[1] + str(sim.duration.startDate.year - 1)
+            else:
+                expupdated = str(sim.experiment).split(' ')[1] + str(sim.duration.startDate.year)
+              
+        else:
+            expupdated = str(sim.experiment).split(' ')[1]
+        
+        if str(sim.centre).replace(' ', '-').lower() == institute.lower() and str(sim.numericalModel).replace(' ', '-').lower() == modelname.lower() and expupdated.lower() == expname.lower():
+          # add me as I fit the query parameters
+          sim.cimviewID = cimviewer(sim.drsOutput.all()[0])
+          sim.exp = str(sim.experiment).split(' ')[1]
+          sim.member = str(sim.drsOutput.all()[0].member).split(' ')[0]
+          sim.startyear = sim.drsOutput.all()[0].startyear
+          simdoipubs.append(sim)
+    
+    # Check that at least one document has been found for the given query parameters:
+    if len(simdoipubs) == 0:
+        #return a message stating no docs found
+        pass
+        
+    
+    return simdoipubs
+  
 
 def getsims(centre):
     '''

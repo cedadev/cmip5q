@@ -89,7 +89,7 @@ class ConformanceForm(forms.ModelForm):
         # check for missing option in case of ctype and report error
         if len(GenericNumericalRequirement.objects.get(
                                 id=self.instance.requirement_id).options.all()):
-            if cd_ctype and str(cd_ctype) != 'Not Applicable' and cd_option is None:
+            if cd_ctype and str(cd_ctype) != 'Not Applicable' and str(cd_ctype) != 'Not Conformant' and cd_option is None:
                 raise forms.ValidationError(
                                         "A requirement option must be selected")
         
@@ -146,17 +146,12 @@ class ComponentForm(forms.ModelForm):
     # it does if we don't handle the display.
     
     abbrev = forms.CharField() #widget is specialised below
-    description = forms.CharField(widget=forms.Textarea(
-                            attrs={'cols':"80", 'rows':"4"}), required=False)
-    geneology = forms.CharField(widget=forms.Textarea(
-                            attrs={'cols':"80",'rows':"4"}),required=False)
-    title = forms.CharField(widget=forms.TextInput(
-                            attrs={'size':'80'}), required=True)
+    description = forms.CharField(widget=forms.Textarea(attrs={'cols':"80", 'rows':"4"}), required=False)
+    geneology = forms.CharField(widget=forms.Textarea(attrs={'cols':"80", 'rows':"4"}), required=False)
+    title = forms.CharField(max_length=128, widget=forms.TextInput(attrs={'size':'80'}), required=True)
     implemented = forms.BooleanField(required=False)
-    yearReleased = forms.IntegerField(widget=forms.TextInput(
-                            attrs={'size':'4'}),required=False)
-    otherVersion = forms.CharField(widget=forms.TextInput(
-                            attrs={'size':'40'}),required=False)
+    yearReleased = forms.IntegerField(widget=forms.TextInput(attrs={'size':'4'}), required=False)
+    otherVersion = forms.CharField(widget=forms.TextInput(attrs={'size':'40'}), required=False)
     controlled = forms.BooleanField(widget=forms.HiddenInput, required=False)
     
     class Meta:
@@ -232,8 +227,8 @@ class ComponentForm(forms.ModelForm):
     
 
 class ComponentInputForm(forms.ModelForm):
-    description=forms.CharField(widget=forms.Textarea(attrs={'cols':"120",'rows':"2"}),required=False)
-    abbrev=forms.CharField(max_length=24,widget=forms.TextInput(attrs={'size':'24'}),required=True)
+    description=forms.CharField(max_length=128, widget=forms.TextInput(attrs={'size':'60'}),required=False)
+    abbrev=forms.CharField(max_length=24, widget=forms.TextInput(attrs={'size':'24'}),required=True)
     units=forms.CharField(widget=forms.TextInput(attrs={'size':'48'}),required=False)
     cfname=TermAutocompleteField(Vocab,'CFStandardNames',Term,required=False,size=60)
  
@@ -244,9 +239,9 @@ class ComponentInputForm(forms.ModelForm):
         forms.ModelForm.__init__(self,*args,**kwargs)
         v=Vocab.objects.get(name='InputTypes')
         self.fields['ctype'].queryset=Term.objects.filter(vocab=v)
-        # this can't go in the attributes section, because of import issues, deferring it works ...
+        # this can't go in the attributes section, because of import issues, deferring it works ...    
            
-       
+           
 class DataContainerForm(forms.ModelForm):
     ''' 
     This is the form used to edit "files" ... 
@@ -431,6 +426,9 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
         mymodel = mysim.numericalModel
         myexp = mysim.experiment
         
+        # grab the startdate also for checking the decadal experiments
+        mystartdate = str(ensemb.simulation.duration.startDate).partition('-')[0]
+        
         # search through expgroups to decide if I am part of a linked experiment
         for expgroup in expgroups:
             #make a copy of the inner list (for possible editing) 
@@ -455,7 +453,18 @@ class BaseEnsembleMemberFormSet(BaseModelFormSet):
                                 experiment__abbrev__exact=exp).filter(
                                 isDeleted=False)
                 
-                #first remove the current sim 
+                # remove the current sim if it is in current queryset, i.e. if 
+                # this isn't a new sim being created
+                if mysim in linkedsims:
+                    linkedsims = linkedsims.exclude(id=mysim.id)
+                
+                # in the case of decadal exps, only check across sims with the 
+                # same start year, i.e. a decadal1960 can have the same rip 
+                # values as a decadal1965
+                for linkedsim in linkedsims:
+                    if exp.partition(' ')[2] == 'decadal' and \
+                      str(linkedsim.duration.startDate).partition('-')[0] != mystartdate:
+                        linkedsims = linkedsims.exclude(id=linkedsim.id)
                 
                 for simul in linkedsims:
                     #add the rip value of the simulation
@@ -523,6 +532,7 @@ class InputModForm(ModForm):
         f=ModForm.save(self,attr=('mtype',self.ic))
         self.save_m2m()
         return f
+        
     
 class InputModIndex(object):
     ''' Used to bundle the form and child formsets together to help base view '''
@@ -649,7 +659,8 @@ class SimulationForm(forms.ModelForm):
         # loss of information ...
         exclude=('centre', 'experiment', 'uri', 'codeMod', 'inputMod', 
                  'relatedSimulations', 'drsOutput', 'datasets', 'isComplete')
-
+       
+    
     def clean_drsMember(self):
         '''
         Checks for uniqueness and correct format of a simulation level rip 
@@ -658,7 +669,7 @@ class SimulationForm(forms.ModelForm):
         '''
         value = self.cleaned_data['drsMember']
         #grab the startdate also for checking the decadal experiments in 3 below
-        startdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
+        #startdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
         
         # 1. check for correct drs format
         p=re.compile(r'(?P<r>\d+)i(?P<i>\d+)p(?P<p>\d+)$')
@@ -691,9 +702,16 @@ class SimulationForm(forms.ModelForm):
         mycentre = self.instance.centre
         mymodel = self.cleaned_data['numericalModel']
         myexp = self.instance.experiment
-        # grab the startdate also for checking the decadal experiments
-        mystartdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
         
+        # grab the startdate also for checking the decadal experiments
+        try: 
+            mystartdate = str(self.cleaned_data['duration'].startDate).partition('-')[0]
+        except:
+            raise ValidationError('A valid start date is needed in Duration')
+        
+        if mystartdate == 'None':
+                raise ValidationError('A valid start date is needed in Duration')
+                
         # search through expgroups to decide if I am part of a linked experiment
         for expgroup in expgroups:
             #make a copy of the inner list (for possible editing) 
@@ -870,7 +888,6 @@ class BaseParamForm(forms.ModelForm):
             self.fields['name'].widget=forms.TextInput(attrs={'size':'36'})
 
 class OrParamForm(BaseParamForm):
-    #value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(),widget=DropDownWidget(),required=False)
     value=forms.ModelMultipleChoiceField(queryset=Term.objects.all(), widget=forms.SelectMultiple(attrs={'size': 3}), required=False)
     class Meta(BaseParamForm.Meta):
         model=OrParam

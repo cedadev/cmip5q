@@ -14,7 +14,7 @@ from cmip5q.protoq.feeds import DocFeed
 from cmip5q.protoq.forms import *
 from cmip5q.protoq.yuiTree import *
 from cmip5q.protoq.BaseView import *
-from cmip5q.protoq.layoutUtilities import tabs, getpubs, getsims
+from cmip5q.protoq.layoutUtilities import tabs, getpubs, getsims, getdoidocs
 from cmip5q.protoq.components import componentHandler
 from cmip5q.protoq.grids import gridHandler
 from cmip5q.protoq.simulations import simulationHandler
@@ -169,12 +169,10 @@ def centres(request):
     # creating a separate list for the example and test centre
     p_aux=Centre.objects.filter(Q(abbrev='1. Example')|Q(abbrev='2. Test Centre'))
     
-    #for ab in ['1. Example','2. Test Centre']:
-    #    p_aux.append(Centre.objects.get(abbrev=ab))
-    
-    # adding url location for AR5 table button    
+    # adding url location for AR5, strat, and published docs buttons    
     ar5URL = reverse('cmip5q.explorer.views_ar5.home')
     stratURL = reverse('cmip5q.explorer.views_strat.home')    
+    pdURL = reverse('cmip5q.protoq.views.published_docs')
     
     if request.method=='POST':
         #yep we've selected something
@@ -189,6 +187,19 @@ def centres(request):
                 centre = Centre.objects.get(id=request.POST['ripchoice'])
                 ensembles = []
                 sims=Simulation.objects.filter(centre=request.POST['ripchoice']).filter(isDeleted=False)
+                #FIXME
+                # A temporary fix for empty start dates on input mods
+                for sim in sims:
+                    for ens in sim.ensemble_set.all():
+                        for mem in ens.ensemblemember_set.all():
+                            if mem.imod:
+                                try:
+                                    m = mem.imod.memberStartDate
+                                    print 'Successful startdate found - %s' % m
+                                except:
+                                    print 'Replacing null startdate with %s' % sim.duration.startDate
+                                    mem.imod.memberStartDate = sim.duration.startDate
+                                    
                 return render_to_response('ripinfo.html',{'sims':sims, "ensembles":ensembles, "centre":centre})
         except KeyError:
             m='Unable to select requested centre %s'%request.POST['choice']
@@ -201,20 +212,46 @@ def centres(request):
         feedlist=[]
         for f in sorted(feeds):
             feedlist.append((f,reverse('django.contrib.syndication.views.feed',args=('cmip5/%s'%f,))))
-            
-        #get publication list for front page table
-        pubs = getpubs()
         
         return render_to_response('centres/centres.html',{'objects':sublist(p,4),
                                                   'centreList':p,
                                                   'auxList':p_aux,
                                                   'curl':curl,
-                                                  'pubs':pubs,
                                                   'feedobjects':sublist(feedlist,4),
                                                   'ar5URL': ar5URL,
-                                                  'stratURL': stratURL}
+                                                  'stratURL': stratURL,
+                                                  'pdURL':pdURL}
                                                   )
-    
+
+
+def published_docs(request):
+    ''' Populates a published cim docs table '''
+  
+    #get url to return to home page
+    homeurl = reverse('cmip5q.protoq.views.centres')
+    #get publication list for front page table
+    pubs = getpubs()
+        
+    return render_to_response('centres/publisheddocs.html', {'pubs':pubs, 
+                                                             'homeurl':homeurl})
+
+
+def doi_docs(request, institute, modelname, expname):
+    ''' DOI landing page documents'''
+  
+    # retrieve list of matching documents
+    doidocs = getdoidocs(institute, modelname, expname)
+
+    # generate the url for the 'published docs' button       
+    pdURL = reverse('cmip5q.protoq.views.published_docs') 
+        
+    return render_to_response('centres/doidocs.html', {'doidocs':doidocs, 
+                                                       'institute':institute, 
+                                                       'model':modelname, 
+                                                       'experiment':expname,
+                                                       'pdURL':pdURL}) 
+        
+
 def centre(request,centre_id):
     ''' 
     Handle the top page on a centre by centre basis 
@@ -324,7 +361,7 @@ def componentInp(request,centre_id,component_id):
 def componentCopy(request,centre_id,component_id):
     c=componentHandler(centre_id,component_id)
     return c.copy()
-
+    
 #### GRID HANDLING ###########################################################
 
 # Provide a vew interface to the grid object 

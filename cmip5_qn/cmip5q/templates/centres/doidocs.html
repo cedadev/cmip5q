@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<center>
+  <h1> DOI Metadata</h1>
+</center>
+
+<!-- Published CIM documents table -->
+<div class="boxer">
+
+<!--  Publication info table section -->
+
+<div class="formcontainer">
+  
+  <div class="header">
+    <h3>Institute  : {{ institute }}</h2>
+    <h3>Model      : {{ model }}</h2>
+    <h3>Experiment : {{ experiment }}</h2>
+  </div>
+  
+  <div class="content">
+  
+    <table>
+      <tr>
+        <td width="100%">
+          <table id="pubs-table">
+            <thead>
+              <tr>
+                <th width="15%">
+                  Institute
+                </th>
+                <th width="15%">
+                  Model
+                </th>
+                <th width="15%">
+                  Experiment
+                </th>
+                <th width="15%">
+                  Member
+                </th>
+                <th width="15%">
+                  Start Year
+                </th>
+                <th width="25%">
+                  View Metadata
+                </th>
+              </tr>
+            </thead>
+            
+            <tbody>
+              {% for doidoc in doidocs %}
+                <tr>
+                    <td>{{ doidoc.centre }}</td>
+                    <td>{{ doidoc.numericalModel }}...</td>
+                    <td>{{ doidoc.exp }}</td>
+                    <td>{{ doidoc.member }}</td>
+                    <td>{{ doidoc.startyear }}</td>
+                    <td><input id={{ doidoc.cimviewID }} class="cim-viewer-hookup" value="View Metadata" type="button"></td>    
+                </tr>
+              {% endfor %}
+            </tbody>
+            
+          </table>
+        </td>
+      </tr>
+      
+      <tr>
+        <td>
+          <form>
+            <p>Use the 'Publication Table' button to generate a searchable table of all documents that have been exported 
+            using the cmip5 questionnaire. This can take a few moments to load so please be patient.
+            </p>   
+            <input type="button" value="Publication Table" onClick="window.location.href='{{ pdURL }}'">
+          </form>
+        </td>
+      </tr>
+
+    </table>  
+        
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block pagejs %}    
+    <script type="text/javascript">
+       (function(root) {
+
+		    var onCIMViewerHookupClick = function(){
+		         var params, drsPath = '';
+		         // Set viewer params.
+		         params = {
+		            project : 'cmip5',  
+		            drsPath : this.id
+		         };
+		         cim.viewer.renderFromDRS(params);
+		    
+		    };
+		    
+		    // Event handler for document ready event.
+		    $(document).ready(function(root) {
+		       
+		        // Initialise general cim viewer options.
+		        cim.setOptions({
+		            mode : 'prod',
+		            usePURL : false,
+		            uiFramework : 'jquery.ui',
+		            uiMode : 'tabbed'
+		        });
+		        
+		        // Augment UI.
+		        $(".demo-render-button").button();
+		
+		        // Event hook ups.
+		        $(".cim-viewer-hookup").click(onCIMViewerHookupClick);
+		
+		    });
+		
+		})(this || window); 
+    </script> 
+    
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#pubs-table').dataTable({
+             "bJQueryUI": true,
+             "bAutoWidth": false,
+             "sPaginationType": 'full_numbers',
+             "aaSorting": [[ 0, "desc" ]],
+             "aoColumns":[
+		        {"bSortable": true},
+		        {"bSortable": true},
+		        {"bSortable": true},
+		        {"bSortable": true},
+		        {"bSortable": true},
+                {"bSortable": false}
+                ]
+          });
+         
+          $('#pubs-table .cim-viewer-hookup').live('click', function (){
+            onCIMViewerHookupClick
+          });
+        });
+    </script>   
+    
+{% endblock %}

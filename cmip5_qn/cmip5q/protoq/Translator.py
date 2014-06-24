@@ -1314,104 +1314,105 @@ class Translator:
 
             # add in properties associated with this component
             for pg in componentObject.paramGroup.all():
-              componentProperty={}
-              if pg.name=="General Attributes" or pg.name=="Attributes": # skip general attributes as this is just a container for grouping properties in the Questionnaire. The Attributes test is due to "top level" components using this for some reason. I've created a ticket (716) for this.
-                componentProperty=newRootElement
-              else:
-                componentProperty=ET.SubElement(newRootElement,'componentProperty',{'represented':'true'})
-                '''shortName [1]'''
-                if pg.name:
-                    ET.SubElement(componentProperty,'shortName').text=pg.name
-                '''longName [0..1]'''
-                if pg.name:
-                    ET.SubElement(componentProperty,'longName').text=pg.name
-
-              # the internal questionnaire representation is that all parameters
-              # are contained in a constraint group
-              constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
-              for con in constraintSet:
-                if con.constraint!='' :
-                    componentProperty.append(ET.Comment('Constraint start: '+con.constraint))
-                if not(self.constraintValid(con,constraintSet,componentProperty)) :
-                    componentProperty.append(ET.Comment('Constraint is invalid'))
-                else :
-                    #
-                    # RF: one can now get at a child object (get_child)
-                    # so we could simplify the code below, but as it works ...
-                    #
-                    # Needed to add .order_by('id') as the database does not guarantee
-                    # to return objects in the same order, hence the order of the baseclass
-                    # objects might not be the same as the Xor, Or, or KeyBoard objects
-                    # whereas the code assumes the same order.
-                    #
-                    BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
-                    XorParamSet=XorParam.objects.filter(constraint=con).order_by('id')
-                    OrParamSet=OrParam.objects.filter(constraint=con).order_by('id')
-                    KeyBoardParamSet=KeyBoardParam.objects.filter(constraint=con).order_by('id')
-                    XorIDX=0
-                    OrIDX=0
-                    KeyBoardIDX=0
-                    for bp in BaseParamSet:
-                        found=False
-                        if not(found) and XorIDX<XorParamSet.count() :
-                            if bp.name == XorParamSet[XorIDX].name :
-                                found=True
-                                p=XorParamSet[XorIDX]
-                                XorIDX+=1
-                                ptype="XOR"
-                        if not(found) and OrIDX<OrParamSet.count() :
-                            if bp.name == OrParamSet[OrIDX].name :
-                                found=True
-                                p=OrParamSet[OrIDX]
-                                OrIDX+=1
-                                ptype="OR"
-                        if not(found) and KeyBoardIDX<KeyBoardParamSet.count() :
-                            if bp.name == KeyBoardParamSet[KeyBoardIDX].name :
-                                found=True
-                                p=KeyBoardParamSet[KeyBoardIDX]
-                                KeyBoardIDX+=1
-                                ptype="KeyBoard"
-                        assert found, "Found must be true at this point"
-
-                        # skip CV output if the value is "n/a" for XOR or OR and if (for OR) there is only one value chosen. The validation step will flag the existence of N/A with other values
-                        if (ptype=='XOR' and p.value and p.value.name=='N/A') :
-                            componentProperty.append(ET.Comment('Value of XOR property called '+p.name+' is N/A so skipping'))
-                        elif (ptype=='OR' and p.value and len(p.value.all())==1 and ('N/A' in str(p.value.all()))) : # last clause is messy as we turn the value into a string in a nasty way but I don't know how to do it another way
-                            componentProperty.append(ET.Comment('Value of OR property called '+p.name+' is N/A so skipping'))
-                        else :
-                            property=ET.SubElement(componentProperty,'componentProperty',{'represented': 'true'})
-                            '''shortName [1]'''
-                            if p.name:
-                                ET.SubElement(property,'shortName').text=p.name
-                            '''longName [0..1]'''
-                            if p.name:
-                                ET.SubElement(property,'longName').text=p.name
-                            '''value'''
-                            if ptype=='KeyBoard':
-                                #removing illegal xml characters 
-                                legalstr = re.sub(RE_XML_ILLEGAL, "", unicode(p.value))
-                                ET.SubElement(property,'value').text=legalstr
-                            elif ptype=='XOR':
-                                value=''
-                                if p.value:
-                                    value=p.value.name
-                                ET.SubElement(property,'value').text=value
-                            elif ptype=='OR':
-                                if p.value :
-                                    valset=p.value.all()
-                                    for value in valset :
-                                        ET.SubElement(property,'value').text=value.name
-                if con.constraint!='' :
-                    componentProperty.append(ET.Comment('Constraint end: '+con.constraint))
-
-              if componentProperty:
-                  if componentProperty.tag=="componentProperty" :
-                      # I should not be a leaf property
-                      if not componentProperty.find("componentProperty"):
-                          # All children must have been declared as N/A so remove me
-                          parent=componentProperty.getparent()
-                          parent.remove(componentProperty)
-                          parent.append(ET.Comment('Property '+pg.name+' removed as it has no children'))
+              if pg.name != u"Model development path" and pg.name != u"Tuning Section" and pg.name != u"Conservation of integral quantities": # Not exporting 'new questions' to cim - these will pnly be used in explorer tables:
+                  componentProperty={}
+                  if pg.name=="General Attributes" or pg.name=="Attributes": # skip general attributes as this is just a container for grouping properties in the Questionnaire. The Attributes test is due to "top level" components using this for some reason. I've created a ticket (716) for this.
+                    componentProperty=newRootElement
+                  else:
+                    componentProperty=ET.SubElement(newRootElement,'componentProperty',{'represented':'true'})
+                    '''shortName [1]'''
+                    if pg.name:
+                        ET.SubElement(componentProperty,'shortName').text=pg.name
+                    '''longName [0..1]'''
+                    if pg.name:
+                        ET.SubElement(componentProperty,'longName').text=pg.name
+    
+                  # the internal questionnaire representation is that all parameters
+                  # are contained in a constraint group
+                  constraintSet=ConstraintGroup.objects.filter(parentGroup=pg)
+                  for con in constraintSet:
+                    if con.constraint!='' :
+                        componentProperty.append(ET.Comment('Constraint start: '+con.constraint))
+                    if not(self.constraintValid(con,constraintSet,componentProperty)) :
+                        componentProperty.append(ET.Comment('Constraint is invalid'))
+                    else :
+                        #
+                        # RF: one can now get at a child object (get_child)
+                        # so we could simplify the code below, but as it works ...
+                        #
+                        # Needed to add .order_by('id') as the database does not guarantee
+                        # to return objects in the same order, hence the order of the baseclass
+                        # objects might not be the same as the Xor, Or, or KeyBoard objects
+                        # whereas the code assumes the same order.
+                        #
+                        BaseParamSet=BaseParam.objects.filter(constraint=con).order_by('id')
+                        XorParamSet=XorParam.objects.filter(constraint=con).order_by('id')
+                        OrParamSet=OrParam.objects.filter(constraint=con).order_by('id')
+                        KeyBoardParamSet=KeyBoardParam.objects.filter(constraint=con).order_by('id')
+                        XorIDX=0
+                        OrIDX=0
+                        KeyBoardIDX=0
+                        for bp in BaseParamSet:
+                            found=False
+                            if not(found) and XorIDX<XorParamSet.count() :
+                                if bp.name == XorParamSet[XorIDX].name :
+                                    found=True
+                                    p=XorParamSet[XorIDX]
+                                    XorIDX+=1
+                                    ptype="XOR"
+                            if not(found) and OrIDX<OrParamSet.count() :
+                                if bp.name == OrParamSet[OrIDX].name :
+                                    found=True
+                                    p=OrParamSet[OrIDX]
+                                    OrIDX+=1
+                                    ptype="OR"
+                            if not(found) and KeyBoardIDX<KeyBoardParamSet.count() :
+                                if bp.name == KeyBoardParamSet[KeyBoardIDX].name :
+                                    found=True
+                                    p=KeyBoardParamSet[KeyBoardIDX]
+                                    KeyBoardIDX+=1
+                                    ptype="KeyBoard"
+                            assert found, "Found must be true at this point"
+    
+                            # skip CV output if the value is "n/a" for XOR or OR and if (for OR) there is only one value chosen. The validation step will flag the existence of N/A with other values
+                            if (ptype=='XOR' and p.value and p.value.name=='N/A') :
+                                componentProperty.append(ET.Comment('Value of XOR property called '+p.name+' is N/A so skipping'))
+                            elif (ptype=='OR' and p.value and len(p.value.all())==1 and ('N/A' in str(p.value.all()))) : # last clause is messy as we turn the value into a string in a nasty way but I don't know how to do it another way
+                                componentProperty.append(ET.Comment('Value of OR property called '+p.name+' is N/A so skipping'))
+                            else :
+                                property=ET.SubElement(componentProperty,'componentProperty',{'represented': 'true'})
+                                '''shortName [1]'''
+                                if p.name:
+                                    ET.SubElement(property,'shortName').text=p.name
+                                '''longName [0..1]'''
+                                if p.name:
+                                    ET.SubElement(property,'longName').text=p.name
+                                '''value'''
+                                if ptype=='KeyBoard':
+                                    #removing illegal xml characters 
+                                    legalstr = re.sub(RE_XML_ILLEGAL, "", unicode(p.value))
+                                    ET.SubElement(property,'value').text=legalstr
+                                elif ptype=='XOR':
+                                    value=''
+                                    if p.value:
+                                        value=p.value.name
+                                    ET.SubElement(property,'value').text=value
+                                elif ptype=='OR':
+                                    if p.value :
+                                        valset=p.value.all()
+                                        for value in valset :
+                                            ET.SubElement(property,'value').text=value.name
+                    if con.constraint!='' :
+                        componentProperty.append(ET.Comment('Constraint end: '+con.constraint))
+    
+                  if componentProperty:
+                      if componentProperty.tag=="componentProperty" :
+                          # I should not be a leaf property
+                          if not componentProperty.find("componentProperty"):
+                              # All children must have been declared as N/A so remove me
+                              parent=componentProperty.getparent()
+                              parent.remove(componentProperty)
+                              parent.append(ET.Comment('Property '+pg.name+' removed as it has no children'))
 
     def addChildComponent(self,c,root,nest,recurse=True):
 

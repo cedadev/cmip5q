@@ -8,16 +8,15 @@
 
 {% block pagelinks %}
   <div class="boxer">
-    <a href = "{{ urls.home }}">Explorer home page</a>
+    <a href = "{{ urls.home }}">Return to Menu</a>
   </div>
 {% endblock%} 
 
 {% block pagetools %}
   <div class="boxer">
     <div class="toolbar">
-      <a href="{{ urls.ar5csv }}" class="ui-state-default ui-corner-all" title="export"><span class="ui-icon ui-icon-calculator"></span></a>
-      <a href="{{ urls.ar5bib }}" class="ui-state-default ui-corner-all" title="references"><span class="ui-icon ui-icon-calculator"></span></a>
-      <a href="#" class="ui-state-default ui-corner-all" title="help"><span id="opener" class="ui-icon ui-icon-help"></span></a>
+      <a href="{{ urls.ar5csv }}" class="ui-state-default ui-corner-all" title="export">csv</a>
+      <a href="{{ urls.ar5bib }}" class="ui-state-default ui-corner-all" title="references">bib</a>
     </div>
   </div>
 {% endblock%} 
@@ -37,98 +36,15 @@
    <tr>
      <!-- Main Model info -->
      <th style="width:240px">
-       Model ID
+       (1) Model ID
        <br/> 
-       Vintage
+       (2) Vintage
      </th>
      
      <th>
-       Institution
+       (1) Institution
        <br/> 
-       Main Reference(s)
-       <br/> 
-       Flux Correction
-     </th>
-     
-     <!-- Atmosphere Column -->
-     <th>
-       <span style="text-decoration: underline; color:white">
-       Atmosphere
-       </span>
-       <br/>
-       Component Name
-       <br/>
-       Horizontal Grid
-       <br/>
-       Number of Vert Levels
-       <br/>
-       Grid Top
-       <br/>
-       Code Independence
-       <br/>                 
-       References
-     </th>
-                    
-     <!-- Ocean Column -->
-     <th>
-       <span style="text-decoration: underline; color:white">
-       Ocean
-       </span>
-       <br/>
-       Component Name
-       <br/>
-       Horizontal Resolution
-       <br/>
-       Number of Vertical Levels
-       <br/>
-       Top Level
-       <br/>
-       Z Co-ord
-       <br/>
-       Top BC
-       <br/>
-       Code Independence
-       <br/>                 
-       References
-     </th>
-            
-     <!-- Land Ice Column -->
-     <th>
-       <span style="text-decoration: underline; color:white">
-       Land Ice
-       </span>
-       <br/>
-       Component Name
-       <br/>
-       Code Independence
-       <br/>                 
-       References
-     </th>
-     
-     <!-- Land Surface Column -->
-     <th>
-       <span style="text-decoration: underline; color:white">
-       Land Surface
-       </span>
-       <br/>
-       Component Name
-       <br/>
-       Code Independence
-       <br/>                 
-       References
-     </th>
-     
-     <!-- Sea Ice Column -->
-     <th>
-       <span style="text-decoration: underline; color:white">
-       Sea Ice
-       </span>
-       <br/>
-       Component Name
-       <br/>
-       Code Independence
-       <br/>                 
-       References
+       (2) Main Reference(s)
      </th>
      
      <!-- Aerosol Column -->
@@ -137,11 +53,26 @@
        Aerosols
        </span>
        <br/>
-       Component Name
-       <br/>
-       Code Independence
+       (1) Component Name
        <br/>                 
-       References
+       (2) References
+     </th>
+     
+     <!-- Atmosphere Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Atmosphere
+       </span>
+       <br/>
+       (1) Component Name
+       <br/>
+       (2) Horizontal Grid
+       <br/>
+       (3) Number of Vert Levels
+       <br/>
+       (4) Grid Top
+       <br/>                 
+       (5) References
      </th>
      
      <!-- Atmospheric chemistry Column -->
@@ -150,11 +81,31 @@
        Atmos Chemistry
        </span>
        <br/>
-       Component Name
-       <br/>
-       Code Independence
+       (1) Component Name
        <br/>                 
-       References
+       (2) References
+     </th>
+            
+     <!-- Land Ice Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Land Ice
+       </span>
+       <br/>
+       (1) Component Name
+       <br/>                 
+       (2) References
+     </th>
+     
+     <!-- Land Surface Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Land Surface
+       </span>
+       <br/>
+       (1) Component Name
+       <br/>                 
+       (2) References
      </th>
      
      <!-- Ocean Biogeochemistry Column -->
@@ -163,11 +114,41 @@
        Ocean Biogeochemistry
        </span>
        <br/>
-       Component Name
+       (1) Component Name
+       <br/>               
+       (2) References
+     </th>
+                    
+     <!-- Ocean Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Ocean
+       </span>
        <br/>
-       Code Independence
+       (1) Component Name
+       <br/>
+       (2) Horizontal Resolution
+       <br/>
+       (3) Number of Vertical Levels
+       <br/>
+       (4) Top Level
+       <br/>
+       (5) Z Co-ord
+       <br/>
+       (6) Top BC
        <br/>                 
-       References
+       (7) References
+     </th>
+     
+     <!-- Sea Ice Column -->
+     <th>
+       <span style="text-decoration: underline; color:white">
+       Sea Ice
+       </span>
+       <br/>
+       (1) Component Name
+       <br/>                 
+       (2) References
      </th>
      
    </tr>
@@ -177,22 +158,36 @@
   <tr class="{%cycle 'row2' 'row1'%}">
     
     <td style="width:240px">
-      {{ model.abbrev }}
-      <br/> 
+      (1) {{ model.abbrev }}
+      <br/>
+      (2)  
       {% if model.yearReleased %}
         {{ model.yearReleased }}
       {% endif %}
     </td>
     
     <td>
-      {{ model.centre.name }}
+      (1) {{ model.centre.name }}
       <br/>
+      (2) 
       {% for ref in model.mainrefs %}
         {{ ref }}; 
       {% endfor %}
-      <br/>
-      Flux correction field
     </td>
+          
+    <!-- Aerosol -->
+    <td>
+       {% if model.aerimplemented%}
+         (1) {{ model.aerabbrev }}
+         <br/>
+         (2)
+         {% for ref in model.aerrefs %}
+           {{ ref }};
+         {% endfor %}
+       {% else %}
+         Not implemented
+       {% endif %}
+    </td> 
     
     <!-- Atmosphere -->
     <td>
@@ -205,128 +200,105 @@
          <br/>
          {{ model.atmosgridtop }}
          <br/>
-         XX %
-         <br/>
          {% for ref in model.atmosrefs %}
-           {{ ref }}
+           {{ ref }};
          {% endfor %}
        {% else %}
-         None
+         Not implemented
        {% endif %}
     </td>
     
-    <!-- Ocean -->
+    <!-- Atmos Chemistry -->
     <td>
-       {% if model.oceanimplemented%}
-         {{ model.oceanabbrev }}
+       {% if model.atmchemimplemented%}
+         (1) {{ model.atmchemabbrev }}
          <br/>
-         {{ model.oceanhorgrid }}
-         <br/>
-         {{ model.oceannumlevels }}
-         <br/>
-         {{ model.oceantoplevel }}
-         <br/>
-         {{ model.oceanzcoord }}
-         <br/>
-         {{ model.oceantopbc }}
-         <br/>
-         XX %
-         <br/>
-         {% for ref in model.oceanrefs %}
-           {{ ref }}
+         (2)
+         {% for ref in model.atmchemrefs %}
+           {{ ref }};
          {% endfor %}
        {% else %}
-         None
+         Not implemented
        {% endif %}
     </td>
     
     <!-- LandIce -->
     <td>
        {% if model.liceimplemented%}
-         {{ model.liceabbrev }}
+         (1) {{ model.liceabbrev }}
          <br/>
-         XX %
-         <br/>
+         (2) 
          {% for ref in model.licerefs %}
-           {{ ref }}
+           {{ ref }};
          {% endfor %}
        {% else %}
-         None
+         Not implemented
        {% endif %}
     </td>
     
     <!-- Land Surface -->
     <td>
        {% if model.lsurfimplemented%}
-         {{ model.lsurfabbrev }}
+         (1) {{ model.lsurfabbrev }}
          <br/>
-         XX %
-         <br/>
+         (2)
          {% for ref in model.lsurfrefs %}
-           {{ ref }}
+           {{ ref }};
          {% endfor %}
        {% else %}
-         None
-       {% endif %}
-    </td>
-    
-    <!-- Sea Ice -->
-    <td>
-       {% if model.seaiceimplemented%}
-         {{ model.seaiceabbrev }}
-         <br/>
-         XX %
-         <br/>
-         {% for ref in model.seaicerefs %}
-           {{ ref }}
-         {% endfor %}
-       {% else %}
-         None
-       {% endif %}
-    </td>
-          
-    <!-- Aerosol -->
-    <td>
-       {% if model.aerimplemented%}
-         {{ model.aerabbrev }}
-         <br/>
-         XX %
-         <br/>
-         {% for ref in model.aerrefs %}
-           {{ ref }}
-         {% endfor %}
-       {% else %}
-         None
-       {% endif %}
-    </td> 
-    
-    <!-- Atmos Chemistry -->
-    <td>
-       {% if model.atmchemimplemented%}
-         {{ model.atmchemabbrev }}
-         <br/>
-         XX %
-         <br/>
-         {% for ref in model.atmchemrefs %}
-           {{ ref }}
-         {% endfor %}
-       {% else %}
-         None
+         Not implemented
        {% endif %}
     </td>
     
     <!-- Ocean Biogeochem -->
     <td>
        {% if model.obgcimplemented%}
-         {{ model.obgcabbrev }}
+         (1) {{ model.obgcabbrev }}
          <br/>
-         XX %
-         <br/>
+         (2)
          {% for ref in model.obgcrefs %}
-           {{ ref }}
+           {{ ref }};
          {% endfor %}
        {% else %}
-         None
+         Not implemented
+       {% endif %}
+    </td>
+    
+    <!-- Ocean -->
+    <td>
+       {% if model.oceanimplemented%}
+         (1) {{ model.oceanabbrev }}
+         <br/>
+         (2) {{ model.oceanhorgrid }}
+         <br/>
+         (3) {{ model.oceannumlevels }}
+         <br/>
+         (4) {{ model.oceantoplevel }}
+         <br/>
+         (5) {{ model.oceanzcoord }}
+         <br/>
+         (6) {{ model.oceantopbc }}
+         <br/>
+         (7) 
+         {% for ref in model.oceanrefs %}
+           {{ ref }};
+         {% endfor %}
+       {% else %}
+         Not implemented
+       {% endif %}
+    </td>
+    
+    <!-- Sea Ice -->
+    <td>
+       {% if model.seaiceimplemented%}
+         (1) {{ model.seaiceabbrev }}
+         <br/>
+         (2)
+         {% for ref in model.seaicerefs %}
+           {{ ref }};
+         {% endfor %}
+       {% else %}
+         Not implemented
        {% endif %}
     </td>
        

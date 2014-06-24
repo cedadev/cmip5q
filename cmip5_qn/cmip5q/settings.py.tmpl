@@ -3,7 +3,7 @@
 import os
 thisDir = os.path.dirname(__file__)
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 # If we need to deploy the ap using a script path, we have to tell it here ... 
@@ -11,28 +11,19 @@ TEMPLATE_DEBUG = DEBUG
 DEPLOYED_SCRIPT_PATH=''
 
 ADMINS = (
-    ('Gerard Devine', 'g.m.devine@reading.ac.uk'),
-    ('Paul Slavin', 'slavinp@cs.manc.ac.uk'),
+    ('Andrew Harwood', 'andrew.harwood@stfc.ac.uk'),
     # ('Your Name', 'your_email@domain.com'),
 )
 SERVER_EMAIL = 'meta4q@neptune.badc.rl.ac.uk'
 
 MANAGERS = ADMINS
 
-#settings for local sqlite
-#DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-#DATABASE_NAME = os.path.join(thisDir, 'sqlite.db') # Or path to database file if using sqlite3.
-#DATABASE_USER = ''             # Not used with sqlite3.
-#DATABASE_PASSWORD = ''         # Not used with sqlite3.
-#DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-#DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-#settings for local postgres
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.#
-DATABASE_NAME = 'cmip5q' # my settings for local postgres database.
-DATABASE_USER = 'postgres'             # for local postgres setup.
-DATABASE_PASSWORD = 'TORNADO1'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'cmip5q'
+DATABASE_USER = 'cmip5q'             # Not used with sqlite3.
+DATABASE_PASSWORD = '{{ dbpassword }}'         # Not used with sqlite3.
+DATABASE_HOST = '{{ dbhost }}'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = '5432'             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
@@ -91,13 +82,15 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(thisDir, "templates")
+    #"/home/bnl/meta4q/cmip5q/templates"
+    #"/home/rupert/proj/metafor/venv/cmip5q/templates"
+    os.path.join(thisDir, "templates") 
             )
-
 TEMPLATE_STRING_IF_INVALID = 'what happened here?'
 
-#STATIC_DOC_ROOT = os.path.join(thisDir, "templates", "css", )
-STATIC_DOC_ROOT = os.path.join(thisDir, "static", )
+#STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
+#STATIC_DOC_ROOT = "/home/rupert/proj/metafor/venv/cmip5q/templates/css"
+STATIC_DOC_ROOT = os.path.join(thisDir, "static")
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -105,9 +98,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'cmip5q.protoq.admin',
-    'cmip5q.protoq',
-    'cmip5q.explorer'
+    'cmip5q.protoq'
 )
 
 # ----------------------------------------------------
@@ -119,6 +110,7 @@ logging.basicConfig(
     format = '%(name)s %(module)s %(levelname)s [%(asctime)s] %(message)s',
 )
 LOG=logging.getLogger('CMIP5')
+
 
 # Location of test files to expose through feed
 

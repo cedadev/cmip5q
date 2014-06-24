@@ -11,8 +11,6 @@
   </script>
 {% endblock %}
 
-
-
 {% block titlerow %} 
   Edit model
   {% if not c.isModel %}
@@ -138,6 +136,8 @@
           </p>
         </div>
       {% endif %}
+      
+      {% include 'helppanel.html' %}
       
       <!-- Main component information box --> 
       <div class="boxer formbox">
@@ -371,9 +371,13 @@
               </table>
             </div>
           {% endif %}
-        {% endif %}   
-      
-        {% include 'attributeform.html' %}
+        {% endif %} 
+        
+        {% if isModel %}
+          {% include 'topmodel_attform.html' %}
+        {% else %}
+          {% include 'attributeform.html' %}
+        {% endif %}
       
     </div>
        
@@ -490,6 +494,11 @@
     {% endif %}
 <!--End of main panel of a component page -->
 
+{% endblock %}
+
+
+{% block childpagejs %}
+<script type="text/javascript" src="/static/jquery/jquery-checkformsave/jquery.checkformsave.js"></script>
 
 <!-- button specific javascript follows -->
 <script type="text/javascript"> 
@@ -502,32 +511,36 @@
 </script>
 <!-- end of button javascript -->
 
+<!-- Doc buttons -->
+<script type="text/javascript">  
+    var cimLinkButton2 = new YAHOO.widget.Button("cimValBut"); 
+    var cimLinkbutton3 = new YAHOO.widget.Button("cimXMLBut");
+    var cimLinkbutton4 = new YAHOO.widget.Button("cimHTMLBut");
+    var cimLinkbutton5 = new YAHOO.widget.Button("cimViewBut");
+    var cimLinkbutton6 = new YAHOO.widget.Button("cimESGBut");
+    var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+</script>
+<!-- end of Doc buttons -->
+
 <!-- YUI treeview stuff for body -->
 <script type="text/javascript">
-
 //create our own namespace object
-YAHOO.namespace("protoq.tree");
-	                 
+YAHOO.namespace("protoq.tree");               
 //define the initTree function
 YAHOO.protoq.tree.initTree = function() {
-
     //create a TreeView object
     var tree = new YAHOO.widget.TreeView("treeDiv");
-
     //Fix for non-activation of href link on single-clicking node label (YUI bug?):
     //Subscribe to the "dblClickEvent" and do nothing.
     tree.subscribe("dblClickEvent", function(node) {
-    }); 
-
+    });
 	// Draw the tree
     tree.draw();
-  
 };
- 
  //Add an onDOMReady handler to build the tree when the document is ready
 YAHOO.util.Event.onDOMReady(YAHOO.protoq.tree.initTree);
- 
 </script>
 <!-- End of YUI treeview stuff for body -->
+
 
 {% endblock %}

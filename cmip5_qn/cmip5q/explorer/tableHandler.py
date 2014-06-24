@@ -1,8 +1,6 @@
 '''
-Module to handle the generation of tables from information supplied to 
+Module to handle the generation of explorer tables from information supplied to 
 the CMIP5 questionnaire
-
-Created on 23 Sep 2011
 
 @author: gerard devine
 '''
@@ -11,9 +9,10 @@ from cmip5q.explorer.dbvalues import *
 from cmip5q.protoq.models import NumericalRequirement
 
 
-def ar5table1(models):
-    '''
-    Generates all information necessary for AR5 table 1 (i.e. the model table) 
+def modeldesctable(models):
+    ''' Generates all information necessary for AR5 table 1 (i.e. the model 
+    description table)
+     
     '''
     
     for m in models:
@@ -23,30 +22,29 @@ def ar5table1(models):
         #Get the main model reference(s)
         m.mainrefs, m.maincits = get_Refs(m, 'model')
         
-        
         # 1. Get aerosol column information
         
         #Check that realm is implemented
-        m.aerimplemented = is_realmimpl(m, 'Aerosols')
+        m.aerimplemented = is_compimpl(m, 'Aerosols')
 
         if not m.aerimplemented:
             m.aerabbrev = m.aerrefs = m.aercits = 'Not Implemented' 
         else:
             #Get the abbrev
-            m.aerabbrev = get_realmabbrev(m, 'Aerosols')
+            m.aerabbrev = get_compabbrev(m, 'Aerosols')
             #Get the component references
             m.aerrefs, m.aercits = get_Refs(m, 'Aerosols')                
 
         # 2. Get atmosphere column information
           
         #Check that realm is implemented
-        m.atmosimplemented = is_realmimpl(m, 'Atmosphere')
+        m.atmosimplemented = is_compimpl(m, 'Atmosphere')
         if m.atmosimplemented:
             #Get the abbrev
-            m.atmosabbrev = get_realmabbrev(m, 'Atmosphere')
+            m.atmosabbrev = get_compabbrev(m, 'Atmosphere')
             #Get the component references
             m.atmosrefs, m.atmoscits = get_Refs(m, 'Atmosphere')
-            #Get vert grid info
+            #Get vertical grid info
             m.atmosgridtop, m.atmosnumlevels = get_vertgridinfo(m, 'Atmosphere')
             #Get horizontal grid menmonic and resolution
             atmosgridres, atmosgridmnem = get_HorGridRes(m, 'Atmosphere', 
@@ -57,12 +55,12 @@ def ar5table1(models):
         # 3. Get atmospheric chemistry column information
         
         #Check that realm is implemented
-        m.atmchemimplemented = is_realmimpl(m, 'AtmosphericChemistry')
+        m.atmchemimplemented = is_compimpl(m, 'AtmosphericChemistry')
         if not m.atmchemimplemented:
             m.atmchemabbrev = m.atmchemrefs = m.atmchemcits = 'Not Implemented' 
         else:
             #Get the abbrev
-            m.atmchemabbrev = get_realmabbrev(m, 'AtmosphericChemistry')
+            m.atmchemabbrev = get_compabbrev(m, 'AtmosphericChemistry')
             #Get the component references
             m.atmchemrefs, m.atmchemcits = get_Refs(m, 'AtmosphericChemistry')
         
@@ -70,12 +68,12 @@ def ar5table1(models):
         # 4. Get land ice column information
         
         #Check that realm is implemented
-        m.liceimplemented = is_realmimpl(m, 'LandIce')
+        m.liceimplemented = is_compimpl(m, 'LandIce')
         if not m.liceimplemented:
             m.liceabbrev = m.licerefs = m.licecits = 'Not Implemented' 
         else:
             #Get the abbrev
-            m.liceabbrev = get_realmabbrev(m, 'LandIce')
+            m.liceabbrev = get_compabbrev(m, 'LandIce')
             #Get the component references
             m.licerefs, m.licecits = get_Refs(m, 'LandIce')
         
@@ -83,12 +81,12 @@ def ar5table1(models):
         # 5. Get land surface column information
         
         #Check that realm is implemented
-        m.lsurfimplemented = is_realmimpl(m, 'LandSurface')
+        m.lsurfimplemented = is_compimpl(m, 'LandSurface')
         if not m.lsurfimplemented:
             m.lsurfabbrev = m.lsurfrefs = m.lsurfcits = 'Not Implemented'
         else:
             #Get the abbrev
-            m.lsurfabbrev = get_realmabbrev(m, 'LandSurface')
+            m.lsurfabbrev = get_compabbrev(m, 'LandSurface')
             #Get the component references
             m.lsurfrefs, m.lsurfcits = get_Refs(m, 'LandSurface')
         
@@ -96,12 +94,12 @@ def ar5table1(models):
         # 6. Get Ocean Biogeo column information
         
         #Check that realm is implemented
-        m.obgcimplemented = is_realmimpl(m, 'OceanBiogeoChemistry')
+        m.obgcimplemented = is_compimpl(m, 'OceanBiogeoChemistry')
         if not m.obgcimplemented:
             m.obgcabbrev = m.obgcrefs = m.obgccits = 'Not Implemented'
         else:
             #Get the abbrev
-            m.obgcabbrev = get_realmabbrev(m, 'OceanBiogeoChemistry')
+            m.obgcabbrev = get_compabbrev(m, 'OceanBiogeoChemistry')
             #Get the component references
             m.obgcrefs, m.obgccits = get_Refs(m, 'OceanBiogeoChemistry')
         
@@ -109,7 +107,7 @@ def ar5table1(models):
         # 7. Get Ocean information
         
         #Check that realm is implemented
-        m.oceanimplemented = is_realmimpl(m, 'Ocean')
+        m.oceanimplemented = is_compimpl(m, 'Ocean')
         if not m.oceanimplemented:
             m.oceanabbrev = 'Not Implemented' 
             m.oceanrefs = 'Not Implemented'
@@ -121,7 +119,7 @@ def ar5table1(models):
             m.oceantopbc = 'Not Implemented'
         else:
             #Get the abbrev
-            m.oceanabbrev = get_realmabbrev(m, 'Ocean')
+            m.oceanabbrev = get_compabbrev(m, 'Ocean')
             #Get the component references
             m.oceanrefs, m.oceancits = get_Refs(m, 'Ocean')
             #Get vert grid info
@@ -139,44 +137,87 @@ def ar5table1(models):
         # 8. Get Sea Ice column information
         
         #Check that realm is implemented
-        m.seaiceimplemented = is_realmimpl(m, 'SeaIce')
+        m.seaiceimplemented = is_compimpl(m, 'SeaIce')
         if not m.seaiceimplemented:
             m.seaiceabbrev = m.seaicerefs = m.seaicecits = 'Not Implemented'
         else:
             #Get the abbrev
-            m.seaiceabbrev = get_realmabbrev(m, 'SeaIce')
+            m.seaiceabbrev = get_compabbrev(m, 'SeaIce')
             #Get the component references
             m.seaicerefs, m.seaicecits = get_Refs(m, 'SeaIce')
         
-        '''
-        
-        # 3. Get sea ice column information
+    return models
 
-        #Check that realm is implemented
-        m.oceanimplemented = is_realmimpl(m, '')
-        #Get the abbrev
-        m.oceanabbrev = get_realmabbrev(m, 'Ocean')
-        #Get the ocean component references
-        m.oceanrefs, m.oceancits = get_Refs(m, 'Ocean')                         
-        #Get the seaice component references
-        m.seaicerefs, m.seaicecits = get_Refs(m, 'SeaIce')
-        #Get the rheology type
-        m.sirheol, m.sirheolurl = get_sirheology(m)
-        #Get information on water ponds (for leads)
-        m.siwaterpond, m.siwpurl = get_siwaterpond(m)
-        #Get information on lateral melting (for leads)
-        m.silatmelt, m.silmurl = get_silatmelt(m)
+
+def ch09table(models):
+    '''
+    Generates all information necessary for AR5 ch09 table 
+    '''
+    
+    for m in models:        
         
-         
-        # 5. Get land column information
+        # Get Model assembly information including any related constraints
+        m.modelassembly, \
+        m.assemblyotherinstitutes,\
+        m.assemblyconsortium, \
+        m.mixedassemblynames, \
+        m.offshelfinst = get_modelassembly(m)
         
-        #Get the land surface references
-        m.lsrefs, m.lscits = get_Refs(m, 'LandSurface')
-        #Get information on river routing
-        m.riverrouting, m.rrurl = get_lsrivrout(m)
-                '''
+        #get any additional info supplied under the model development section
+        m.modeldevothers = get_modeldevothers(m)
         
         
+        # Get Model Tuning information
+        m.meanstateglobmets = get_meanstateglobmets(m)
+        m.obstrendsmets = get_obstrendsmets(m)
+        m.meanstateregmets = get_meanstateregmets(m)
+        m.tempvarmets = get_tempvarmets(m)
+        m.adjparams = get_adjparams(m)
+        m.othmodtuning = get_othmodtuning(m)
+        
+        #get any additional info supplied under the tuning section
+        m.tuningsectothers = get_tuningsectothers(m)
+           
+        # Get Conservation of integral quantities information
+        m.intconservation = get_intconservation(m)
+        m.spectuning = get_spectuning(m)
+        m.fluxcorrused = get_fluxcorrused(m)
+        if m.fluxcorrused == 'Yes':
+            m.fluxcorrfields = get_fluxcorrfields(m)
+            m.fluxcorrmeth = get_fluxcorrmeth(m)
+        else:
+            m.fluxcorrfields = ['N/A']
+            m.fluxcorrmeth = 'N/A'
+        
+        #get any additional info supplied under the conservation of integral 
+        # quantities section
+        m.consintegothers = get_consintegothers(m)
+                
+    return models
+
+
+def chemtable(models):
+    '''
+    Generates all information necessary for AR5 chemistry table 
+    '''
+    
+    for m in models:        
+        
+        # Is land surface carbon cycle implemented?
+        m.lsccimplemented = is_compimpl(m, 'LandSurfaceCarbonCycle')
+        # Is ocean bio chemistry (carbon cycle) implemented?
+        m.occimplemented = is_compimpl(m, 'OceanBiogeoChemistry')
+        
+        # How are aerosols represented, mass/volume, number etc?
+        m.aermoments = get_aermoments(m)
+        
+        # What type of aerosol model scheme
+        m.aerscheme = get_aerscheme(m)
+        
+        # What type of aerosol model scheme
+        m.ocbiotracnuts = get_ocbiotracnuts(m)
+        
+                        
     return models
 
 
@@ -237,18 +278,22 @@ def ar5table3(exps, model):
         for reqid in reqidlist:
             if reqid in e.requirements.all().values_list('docid', flat=True):
                 reqsinexp.append('True')
-                #get the simulation using the particular model for this experiment
-                sim = Simulation.objects.filter(numericalModel=model, experiment=e)
+                #get the sim using the particular model for this experiment
+                sim = Simulation.objects.filter(numericalModel=model, 
+                                                experiment=e)
                 sim = sim.filter(isDeleted='False')
-                # check if current model conforms if it has been run for this exp
+                # check current model conforms if it has been run for this exp
                 if sim:
                     #first get all reqs associated with the experiment
                     ereqs = e.requirements.all()
                     #get the actual requirement
-                    reqs =  GenericNumericalRequirement.objects.filter(docid=reqid)
-                    #pull out the common requirement (must be better way of doing this!)
+                    reqs =  GenericNumericalRequirement.objects.filter(
+                                                                    docid=reqid)
+                    #pull out the common requirement (must be better 
+                    #way of doing this!)
                     
-                    conf = Conformance.objects.filter(simulation=sim[0]).filter(requirement=req)
+                    conf = Conformance.objects.filter(simulation=sim[0]).filter(
+                                                                requirement=req)
                     modconforms.append('True')
                 else:
                     modconforms.append('') 
@@ -296,10 +341,10 @@ def strattable(models):
         m.mainrefs, m.maincits = get_Refs(m, 'model')
 
         # Atmosphere information
-        m.atmosimplemented = is_realmimpl(m, 'Atmosphere')
+        m.atmosimplemented = is_compimpl(m, 'Atmosphere')
         if m.atmosimplemented:
             # Get the abbrev
-            m.atmosabbrev = get_realmabbrev(m, 'Atmosphere')
+            m.atmosabbrev = get_compabbrev(m, 'Atmosphere')
             # Get the component references
             m.atmosrefs, m.atmoscits = get_Refs(m, 'Atmosphere')
             # Get vert grid info
@@ -324,10 +369,10 @@ def strattable(models):
                                         bpname='DissipationScheme')
 
         # Atmospheric chemistry column information
-        m.atmchemimplemented = is_realmimpl(m, 'AtmosphericChemistry')
+        m.atmchemimplemented = is_compimpl(m, 'AtmosphericChemistry')
         if m.atmchemimplemented:
             # Get the abbrev
-            m.atmchemabbrev = get_realmabbrev(m, 'AtmosphericChemistry')
+            m.atmchemabbrev = get_compabbrev(m, 'AtmosphericChemistry')
             # Get the component references
             m.atmchemrefs, m.atmchemcits = get_Refs(m, 'AtmosphericChemistry')
             # Get OR values
@@ -343,6 +388,9 @@ def strattable(models):
         # Grid info
         if m.atmosimplemented:
             # Get vertical atmosphere grid info
-            m.numlevels, m.topmodellevel, m.levsbelow850, m.levsabove200 = get_atmosvertgridinfo(m)
+            m.numlevels, \
+            m.topmodellevel, \
+            m.levsbelow850, \
+            m.levsabove200 = get_atmosvertgridinfo(m)
 
     return models

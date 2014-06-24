@@ -5,8 +5,10 @@ http://esg-pcmdi.llnl.gov/internal/esg-data-node-documentation/cmip5_controlled_
    
 modelnames = [
 'ACCESS1.0',
+'ACCESS1.3',
 'BCC-CSM1.1',
 'BNU-ESM',
+'BESM-OA2.3',
 'CanESM2',
 'CanCM4',
 'CanAM4',

@@ -702,7 +702,7 @@ class ComponentInput(models.Model):
         ci.save()
     class Meta:
         ordering=['abbrev']
-
+        
 
 class Platform(Doc):
     ''' Hardware platform on which simulation was run '''
@@ -1032,6 +1032,7 @@ class SpatialResolution(models.Model):
     def __unicode__(self):
         return '%s %s' % self.value, self.units
 
+
 class TimeAverage(models.Model):
     units=models.ForeignKey('Term')
     period=models.FloatField()
@@ -1043,6 +1044,7 @@ class TimeAverage(models.Model):
         ET.SubElement(e,'period').text=self.period
         ET.SubElement(e,'units').text=self.units
         return e
+        
         
 class Simulation(Doc):
     ''' 
@@ -1336,16 +1338,23 @@ class Simulation(Doc):
         ''' 
         Collect and store the information to be put in the drs string
         '''
-        #really should only be one drs output? So deleting any current drs first....
-        mydrs = self.drsOutput.all()[0]    
-        
-        #now update all values
-        mydrs.institute = self.centre 
-        mydrs.model = self.numericalModel 
-        mydrs.member = self.drsMember
-        mydrs.experiment = self.experiment
-        mydrs.startyear = self.duration.startDate.year
-        mydrs.save()
+        if len(self.drsOutput.all()): # updating a currently existing drs
+            mydrs = self.drsOutput.all()[0]
+            mydrs.institute = self.centre 
+            mydrs.model = self.numericalModel 
+            mydrs.member = self.drsMember
+            mydrs.experiment = self.experiment
+            mydrs.startyear = self.duration.startDate.year
+            mydrs.save()
+        else: # generating a new drs  
+            mydrs = DRSOutput()        
+            mydrs.institute = self.centre 
+            mydrs.model = self.numericalModel 
+            mydrs.member = self.drsMember
+            mydrs.experiment = self.experiment
+            mydrs.startyear = self.duration.startDate.year
+            mydrs.save()
+            self.drsOutput.add(mydrs)
         
                 
 class PhysicalProperty(Term):
@@ -1365,6 +1374,7 @@ class ParamGroup(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class ConstraintGroup(models.Model):
     constraint=models.CharField(max_length=256,blank=True,null=True)
     parentGroup=models.ForeignKey(ParamGroup)
@@ -1377,10 +1387,11 @@ class ConstraintGroup(models.Model):
         new.save()
         for param in self.baseparam_set.all().order_by('id'): param.copy(new)
         
+        
 class BaseParam(ParentModel):
     ''' Base class for parameters within constraint groups '''
     # We can't the name of this is a value in vocab, because it might be user generated '''
-    name=models.CharField(max_length=64,blank=False)
+    name=models.CharField(max_length=256,blank=False)
     # lives in 
     constraint=models.ForeignKey(ConstraintGroup)
     #strictly we don't need the following attribute, but it simplifies template code
@@ -1979,7 +1990,8 @@ class DRSOutput(models.Model):
         # the date into the experiment name
         if expdrs in ["decadal", "noVolc"]:
             # need to finally check  if start date is january 1st in which case
-            # this will apply to a simulation for the year before
+            # this will apply to a simulation for the year before (see cmip5 
+            # experiment design document)
             if str(sims[0].duration.startDate.mon) == '1' and str(sims[0].duration.startDate.day) == '1':
                 expdate = str(sims[0].duration.startDate.year - 1)
 

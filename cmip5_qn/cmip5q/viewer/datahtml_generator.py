@@ -36,7 +36,10 @@ def get_data_name(cimxml):
     dataname =  cimxml.find('content/topic/name')
     datastatus = cimxml.get('dataStatus')
     
-    return dataname, datastatus
+    if dataname is not None:
+        return dataname.text, datastatus
+    else:
+        return '', datastatus
 
 
 def get_mdihtml(elemroot):
@@ -363,7 +366,7 @@ def get_datahtml(cimxml):
     datahtml.append('<ul class="accordion" id="acc1">')
     datahtml.append('<li>')
     datahtml.append('<h4 class="acc_docheader">Data: %s (Status: %s)</h4>' 
-                    %(dataname.text, datastatus))
+                    %(dataname, datastatus))
     datahtml.append('<div class="inner">')
 
     #Iterate through the data xml and harvest all required information

@@ -81,8 +81,7 @@ class componentHandler(object):
         
         if component_id is None:
             ''' This is a brand new component '''
-            #nm=NumericalModel(0,centre=Centre.objects.get(id=centre_id))
-            #nm.read()
+            
             cmip5c=Centre.objects.get(abbrev='CMIP5')
             original=Component.objects.filter(abbrev='Model Template').get(centre=cmip5c)
             self.component=original.copy(Centre.objects.get(id=centre_id))
@@ -247,6 +246,29 @@ class componentHandler(object):
                 warning=False
         else:
                 warning=False
+                
+        # Text for notification panel to alert user of new questions and the 
+        # background behind this
+        if c.isModel:
+            helppaneltitle = "New Questions added"
+            helppaneltext = \
+            """         
+            
+            These additional questions have been established by the Lead Authors 
+            of IPCC AR5 Chap 9 on "Model evaluation" and in consultation with 
+            the community to inform the model development process of CMIP5. These 
+            will help document: <br/> 
+            1) the model development path, <br/> 
+            2) the tuning process, and  <br/>
+            3) the conservation of integral properties. <br/> 
+            
+            It is expected that answers provided before July 15th 2012  will be 
+            reflected in the second order draft of the AR5 report.
+            
+            """ 
+        else:
+            helppaneltitle = ''
+            helppaneltext = ''
         
         
         logging.debug('Finished handling %s to component %s'%(request.method,c.id))
@@ -260,7 +282,9 @@ class componentHandler(object):
                 'isParamGroup':c.isParamGroup,
                 'cset':cset,
                 'warning':warning,
-                'tabs':tabs(request,self.centre_id,'Model',self.component.model.id),
+                'helppaneltitle': helppaneltitle,
+                'helppaneltext': helppaneltext,
+                'tabs':tabs(request, self.centre_id, 'Model', self.component.model.id),
                 'notAjax':not request.is_ajax()})
             
             

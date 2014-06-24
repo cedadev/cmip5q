@@ -85,7 +85,10 @@ class SimDateTime(object):
     def __unicode__(self):
         return self.s
     def __str__(self):
-        return self.s
+        try:
+            return self.s
+        except:
+            return u''
     def __len__(self):
         return len(str(self))
         

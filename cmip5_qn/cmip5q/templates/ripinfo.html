@@ -139,7 +139,12 @@
                             <tbody>
                               <tr class="{%cycle 'row2' 'row1'%}">
   		                          <td> {{ mem.imod.inputTypeModified }} </td>
-                                <td> {{ mem.imod.memberStartDate }} </td>
+  		                          {% if mem.imod.memberStartDate %}
+                                      <td> {{ mem.imod.memberStartDate }} </td>
+                                  {% else %}
+                                      <td></td>
+                                  {% endif %}
+                                      
   		                          <td> {{ mem.imod.description }} </td>
                               </tr>
                             </tbody>

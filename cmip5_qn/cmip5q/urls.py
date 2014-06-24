@@ -22,6 +22,10 @@ urlpatterns = patterns('',
     (r'^cmip5/$','cmip5q.protoq.views.centres'),
     (r'^cmip5/centres/$','cmip5q.protoq.views.centres'),
     (r'^cmip5/(?P<centre_id>\d+)/$','cmip5q.protoq.views.centre'),
+    
+    # Published docs urls - table and doi landing page
+    (r'^cmip5/publisheddocs/$','cmip5q.protoq.views.published_docs'),
+    (r'^cmip5/doidocs/(?P<institute>[-\.\w]+)/(?P<modelname>[-\.\w]+)/(?P<expname>[-\.\w]+)/$', 'cmip5q.protoq.views.doi_docs'),
     # 
     url(r'^cmip5/authz/$','cmip5q.protoq.views.authorisation',name='security'),
     #        
@@ -167,7 +171,7 @@ urlpatterns = patterns('',
     (r'^cmip5/explorer/', include('cmip5q.explorer.urls')),
 
     # API included
-    (r'^cmip5/api/', include('cmip5q.api.urls')),
+    (r'^cmip5/qnstats/', include('cmip5q.qnstats.urls')),
 )
 
 

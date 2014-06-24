@@ -35,21 +35,24 @@ class MyConformanceFormSet(ConformanceFormSet):
             form.specialise(self.s)
             
 class simulationHandler(object):
-    ''' Simulation is an instance of a cim document which means there are some common methods '''
+    ''' 
+    Simulation is an instance of a cim document which means there are some 
+    common methods 
+    '''
     
-    def __init__(self,centre_id,simid=None,expid=None):
+    def __init__(self, centre_id, simid=None, expid=None):
         ''' Initialise based on what the request needs '''
-        self.centreid=centre_id
-        self.centre=Centre.objects.get(pk=centre_id)
-        self.pkid=simid
-        self.expid=expid
-        self.errors={}
+        self.centreid = centre_id
+        self.centre = Centre.objects.get(pk=centre_id)
+        self.pkid = simid
+        self.expid = expid
+        self.errors = {}
         if self.pkid:
-            self.s=Simulation.objects.get(pk=self.pkid)
-            self.Klass=self.s.__class__
+            self.s = Simulation.objects.get(pk=self.pkid)
+            self.Klass = self.s.__class__
         else:
-            self.s=None
-            self.Klass='Unknown as yet by simulation handler'
+            self.s = None
+            self.Klass = 'Unknown as yet by simulation handler'
 
     def __handle(self,request,s,e,url,label):
         '''
@@ -102,9 +105,11 @@ class simulationHandler(object):
                 if label == 'Add':
                     oldmodel = None
                     olddrs = None
+                    oldstartyear = None
                 else:
                     oldmodel = s.numericalModel
                     olddrs = s.drsMember
+                    oldstartyear = s.duration.startDate.year
 
                 news = simform.save()
                 logging.debug('model before %s, after %s' % (oldmodel,
@@ -118,8 +123,21 @@ class simulationHandler(object):
                 logging.debug('drs before %s, after %s' % (olddrs,
                                                            news.drsMember))
 
-                if news.drsMember != olddrs or s.drsOutput.all().count() == 0:
+                # making sure the original sim has a drsoutput
+                if s.drsOutput.all().count() == 0:
                     s.updateDRS()
+                    
+                #update the drsouput if drsmember changes or new sim created
+                if news.drsMember != olddrs:
+                    news.updateDRS()
+                
+                #update the start year if necessary
+                if news.duration.startDate.year != oldstartyear:
+                    news.updateDRS()
+                
+                # adding an extra check to make sure the drs and duration are synced
+                if news.drsOutput.all()[0].startyear != news.duration.startDate.year:
+                    news.updateDRS()
 
             elif not simform.is_valid():
                 simok = False

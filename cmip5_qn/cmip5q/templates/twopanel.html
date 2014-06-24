@@ -12,8 +12,14 @@
         {% endblock %}
       </td>
       <td valign="top">
-        {% block mainpanel %} {% endblock %}
+        {% block mainpanel %} 
+        {% endblock %}
       </td>
     </tr>
   </table>
+{% endblock %}
+
+{% block pagejs %} 
+  {% block childpagejs %}
+  {% endblock %}
 {% endblock %}

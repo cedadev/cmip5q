@@ -1,4 +1,5 @@
 {% extends "twopanel.html" %}
+
 {% block titlerow %}
     <table width="100%" class="{{s.qstatus}}">
     <tr>
@@ -162,15 +163,7 @@
         </form>
     </div> <!-- boxser2 -->
         
-    <script type="text/javascript">
-        var oLinkButton1 = new YAHOO.widget.Button("iclinkbut"); 
-        var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
-        var oLinkButton3 = new YAHOO.widget.Button("enslinkbut"); 
-        var oLinkButton4 = new YAHOO.widget.Button("conlinkbut"); 
-        var oLinkButton7 = new YAHOO.widget.Button("modlinkbut"); 
-        //var oLinkButton8 = new YAHOO.widget.Button("icslinkbut"); 
-        var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
-    </script>
+    
     
     {% ifequal label "Update" %}
     {% if s.modelMod.all|length %}
@@ -238,4 +231,27 @@
         {% endifnotequal %}
     </div>
         
+{% endblock %}
+
+{% block childpagejs %}
+<script type="text/javascript">
+    var oLinkButton1 = new YAHOO.widget.Button("iclinkbut"); 
+    var oLinkButton2 = new YAHOO.widget.Button("bclinkbut"); 
+    var oLinkButton3 = new YAHOO.widget.Button("enslinkbut"); 
+    var oLinkButton4 = new YAHOO.widget.Button("conlinkbut"); 
+    var oLinkButton7 = new YAHOO.widget.Button("modlinkbut"); 
+    //var oLinkButton8 = new YAHOO.widget.Button("icslinkbut"); 
+    var oSimFormButton = new YAHOO.widget.Button("simFormButton",{value:"simFormButtonvalue"}); 
+</script>
+
+<!-- Doc buttons -->
+<script type="text/javascript">  
+    var cimLinkButton2 = new YAHOO.widget.Button("cimValBut"); 
+    var cimLinkbutton3 = new YAHOO.widget.Button("cimXMLBut");
+    var cimLinkbutton4 = new YAHOO.widget.Button("cimHTMLBut");
+    var cimLinkbutton5 = new YAHOO.widget.Button("cimViewBut");
+    var cimLinkbutton6 = new YAHOO.widget.Button("cimESGBut");
+    var olinkButton7 = new YAHOO.widget.Button("txtlinkbut");
+</script>
+<!-- end of Doc buttons -->
 {% endblock %}
