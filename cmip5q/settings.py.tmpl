@@ -86,7 +86,9 @@ TEMPLATE_DIRS = (
     #"/home/rupert/proj/metafor/venv/cmip5q/templates"
     os.path.join(thisDir, "templates") 
             )
-TEMPLATE_STRING_IF_INVALID = 'what happened here?'
+
+# If this isn't '' the Admin site won't work properly.  Adding a user fails.
+TEMPLATE_STRING_IF_INVALID = ''
 
 #STATIC_DOC_ROOT = "/home/bnl/meta4q/cmip5q/templates/css"
 #STATIC_DOC_ROOT = "/home/rupert/proj/metafor/venv/cmip5q/templates/css"
