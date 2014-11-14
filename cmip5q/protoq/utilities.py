@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.cache import add_never_cache_headers
 from django.utils import simplejson
+from django.contrib.auth.model import User
 
 import uuid
 
@@ -192,3 +193,66 @@ def sublist(alist,n):
     return blist
 
 
+def get_user(request):
+    """
+    Get and return the user from username, userid or authenticated_user
+    object in request.authenticated_user.
+
+    @param request: django request object
+    @return: If the user is authenticated return an instance of User
+    @type return: django Model object or None
+    """
+    import json
+    try:
+        user_data = json.loads(request.authenticated_user['user_data'])
+        return User.objects.get(userkey=user_data['userkey'])
+    except Exception:
+        return None
+
+def check_user_authorised(request, centre_id):
+
+    # Exported from NDG-security policy file
+    centre_to_group = {
+        1: 'cmip5q_ncas',
+        3: 'cmip5q_ncar',
+        5: 'cmip5q_mohc',
+        7: 'cmip5q_gfdl',
+        9: 'cmip5q_ipsl',
+        11: 'cmip5q_mpim',
+        13: 'cmip5q_admin',
+        17: 'cmip5q_norclim',
+        19: 'cmip5q_mri',
+        21: 'cmip5q_utnies',
+        23: 'cmip5q_inm',
+        25: 'cmip5q_nimr',
+        27: 'cmip5q_lasg',
+        29: 'cmip5q_csiro',
+        31: 'cmip5q_cnrm_cerfacs',
+        33: 'cmip5q_cccma',
+        35: 'cmip5q_cawcr',
+        37: 'cmip5q_cmabcc',
+        41: 'cmip5q_ecearth',
+        113: 'cmip5q_nasagiss',
+        121: 'cmip5q_ccsm',
+        123: 'cmip5q_cmcc',
+        125: 'cmip5q_gcess',
+        127: 'cmip5q_fio',
+        129: 'cmip5q_rsmas',
+        202: 'cmip5q_ncep',
+        209: 'cmip5q_nasagmao',
+        211: 'cmip5q_lasg',
+        217: 'cmip51_inpe',
+        }
+
+    user = request.get_user(request)
+    if user is None:
+        return False
+
+    user_groups = [g.name for g in user.groups.iterator()]
+    if 'cmip5q_all' in user_groups:
+        return True
+    
+    if centre_to_group[centre_id] in user_groups:
+        return True
+    else:
+        return False

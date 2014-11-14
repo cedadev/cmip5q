@@ -84,6 +84,10 @@ def autocomplete_model(request):
 def genericDoc(request,cid,docType,pkid,method):
     ''' Handle the generic documents '''
     logging.debug('entering generic document handler')
+
+    if not check_user_authorised(request, cid):
+        return authorisation(request)
+
     try:
         klass={'simulation':Simulation,'experiment':Experiment,'component':Component,
            'platform':Platform}[docType]
@@ -145,6 +149,10 @@ def persistedDoc(request, docType, uri, version=0):
     
 def exportFiles(request,cen_id):
     ''' Used to export all files to CMIP5 in one go '''
+
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     objects=DataContainer.objects.filter(centre__id=cen_id)
     return render_badrequest('error.html',{'message':'Sorry not completely implemented'})
 
@@ -257,6 +265,9 @@ def centre(request,centre_id):
     Handle the top page on a centre by centre basis 
     '''
     
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=Centre.objects.get(id=centre_id)
     
     #models=[]
@@ -318,47 +329,83 @@ def centre(request,centre_id):
 # Provide a view interface to the component object 
 def componentAdd(request,centre_id):
     ''' Add a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=componentHandler(centre_id)
     return c.edit(request)
 
 @gracefulNotFound
 def componentEdit(request,centre_id,component_id):
     ''' Edit a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=componentHandler(centre_id,component_id)
     return c.edit(request)
     
 @gracefulNotFound   
 def componentSub(request,centre_id,component_id):
     ''' Add a subcomponent onto a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
+
     c=componentHandler(centre_id,component_id)
     return c.addsub(request)
     
 @gracefulNotFound
 def componentRefs(request,centre_id,component_id):
     ''' Manage the references associated with a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
+
     c=componentHandler(centre_id,component_id)
     return c.manageRefs(request)
     
 @gracefulNotFound
 def componentTxt(request,centre_id,component_id):
     ''' Return a textual view of the component with possible values '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
+
     c=componentHandler(centre_id,component_id)
     return c.XMLasText()
   
 @gracefulNotFound
 def componentCup(request,centre_id,component_id):
     ''' Return couplings for a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=couplingHandler(centre_id,request)
     return c.component(component_id)
 
 @gracefulNotFound
 def componentInp(request,centre_id,component_id):
     ''' Return inputs for a component '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
+
     c=componentHandler(centre_id,component_id)
     return c.inputs(request)
 
 @gracefulNotFound
 def componentCopy(request,centre_id,component_id):
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=componentHandler(centre_id,component_id)
     return c.copy()
     
@@ -367,23 +414,38 @@ def componentCopy(request,centre_id,component_id):
 # Provide a vew interface to the grid object 
 def gridAdd(request,centre_id):
     ''' Add a grid '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     g=gridHandler(centre_id)
     return g.edit(request)
 
 @gracefulNotFound
 def gridEdit(request,centre_id,grid_id):
     ''' Edit a grid '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     g=gridHandler(centre_id,grid_id)
     return g.edit(request)
 
 @gracefulNotFound
 def gridRefs(request,centre_id,grid_id):
     ''' Manage the references associated with a grid '''
+
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=gridHandler(centre_id,grid_id)
     return c.manageRefs(request)
 
 @gracefulNotFound
 def gridCopy(request,centre_id,grid_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=gridHandler(centre_id,grid_id)
     return c.copy()
    
@@ -409,39 +471,63 @@ def gridCopy(request,centre_id,grid_id):
 
 @gracefulNotFound
 def simulationEdit(request,centre_id,simulation_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id,simid=simulation_id)
     return s.edit(request)
 
 def simulationAdd(request,centre_id,experiment_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id,expid=experiment_id)
     return s.add(request)
 
 def simulationDel(request, centre_id, simulation_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id, simid=simulation_id)
     return s.markdeleted(request)
 
 def simulationList(request,centre_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id)
     return s.list(request)
 
 @gracefulNotFound
 def simulationCopy(request,centre_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id)
     return s.copy(request)
 
 @gracefulNotFound
 def simulationCopyInd(request, centre_id, simulation_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id, simid=simulation_id)
     return s.copyind(request)
 
 @gracefulNotFound
 def conformanceMain(request,centre_id,simulation_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id,simulation_id)
     return s.conformanceMain(request)
 
 @gracefulNotFound
 def simulationCup(request,centre_id,simulation_id,coupling_id=None,ctype=None):
     ''' Return couplings for a component '''
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=couplingHandler(centre_id,request)
     if ctype: # this method deprecated.
         return c.resetClosures(simulation_id,coupling_id,ctype)
@@ -449,6 +535,9 @@ def simulationCup(request,centre_id,simulation_id,coupling_id=None,ctype=None):
         return c.simulation(simulation_id)
     
 def simulationCupReset(request,centre_id,simulation_id):
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     s=simulationHandler(centre_id,simulation_id)
     return s.resetCouplings()
    
@@ -456,6 +545,9 @@ def simulationCupReset(request,centre_id,simulation_id):
  
 @gracefulNotFound
 def conformanceEdit(request,cen_id,sim_id,req_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     s=simulationHandler(cen_id,simid=sim_id)
     return s.conformanceEdit(request,req_id)
             
@@ -463,6 +555,9 @@ def conformanceEdit(request,cen_id,sim_id,req_id):
 
 class MyPlatformForm(PlatformForm):
     def __init__(self,centre,*args,**kwargs):
+        if not check_user_authorised(request, centre):
+            return authorisation(request)
+
         PlatformForm.__init__(self,*args,**kwargs)
         self.vocabs={'hardware':Vocab.objects.get(name='hardwareType'),
                      'vendor':Vocab.objects.get(name='vendorType'),
@@ -478,6 +573,9 @@ class MyPlatformForm(PlatformForm):
 @gracefulNotFound
 def platformEdit(request,centre_id,platform_id=None):
     ''' Handle platform editing '''
+    if not check_user_authorised(request, centre_id):
+        return authorisation(request)
+
     c=Centre.objects.get(id=centre_id)
     urls={}
     # start by getting a form ...
@@ -517,6 +615,9 @@ def platformEdit(request,centre_id,platform_id=None):
 ########## EXPERIMENT VIEWS ##################
     
 def viewExperiment(request,cen_id,experiment_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     e=Experiment.objects.get(id=experiment_id)
     r=e.requirements.all()
     return render_to_response('experiment.html',{'e':e,'reqs':r,'tabs':tabs(request,cen_id,'Experiment')})
@@ -524,27 +625,45 @@ def viewExperiment(request,cen_id,experiment_id):
 ######## HELP, ABOUT and Vn History ###############
 
 def vnhist(request,cen_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     return render_to_response('vnhist.html')
 
 def trans(request,cen_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     return render_to_response('trans.html')
 
 def help(request,cen_id):    
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     urls={'vnhist':reverse('cmip5q.protoq.views.vnhist',args=(cen_id,)),
           'trans':reverse('cmip5q.protoq.views.trans',args=(cen_id,)),}
     
     return render_to_response('help.html',{'urls':urls,'tabs':tabs(request,cen_id,'Help')})
  
 def about(request,cen_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     return render_to_response('about.html',{'tabs':tabs(request,cen_id,'About')})
 
 def intro(request,cen_id):
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     return render_to_response('intro.html',{'tabs':tabs(request,cen_id,'Intro')})
             
 ############# Ensemble View ###############################            
             
 def ensemble(request,cen_id,sim_id):
     ''' Manage ensembles for a given simulation '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     s=Simulation.objects.get(id=sim_id)
     e=Ensemble.objects.get(simulation=s)
     e.updateMembers()  # in case members were deleted via their code mods or ics.
@@ -665,7 +784,9 @@ class ViewHandler(BaseViewHandler):
                         
     def __init__(self,cen_id,resourceType,resource_id,target_id,targetType):
         ''' We can have some combination of the above at initialiation time '''
-        
+        if not check_user_authorised(request, cen_id):
+            return authorisation(request)
+
         if resourceType not in self.SupportedResources:
             raise ValueError('Unknown resource type %s '%resourceType)
      
@@ -740,27 +861,42 @@ class ViewHandler(BaseViewHandler):
 
 def edit(request,cen_id,resourceType,resource_id,targetType=None,target_id=None,returnType=None):
     ''' This is the generic simple view editor '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     h=ViewHandler(cen_id,resourceType,resource_id,target_id,targetType)
     return h.edit(request,returnType)
 
 def delete(request,cen_id,resourceType,resource_id,targetType=None,target_id=None,returnType=None):
     ''' This is the generic simple item deleter '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     h=ViewHandler(cen_id,resourceType,resource_id,target_id,targetType)
     return h.delete(request,returnType)
 
 def list(request,cen_id,resourceType,targetType=None,target_id=None):
     ''' This is the generic simple view lister '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     h=ViewHandler(cen_id,resourceType,None,target_id,targetType)
     return h.list(request)
 
 def filterlist(request,cen_id,resourceType):
     ''' Receives a list filter post and redirects to list '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     h=ViewHandler(cen_id,resourceType,None,None,None)
     return h.filterlist(request)
 
 def assign(request,cen_id,resourceType,targetType,target_id):
     ''' Provide a page to allow the assignation of resources of type resourceType
     to resource target_id of type targetType '''
+    if not check_user_authorised(request, cen_id):
+        return authorisation(request)
+
     if resourceType=='file':
         return render_badrequest('error.html',{'message':'Cannot assign files to targets, assign objects from within them!'})
    
