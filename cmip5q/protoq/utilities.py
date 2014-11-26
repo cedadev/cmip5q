@@ -203,9 +203,23 @@ def get_user(request):
     @type return: django Model object or None
     """
     import json
+
+    try:
+        override_user = settings.SECURITY_OVERRIDE_USER
+        if override_user:
+            logging.debug('User override enabled, user set to %s' % override_user)
+            return User.objects.get(username=override_user)
+        else:
+            raise Exception
+    except:
+        pass
+
     try:
         user_data = json.loads(request.authenticated_user['user_data'])
-        return User.objects.get(userkey=user_data['userkey'])
+        username = user_data['userkey']
+        logging.debug('Getting user from dj_security_middleware.  username=%s' % username)
+
+        return User.objects.get(username=username)
     except Exception:
         return None
 
@@ -231,8 +245,8 @@ def check_user_authorised(request, centre_id):
         31: 'cmip5q_cnrm_cerfacs',
         33: 'cmip5q_cccma',
         35: 'cmip5q_cawcr',
+        39: 'cmip5q_any',
         37: 'cmip5q_cmabcc',
-        39: 'cmip5_any',
         41: 'cmip5q_ecearth',
         113: 'cmip5q_nasagiss',
         121: 'cmip5q_ccsm',
@@ -247,18 +261,30 @@ def check_user_authorised(request, centre_id):
         }
 
     centre_id = int(centre_id)
-    if centre_to_group[centre_id] == 'cmip5q_any':
+    centre_group = centre_to_group[centre_id]
+    logging.debug('check_user_authorised: centre_id = %d, centre_group = %s' % 
+                  (centre_id, centre_group))
+    if centre_group == 'cmip5q_any':
+        logging.debug('check_user_authorised: centre_id policy is ANY => ALLOW')
         return True
 
     user = get_user(request)
     if user is None:
+        logging.debug('check_user_authorised: no valid user => DENY')
         return False
 
     user_groups = [g.name for g in user.groups.iterator()]
+    logging.debug('check_user_authorised: User %s has groups %s' % 
+                  (user.username, user_groups))
     if 'cmip5q_all' in user_groups:
+        logging.debug('check_user_authorised: in group cmip5q_all => ALLOW')
         return True
     
-    if centre_to_group[centre_id] in user_groups:
+    if centre_group in user_groups:
+        logging.debug('check_user_authorised: in group %s => ALLOW' % 
+                      centre_group)
         return True
     else:
+        logging.debug('check_user_authorised: not in group %s => DENY' %
+                      centre_group)
         return False
