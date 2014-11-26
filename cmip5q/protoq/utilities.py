@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.cache import add_never_cache_headers
 from django.utils import simplejson
-from django.contrib.auth.model import User
+from django.contrib.auth.models import User
 
 import uuid
 
@@ -220,6 +220,7 @@ def check_user_authorised(request, centre_id):
         9: 'cmip5q_ipsl',
         11: 'cmip5q_mpim',
         13: 'cmip5q_admin',
+        15: 'cmip5q_any',
         17: 'cmip5q_norclim',
         19: 'cmip5q_mri',
         21: 'cmip5q_utnies',
@@ -231,6 +232,7 @@ def check_user_authorised(request, centre_id):
         33: 'cmip5q_cccma',
         35: 'cmip5q_cawcr',
         37: 'cmip5q_cmabcc',
+        39: 'cmip5_any',
         41: 'cmip5q_ecearth',
         113: 'cmip5q_nasagiss',
         121: 'cmip5q_ccsm',
@@ -244,7 +246,11 @@ def check_user_authorised(request, centre_id):
         217: 'cmip51_inpe',
         }
 
-    user = request.get_user(request)
+    centre_id = int(centre_id)
+    if centre_to_group[centre_id] == 'cmip5q_any':
+        return True
+
+    user = get_user(request)
     if user is None:
         return False
 

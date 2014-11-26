@@ -20,7 +20,7 @@ from cmip5q.protoq.grids import gridHandler
 from cmip5q.protoq.simulations import simulationHandler
 from cmip5q.protoq.cimHandler import cimHandler, commonURLs
 from cmip5q.protoq.XML import *
-from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist, get_datatables_records
+from cmip5q.protoq.utilities import render_badrequest, gracefulNotFound, atomuri, sublist, get_datatables_records, check_user_authorised
 #from cmip5q.protoq.references import referenceHandler
 from cmip5q.protoq.coupling import couplingHandler
 from cmip5q.vocabs import model_list
