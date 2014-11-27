@@ -202,7 +202,6 @@ def get_user(request):
     @return: If the user is authenticated return an instance of User
     @type return: django Model object or None
     """
-    import json
 
     try:
         override_user = settings.SECURITY_OVERRIDE_USER
@@ -215,8 +214,7 @@ def get_user(request):
         pass
 
     try:
-        user_data = json.loads(request.authenticated_user['user_data'])
-        username = user_data['userkey']
+        username = request.authenticated_user['userid']
         logging.debug('Getting user from dj_security_middleware.  username=%s' % username)
 
         return User.objects.get(username=username)
