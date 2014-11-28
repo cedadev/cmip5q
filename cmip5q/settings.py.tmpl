@@ -14,7 +14,7 @@ ADMINS = (
     ('Andrew Harwood', 'andrew.harwood@stfc.ac.uk'),
     # ('Your Name', 'your_email@domain.com'),
 )
-SERVER_EMAIL = 'meta4q@neptune.badc.rl.ac.uk'
+SERVER_EMAIL = 'meta4q@web1.ceda.ac.uk'
 
 MANAGERS = ADMINS
 
@@ -72,7 +72,37 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'dj_security_middleware.middleware.DJ_Security_Middleware',
 )
+
+SECURITY_LOGIN_SERVICE = 'https://services.ceda.ac.uk/dj_security/account/signin'
+COOKIE_DOMAIN = '.ceda.ac.uk'
+# Patterns NOT to protect
+DJ_SECURITY_FILTER = [r'ceda.ac.uk/\?$',                      # Front page
+                      r'ceda.ac.uk/feeds/',                   # All atom feeds
+                      r'ceda.ac.uk/cmip5/experiment/',        # Experiment feed items
+                      r'ceda.ac.uk/cmip5/simulation/',        # Simulation feed items
+                      r'ceda.ac.uk/cmip5/platform/',          # Platform feed items
+                      r'ceda.ac.uk/cmip5/component/',         # Component feed items
+                      r'ceda.ac.uk/cmip5/file/',              # File feed items
+                      r'ceda.ac.uk/cmip5/testFile/',          # Test feed items
+                      r'ceda.ac.uk/cmip5/centres/\?$',        # Tables of Centre information
+                      r'ceda.ac.uk/cmip5/explorer/',          # Tables of general information
+                      r'ceda.ac.uk/cmip5/admin/',             # Admin site secured separately
+		      r'ceda.ac.uk/cmip5/publisheddocs/'      # Published docs
+                      ]
+
+#
+# In order to test the webapp whilst we can't talk to dj_security this will
+# override authentication
+#
+#def disable_auth(request):
+#    return True
+#DJ_SECURITY_AUTH_CHECK = disable_auth
+#SECURITY_OVERRIDE_USER = 'spascoe'
+
+# Insert Shared secret for DJ_SECURITY here.
+#SECURITY_SHAREDSECRET = "{{ shared_secret }}"
 
 ROOT_URLCONF = 'cmip5q.urls'
 
