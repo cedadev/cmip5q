@@ -784,9 +784,6 @@ class ViewHandler(BaseViewHandler):
                         
     def __init__(self,cen_id,resourceType,resource_id,target_id,targetType):
         ''' We can have some combination of the above at initialiation time '''
-        if not check_user_authorised(request, cen_id):
-            return authorisation(request)
-
         if resourceType not in self.SupportedResources:
             raise ValueError('Unknown resource type %s '%resourceType)
      
