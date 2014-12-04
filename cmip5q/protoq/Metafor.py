@@ -421,7 +421,7 @@ class XMLreport(object):
 
     def __markup_line_attr(self, stTree):
 
-        for elem in stTree.iter():
+        for elem in stTree.iter(tag=et.Element):
             if type(elem) == et._Comment:
                 continue
             if elem.tag.endswith("report") or elem.tag.endswith("assert"):

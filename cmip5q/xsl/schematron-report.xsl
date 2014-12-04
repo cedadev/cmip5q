@@ -40,9 +40,8 @@
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
    xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias">
 
-
-<xsl:import href="file:///usr/local/cmip5q/eggs/cmip5q-1.7.0-py2.6.egg/cmip5q/xsl/skeleton1-5.xsl" />
-<!-- <xsl:import href="file:///home/gerarddevine/dev/projs/cmip5q/cmip5q/xsl/skeleton1-5.xsl" /> -->
+<!-- FIXME: This reference is hard-coded.  Should be somehow relocatable -->
+<xsl:import href="file:///usr/local/cmip5q/cmip5q/cmip5q/xsl/skeleton1-5.xsl" />
 <xsl:param name="diagnose">yes</xsl:param>     
 
 <xsl:template name="process-prolog">

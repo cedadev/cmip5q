@@ -57,6 +57,8 @@ class cimHandler(object):
             mymodelname = str(self.obj.numericalModel)
         elif isinstance(self.obj, Component):
             mymodelname = str(self.obj)
+        else:
+            mymodelname = None
 
         if mymodelname not in model_list.modelnames:
             html = ''' The model name used is not valid for CMIP5. Return to

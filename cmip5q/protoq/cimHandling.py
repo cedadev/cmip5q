@@ -217,7 +217,7 @@ class Validator:
 
     def __markup_line_attr(self, stTree):
 
-        for elem in stTree.iter():
+        for elem in stTree.iter(tag=ET.Element):
             if type(elem) == ET._Comment:
                 continue
             if elem.tag.endswith("report") or elem.tag.endswith("assert"):
@@ -241,7 +241,7 @@ class Validator:
             sys.exit(1)
 
         i=1
-        for elem in CIMdoc.iter():
+        for elem in CIMdoc.iter(tag=ET.Element):
             #elem.attrib["__src_line_number_"] = str(elem.sourceline)
             elem.attrib["__src_line_number_"] = str(i)
             i += 1

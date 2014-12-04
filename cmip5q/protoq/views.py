@@ -555,8 +555,6 @@ def conformanceEdit(request,cen_id,sim_id,req_id):
 
 class MyPlatformForm(PlatformForm):
     def __init__(self,centre,*args,**kwargs):
-        if not check_user_authorised(request, centre):
-            return authorisation(request)
 
         PlatformForm.__init__(self,*args,**kwargs)
         self.vocabs={'hardware':Vocab.objects.get(name='hardwareType'),
