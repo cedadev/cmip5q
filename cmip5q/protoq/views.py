@@ -41,6 +41,26 @@ def authorisation(request):
     return render_to_response('error.html',{'message':m})
 
 
+def logout(request):
+    """
+    logout of dj_security.
+
+    """
+    response = HttpResponseRedirect(reverse('cmip5q.protoq.views.centres'))
+
+    # Get details of dj_security cookie from settings
+    try:
+        key = settings.AUTH_TKT
+    except AttributeError:
+        key = 'auth_tkt'
+    domain = settings.COOKIE_DOMAIN
+
+    # Expire dj_security cookie
+    response.set_cookie(key, domain=domain, path='/', max_age=0)
+
+    return response
+
+
 def completionHelper(request, vocabName):
     ''' 
     This method provides support for ajax autocompletion within a specific 

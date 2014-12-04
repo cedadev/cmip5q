@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     (r'^cmip5/doidocs/(?P<institute>[-\.\w]+)/(?P<modelname>[-\.\w]+)/(?P<expname>[-\.\w]+)/$', 'cmip5q.protoq.views.doi_docs'),
     # 
     url(r'^cmip5/authz/$','cmip5q.protoq.views.authorisation',name='security'),
+    (r'^logout$', 'cmip5q.protoq.views.logout'),
     #        
     # ajax vocabulary handler
     url(r'^ajax/vocabs/(?P<vocabName>\D+)/$','cmip5q.protoq.views.completionHelper', 
